@@ -1,0 +1,16 @@
+title = "BlueEye Tracker gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Repository-local non-secret paths"
+paths = [
+  '''(^|/)\.gradle/''',
+  '''(^|/)\.idea/''',
+  '''(^|/)build/''',
+  '''(^|/)app/build/''',
+  '''(^|/)core/[^/]+/build/''',
+  '''(^|/)feature/[^/]+/build/''',
+  '''(?i)\.(png|jpe?g|webp|gif|svg)$''',
+]

@@ -1,0 +1,2063 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ComplexCondition:LaicaPS7200LDecoder.kt$LaicaPS7200LDecoder$data[2] != 0x86.toByte() || data[3] != 0xFF.toByte() || data[4] != 0xFF.toByte() || data[5] != 0x21.toByte()</ID>
+    <ID>CyclomaticComplexMethod:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:AppleContinuityParser.kt$AppleContinuityParser$fun parse(manufacturerData: ByteArray?): AppleDeviceData?</ID>
+    <ID>CyclomaticComplexMethod:AppleDeviceData.kt$AppleDeviceData$override fun equals(other: Any?): Boolean</ID>
+    <ID>CyclomaticComplexMethod:AppleDeviceData.kt$AppleDeviceData$override fun hashCode(): Int</ID>
+    <ID>CyclomaticComplexMethod:AppleGenericDecoder.kt$AppleGenericDecoder$private fun mapToSensorData( data: AppleDeviceData, hexData: String, mac: String ): SensorData</ID>
+    <ID>CyclomaticComplexMethod:BParasiteV2Decoder.kt$BParasiteV2Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:BoschEbDecoder.kt$BoschEbDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:BtHomeParser.kt$BtHomeParser$fun decode(data: ByteArray): SensorData</ID>
+    <ID>CyclomaticComplexMethod:EddystoneDecoder.kt$EddystoneDecoder$private fun decodeUrl(bytes: ByteArray): String</ID>
+    <ID>CyclomaticComplexMethod:FeasycomDecoder.kt$FeasycomDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:GoveeH5055Decoder.kt$GoveeH5055Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:NearbyInfoParser.kt$NearbyInfoParser$private fun getDeviceType(id: Int): String</ID>
+    <ID>CyclomaticComplexMethod:NodonDecoder.kt$NodonDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:OralBDecoder.kt$OralBDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:SamsungFindDecoder.kt$SamsungFindDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:SensorEasyDecoder.kt$SensorEasyDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:ShellyButtonDecoder.kt$ShellyButtonDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:ShellyDoorDecoder.kt$ShellyDoorDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:ShellyHTDecoder.kt$ShellyHTDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:ShellyMotionDecoder.kt$ShellyMotionDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:SwiftPairParser.kt$SwiftPairParser$fun parse(data: ByteArray): MicrosoftDeviceData?</ID>
+    <ID>CyclomaticComplexMethod:SwiftPairParser.kt$SwiftPairParser$private fun mapClassOfDeviceToModel(cod: Int): String</ID>
+    <ID>CyclomaticComplexMethod:SwiftPairParser.kt$SwiftPairParser$private fun mapClassOfDeviceToType(cod: Int): DeviceType</ID>
+    <ID>CyclomaticComplexMethod:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$private fun decodeXiaomi(payload: ByteArray): SensorData</ID>
+    <ID>CyclomaticComplexMethod:ThermoProDecoder.kt$ThermoProDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>CyclomaticComplexMethod:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>InvalidPackageDeclaration:AppleContinuityParserTest.kt$package io.blueeye.core.scanner.parser.apple</ID>
+    <ID>LongParameterList:AppleContinuityParser.kt$AppleContinuityParser$( private val nearbyInfoParser: NearbyInfoParser, private val nearbyActionParser: NearbyActionParser, private val handoffParser: HandoffParser, private val proximityPairingParser: ProximityPairingParser, private val tetheringTargetParser: TetheringTargetParser, private val tetheringSourceParser: TetheringSourceParser, private val findMyParser: FindMyParser, private val airDropParser: AirDropParser, private val airPrintParser: AirPrintParser, private val homeKitParser: HomeKitParser, private val heySiriParser: HeySiriParser, private val airPlayParser: AirPlayParser, private val magicSwitchParser: MagicSwitchParser, )</ID>
+    <ID>LoopWithTooManyJumpStatements:ABN03Decoder.kt$ABN03Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:ABN07Decoder.kt$ABN07Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:AdRecordParser.kt$AdRecordParser$while</ID>
+    <ID>LoopWithTooManyJumpStatements:BParasiteDecoder.kt$BParasiteDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:BParasiteV2Decoder.kt$BParasiteV2Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:BikeSharingDecoder.kt$BikeSharingDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:BlueCharmDecoder.kt$BlueCharmDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:BoschEbDecoder.kt$BoschEbDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:ChipoloDecoder.kt$ChipoloDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:EddystoneDecoder.kt$EddystoneDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:FeasycomDecoder.kt$FeasycomDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:GAENDecoder.kt$GAENDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:GenericTrackerDecoder.kt$GenericTrackerDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:GoveeH5072Decoder.kt$GoveeH5072Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:GoveeH5074Decoder.kt$GoveeH5074Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:HolyIotDecoder.kt$HolyIotDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:INodeDecoder.kt$INodeDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:InkbirdTHDecoder.kt$InkbirdTHDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:KKMDecoder.kt$KKMDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:MiFloraDecoder.kt$MiFloraDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:MokobeaconDecoder.kt$MokobeaconDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:MokosmartDecoder.kt$MokosmartDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:NodonDecoder.kt$NodonDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:RadiolandDecoder.kt$RadiolandDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:SamsungFindDecoder.kt$SamsungFindDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:ScanRecordParser.kt$ScanRecordParser$while</ID>
+    <ID>LoopWithTooManyJumpStatements:SensorEasyDecoder.kt$SensorEasyDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:ServiceDataDecoder.kt$ServiceDataDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:ServiceDataExtractor.kt$ServiceDataExtractor$while</ID>
+    <ID>LoopWithTooManyJumpStatements:ShellyButtonDecoder.kt$ShellyButtonDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:ShellyDoorDecoder.kt$ShellyDoorDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:ShellyHTDecoder.kt$ShellyHTDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:ShellyMotionDecoder.kt$ShellyMotionDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:TPMSBRDecoder.kt$TPMSBRDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:TPMSDecoder.kt$TPMSDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:ThermoProDecoder.kt$ThermoProDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:TuyaTHBDecoder.kt$TuyaTHBDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$while</ID>
+    <ID>LoopWithTooManyJumpStatements:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$while</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$0x03</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$0x16</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$0xAB</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$0xFF</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$10</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$11</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$12</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$13</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$3</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$4</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$6</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$7</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$8</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$8.0</ID>
+    <ID>MagicNumber:ABN03Decoder.kt$ABN03Decoder$9</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$0x08</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$0x09</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$0x16</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$0x40</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$0xD2</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$0xFC</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$0xFF</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$10</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$100.0</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$11</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$3</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$4</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$6</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$7</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$8</ID>
+    <ID>MagicNumber:ABN07Decoder.kt$ABN07Decoder$9</ID>
+    <ID>MagicNumber:ABTempDecoder.kt$ABTempDecoder$0x004C</ID>
+    <ID>MagicNumber:ABTempDecoder.kt$ABTempDecoder$0xFF</ID>
+    <ID>MagicNumber:ABTempDecoder.kt$ABTempDecoder$20</ID>
+    <ID>MagicNumber:ABTempDecoder.kt$ABTempDecoder$21</ID>
+    <ID>MagicNumber:ABTempDecoder.kt$ABTempDecoder$23</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x03</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x04</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x05</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x06</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x07</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x08</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x09</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x0A</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x16</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x19</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x20</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0x21</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$0xFF</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$16</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$4</ID>
+    <ID>MagicNumber:AdRecordParser.kt$AdRecordParser$8</ID>
+    <ID>MagicNumber:AirDropParser.kt$AirDropParser$8</ID>
+    <ID>MagicNumber:AirPlayParser.kt$AirPlayParser$0xFF</ID>
+    <ID>MagicNumber:AirTagBroadcastDecoder.kt$AirTagBroadcastDecoder$0x03</ID>
+    <ID>MagicNumber:AirTagBroadcastDecoder.kt$AirTagBroadcastDecoder$0xFF</ID>
+    <ID>MagicNumber:AirTagBroadcastDecoder.kt$AirTagBroadcastDecoder$25</ID>
+    <ID>MagicNumber:AirTagBroadcastDecoder.kt$AirTagBroadcastDecoder$3</ID>
+    <ID>MagicNumber:AirTagBroadcastDecoder.kt$AirTagBroadcastDecoder$6</ID>
+    <ID>MagicNumber:AirTagBroadcastDecoder.kt$AirTagBroadcastDecoder$76</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$0xAC</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$0xBE</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$0xFF</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$16</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$18</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$19</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$20</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$21</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$22</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$23</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$24</ID>
+    <ID>MagicNumber:AltBeaconDecoder.kt$AltBeaconDecoder$8</ID>
+    <ID>MagicNumber:AmazonAmaDecoder.kt$AmazonAmaDecoder$0xFF</ID>
+    <ID>MagicNumber:AmazonAmaDecoder.kt$AmazonAmaDecoder$16</ID>
+    <ID>MagicNumber:AmazonAmaDecoder.kt$AmazonAmaDecoder$3</ID>
+    <ID>MagicNumber:AmazonAmaDecoder.kt$AmazonAmaDecoder$4</ID>
+    <ID>MagicNumber:AmazonAmaDecoder.kt$AmazonAmaDecoder$8</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$0xFAEE</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$0xFF</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$10</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$100.0</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$11</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$12</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$13</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$16</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$19</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$2560.0</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$3</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$4</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$8</ID>
+    <ID>MagicNumber:AmphiroDecoder.kt$AmphiroDecoder$9</ID>
+    <ID>MagicNumber:AnemometerDecoder.kt$AnemometerDecoder$0x4D</ID>
+    <ID>MagicNumber:AnemometerDecoder.kt$AnemometerDecoder$0x53</ID>
+    <ID>MagicNumber:AnemometerDecoder.kt$AnemometerDecoder$0xAA</ID>
+    <ID>MagicNumber:AnemometerDecoder.kt$AnemometerDecoder$0xBB</ID>
+    <ID>MagicNumber:AnemometerDecoder.kt$AnemometerDecoder$0xFF</ID>
+    <ID>MagicNumber:AnemometerDecoder.kt$AnemometerDecoder$10</ID>
+    <ID>MagicNumber:AnemometerDecoder.kt$AnemometerDecoder$11</ID>
+    <ID>MagicNumber:AnemometerDecoder.kt$AnemometerDecoder$12</ID>
+    <ID>MagicNumber:AnemometerDecoder.kt$AnemometerDecoder$26</ID>
+    <ID>MagicNumber:AnemometerDecoder.kt$AnemometerDecoder$3</ID>
+    <ID>MagicNumber:AnemometerDecoder.kt$AnemometerDecoder$9</ID>
+    <ID>MagicNumber:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$0x004C</ID>
+    <ID>MagicNumber:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$10</ID>
+    <ID>MagicNumber:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$25</ID>
+    <ID>MagicNumber:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$3</ID>
+    <ID>MagicNumber:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$4</ID>
+    <ID>MagicNumber:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$5</ID>
+    <ID>MagicNumber:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$6</ID>
+    <ID>MagicNumber:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$7</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0x03</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0x05</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0x06</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0x07</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0x08</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0x09</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0x0B</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0x0C</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0x0E</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0x10</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0x12</ID>
+    <ID>MagicNumber:AppleContinuityParser.kt$AppleContinuityParser$0xFF</ID>
+    <ID>MagicNumber:AppleGenericDecoder.kt$AppleGenericDecoder$0x004C</ID>
+    <ID>MagicNumber:AppleGenericDecoder.kt$AppleGenericDecoder$0x08</ID>
+    <ID>MagicNumber:AppleGenericDecoder.kt$AppleGenericDecoder$0x18</ID>
+    <ID>MagicNumber:AppleGenericDecoder.kt$AppleGenericDecoder$0x98</ID>
+    <ID>MagicNumber:AppleGenericDecoder.kt$AppleGenericDecoder$0xFF</ID>
+    <ID>MagicNumber:AppleGenericDecoder.kt$AppleGenericDecoder$12</ID>
+    <ID>MagicNumber:AppleGenericDecoder.kt$AppleGenericDecoder$22</ID>
+    <ID>MagicNumber:AppleGenericDecoder.kt$AppleGenericDecoder$25</ID>
+    <ID>MagicNumber:AppleGenericDecoder.kt$AppleGenericDecoder$8</ID>
+    <ID>MagicNumber:AppleGenericDecoder.kt$AppleGenericDecoder$9</ID>
+    <ID>MagicNumber:AppleWatchDecoder.kt$AppleWatchDecoder$0x004C</ID>
+    <ID>MagicNumber:AppleWatchDecoder.kt$AppleWatchDecoder$0x18</ID>
+    <ID>MagicNumber:AppleWatchDecoder.kt$AppleWatchDecoder$0x98</ID>
+    <ID>MagicNumber:AppleWatchDecoder.kt$AppleWatchDecoder$0xFF</ID>
+    <ID>MagicNumber:AppleWatchDecoder.kt$AppleWatchDecoder$8</ID>
+    <ID>MagicNumber:AppleWatchDecoder.kt$AppleWatchDecoder$9</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$0x0702</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$0x7F</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$0xFF</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$10</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$10.0</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$11</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$12</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$13</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$14</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$15</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$20.0</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$8</ID>
+    <ID>MagicNumber:Aranet4Decoder.kt$Aranet4Decoder$9</ID>
+    <ID>MagicNumber:BM2BatteryMonitorDecoder.kt$BM2BatteryMonitorDecoder$0x004C</ID>
+    <ID>MagicNumber:BM2BatteryMonitorDecoder.kt$BM2BatteryMonitorDecoder$0xFF</ID>
+    <ID>MagicNumber:BM2BatteryMonitorDecoder.kt$BM2BatteryMonitorDecoder$22</ID>
+    <ID>MagicNumber:BM2BatteryMonitorDecoder.kt$BM2BatteryMonitorDecoder$23</ID>
+    <ID>MagicNumber:BM6BatteryMonitorDecoder.kt$BM6BatteryMonitorDecoder$0x004C</ID>
+    <ID>MagicNumber:BM6BatteryMonitorDecoder.kt$BM6BatteryMonitorDecoder$0xFF</ID>
+    <ID>MagicNumber:BM6BatteryMonitorDecoder.kt$BM6BatteryMonitorDecoder$19</ID>
+    <ID>MagicNumber:BM6BatteryMonitorDecoder.kt$BM6BatteryMonitorDecoder$23</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$0.8</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$0x16</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$0x18</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$0x1A</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$0xFF</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$100</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$100.0</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$1000.0</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$16</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$17</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$18</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$2.2</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$3</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$4</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$5</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$6</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$655.35</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$7</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$8</ID>
+    <ID>MagicNumber:BParasiteDecoder.kt$BParasiteDecoder$9</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$0x05</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$0x08</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$0x09</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$0x0C</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$0x16</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$0x2E</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$0xD2</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$0xFC</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$0xFF</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$100.0</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$1000.0</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$16</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$3</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$4</ID>
+    <ID>MagicNumber:BParasiteV2Decoder.kt$BParasiteV2Decoder$8</ID>
+    <ID>MagicNumber:BeeWiDoorDecoder.kt$BeeWiDoorDecoder$0xFF</ID>
+    <ID>MagicNumber:BeeWiDoorDecoder.kt$BeeWiDoorDecoder$3</ID>
+    <ID>MagicNumber:BeeWiDoorDecoder.kt$BeeWiDoorDecoder$4</ID>
+    <ID>MagicNumber:BeeWiDoorDecoder.kt$BeeWiDoorDecoder$5</ID>
+    <ID>MagicNumber:BikeSharingDecoder.kt$BikeSharingDecoder$0x08</ID>
+    <ID>MagicNumber:BikeSharingDecoder.kt$BikeSharingDecoder$0x09</ID>
+    <ID>MagicNumber:BikeSharingDecoder.kt$BikeSharingDecoder$0xFF</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$0x16</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$0xAA</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$0xFE</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$0xFF</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$10</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$100</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$1000.0</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$11</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$12</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$13</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$256.0</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$3</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$3.0</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$4</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$5</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$6</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$7</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$8</ID>
+    <ID>MagicNumber:BlueCharmDecoder.kt$BlueCharmDecoder$9</ID>
+    <ID>MagicNumber:BlueMaestro1Decoder.kt$BlueMaestro1Decoder$0x0133</ID>
+    <ID>MagicNumber:BlueMaestro1Decoder.kt$BlueMaestro1Decoder$0xFF</ID>
+    <ID>MagicNumber:BlueMaestro1Decoder.kt$BlueMaestro1Decoder$10</ID>
+    <ID>MagicNumber:BlueMaestro1Decoder.kt$BlueMaestro1Decoder$10.0</ID>
+    <ID>MagicNumber:BlueMaestro1Decoder.kt$BlueMaestro1Decoder$6</ID>
+    <ID>MagicNumber:BlueMaestro1Decoder.kt$BlueMaestro1Decoder$7</ID>
+    <ID>MagicNumber:BlueMaestro1Decoder.kt$BlueMaestro1Decoder$8</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$0x0133</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$0x16</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$0x17</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$0xFF</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$10</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$10.0</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$11</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$14</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$6</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$7</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$8</ID>
+    <ID>MagicNumber:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$9</ID>
+    <ID>MagicNumber:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$0x0133</ID>
+    <ID>MagicNumber:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$0x1B</ID>
+    <ID>MagicNumber:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$0xFF</ID>
+    <ID>MagicNumber:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$10</ID>
+    <ID>MagicNumber:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$10.0</ID>
+    <ID>MagicNumber:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$11</ID>
+    <ID>MagicNumber:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$14</ID>
+    <ID>MagicNumber:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$6</ID>
+    <ID>MagicNumber:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$7</ID>
+    <ID>MagicNumber:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$8</ID>
+    <ID>MagicNumber:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$9</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$0x7F</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$0x80</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$0x8088</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$0x98</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$0x9809</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$0x982D</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$0x985A</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$0x985B</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$0x985D</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$0xFF</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$10.0</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$3</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$4</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$7</ID>
+    <ID>MagicNumber:BoschEbDecoder.kt$BoschEbDecoder$8</ID>
+    <ID>MagicNumber:BoseDecoder.kt$BoseDecoder$0x10</ID>
+    <ID>MagicNumber:BoseDecoder.kt$BoseDecoder$0x23</ID>
+    <ID>MagicNumber:BoseDecoder.kt$BoseDecoder$0x47</ID>
+    <ID>MagicNumber:BoseDecoder.kt$BoseDecoder$0xFF</ID>
+    <ID>MagicNumber:BoseDecoder.kt$BoseDecoder$3</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0.01</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0.1</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x03</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x04</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x05</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x06</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x07</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x08</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x09</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x0A</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x0B</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x0C</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x2E</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x3A</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x3C</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x40</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x41</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x42</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x43</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x45</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x46</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x4A</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x4D</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x4E</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0x4F</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$0xFF</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$1000.0</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$16</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$3</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$4</ID>
+    <ID>MagicNumber:BtHomeParser.kt$BtHomeParser$8</ID>
+    <ID>MagicNumber:CdpParser.kt$CdpParser$0x09</ID>
+    <ID>MagicNumber:CdpParser.kt$CdpParser$0x20</ID>
+    <ID>MagicNumber:CdpParser.kt$CdpParser$0xFF</ID>
+    <ID>MagicNumber:CdpParser.kt$CdpParser$24</ID>
+    <ID>MagicNumber:CdpParser.kt$CdpParser$3</ID>
+    <ID>MagicNumber:CdpParser.kt$CdpParser$4</ID>
+    <ID>MagicNumber:CdpParser.kt$CdpParser$8</ID>
+    <ID>MagicNumber:ChipoloDecoder.kt$ChipoloDecoder$0x08</ID>
+    <ID>MagicNumber:ChipoloDecoder.kt$ChipoloDecoder$0x09</ID>
+    <ID>MagicNumber:ChipoloDecoder.kt$ChipoloDecoder$0x21</ID>
+    <ID>MagicNumber:ChipoloDecoder.kt$ChipoloDecoder$0xFF</ID>
+    <ID>MagicNumber:ChipoloDecoder.kt$ChipoloDecoder$14</ID>
+    <ID>MagicNumber:ChipoloDecoder.kt$ChipoloDecoder$15</ID>
+    <ID>MagicNumber:ChipoloDecoder.kt$ChipoloDecoder$17</ID>
+    <ID>MagicNumber:ChipoloDecoder.kt$ChipoloDecoder$18</ID>
+    <ID>MagicNumber:ChipoloDecoder.kt$ChipoloDecoder$3</ID>
+    <ID>MagicNumber:EcoFlowDecoder.kt$EcoFlowDecoder$0x7F</ID>
+    <ID>MagicNumber:EcoFlowDecoder.kt$EcoFlowDecoder$0xB5B5</ID>
+    <ID>MagicNumber:EcoFlowDecoder.kt$EcoFlowDecoder$19</ID>
+    <ID>MagicNumber:EcoFlowDecoder.kt$EcoFlowDecoder$26</ID>
+    <ID>MagicNumber:EcoFlowDecoder.kt$EcoFlowDecoder$3</ID>
+    <ID>MagicNumber:EcoFlowDecoder.kt$EcoFlowDecoder$6</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x03</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x04</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x05</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x06</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x07</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x08</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x09</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x0A</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x0B</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x0C</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x16</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x21</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0x7E</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0xFEAA</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$0xFF</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$10</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$100</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$11</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$12</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$13</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$14</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$16</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$18</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$24</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$256.0</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$3</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$4</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$5</ID>
+    <ID>MagicNumber:EddystoneDecoder.kt$EddystoneDecoder$8</ID>
+    <ID>MagicNumber:FeasycomDecoder.kt$FeasycomDecoder$0x16</ID>
+    <ID>MagicNumber:FeasycomDecoder.kt$FeasycomDecoder$0x65</ID>
+    <ID>MagicNumber:FeasycomDecoder.kt$FeasycomDecoder$0x7F</ID>
+    <ID>MagicNumber:FeasycomDecoder.kt$FeasycomDecoder$0xF0</ID>
+    <ID>MagicNumber:FeasycomDecoder.kt$FeasycomDecoder$0xFF</ID>
+    <ID>MagicNumber:FeasycomDecoder.kt$FeasycomDecoder$10</ID>
+    <ID>MagicNumber:FeasycomDecoder.kt$FeasycomDecoder$11</ID>
+    <ID>MagicNumber:FeasycomDecoder.kt$FeasycomDecoder$3</ID>
+    <ID>MagicNumber:FeasycomDecoder.kt$FeasycomDecoder$4</ID>
+    <ID>MagicNumber:FindMyParser.kt$FindMyParser$0x04</ID>
+    <ID>MagicNumber:FindMyParser.kt$FindMyParser$0xFF</ID>
+    <ID>MagicNumber:GAENDecoder.kt$GAENDecoder$0x16</ID>
+    <ID>MagicNumber:GAENDecoder.kt$GAENDecoder$0x6F</ID>
+    <ID>MagicNumber:GAENDecoder.kt$GAENDecoder$0xFF</ID>
+    <ID>MagicNumber:GAENDecoder.kt$GAENDecoder$16</ID>
+    <ID>MagicNumber:GAENDecoder.kt$GAENDecoder$20</ID>
+    <ID>MagicNumber:GAENDecoder.kt$GAENDecoder$3</ID>
+    <ID>MagicNumber:GAENDecoder.kt$GAENDecoder$4</ID>
+    <ID>MagicNumber:GarminDecoder.kt$GarminDecoder$0xFF</ID>
+    <ID>MagicNumber:GarminDecoder.kt$GarminDecoder$16</ID>
+    <ID>MagicNumber:GarminDecoder.kt$GarminDecoder$4</ID>
+    <ID>MagicNumber:GarminDecoder.kt$GarminDecoder$8</ID>
+    <ID>MagicNumber:GenericTrackerDecoder.kt$GenericTrackerDecoder$0x08</ID>
+    <ID>MagicNumber:GenericTrackerDecoder.kt$GenericTrackerDecoder$0x09</ID>
+    <ID>MagicNumber:GenericTrackerDecoder.kt$GenericTrackerDecoder$0xFF</ID>
+    <ID>MagicNumber:GenericTrackerDecoder.kt$GenericTrackerDecoder$8</ID>
+    <ID>MagicNumber:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$0x07</ID>
+    <ID>MagicNumber:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$0x7F</ID>
+    <ID>MagicNumber:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$0xFF</ID>
+    <ID>MagicNumber:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$100</ID>
+    <ID>MagicNumber:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$16</ID>
+    <ID>MagicNumber:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$3</ID>
+    <ID>MagicNumber:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$4</ID>
+    <ID>MagicNumber:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$5</ID>
+    <ID>MagicNumber:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$6</ID>
+    <ID>MagicNumber:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$8</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$0x7FFFFF</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$0x800000</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$0xFF</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$10.0</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$1000</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$10000.0</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$16</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$4</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$5</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$6</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$7</ID>
+    <ID>MagicNumber:GoveeBTHDecoder.kt$GoveeBTHDecoder$8</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$0x06</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$0x20</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$0x22</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$0xEC88</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$0xFF</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$10.0</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$14</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$20</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$22</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$3</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$4</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$5</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$6</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$7</ID>
+    <ID>MagicNumber:GoveeH5055Decoder.kt$GoveeH5055Decoder$8</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$0x08</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$0x09</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$0x7FFFFF</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$0x800000</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$0xEC88</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$0xFF</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$10.0</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$1000</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$10000.0</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$11</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$16</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$3</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$4</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$5</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$6</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$8</ID>
+    <ID>MagicNumber:GoveeH5072Decoder.kt$GoveeH5072Decoder$9</ID>
+    <ID>MagicNumber:GoveeH5074Decoder.kt$GoveeH5074Decoder$0x08</ID>
+    <ID>MagicNumber:GoveeH5074Decoder.kt$GoveeH5074Decoder$0x09</ID>
+    <ID>MagicNumber:GoveeH5074Decoder.kt$GoveeH5074Decoder$0xEC88</ID>
+    <ID>MagicNumber:GoveeH5074Decoder.kt$GoveeH5074Decoder$0xFF</ID>
+    <ID>MagicNumber:GoveeH5074Decoder.kt$GoveeH5074Decoder$100.0</ID>
+    <ID>MagicNumber:GoveeH5074Decoder.kt$GoveeH5074Decoder$3</ID>
+    <ID>MagicNumber:GoveeH5074Decoder.kt$GoveeH5074Decoder$5</ID>
+    <ID>MagicNumber:GoveeH5074Decoder.kt$GoveeH5074Decoder$6</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$0x7FFFFFFFL</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$0x80</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$0xFF</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$10.0</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$1000</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$1000.0</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$1000000</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$1000000.0</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$16</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$24</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$4</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$5</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$6</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$7</ID>
+    <ID>MagicNumber:GoveeH5106Decoder.kt$GoveeH5106Decoder$8</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$0x7FFFFF</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$0x800000</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$0xEC88</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$0xFF</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$10</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$10.0</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$100.0</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$1000</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$10000.0</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$11</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$16</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$4</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$5</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$6</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$7</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$8</ID>
+    <ID>MagicNumber:GoveeH5179Decoder.kt$GoveeH5179Decoder$9</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$0x08</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$0x09</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$0x16</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$0x20</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$0x5D</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$0xFE95</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$0xFF</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$12</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$15</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$16</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$3</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$4</ID>
+    <ID>MagicNumber:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$8</ID>
+    <ID>MagicNumber:HandoffParser.kt$HandoffParser$0xFF</ID>
+    <ID>MagicNumber:HandoffParser.kt$HandoffParser$8</ID>
+    <ID>MagicNumber:HeartRateDecoder.kt$HeartRateDecoder$0x006B</ID>
+    <ID>MagicNumber:HeartRateDecoder.kt$HeartRateDecoder$0x7F</ID>
+    <ID>MagicNumber:HeartRateDecoder.kt$HeartRateDecoder$0xFF</ID>
+    <ID>MagicNumber:HeartRateDecoder.kt$HeartRateDecoder$0xFF04</ID>
+    <ID>MagicNumber:HeartRateDecoder.kt$HeartRateDecoder$10</ID>
+    <ID>MagicNumber:HeartRateDecoder.kt$HeartRateDecoder$3</ID>
+    <ID>MagicNumber:HeartRateDecoder.kt$HeartRateDecoder$8</ID>
+    <ID>MagicNumber:HoboDecoder.kt$HoboDecoder$0x00C5</ID>
+    <ID>MagicNumber:HoboDecoder.kt$HoboDecoder$100.0</ID>
+    <ID>MagicNumber:HoboDecoder.kt$HoboDecoder$18</ID>
+    <ID>MagicNumber:HoboDecoder.kt$HoboDecoder$22</ID>
+    <ID>MagicNumber:HolyIotDecoder.kt$HolyIotDecoder$0x16</ID>
+    <ID>MagicNumber:HolyIotDecoder.kt$HolyIotDecoder$0x41</ID>
+    <ID>MagicNumber:HolyIotDecoder.kt$HolyIotDecoder$0x5242</ID>
+    <ID>MagicNumber:HolyIotDecoder.kt$HolyIotDecoder$0xFF</ID>
+    <ID>MagicNumber:HolyIotDecoder.kt$HolyIotDecoder$13</ID>
+    <ID>MagicNumber:HolyIotDecoder.kt$HolyIotDecoder$3</ID>
+    <ID>MagicNumber:HolyIotDecoder.kt$HolyIotDecoder$4</ID>
+    <ID>MagicNumber:HolyIotDecoder.kt$HolyIotDecoder$8</ID>
+    <ID>MagicNumber:HomeKitParser.kt$HomeKitParser$0xFF</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$0x004C</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$0x08</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$0xFF</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$10.0</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$12</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$16</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$18</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$19</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$20</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$21</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$22</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$23</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$32</ID>
+    <ID>MagicNumber:IBeaconDecoder.kt$IBeaconDecoder$8</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$0x0A</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$0x82</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$0x90</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$0x92</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$0x94</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$0x96</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$0xFF</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$10</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$100</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$16</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$16383</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$18</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$20</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$24</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$26</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$4</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$60.0</ID>
+    <ID>MagicNumber:INodeDecoder.kt$INodeDecoder$8</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$0x01000000L</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$0x08</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$0x09</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$0xFF</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$10</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$10.0</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$12</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$14</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$16</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$24</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$3</ID>
+    <ID>MagicNumber:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$8</ID>
+    <ID>MagicNumber:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$0x08</ID>
+    <ID>MagicNumber:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$0x09</ID>
+    <ID>MagicNumber:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$0xFF</ID>
+    <ID>MagicNumber:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$10</ID>
+    <ID>MagicNumber:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$10.0</ID>
+    <ID>MagicNumber:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$13</ID>
+    <ID>MagicNumber:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$18</ID>
+    <ID>MagicNumber:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$6</ID>
+    <ID>MagicNumber:InkbirdTHDecoder.kt$InkbirdTHDecoder$0x08</ID>
+    <ID>MagicNumber:InkbirdTHDecoder.kt$InkbirdTHDecoder$0x09</ID>
+    <ID>MagicNumber:InkbirdTHDecoder.kt$InkbirdTHDecoder$0x0E</ID>
+    <ID>MagicNumber:InkbirdTHDecoder.kt$InkbirdTHDecoder$0xFF</ID>
+    <ID>MagicNumber:InkbirdTHDecoder.kt$InkbirdTHDecoder$0xFFFF</ID>
+    <ID>MagicNumber:InkbirdTHDecoder.kt$InkbirdTHDecoder$100.0</ID>
+    <ID>MagicNumber:InkbirdTHDecoder.kt$InkbirdTHDecoder$3</ID>
+    <ID>MagicNumber:InkbirdTHDecoder.kt$InkbirdTHDecoder$7</ID>
+    <ID>MagicNumber:InkbirdTHDecoder.kt$InkbirdTHDecoder$8</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$0xFF</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$100.0</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$175.0</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$20</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$21</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$22</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$23</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$25</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$26</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$45.0</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$65535.0</ID>
+    <ID>MagicNumber:JaaleeDecoder.kt$JaaleeDecoder$8</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$0x16</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$0xFEAA</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$0xFF</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$10</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$1000.0</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$11</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$12</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$13</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$14</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$15</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$16</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$256.0</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$3</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$4</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$5</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$6</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$7</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$8</ID>
+    <ID>MagicNumber:KKMDecoder.kt$KKMDecoder$9</ID>
+    <ID>MagicNumber:LaicaPS7200LDecoder.kt$LaicaPS7200LDecoder$0xFF</ID>
+    <ID>MagicNumber:LaicaPS7200LDecoder.kt$LaicaPS7200LDecoder$10.0</ID>
+    <ID>MagicNumber:LaicaPS7200LDecoder.kt$LaicaPS7200LDecoder$3</ID>
+    <ID>MagicNumber:LaicaPS7200LDecoder.kt$LaicaPS7200LDecoder$4</ID>
+    <ID>MagicNumber:LaicaPS7200LDecoder.kt$LaicaPS7200LDecoder$5</ID>
+    <ID>MagicNumber:LaicaPS7200LDecoder.kt$LaicaPS7200LDecoder$6</ID>
+    <ID>MagicNumber:LaicaPS7200LDecoder.kt$LaicaPS7200LDecoder$8</ID>
+    <ID>MagicNumber:MiBandDecoder.kt$MiBandDecoder$0x0157</ID>
+    <ID>MagicNumber:MiBandDecoder.kt$MiBandDecoder$0xFF</ID>
+    <ID>MagicNumber:MiBandDecoder.kt$MiBandDecoder$20</ID>
+    <ID>MagicNumber:MiBandDecoder.kt$MiBandDecoder$3</ID>
+    <ID>MagicNumber:MiBandDecoder.kt$MiBandDecoder$5</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0x03</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0x04</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0x07</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0x08</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0x09</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0x10</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0x16</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0x50</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0x95</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0x98</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0xBC</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0xFE</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$0xFF</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$10.0</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$12</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$13</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$15</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$16</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$17</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$18</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$3</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$4</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$5</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$6</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$7</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$8</ID>
+    <ID>MagicNumber:MiFloraDecoder.kt$MiFloraDecoder$9</ID>
+    <ID>MagicNumber:MicrosoftCDPDecoder.kt$MicrosoftCDPDecoder$0x0006</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$0x04</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$0x08</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$0x094F</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$0x10</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$0x20</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$0x7F</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$0xFF</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$0xFFFFFFFFL</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$10</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$12</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$14</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$18</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$19</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$20</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$256.0</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$3</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$6</ID>
+    <ID>MagicNumber:MikrotikDecoder.kt$MikrotikDecoder$8</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$0x16</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$0xFF</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$0xFF01</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$10</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$10000.0</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$11</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$12</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$13</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$3</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$4</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$7</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$8</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$9</ID>
+    <ID>MagicNumber:MokobeaconDecoder.kt$MokobeaconDecoder$9.80665</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$0x16</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$0x40</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$0x60</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$0x70</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$0xFEAB</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$0xFF</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$10</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$10.0</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$1000.0</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$10000.0</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$11</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$12</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$13</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$14</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$3</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$4</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$5</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$6</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$7</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$8</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$9</ID>
+    <ID>MagicNumber:MokosmartDecoder.kt$MokosmartDecoder$9.80665</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$0.65</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$0x0059</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$0x03</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$0x06</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$0x08</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$0x0C</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$0x3FFF</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$0x7F</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$0xFF</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$10.0</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$100.0</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$12</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$2.2</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$3</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$32.0</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$4</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$40</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$5</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$6</ID>
+    <ID>MagicNumber:MopekaDecoder.kt$MopekaDecoder$8</ID>
+    <ID>MagicNumber:NearbyActionParser.kt$NearbyActionParser$3</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$0x03</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$0x06</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$0x07</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$0x09</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$0x0A</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$0x0B</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$0x0C</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$0x0E</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$0xFF</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$10</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$11</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$12</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$13</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$14</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$15</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$3</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$4</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$5</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$6</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$7</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$8</ID>
+    <ID>MagicNumber:NearbyInfoParser.kt$NearbyInfoParser$9</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$0x03</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$0x04</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$0x05</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$0x06</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$0x07</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$0x16</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$0x7F</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$0xFF</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$10</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$11</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$12</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$15</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$16</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$3</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$4</ID>
+    <ID>MagicNumber:NodonDecoder.kt$NodonDecoder$8</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$0x00DC</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$0x03</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$0x04</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$0x05</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$0x06</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$0x07</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$0x73</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$0xFF</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$3</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$4</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$5</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$6</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$60</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$7</ID>
+    <ID>MagicNumber:OralBDecoder.kt$OralBDecoder$9</ID>
+    <ID>MagicNumber:OrasDecoder.kt$OrasDecoder$0x0131</ID>
+    <ID>MagicNumber:OrasDecoder.kt$OrasDecoder$0x7F</ID>
+    <ID>MagicNumber:OrasDecoder.kt$OrasDecoder$15</ID>
+    <ID>MagicNumber:OrasDecoder.kt$OrasDecoder$20</ID>
+    <ID>MagicNumber:OrasDecoder.kt$OrasDecoder$3</ID>
+    <ID>MagicNumber:OrasDecoder.kt$OrasDecoder$5</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$0x03B1</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$0xFF</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$10</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$100.0</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$11</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$12</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$18</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$19</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$22</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$7</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$8</ID>
+    <ID>MagicNumber:OtodataDecoder.kt$OtodataDecoder$9</ID>
+    <ID>MagicNumber:ProximityPairingParser.kt$ProximityPairingParser$0x03</ID>
+    <ID>MagicNumber:ProximityPairingParser.kt$ProximityPairingParser$0x09</ID>
+    <ID>MagicNumber:ProximityPairingParser.kt$ProximityPairingParser$0x0B</ID>
+    <ID>MagicNumber:ProximityPairingParser.kt$ProximityPairingParser$0x10</ID>
+    <ID>MagicNumber:ProximityPairingParser.kt$ProximityPairingParser$0x13</ID>
+    <ID>MagicNumber:ProximityPairingParser.kt$ProximityPairingParser$0x2A</ID>
+    <ID>MagicNumber:ProximityPairingParser.kt$ProximityPairingParser$0xFF</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$0x0C</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$0x16</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$0x1E</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$0x7F</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$0xCD</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$0xFF</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$10</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$10.0</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$11</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$12</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$13</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$16</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$17</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$3</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$4</ID>
+    <ID>MagicNumber:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$8</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$0x10</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$0x16</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$0xCD</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$0xFF</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$10</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$10.0</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$11</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$12</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$13</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$16</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$17</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$3</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$4</ID>
+    <ID>MagicNumber:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$8</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$0x0E</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$0x16</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$0x24</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$0xCD</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$0xFF</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$10</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$10.0</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$11</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$12</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$13</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$16</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$17</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$18</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$19</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$22</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$23</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$24</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$3</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$4</ID>
+    <ID>MagicNumber:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$8</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$0x07</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$0x16</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$0x181A</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$0xFDCD</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$0xFF</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$10</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$10.0</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$100.0</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$1000.0</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$11</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$12</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$13</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$15</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$16</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$17</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$3</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$4</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$6</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$7</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$8</ID>
+    <ID>MagicNumber:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$9</ID>
+    <ID>MagicNumber:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$0x04</ID>
+    <ID>MagicNumber:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$0x16</ID>
+    <ID>MagicNumber:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$0xCD</ID>
+    <ID>MagicNumber:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$0xFF</ID>
+    <ID>MagicNumber:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$10</ID>
+    <ID>MagicNumber:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$14</ID>
+    <ID>MagicNumber:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$16</ID>
+    <ID>MagicNumber:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$17</ID>
+    <ID>MagicNumber:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$3</ID>
+    <ID>MagicNumber:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$4</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$0x09</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$0x16</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$0x7F</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$0xCD</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$0xFF</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$10</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$10.0</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$11</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$12</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$13</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$16</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$17</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$20</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$21</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$3</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$4</ID>
+    <ID>MagicNumber:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$8</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$0x16</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$0x5D</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$0x7F</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$0xCD</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$0xFF</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$10</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$10.0</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$11</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$12</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$13</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$16</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$19</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$20</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$21</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$3</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$4</ID>
+    <ID>MagicNumber:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$8</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$0x16</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$0x18</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$0x7F</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$0xCD</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$0xFF</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$10</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$10.0</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$11</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$12</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$13</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$16</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$19</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$20</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$21</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$3</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$4</ID>
+    <ID>MagicNumber:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$8</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$0x12</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$0x16</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$0xCD</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$0xFF</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$10</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$11</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$12</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$14</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$16</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$17</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$20</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$3</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$4</ID>
+    <ID>MagicNumber:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$8</ID>
+    <ID>MagicNumber:RadiolandDecoder.kt$RadiolandDecoder$0x08</ID>
+    <ID>MagicNumber:RadiolandDecoder.kt$RadiolandDecoder$0x09</ID>
+    <ID>MagicNumber:RadiolandDecoder.kt$RadiolandDecoder$0x16</ID>
+    <ID>MagicNumber:RadiolandDecoder.kt$RadiolandDecoder$0xFF</ID>
+    <ID>MagicNumber:RadiolandDecoder.kt$RadiolandDecoder$18</ID>
+    <ID>MagicNumber:RadiolandDecoder.kt$RadiolandDecoder$20</ID>
+    <ID>MagicNumber:RadiolandDecoder.kt$RadiolandDecoder$256.0</ID>
+    <ID>MagicNumber:RadiolandDecoder.kt$RadiolandDecoder$3</ID>
+    <ID>MagicNumber:RadiolandDecoder.kt$RadiolandDecoder$4</ID>
+    <ID>MagicNumber:RadiolandDecoder.kt$RadiolandDecoder$48</ID>
+    <ID>MagicNumber:RadiolandDecoder.kt$RadiolandDecoder$8</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$0x03</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$0x0499</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$0x05</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$0x7F</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$0x7FF</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$0x80</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$0x8000</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$0xFF</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$0xFFFF</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$10</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$100</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$100.0</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$1000.0</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$10000.0</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$11</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$12</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$13</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$14</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$15</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$1600</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$200.0</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$24</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$3</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$32768</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$4</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$40</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$400.0</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$5</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$50000</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$6</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$7</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$8</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$9</ID>
+    <ID>MagicNumber:RuuviTagDecoder.kt$RuuviTagDecoder$9.80665</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$0x16</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$0xFD5A</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$0xFF</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$100</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$12</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$13</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$20</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$3</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$4</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$5</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$6</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$60</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$7</ID>
+    <ID>MagicNumber:SamsungFindDecoder.kt$SamsungFindDecoder$8</ID>
+    <ID>MagicNumber:SamsungGenericDecoder.kt$SamsungGenericDecoder$0x0075</ID>
+    <ID>MagicNumber:ScanRecordParser.kt$ScanRecordParser$0x19</ID>
+    <ID>MagicNumber:ScanRecordParser.kt$ScanRecordParser$0xFF</ID>
+    <ID>MagicNumber:ScanRecordParser.kt$ScanRecordParser$3</ID>
+    <ID>MagicNumber:ScanRecordParser.kt$ScanRecordParser$8</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$0x06D5</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$0xFF</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$10</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$100.0</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$175.0</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$4</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$45.0</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$5</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$6</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$65535.0</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$7</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$8</ID>
+    <ID>MagicNumber:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$9</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$0x06</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$0x06D5</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$0xFF</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$10</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$125.0</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$175.0</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$3</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$45.0</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$6</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$6.0</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$65535.0</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$7</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$8</ID>
+    <ID>MagicNumber:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$9</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$0x08</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$0x09</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$0x16</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$0x2A06</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$0x2A6E</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$0x2A6F</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$0xF2</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$0xFF</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$100.0</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$1000.0</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$3</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$4</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$5</ID>
+    <ID>MagicNumber:SensorEasyDecoder.kt$SensorEasyDecoder$8</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$0.0025</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$0x04</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$0xFF</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$100.0</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$12</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$2640106001</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$273613520207001L</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$2880112001L</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$30000.0</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$4</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$40.0</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$6</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$66001</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$72001</ID>
+    <ID>MagicNumber:SensorPushDecoder.kt$SensorPushDecoder$8</ID>
+    <ID>MagicNumber:ServiceDataDecoder.kt$ServiceDataDecoder$0x16</ID>
+    <ID>MagicNumber:ServiceDataDecoder.kt$ServiceDataDecoder$0x180F</ID>
+    <ID>MagicNumber:ServiceDataDecoder.kt$ServiceDataDecoder$0xFF</ID>
+    <ID>MagicNumber:ServiceDataDecoder.kt$ServiceDataDecoder$3</ID>
+    <ID>MagicNumber:ServiceDataDecoder.kt$ServiceDataDecoder$4</ID>
+    <ID>MagicNumber:ServiceDataDecoder.kt$ServiceDataDecoder$8</ID>
+    <ID>MagicNumber:ServiceDataExtractor.kt$ServiceDataExtractor$0x16</ID>
+    <ID>MagicNumber:ServiceDataExtractor.kt$ServiceDataExtractor$0xFF</ID>
+    <ID>MagicNumber:ServiceDataExtractor.kt$ServiceDataExtractor$8</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0x03</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0x04</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0x08</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0x09</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0x0B</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0x16</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0x3A</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0x40</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0x41</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0x44</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0x45</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0xD2</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0xFC</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0xFE</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$0xFF</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$10</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$3</ID>
+    <ID>MagicNumber:ShellyButtonDecoder.kt$ShellyButtonDecoder$4</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$0x05</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$0x08</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$0x09</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$0x16</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$0x3F</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$0x44</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$0x45</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$0xD2</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$0xFC</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$0xFF</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$100.0</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$16</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$3</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$4</ID>
+    <ID>MagicNumber:ShellyDoorDecoder.kt$ShellyDoorDecoder$8</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$0x08</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$0x09</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$0x16</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$0x2E</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$0x3A</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$0x44</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$0x45</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$0xD2</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$0xFC</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$0xFF</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$10.0</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$3</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$4</ID>
+    <ID>MagicNumber:ShellyHTDecoder.kt$ShellyHTDecoder$8</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$0x05</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$0x08</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$0x09</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$0x16</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$0x21</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$0x44</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$0x45</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$0xD2</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$0xFC</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$0xFF</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$100.0</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$16</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$3</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$4</ID>
+    <ID>MagicNumber:ShellyMotionDecoder.kt$ShellyMotionDecoder$8</ID>
+    <ID>MagicNumber:SkaleDecoder.kt$SkaleDecoder$0x81EF</ID>
+    <ID>MagicNumber:SkaleDecoder.kt$SkaleDecoder$0xFF</ID>
+    <ID>MagicNumber:SkaleDecoder.kt$SkaleDecoder$10.0</ID>
+    <ID>MagicNumber:SkaleDecoder.kt$SkaleDecoder$3</ID>
+    <ID>MagicNumber:SkaleDecoder.kt$SkaleDecoder$8</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$0x01AE</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$0xFF</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$10</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$1000.0</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$11</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$12</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$16</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$24</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$26</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$2847.0</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$3</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$6</ID>
+    <ID>MagicNumber:SmartDryDecoder.kt$SmartDryDecoder$8</ID>
+    <ID>MagicNumber:SmartTagParser.kt$SmartTagParser$0xFF</ID>
+    <ID>MagicNumber:SmartTagParser.kt$SmartTagParser$12</ID>
+    <ID>MagicNumber:SmartTagParser.kt$SmartTagParser$4</ID>
+    <ID>MagicNumber:SmartTagParser.kt$SmartTagParser$8</ID>
+    <ID>MagicNumber:SmartThingsParser.kt$SmartThingsParser$4</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x03</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x04</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x05</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x06</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x07</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x08</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x09</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x0A</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x0B</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x0C</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x0E</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x10</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x12</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x20</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x30</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0x3F</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$0xFF</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$12</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$16</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$3</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$4</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$6</ID>
+    <ID>MagicNumber:SwiftPairParser.kt$SwiftPairParser$8</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$0x08</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$0x0969</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$0x0D00</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$0x16</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$0x78</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$0x7F</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$0xFD3D</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$0xFF</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$10</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$100</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$3</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$4</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$50</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$8</ID>
+    <ID>MagicNumber:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$9</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$0x0D00</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$0x16</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$0x40</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$0x48</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$0x7F</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$0x80</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$0xFD3D</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$0xFF</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$3</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$4</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$6</ID>
+    <ID>MagicNumber:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$8</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$0x04</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$0x0D00</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$0x16</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$0x64</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$0x7F</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$0xFD3D</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$0xFF</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$3</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$4</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$7</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$8</ID>
+    <ID>MagicNumber:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$9</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$0x08</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$0x0D00</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$0x16</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$0x63</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$0x7B</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$0x7F</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$0xFD3D</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$0xFF</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$3</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$4</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$6</ID>
+    <ID>MagicNumber:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$8</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$0x08</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$0x09</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$0x0D00</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$0x16</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$0x54</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$0x69</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$0x7F</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$0xFD3D</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$0xFF</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$10</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$10.0</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$12</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$128.0</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$18</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$20</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$21</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$23</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$24</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$3</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$4</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$5</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$7</ID>
+    <ID>MagicNumber:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$8</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$0x08</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$0x0969</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$0x7F</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$0xFF</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$10.0</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$128.0</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$16</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$19</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$20</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$21</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$23</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$24</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$28</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$29</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$30</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$31</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$34</ID>
+    <ID>MagicNumber:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$8</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$0x03</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$0x04</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$0x0D00</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$0x16</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$0x73</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$0x7F</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$0xFD3D</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$0xFF</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$11</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$12</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$3</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$4</ID>
+    <ID>MagicNumber:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$8</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$0x08</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$0x09</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$0x16</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$0x77</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$0x7F</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$0xFD3D</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$0xFF</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$10.0</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$128.0</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$19</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$20</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$21</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$23</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$26</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$3</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$4</ID>
+    <ID>MagicNumber:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$8</ID>
+    <ID>MagicNumber:TP357SDecoder.kt$TP357SDecoder$0xC2</ID>
+    <ID>MagicNumber:TP357SDecoder.kt$TP357SDecoder$0xEC88</ID>
+    <ID>MagicNumber:TP357SDecoder.kt$TP357SDecoder$0xFF</ID>
+    <ID>MagicNumber:TP357SDecoder.kt$TP357SDecoder$10.0</ID>
+    <ID>MagicNumber:TP357SDecoder.kt$TP357SDecoder$100</ID>
+    <ID>MagicNumber:TP357SDecoder.kt$TP357SDecoder$49346</ID>
+    <ID>MagicNumber:TP357SDecoder.kt$TP357SDecoder$5</ID>
+    <ID>MagicNumber:TP357SDecoder.kt$TP357SDecoder$50626</ID>
+    <ID>MagicNumber:TP357SDecoder.kt$TP357SDecoder$8</ID>
+    <ID>MagicNumber:TPMSBRDecoder.kt$TPMSBRDecoder$0x030A</ID>
+    <ID>MagicNumber:TPMSBRDecoder.kt$TPMSBRDecoder$0x08</ID>
+    <ID>MagicNumber:TPMSBRDecoder.kt$TPMSBRDecoder$0x09</ID>
+    <ID>MagicNumber:TPMSBRDecoder.kt$TPMSBRDecoder$0xFF</ID>
+    <ID>MagicNumber:TPMSBRDecoder.kt$TPMSBRDecoder$10.0</ID>
+    <ID>MagicNumber:TPMSBRDecoder.kt$TPMSBRDecoder$1000.0</ID>
+    <ID>MagicNumber:TPMSBRDecoder.kt$TPMSBRDecoder$12</ID>
+    <ID>MagicNumber:TPMSBRDecoder.kt$TPMSBRDecoder$14.5</ID>
+    <ID>MagicNumber:TPMSBRDecoder.kt$TPMSBRDecoder$4</ID>
+    <ID>MagicNumber:TPMSBRDecoder.kt$TPMSBRDecoder$8</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$0x08</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$0x09</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$0xFF</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$10</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$100.0</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$100000.0</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$14</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$22</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$26</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$30</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$34</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$36</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$4</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$6</ID>
+    <ID>MagicNumber:TPMSDecoder.kt$TPMSDecoder$8</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$0x10</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$0x1004</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$0x1006</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$0x100A</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$0x16</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$0x20</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$0x40</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$0xFE95</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$0xFF</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$10.0</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$3</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$4</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$5</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$6</ID>
+    <ID>MagicNumber:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$8</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$0.8</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$0xFF</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$10</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$100</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$100.0</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$1000.0</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$11</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$12</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$13</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$16.0</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$18</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$2.2</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$8</ID>
+    <ID>MagicNumber:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$9</ID>
+    <ID>MagicNumber:ThermoProDecoder.kt$ThermoProDecoder$0x08</ID>
+    <ID>MagicNumber:ThermoProDecoder.kt$ThermoProDecoder$0x09</ID>
+    <ID>MagicNumber:ThermoProDecoder.kt$ThermoProDecoder$0xC2</ID>
+    <ID>MagicNumber:ThermoProDecoder.kt$ThermoProDecoder$0xFF</ID>
+    <ID>MagicNumber:ThermoProDecoder.kt$ThermoProDecoder$10.0</ID>
+    <ID>MagicNumber:ThermoProDecoder.kt$ThermoProDecoder$100</ID>
+    <ID>MagicNumber:ThermoProDecoder.kt$ThermoProDecoder$3</ID>
+    <ID>MagicNumber:ThermoProDecoder.kt$ThermoProDecoder$4</ID>
+    <ID>MagicNumber:ThermoProDecoder.kt$ThermoProDecoder$5</ID>
+    <ID>MagicNumber:ThermoProDecoder.kt$ThermoProDecoder$50</ID>
+    <ID>MagicNumber:ThermoProDecoder.kt$ThermoProDecoder$8</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$0x004C</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$0x10</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$0x20</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$0x30</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$0x40</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$0x50</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$0x60</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$0x70</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$0x80</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$0xFF</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$1000.0</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$18</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$19</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$20</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$21</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$23</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$3</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$32</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$4</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$5.0</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$7</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$8</ID>
+    <ID>MagicNumber:TiltDecoder.kt$TiltDecoder$9.0</ID>
+    <ID>MagicNumber:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder$0x08</ID>
+    <ID>MagicNumber:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder$0x09</ID>
+    <ID>MagicNumber:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder$0xFF</ID>
+    <ID>MagicNumber:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder$100</ID>
+    <ID>MagicNumber:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder$255</ID>
+    <ID>MagicNumber:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder$3</ID>
+    <ID>MagicNumber:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder$4</ID>
+    <ID>MagicNumber:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder$6</ID>
+    <ID>MagicNumber:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder$765</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$0x03</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$0x08</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$0x09</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$0x0C</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$0x16</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$0x40</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$0xFCD2</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$0xFF</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$10</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$100.0</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$1000.0</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$12</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$16</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$18</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$22</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$24</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$28</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$3</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$4</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$6</ID>
+    <ID>MagicNumber:TuyaTHBDecoder.kt$TuyaTHBDecoder$8</ID>
+    <ID>MagicNumber:VchonDecoder.kt$VchonDecoder$0x0901</ID>
+    <ID>MagicNumber:VchonDecoder.kt$VchonDecoder$0xFF</ID>
+    <ID>MagicNumber:VchonDecoder.kt$VchonDecoder$10.0</ID>
+    <ID>MagicNumber:VchonDecoder.kt$VchonDecoder$20</ID>
+    <ID>MagicNumber:VchonDecoder.kt$VchonDecoder$6</ID>
+    <ID>MagicNumber:VchonDecoder.kt$VchonDecoder$8</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$0x02E1</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$0x09</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$0x10</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$0x11</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$0x3FFF</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$0x7F</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$0x7FFF</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$0xFF</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$0xFFFF</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$100.0</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$12</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$14</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$18</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$27315.0</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$4</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$40</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$42</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$44</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$48</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$8</ID>
+    <ID>MagicNumber:VictronDecoder.kt$VictronDecoder$9</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$0x04</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$0x06</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$0x0A</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$0x16</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$0x95</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$0xFE</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$0xFF</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$10.0</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$100.0</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$11</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$14</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$15</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$16</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$3</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$4</ID>
+    <ID>MagicNumber:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$8</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$0x04</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$0x10</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$0x1004</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$0x1006</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$0x100A</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$0x16</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$0x20</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$0x5B</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$0xFE95</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$0xFF</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$10.0</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$3</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$4</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$5</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$6</ID>
+    <ID>MagicNumber:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$8</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$0x08</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$0x09</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$0x16</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$0x181A</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$0xFCD2</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$0xFF</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$10</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$10.0</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$100.0</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$1000.0</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$11</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$12</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$13</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$15</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$3</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$4</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$6</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$7</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$8</ID>
+    <ID>MagicNumber:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$9</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$0x04</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$0x06</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$0x0A</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$0x16</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$0x95</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$0xFE</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$0xFF</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$10.0</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$11</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$14</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$15</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$16</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$17</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$3</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$4</ID>
+    <ID>MagicNumber:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$8</ID>
+    <ID>MagicNumber:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$0x16</ID>
+    <ID>MagicNumber:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$0x30</ID>
+    <ID>MagicNumber:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$0x40</ID>
+    <ID>MagicNumber:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$0xFE95</ID>
+    <ID>MagicNumber:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$0xFF</ID>
+    <ID>MagicNumber:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$3</ID>
+    <ID>MagicNumber:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$4</ID>
+    <ID>MagicNumber:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$8</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$0x04</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$0x16</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$0x181B</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$0x181D</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$0xFF</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$10</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$11</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$12</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$13</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$200.0</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$3</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$4</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$8</ID>
+    <ID>MagicNumber:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$9</ID>
+    <ID>MaximumLineLength:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$ </ID>
+    <ID>NestedBlockDepth:ABN03Decoder.kt$ABN03Decoder$private fun findServiceDataAB03(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:ABN07Decoder.kt$ABN07Decoder$private fun findServiceDataFCD2(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:AdRecordParser.kt$AdRecordParser$private fun interpretData( type: Int, data: ByteArray, ): String</ID>
+    <ID>NestedBlockDepth:BParasiteDecoder.kt$BParasiteDecoder$private fun findServiceData181A(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:BParasiteV2Decoder.kt$BParasiteV2Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>NestedBlockDepth:BParasiteV2Decoder.kt$BParasiteV2Decoder$private fun findServiceDataFCD2(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:BlueCharmDecoder.kt$BlueCharmDecoder$private fun findServiceDataFEAA(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:BoschEbDecoder.kt$BoschEbDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>NestedBlockDepth:ChipoloDecoder.kt$ChipoloDecoder$private fun findServiceData(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:EddystoneDecoder.kt$EddystoneDecoder$@OptIn(ExperimentalStdlibApi::class) override fun decode(input: BleBeaconScanInput): SensorData?</ID>
+    <ID>NestedBlockDepth:FeasycomDecoder.kt$FeasycomDecoder$private fun findServiceDataFFF0(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:GAENDecoder.kt$GAENDecoder$private fun findServiceDataFD6F(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$private fun decodeAccountData(data: ByteArray): FastPairInfo</ID>
+    <ID>NestedBlockDepth:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:HolyIotDecoder.kt$HolyIotDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>NestedBlockDepth:KKMDecoder.kt$KKMDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:MiFloraDecoder.kt$MiFloraDecoder$private fun findServiceDataFD50(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:MiFloraDecoder.kt$MiFloraDecoder$private fun findServiceDataFE95(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:MokobeaconDecoder.kt$MokobeaconDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:MokosmartDecoder.kt$MokosmartDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:NodonDecoder.kt$NodonDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$private fun findServiceDataFDCD(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$private fun findServiceDataFDCD(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$private fun findServiceDataFDCD(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$private fun findServiceDataFDCD(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$private fun findServiceDataFDCD(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$private fun findServiceDataFDCD(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$private fun findServiceDataFDCD(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$private fun findServiceDataFDCD(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:SamsungFindDecoder.kt$SamsungFindDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:SensorEasyDecoder.kt$SensorEasyDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:ServiceDataDecoder.kt$ServiceDataDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:ShellyButtonDecoder.kt$ShellyButtonDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>NestedBlockDepth:ShellyButtonDecoder.kt$ShellyButtonDecoder$private fun findServiceDataFCD2(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:ShellyDoorDecoder.kt$ShellyDoorDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>NestedBlockDepth:ShellyDoorDecoder.kt$ShellyDoorDecoder$private fun findServiceDataFCD2(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:ShellyHTDecoder.kt$ShellyHTDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>NestedBlockDepth:ShellyHTDecoder.kt$ShellyHTDecoder$private fun findServiceDataFCD2(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:ShellyMotionDecoder.kt$ShellyMotionDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>NestedBlockDepth:ShellyMotionDecoder.kt$ShellyMotionDecoder$private fun findServiceDataFCD2(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$private fun decodeXiaomi(payload: ByteArray): SensorData</ID>
+    <ID>NestedBlockDepth:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:ThermoProDecoder.kt$ThermoProDecoder$private fun findManufacturerDataWithC2(rawData: ByteArray?): ByteArray?</ID>
+    <ID>NestedBlockDepth:TuyaTHBDecoder.kt$TuyaTHBDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$private fun findServiceDataFE95(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>NestedBlockDepth:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>NestedBlockDepth:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$private fun findServiceDataFE95(rawData: ByteArray): ByteArray?</ID>
+    <ID>NestedBlockDepth:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>NestedBlockDepth:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$private fun findServiceData( rawData: ByteArray, uuid16: Int, ): ByteArray?</ID>
+    <ID>ReturnCount:ABN03Decoder.kt$ABN03Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:ABN07Decoder.kt$ABN07Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:ABN07Decoder.kt$ABN07Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:ABTempDecoder.kt$ABTempDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:ABTempDecoder.kt$ABTempDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:AnemometerDecoder.kt$AnemometerDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:AppleGenericDecoder.kt$AppleGenericDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:AppleGenericDecoder.kt$AppleGenericDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:AppleWatchDecoder.kt$AppleWatchDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:Aranet4Decoder.kt$Aranet4Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:BM2BatteryMonitorDecoder.kt$BM2BatteryMonitorDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:BM2BatteryMonitorDecoder.kt$BM2BatteryMonitorDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:BM6BatteryMonitorDecoder.kt$BM6BatteryMonitorDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:BM6BatteryMonitorDecoder.kt$BM6BatteryMonitorDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:BParasiteDecoder.kt$BParasiteDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:BParasiteDecoder.kt$BParasiteDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:BParasiteV2Decoder.kt$BParasiteV2Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:BParasiteV2Decoder.kt$BParasiteV2Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:BeeWiDoorDecoder.kt$BeeWiDoorDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:BeeWiDoorDecoder.kt$BeeWiDoorDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:BikeSharingDecoder.kt$BikeSharingDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:BlueCharmDecoder.kt$BlueCharmDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:BlueCharmDecoder.kt$BlueCharmDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:BlueMaestro1Decoder.kt$BlueMaestro1Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:BoschEbDecoder.kt$BoschEbDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:CdpParser.kt$CdpParser$fun parse(data: ByteArray): MicrosoftDeviceData?</ID>
+    <ID>ReturnCount:ChipoloDecoder.kt$ChipoloDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:EcoFlowDecoder.kt$EcoFlowDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:EddystoneDecoder.kt$EddystoneDecoder$@OptIn(ExperimentalStdlibApi::class) override fun decode(input: BleBeaconScanInput): SensorData?</ID>
+    <ID>ReturnCount:EddystoneDecoder.kt$EddystoneDecoder$private fun parseEddystonePayload(payload: ByteArray): SensorData?</ID>
+    <ID>ReturnCount:FeasycomDecoder.kt$FeasycomDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:FeasycomDecoder.kt$FeasycomDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:GAENDecoder.kt$GAENDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:GenericTrackerDecoder.kt$GenericTrackerDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:GoogleFastPairBeaconDecoder.kt$GoogleFastPairBeaconDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:GoogleFastPairDecoder.kt$GoogleFastPairDecoder$fun decode(serviceData: ByteArray): FastPairInfo?</ID>
+    <ID>ReturnCount:GoveeBTHDecoder.kt$GoveeBTHDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:GoveeH5055Decoder.kt$GoveeH5055Decoder$fun getTemp(offset: Int): Double?</ID>
+    <ID>ReturnCount:GoveeH5055Decoder.kt$GoveeH5055Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:GoveeH5055Decoder.kt$GoveeH5055Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:GoveeH5072Decoder.kt$GoveeH5072Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:GoveeH5072Decoder.kt$GoveeH5072Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:GoveeH5072Decoder.kt$GoveeH5072Decoder$private fun extractLocalName(rawData: ByteArray?): String?</ID>
+    <ID>ReturnCount:GoveeH5074Decoder.kt$GoveeH5074Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:GoveeH5074Decoder.kt$GoveeH5074Decoder$private fun extractLocalName(rawData: ByteArray?): String?</ID>
+    <ID>ReturnCount:GoveeH5106Decoder.kt$GoveeH5106Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:GoveeH5179Decoder.kt$GoveeH5179Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:HeartRateDecoder.kt$HeartRateDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:HoboDecoder.kt$HoboDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:HolyIotDecoder.kt$HolyIotDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:HolyIotDecoder.kt$HolyIotDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:IBeaconDecoder.kt$IBeaconDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:IBeaconDecoder.kt$IBeaconDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:INodeDecoder.kt$INodeDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:INodeDecoder.kt$INodeDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:InkbirdTHDecoder.kt$InkbirdTHDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:InkbirdTHDecoder.kt$InkbirdTHDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:JaaleeDecoder.kt$JaaleeDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:KKMDecoder.kt$KKMDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:KKMDecoder.kt$KKMDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:KKMDecoder.kt$KKMDecoder$private fun ByteArray.startsWith(hex: String): Boolean</ID>
+    <ID>ReturnCount:LaicaPS7200LDecoder.kt$LaicaPS7200LDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:MiBandDecoder.kt$MiBandDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:MiFloraDecoder.kt$MiFloraDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:MiFloraDecoder.kt$MiFloraDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:MicrosoftCDPDecoder.kt$MicrosoftCDPDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:MikrotikDecoder.kt$MikrotikDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:MikrotikDecoder.kt$MikrotikDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:MokobeaconDecoder.kt$MokobeaconDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:MokosmartDecoder.kt$MokosmartDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:MopekaDecoder.kt$MopekaDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:MopekaDecoder.kt$MopekaDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:NodonDecoder.kt$NodonDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:NodonDecoder.kt$NodonDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:OralBDecoder.kt$OralBDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:OrasDecoder.kt$OrasDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:QingpingCGG1Decoder.kt$QingpingCGG1Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:RadiolandDecoder.kt$RadiolandDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:RuuviTagDecoder.kt$RuuviTagDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:SamsungFindDecoder.kt$SamsungFindDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SamsungManufacturerParser.kt$SamsungManufacturerParser$fun parse(data: ByteArray?): SamsungDeviceData?</ID>
+    <ID>ReturnCount:ScanRecordParser.kt$ScanRecordParser$fun determineTechnology( isLegacy: Boolean, primaryPhy: Int, ): String</ID>
+    <ID>ReturnCount:ScanRecordParser.kt$ScanRecordParser$fun extractAppearance(bytes: ByteArray?): Int?</ID>
+    <ID>ReturnCount:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:SensorEasyDecoder.kt$SensorEasyDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SensorEasyDecoder.kt$SensorEasyDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:SensorPushDecoder.kt$SensorPushDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SensorPushDecoder.kt$SensorPushDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:ServiceDataDecoder.kt$ServiceDataDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:ShellyButtonDecoder.kt$ShellyButtonDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:ShellyButtonDecoder.kt$ShellyButtonDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:ShellyDoorDecoder.kt$ShellyDoorDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:ShellyDoorDecoder.kt$ShellyDoorDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:ShellyHTDecoder.kt$ShellyHTDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:ShellyHTDecoder.kt$ShellyHTDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:ShellyMotionDecoder.kt$ShellyMotionDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:ShellyMotionDecoder.kt$ShellyMotionDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:SmartTagParser.kt$SmartTagParser$fun parse(data: ByteArray): SamsungDeviceData?</ID>
+    <ID>ReturnCount:SmartThingsParser.kt$SmartThingsParser$fun parse(serviceData: ByteArray?): SamsungDeviceData?</ID>
+    <ID>ReturnCount:SwiftPairParser.kt$SwiftPairParser$fun parse(data: ByteArray): MicrosoftDeviceData?</ID>
+    <ID>ReturnCount:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:TPMSBRDecoder.kt$TPMSBRDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:TPMSDecoder.kt$TPMSDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:TPMSDecoder.kt$TPMSDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:TheengsInteroperableDecoder.kt$TheengsInteroperableDecoder$private fun decodeXiaomi(payload: ByteArray): SensorData</ID>
+    <ID>ReturnCount:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:ThermoProDecoder.kt$ThermoProDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:ThermoProDecoder.kt$ThermoProDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:ThermoProDecoder.kt$ThermoProDecoder$private fun findManufacturerDataPayload(rawData: ByteArray?): ByteArray?</ID>
+    <ID>ReturnCount:ThermoProDecoder.kt$ThermoProDecoder$private fun findManufacturerDataWithC2(rawData: ByteArray?): ByteArray?</ID>
+    <ID>ReturnCount:TiltDecoder.kt$TiltDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:TiltDecoder.kt$TiltDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:TuyaTHBDecoder.kt$TuyaTHBDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:TuyaTHBDecoder.kt$TuyaTHBDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:VictronDecoder.kt$VictronDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>ReturnCount:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$override fun decode(input: BleBeaconScanInput): SensorData</ID>
+    <ID>ReturnCount:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$override fun supports(input: BleBeaconScanInput): Boolean</ID>
+    <ID>SwallowedException:ABN03Decoder.kt$ABN03Decoder$e: Exception</ID>
+    <ID>SwallowedException:ABN07Decoder.kt$ABN07Decoder$e: Exception</ID>
+    <ID>SwallowedException:ABTempDecoder.kt$ABTempDecoder$e: Exception</ID>
+    <ID>SwallowedException:AdRecordParser.kt$AdRecordParser$e: Exception</ID>
+    <ID>SwallowedException:AltBeaconDecoder.kt$AltBeaconDecoder$e: Exception</ID>
+    <ID>SwallowedException:AmphiroDecoder.kt$AmphiroDecoder$e: Exception</ID>
+    <ID>SwallowedException:AnemometerDecoder.kt$AnemometerDecoder$e: Exception</ID>
+    <ID>SwallowedException:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$e: Exception</ID>
+    <ID>SwallowedException:Aranet4Decoder.kt$Aranet4Decoder$e: Exception</ID>
+    <ID>SwallowedException:BM2BatteryMonitorDecoder.kt$BM2BatteryMonitorDecoder$e: Exception</ID>
+    <ID>SwallowedException:BM6BatteryMonitorDecoder.kt$BM6BatteryMonitorDecoder$e: Exception</ID>
+    <ID>SwallowedException:BParasiteDecoder.kt$BParasiteDecoder$e: Exception</ID>
+    <ID>SwallowedException:BParasiteV2Decoder.kt$BParasiteV2Decoder$e: Exception</ID>
+    <ID>SwallowedException:BeeWiDoorDecoder.kt$BeeWiDoorDecoder$e: Exception</ID>
+    <ID>SwallowedException:BlueCharmDecoder.kt$BlueCharmDecoder$e: Exception</ID>
+    <ID>SwallowedException:BlueMaestro1Decoder.kt$BlueMaestro1Decoder$e: Exception</ID>
+    <ID>SwallowedException:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$e: Exception</ID>
+    <ID>SwallowedException:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$e: Exception</ID>
+    <ID>SwallowedException:BoschEbDecoder.kt$BoschEbDecoder$e: Exception</ID>
+    <ID>SwallowedException:EcoFlowDecoder.kt$EcoFlowDecoder$e: Exception</ID>
+    <ID>SwallowedException:FeasycomDecoder.kt$FeasycomDecoder$e: Exception</ID>
+    <ID>SwallowedException:GenericTrackerDecoder.kt$GenericTrackerDecoder$e: Exception</ID>
+    <ID>SwallowedException:GoveeBTHDecoder.kt$GoveeBTHDecoder$e: Exception</ID>
+    <ID>SwallowedException:GoveeH5055Decoder.kt$GoveeH5055Decoder$e: Exception</ID>
+    <ID>SwallowedException:GoveeH5072Decoder.kt$GoveeH5072Decoder$e: Exception</ID>
+    <ID>SwallowedException:GoveeH5074Decoder.kt$GoveeH5074Decoder$e: Exception</ID>
+    <ID>SwallowedException:GoveeH5106Decoder.kt$GoveeH5106Decoder$e: Exception</ID>
+    <ID>SwallowedException:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$e: Exception</ID>
+    <ID>SwallowedException:HeartRateDecoder.kt$HeartRateDecoder$e: Exception</ID>
+    <ID>SwallowedException:HoboDecoder.kt$HoboDecoder$e: Exception</ID>
+    <ID>SwallowedException:HolyIotDecoder.kt$HolyIotDecoder$e: Exception</ID>
+    <ID>SwallowedException:IBeaconDecoder.kt$IBeaconDecoder$e: Exception</ID>
+    <ID>SwallowedException:INodeDecoder.kt$INodeDecoder$e: Exception</ID>
+    <ID>SwallowedException:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$e: Exception</ID>
+    <ID>SwallowedException:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$e: Exception</ID>
+    <ID>SwallowedException:InkbirdTHDecoder.kt$InkbirdTHDecoder$e: Exception</ID>
+    <ID>SwallowedException:JaaleeDecoder.kt$JaaleeDecoder$e: Exception</ID>
+    <ID>SwallowedException:KKMDecoder.kt$KKMDecoder$e: Exception</ID>
+    <ID>SwallowedException:MiBandDecoder.kt$MiBandDecoder$e: Exception</ID>
+    <ID>SwallowedException:MikrotikDecoder.kt$MikrotikDecoder$e: Exception</ID>
+    <ID>SwallowedException:MokobeaconDecoder.kt$MokobeaconDecoder$e: Exception</ID>
+    <ID>SwallowedException:MokosmartDecoder.kt$MokosmartDecoder$e: Exception</ID>
+    <ID>SwallowedException:MopekaDecoder.kt$MopekaDecoder$e: Exception</ID>
+    <ID>SwallowedException:NodonDecoder.kt$NodonDecoder$e: Exception</ID>
+    <ID>SwallowedException:OralBDecoder.kt$OralBDecoder$e: Exception</ID>
+    <ID>SwallowedException:OrasDecoder.kt$OrasDecoder$e: Exception</ID>
+    <ID>SwallowedException:OtodataDecoder.kt$OtodataDecoder$e: Exception</ID>
+    <ID>SwallowedException:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$e: Exception</ID>
+    <ID>SwallowedException:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$e: Exception</ID>
+    <ID>SwallowedException:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$e: Exception</ID>
+    <ID>SwallowedException:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$e: Exception</ID>
+    <ID>SwallowedException:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$e: Exception</ID>
+    <ID>SwallowedException:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$e: Exception</ID>
+    <ID>SwallowedException:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$e: Exception</ID>
+    <ID>SwallowedException:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$e: Exception</ID>
+    <ID>SwallowedException:RadiolandDecoder.kt$RadiolandDecoder$e: Exception</ID>
+    <ID>SwallowedException:SamsungFindDecoder.kt$SamsungFindDecoder$e: Exception</ID>
+    <ID>SwallowedException:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$e: Exception</ID>
+    <ID>SwallowedException:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$e: Exception</ID>
+    <ID>SwallowedException:SensorEasyDecoder.kt$SensorEasyDecoder$e: Exception</ID>
+    <ID>SwallowedException:SensorPushDecoder.kt$SensorPushDecoder$e: Exception</ID>
+    <ID>SwallowedException:ServiceDataDecoder.kt$ServiceDataDecoder$e: Exception</ID>
+    <ID>SwallowedException:ShellyButtonDecoder.kt$ShellyButtonDecoder$e: Exception</ID>
+    <ID>SwallowedException:ShellyDoorDecoder.kt$ShellyDoorDecoder$e: Exception</ID>
+    <ID>SwallowedException:ShellyHTDecoder.kt$ShellyHTDecoder$e: Exception</ID>
+    <ID>SwallowedException:ShellyMotionDecoder.kt$ShellyMotionDecoder$e: Exception</ID>
+    <ID>SwallowedException:SkaleDecoder.kt$SkaleDecoder$e: Exception</ID>
+    <ID>SwallowedException:SmartDryDecoder.kt$SmartDryDecoder$e: Exception</ID>
+    <ID>SwallowedException:SwiftPairParser.kt$SwiftPairParser$e: Exception</ID>
+    <ID>SwallowedException:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$e: Exception</ID>
+    <ID>SwallowedException:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$e: Exception</ID>
+    <ID>SwallowedException:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$e: Exception</ID>
+    <ID>SwallowedException:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$e: Exception</ID>
+    <ID>SwallowedException:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$e: Exception</ID>
+    <ID>SwallowedException:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$e: Exception</ID>
+    <ID>SwallowedException:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$e: Exception</ID>
+    <ID>SwallowedException:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$e: Exception</ID>
+    <ID>SwallowedException:TPMSBRDecoder.kt$TPMSBRDecoder$e: Exception</ID>
+    <ID>SwallowedException:TPMSDecoder.kt$TPMSDecoder$e: Exception</ID>
+    <ID>SwallowedException:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$e: Exception</ID>
+    <ID>SwallowedException:ThermoProDecoder.kt$ThermoProDecoder$e: Exception</ID>
+    <ID>SwallowedException:TiltDecoder.kt$TiltDecoder$e: Exception</ID>
+    <ID>SwallowedException:TuyaTHBDecoder.kt$TuyaTHBDecoder$e: Exception</ID>
+    <ID>SwallowedException:VchonDecoder.kt$VchonDecoder$e: Exception</ID>
+    <ID>SwallowedException:VictronDecoder.kt$VictronDecoder$e: Exception</ID>
+    <ID>SwallowedException:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$e: Exception</ID>
+    <ID>SwallowedException:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$e: Exception</ID>
+    <ID>SwallowedException:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$e: Exception</ID>
+    <ID>SwallowedException:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$e: Exception</ID>
+    <ID>SwallowedException:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ABN03Decoder.kt$ABN03Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ABN07Decoder.kt$ABN07Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ABTempDecoder.kt$ABTempDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AdRecordParser.kt$AdRecordParser$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AltBeaconDecoder.kt$AltBeaconDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AmphiroDecoder.kt$AmphiroDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AnemometerDecoder.kt$AnemometerDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AppleAirPodsDecoder.kt$AppleAirPodsDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:Aranet4Decoder.kt$Aranet4Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BM2BatteryMonitorDecoder.kt$BM2BatteryMonitorDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BM6BatteryMonitorDecoder.kt$BM6BatteryMonitorDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BParasiteDecoder.kt$BParasiteDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BParasiteV2Decoder.kt$BParasiteV2Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BeeWiDoorDecoder.kt$BeeWiDoorDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BlueCharmDecoder.kt$BlueCharmDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BlueMaestro1Decoder.kt$BlueMaestro1Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BlueMaestro3Decoder.kt$BlueMaestro3Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BlueMaestro4Decoder.kt$BlueMaestro4Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BoschEbDecoder.kt$BoschEbDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:EcoFlowDecoder.kt$EcoFlowDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:FeasycomDecoder.kt$FeasycomDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GenericTrackerDecoder.kt$GenericTrackerDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GoveeBTHDecoder.kt$GoveeBTHDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GoveeH5055Decoder.kt$GoveeH5055Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GoveeH5072Decoder.kt$GoveeH5072Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GoveeH5074Decoder.kt$GoveeH5074Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GoveeH5106Decoder.kt$GoveeH5106Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:HHCCRoPotDecoder.kt$HHCCRoPotDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:HeartRateDecoder.kt$HeartRateDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:HoboDecoder.kt$HoboDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:HolyIotDecoder.kt$HolyIotDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:IBeaconDecoder.kt$IBeaconDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:INodeDecoder.kt$INodeDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:InkbirdIBBQDecoder.kt$InkbirdIBBQDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:InkbirdPoolDecoder.kt$InkbirdPoolDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:InkbirdTHDecoder.kt$InkbirdTHDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:JaaleeDecoder.kt$JaaleeDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:KKMDecoder.kt$KKMDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MiBandDecoder.kt$MiBandDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MikrotikDecoder.kt$MikrotikDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MokobeaconDecoder.kt$MokobeaconDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MokosmartDecoder.kt$MokosmartDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MopekaDecoder.kt$MopekaDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:NodonDecoder.kt$NodonDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:OralBDecoder.kt$OralBDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:OrasDecoder.kt$OrasDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:OtodataDecoder.kt$OtodataDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:QingpingCGD1Decoder.kt$QingpingCGD1Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:QingpingCGDK2Decoder.kt$QingpingCGDK2Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:QingpingCGDN1Decoder.kt$QingpingCGDN1Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:QingpingCGH1Decoder.kt$QingpingCGH1Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:QingpingCGP1WDecoder.kt$QingpingCGP1WDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:QingpingCGP22CDecoder.kt$QingpingCGP22CDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:QingpingCGP23WDecoder.kt$QingpingCGP23WDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:QingpingCGPR1Decoder.kt$QingpingCGPR1Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RadiolandDecoder.kt$RadiolandDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SamsungFindDecoder.kt$SamsungFindDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SensirionSCD4XDecoder.kt$SensirionSCD4XDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SensirionSHT4XDecoder.kt$SensirionSHT4XDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SensorEasyDecoder.kt$SensorEasyDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SensorPushDecoder.kt$SensorPushDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ServiceDataDecoder.kt$ServiceDataDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ShellyButtonDecoder.kt$ShellyButtonDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ShellyDoorDecoder.kt$ShellyDoorDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ShellyHTDecoder.kt$ShellyHTDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ShellyMotionDecoder.kt$ShellyMotionDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SkaleDecoder.kt$SkaleDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SmartDryDecoder.kt$SmartDryDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SwiftPairParser.kt$SwiftPairParser$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SwitchBotBlindTiltDecoder.kt$SwitchBotBlindTiltDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SwitchBotBotDecoder.kt$SwitchBotBotDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SwitchBotContactDecoder.kt$SwitchBotContactDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SwitchBotCurtainDecoder.kt$SwitchBotCurtainDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SwitchBotMeterPlusDecoder.kt$SwitchBotMeterPlusDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SwitchBotMeterProDecoder.kt$SwitchBotMeterProDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SwitchBotMotionDecoder.kt$SwitchBotMotionDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SwitchBotOutdoorMeterDecoder.kt$SwitchBotOutdoorMeterDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:TP357SDecoder.kt$TP357SDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:TPMSBRDecoder.kt$TPMSBRDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:TPMSDecoder.kt$TPMSDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ThermoBeaconDecoder.kt$ThermoBeaconDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ThermoProDecoder.kt$ThermoProDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:TiltDecoder.kt$TiltDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:TuyaTHBDecoder.kt$TuyaTHBDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:VchonDecoder.kt$VchonDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:VictronDecoder.kt$VictronDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:XiaomiFormaldehydeDecoder.kt$XiaomiFormaldehydeDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:XiaomiLYWSD02Decoder.kt$XiaomiLYWSD02Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:XiaomiLYWSD03Decoder.kt$XiaomiLYWSD03Decoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:XiaomiMiJiaDecoder.kt$XiaomiMiJiaDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:XiaomiMiLampDecoder.kt$XiaomiMiLampDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:XiaomiScaleDecoder.kt$XiaomiScaleDecoder$e: Exception</ID>
+    <ID>UnusedPrivateMember:EddystoneDecoder.kt$EddystoneDecoder$private fun decodeUptime(payload: ByteArray): Long</ID>
+    <ID>UnusedPrivateMember:GenericTrackerDecoder.kt$GenericTrackerDecoder$private fun extractInt( data: ByteArray, start: Int, len: Int, ): Int</ID>
+    <ID>UnusedPrivateMember:HeartRateDecoder.kt$HeartRateDecoder$private fun extractInt( data: ByteArray, start: Int, len: Int, ): Int</ID>
+    <ID>UnusedPrivateProperty:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder.Companion$// Common service UUIDs for RGB bulbs private const val SERVICE_FFE5 = 0xFFE5 // Control service</ID>
+    <ID>UnusedPrivateProperty:TuyaRGBBulbDecoder.kt$TuyaRGBBulbDecoder.Companion$private const val SERVICE_FFE0 = 0xFFE0 // Status service</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$("Not enough data", modifier = Modifier.align(Alignment.Center), style = MaterialTheme.typography.bodySmall)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$("Sensor Data", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSecondaryContainer)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(100.dp)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(Alignment.Center)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(Dimens.PaddingSmall)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f), RoundedCornerShape(Dimens.PaddingSmall))</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(alpha = 0.05f)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(android.content.Context.CLIPBOARD_SERVICE)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(checked = alertVibration, onCheckedChange = { alertVibration = it })</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(containerColor = MaterialTheme.colorScheme.secondaryContainer)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(containerColor = MaterialTheme.colorScheme.surfaceVariant)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(context, "Export failed", android.widget.Toast.LENGTH_SHORT)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(context, "JSON copied!", android.widget.Toast.LENGTH_SHORT)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(imageVector = Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer))</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant))</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(modifier = Modifier.fillMaxWidth().height(100.dp).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f), RoundedCornerShape(Dimens.PaddingSmall)))</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(modifier = Modifier.fillMaxWidth().padding(vertical = Dimens.PaddingExtraSmall), horizontalArrangement = Arrangement.SpaceBetween)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(text = "${device.rssi} dBm", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(text = connectionState.message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = Dimens.PaddingSmall))</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(text = device.getDisplayName(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(text = device?.getDisplayName() ?: "Unknown Device", style = MaterialTheme.typography.titleMedium)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(text = fingerprint, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(top = Dimens.PaddingSmall)</ID>
+    <ID>ArgumentListWrapping:DetailsScreen.kt$(vertical = Dimens.PaddingExtraSmall)</ID>
+    <ID>CyclomaticComplexMethod:DetailsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun DetailsScreen( fingerprint: String, onBackClick: () -&gt; Unit, viewModel: DetailsViewModel = hiltViewModel() )</ID>
+    <ID>ImplicitDefaultLocale:DetailsScreen.kt$String.format("%.0f%%", it)</ID>
+    <ID>ImplicitDefaultLocale:DetailsScreen.kt$String.format("%.1f°C", it)</ID>
+    <ID>LongMethod:DetailsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun DetailsScreen( fingerprint: String, onBackClick: () -&gt; Unit, viewModel: DetailsViewModel = hiltViewModel() )</ID>
+    <ID>MagicNumber:DetailsScreen.kt$100f</ID>
+    <ID>MagicNumber:DetailsScreen.kt$30f</ID>
+    <ID>MaxLineLength:DetailsScreen.kt$Box</ID>
+    <ID>MaxLineLength:DetailsScreen.kt$Card</ID>
+    <ID>MaxLineLength:DetailsScreen.kt$Row</ID>
+    <ID>MaxLineLength:DetailsScreen.kt$Text(text = connectionState.message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = Dimens.PaddingSmall))</ID>
+    <ID>MaxLineLength:DetailsScreen.kt$Text(text = fingerprint, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)</ID>
+    <ID>MaxLineLength:DetailsScreen.kt$val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager</ID>
+    <ID>MaximumLineLength:DetailsScreen.kt$ </ID>
+    <ID>MaximumLineLength:DetailsViewModel.kt$DetailsViewModel$ </ID>
+    <ID>Wrapping:DetailsScreen.kt$(</ID>
+  </CurrentIssues>
+</SmellBaseline>

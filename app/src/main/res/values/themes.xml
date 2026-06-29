@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Minimal startup theme to satisfy Android Manifest. 
+         All actual UI styling is handled via Jetpack Compose MaterialTheme. -->
+    <style name="Theme.Tracker" parent="@android:style/Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">#121212</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

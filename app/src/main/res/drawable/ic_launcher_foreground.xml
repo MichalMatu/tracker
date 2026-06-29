@@ -1,0 +1,27 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Outer ring (radar) -->
+    <path
+        android:fillColor="#4FC3F7"
+        android:pathData="M54,27c-14.91,0 -27,12.09 -27,27s12.09,27 27,27 27,-12.09 27,-27 -12.09,-27 -27,-27zM54,75c-11.6,0 -21,-9.4 -21,-21s9.4,-21 21,-21 21,9.4 21,21 -9.4,21 -21,21z"/>
+    
+    <!-- Inner circle (eye/target) -->
+    <path
+        android:fillColor="#29B6F6"
+        android:pathData="M54,42c-6.63,0 -12,5.37 -12,12s5.37,12 12,12 12,-5.37 12,-12 -5.37,-12 -12,-12z"/>
+    
+    <!-- Center dot -->
+    <path
+        android:fillColor="#01579B"
+        android:pathData="M54,50c-2.21,0 -4,1.79 -4,4s1.79,4 4,4 4,-1.79 4,-4 -1.79,-4 -4,-4z"/>
+    
+    <!-- Cross lines (radar style) -->
+    <path
+        android:fillColor="#4FC3F7"
+        android:pathData="M51,18v9h6v-9zM51,81v9h6v-9zM18,51v6h9v-6zM81,51v6h9v-6z"/>
+    
+</vector>

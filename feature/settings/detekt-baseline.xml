@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ArgumentListWrapping:DatabaseExporter.kt$DatabaseExporter$("devices", JsonArray( devicesExport.map { devMap -&gt; buildJsonObject { devMap.forEach { (k, v) -&gt; when (v) { is String -&gt; put(k, v) is Number -&gt; put(k, v) is Boolean -&gt; put(k, v) null -&gt; put(k, JsonNull) else -&gt; put(k, v.toString()) } } } } ) )</ID>
+    <ID>ArgumentListWrapping:DatabaseExporter.kt$DatabaseExporter$("signalSamples", JsonArray( samples.map { sample -&gt; buildJsonObject { put("deviceFingerprint", sample.deviceFingerprint) put("rssi", sample.rssi) put("timestamp", sample.timestamp) put("latitude", sample.latitude) put("longitude", sample.longitude) put("locationAccuracy", sample.locationAccuracy) } } ) )</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$("GATT Characteristics", uiState.gattCharacteristicCount, uiState.isUpdating)</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$(2.dp, MaterialTheme.colorScheme.primary)</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$(SettingsSection.MAIN)</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$(android.content.Context.CLIPBOARD_SERVICE)</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$(containerColor = MaterialTheme.colorScheme.primaryContainer)</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$(context, "Copied ${json.length} chars to clipboard", android.widget.Toast.LENGTH_LONG)</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$(context, "Export failed", android.widget.Toast.LENGTH_SHORT)</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$(horizontal = 12.dp, vertical = 8.dp)</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$(java.util.Date(timestamp))</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$(scheme, color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface)</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$(scheme, themeMode == "Dark" || (themeMode == "System" &amp;&amp; androidx.compose.foundation.isSystemInDarkTheme()))</ID>
+    <ID>ArgumentListWrapping:SettingsScreen.kt$(timestamp)</ID>
+    <ID>LongParameterList:SettingsScreen.kt$( detectionEnabled: Boolean, vibrateEnabled: Boolean, soundEnabled: Boolean, headsUpEnabled: Boolean, onDetectionChange: (Boolean) -&gt; Unit, onVibrateChange: (Boolean) -&gt; Unit, onSoundChange: (Boolean) -&gt; Unit, onHeadsUpChange: (Boolean) -&gt; Unit )</ID>
+    <ID>LongParameterList:SettingsScreen.kt$( themeMode: String, colorSchemeName: String, useDynamicColors: Boolean, onThemeModeChange: (String) -&gt; Unit, onColorSchemeChange: (String) -&gt; Unit, onDynamicColorToggle: (Boolean) -&gt; Unit )</ID>
+    <ID>MaxLineLength:SettingsScreen.kt$Text(scheme, color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface)</ID>
+    <ID>MaxLineLength:SettingsScreen.kt$android.widget.Toast.makeText(context, "Copied ${json.length} chars to clipboard", android.widget.Toast.LENGTH_LONG).show()</ID>
+    <ID>MaxLineLength:SettingsScreen.kt$border = if (isSelected) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else ButtonDefaults.outlinedButtonBorder</ID>
+    <ID>MaxLineLength:SettingsScreen.kt$border = if (themeMode == mode) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else ButtonDefaults.outlinedButtonBorder</ID>
+    <ID>MaxLineLength:SettingsScreen.kt$color = if (uiState.updateStatus?.startsWith("Error") == true) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary</ID>
+    <ID>MaxLineLength:SettingsScreen.kt$colors = if (isSelected) ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer) else ButtonDefaults.outlinedButtonColors()</ID>
+    <ID>MaxLineLength:SettingsScreen.kt$colors = if (themeMode == mode) ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer) else ButtonDefaults.outlinedButtonColors()</ID>
+    <ID>MaxLineLength:SettingsScreen.kt$val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager</ID>
+    <ID>MaxLineLength:SettingsScreen.kt$val previewColor = io.blueeye.core.ui.theme.getThemePrimaryColor(scheme, themeMode == "Dark" || (themeMode == "System" &amp;&amp; androidx.compose.foundation.isSystemInDarkTheme()))</ID>
+    <ID>MaximumLineLength:SettingsScreen.kt$ </ID>
+    <ID>NoWildcardImports:DatabaseExporter.kt$import kotlinx.serialization.json.*</ID>
+    <ID>WildcardImport:DatabaseExporter.kt$import kotlinx.serialization.json.*</ID>
+    <ID>Wrapping:DatabaseExporter.kt$DatabaseExporter$(</ID>
+    <ID>Wrapping:SettingsScreen.kt$androidx.compose.runtime.mutableStateOf(SettingsSection.MAIN)</ID>
+    <ID>Wrapping:SettingsScreen.kt$viewModel.updateGattCharacteristics()</ID>
+  </CurrentIssues>
+</SmellBaseline>

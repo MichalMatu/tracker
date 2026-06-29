@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ArgumentListWrapping:RadarUiFormatter.kt$RadarUiFormatter$(true, "⚠ RETRY ${device.connectionAttempts}", RadarUiColorToken.SUSPICIOUS)</ID>
+    <ID>CyclomaticComplexMethod:RadarDeviceItem.kt$@Composable fun RadarUiColorToken.resolve(): Color</ID>
+    <ID>LongMethod:RadarScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun RadarScreen( onDeviceClick: (String) -&gt; Unit, onMenuClick: () -&gt; Unit, viewModel: RadarViewModel = hiltViewModel(), )</ID>
+    <ID>LongParameterList:RadarScreen.kt$( deviceCount: Int, totalCount: Int, isFilterActive: Boolean, isScanning: Boolean, isBaselineActive: Boolean, filterCount: Int, onMenuClick: () -&gt; Unit, onScanToggle: () -&gt; Unit, onBaselineToggle: () -&gt; Unit, onFilterClick: () -&gt; Unit, onClearClick: () -&gt; Unit, )</ID>
+    <ID>MaxLineLength:RadarUiMapper.kt$RadarUiMapper$val isProbing = activeProbeMac != null &amp;&amp; (device.macAddress.equals(activeProbeMac, ignoreCase = true) || device.fingerprint.equals(activeProbeMac, ignoreCase = true))</ID>
+    <ID>MaximumLineLength:RadarDeviceItem.kt$ </ID>
+    <ID>MaximumLineLength:RadarUiMapper.kt$RadarUiMapper$ </ID>
+    <ID>UnusedParameter:FilterDialog.kt$availableVendors: List&lt;String&gt;</ID>
+  </CurrentIssues>
+</SmellBaseline>

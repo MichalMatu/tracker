@@ -1,0 +1,281 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ArgumentListWrapping:AddressCarryoverTracker.kt$AddressCarryoverTracker$(data.rssi, data.timestamp, payloadHash, uuidSet, deviceName, data.rawData ?: data.manufacturerData, advertisingInterval)</ID>
+    <ID>ArgumentListWrapping:AddressCarryoverTracker.kt$AddressCarryoverTracker$(targetId, isNewTarget = false, isCarryover = false, isPending = false, null)</ID>
+    <ID>ArgumentListWrapping:AddressCarryoverTracker.kt$AddressCarryoverTracker$(targetId, isNewTarget = false, isCarryover = true, isPending = false, target.primaryMac)</ID>
+    <ID>ArgumentListWrapping:AlertDecisionEngineTest.kt$AlertDecisionEngineTest$( isIgnored = false, isKnownTracker = true, userHasMoved = false, isZastane = false, trackingStatus = TrackingStatus.SAFE )</ID>
+    <ID>ArgumentListWrapping:AlertDecisionEngineTest.kt$AlertDecisionEngineTest$( isIgnored = true, isKnownTracker = false, userHasMoved = true, isZastane = false, trackingStatus = TrackingStatus.DANGEROUS )</ID>
+    <ID>ArgumentListWrapping:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeSignalSampleDao$(emptyList())</ID>
+    <ID>ArgumentListWrapping:BleScanHandler.kt$BleScanHandler$(TAG, "🧹 Cleanup: Removed $deleted old devices (inactive &gt; ${RETENTION_THRESHOLD_MS/1000}s)")</ID>
+    <ID>ArgumentListWrapping:BleScanHandler.kt$BleScanHandler$(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO)</ID>
+    <ID>ArgumentListWrapping:ClassicDevicePersister.kt$ClassicDevicePersister$("'")</ID>
+    <ID>ArgumentListWrapping:ClassicDevicePersister.kt$ClassicDevicePersister$("'", "’")</ID>
+    <ID>ArgumentListWrapping:ClassicDevicePersister.kt$ClassicDevicePersister$("’")</ID>
+    <ID>ArgumentListWrapping:ClassicDevicePersister.kt$ClassicDevicePersister$("’", "'")</ID>
+    <ID>ArgumentListWrapping:ClassicDevicePersister.kt$ClassicDevicePersister$(match.lastRssi - ctx.validRssi)</ID>
+    <ID>ArgumentListWrapping:ClassicDevicePersister.kt$ClassicDevicePersister$(uuidMatch.lastRssi - ctx.validRssi)</ID>
+    <ID>ArgumentListWrapping:CorrelationAnalysisTest.kt$CorrelationAnalysisTest$(";")</ID>
+    <ID>ArgumentListWrapping:CorrelationAnalysisTest.kt$CorrelationAnalysisTest$("Target \"${t.lastDeviceName ?: "Unknown"}\" [${t.primaryMac}] -&gt; ${t.macAliases.size} combined MACs")</ID>
+    <ID>ArgumentListWrapping:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$("ShadowMatch", "Concurrent Apple Merge (${if(dataIsShadow) "S-&gt;T" else "T-&gt;S"}): ${data.mac} -&gt; ${target.primaryMac} (dt=${timeDiff}ms, dRsum=${rssiDiff})")</ID>
+    <ID>ArgumentListWrapping:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$("ShadowMatch", "Microsoft MATCH: ${data.mac} -&gt; ${target.primaryMac}. RSSI: ${data.rssi}/${target.lastRssi}")</ID>
+    <ID>ArgumentListWrapping:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$("ShadowMatch", "Same Name MATCH: ${data.mac} (${data.name}) -&gt; ${target.primaryMac}. RSSI: ${data.rssi}/${target.lastRssi}")</ID>
+    <ID>ArgumentListWrapping:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$("ShadowMatch", "Same Name REJECT: ${data.mac} vs ${target.primaryMac}. Name '${data.name}'. RSSI: ${data.rssi}/${target.lastRssi} (Diff: $rssiDiff)")</ID>
+    <ID>ArgumentListWrapping:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$("ShadowMatch", "Shadow MATCH: ${data.mac} (${data.name}) -&gt; ${target.primaryMac} (${target.lastDeviceName}). RSSI: ${data.rssi}/${target.lastRssi}")</ID>
+    <ID>ArgumentListWrapping:DeviceDao.kt$DeviceDao$("SELECT * FROM devices WHERE lastDeviceName = :name OR lastDeviceName = :altName ORDER BY isInWatchlist DESC, firstSeenAt ASC LIMIT 1")</ID>
+    <ID>ArgumentListWrapping:DevicePersister.kt$DevicePersister$(TAG, "Failed to merge rescue candidate ${duplicate.fingerprint} into ${oldest.fingerprint}: ${e.message}")</ID>
+    <ID>ArgumentListWrapping:DeviceTypePriorityHelper.kt$DeviceTypePriorityHelper$("DeviceTypePriority", "Prevented downgrade: $current ($currentPriority) kept over $candidate ($candidatePriority)")</ID>
+    <ID>ArgumentListWrapping:FollowMeSessionManager.kt$FollowMeSessionManager$( startLocationLat!!, startLocationLon!!, currentLat, currentLon )</ID>
+    <ID>ArgumentListWrapping:ProbeResultHandler.kt$ProbeResultHandler$("ProbeResultHandler", "Failed to merge ${fingerprint} into ${matchingDevice.fingerprint}: ${e.message}")</ID>
+    <ID>ArgumentListWrapping:ScoreDiagnosticLogger.kt$ScoreDiagnosticLogger$("Time,MAC,TotalScore,Status,DurScore,RssiScore,TypeScore,MacScore,EncScore,Lat,Lon,Explanation\n")</ID>
+    <ID>ArgumentListWrapping:TrackerAlertService.kt$TrackerAlertService$( context, 0, intent, android.app.PendingIntent.FLAG_IMMUTABLE )</ID>
+    <ID>ArgumentListWrapping:TrackerAlertService.kt$TrackerAlertService$(TAG, "Warmup active: Skipping alert for $mac (${(WARMUP_PERIOD_MS - (now - serviceStartTime))/1000}s remaining)")</ID>
+    <ID>CyclomaticComplexMethod:BleScanHandler.kt$BleScanHandler$suspend fun handle(data: BleScanResultData)</ID>
+    <ID>CyclomaticComplexMethod:ClassicDevicePersister.kt$ClassicDevicePersister$private suspend fun persistExistingDevice( ctx: ClassicScanDataContext, existing: DeviceEntity, )</ID>
+    <ID>CyclomaticComplexMethod:ClassicDevicePersister.kt$ClassicDevicePersister$private suspend fun persistNewDevice(ctx: ClassicScanDataContext)</ID>
+    <ID>CyclomaticComplexMethod:CorrelationAnalysisTest.kt$CorrelationAnalysisTest$@Test fun `run simulation on dumped database`()</ID>
+    <ID>CyclomaticComplexMethod:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$fun findMatch( data: BleScanResultData, deviceName: String?, advertisingInterval: Long?, targets: Collection&lt;TrackedTarget&gt;, ): String?</ID>
+    <ID>CyclomaticComplexMethod:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$private fun stripHeaders(payload: ByteArray?): ByteArray?</ID>
+    <ID>CyclomaticComplexMethod:DevicePersister.kt$DevicePersister$private suspend fun persistExistingDevice( ctx: ScanDataContext, existing: DeviceEntity, sensorDataString: String?, classifier: ScanResultClassifier, )</ID>
+    <ID>CyclomaticComplexMethod:TacticalMsdDecoder.kt$TacticalMsdDecoder$private fun decodeAxon(data: ByteArray): TacticalState?</ID>
+    <ID>CyclomaticComplexMethod:TrackerAlertService.kt$TrackerAlertService$fun onDeviceAnalyzed(mac: String, score: Int, status: TrackingStatus)</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:TrackerAlertService.kt$TrackerAlertService$val (detect, vib, sound, hud) = prefs</ID>
+    <ID>EmptyFunctionBlock:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeDeviceDao${}</ID>
+    <ID>EmptyFunctionBlock:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeSignalSampleDao${}</ID>
+    <ID>ImportOrdering:AppleDeduplicationScenariosTest.kt$import io.blueeye.core.data.db.dao.DeviceDao import io.blueeye.core.data.db.dao.SignalSampleDao import io.blueeye.core.data.db.dao.DeviceSearchDao import io.blueeye.core.data.db.entity.DeviceEntity import io.blueeye.core.data.db.entity.SignalSampleEntity import io.blueeye.core.data.repository.handler.classic.ClassicDevicePersister import io.blueeye.core.data.repository.handler.classic.ClassicScanDataContext import io.blueeye.core.data.repository.handler.common.DeviceTypePriorityHelper import io.blueeye.core.data.tracker.AddressCarryoverTracker import io.blueeye.core.data.tracker.strategy.DeviceCorrelationStrategy import io.blueeye.core.model.DeviceType import io.blueeye.core.model.MacAddressType import io.blueeye.core.model.TrackingStatus import io.blueeye.core.scanner.model.BleScanResultData import kotlinx.coroutines.flow.Flow import kotlinx.coroutines.flow.flowOf import kotlinx.coroutines.runBlocking import org.junit.Assert.assertEquals import org.junit.Assert.assertNotEquals import org.junit.Assert.assertTrue import org.junit.Assert.assertNotNull import org.junit.Test import java.util.UUID</ID>
+    <ID>ImportOrdering:BleJsonParser.kt$import android.content.Context import android.util.Log import kotlinx.serialization.Serializable import kotlinx.serialization.json.Json import kotlinx.serialization.decodeFromString import java.io.IOException import javax.inject.Inject import javax.inject.Singleton</ID>
+    <ID>ImportOrdering:ClassicDevicePersister.kt$import io.blueeye.core.data.db.dao.DeviceDao import io.blueeye.core.data.db.dao.SignalSampleDao import io.blueeye.core.data.db.entity.DeviceEntity import io.blueeye.core.data.db.entity.SignalSampleEntity import io.blueeye.core.model.DeviceType import io.blueeye.core.model.MacAddressType import io.blueeye.core.data.repository.handler.common.DeviceTypePriorityHelper import javax.inject.Inject import javax.inject.Singleton</ID>
+    <ID>ImportOrdering:DevicePersister.kt$import io.blueeye.core.data.classifier.chipset.ChipsetIdentifier import io.blueeye.core.data.db.dao.DeviceDao import io.blueeye.core.data.db.dao.SignalSampleDao import io.blueeye.core.data.db.entity.DeviceEntity import io.blueeye.core.data.db.entity.SignalSampleEntity import io.blueeye.core.location.LocationProvider import io.blueeye.core.scanner.throttle.ScanThrottler import io.blueeye.core.data.repository.handler.common.DeviceTypePriorityHelper import javax.inject.Inject import javax.inject.Singleton</ID>
+    <ID>ImportOrdering:DevicePersisterDebounceTest.kt$import io.blueeye.core.data.db.dao.DeviceDao import io.blueeye.core.data.db.dao.SignalSampleDao import io.blueeye.core.data.db.entity.DeviceEntity import io.blueeye.core.location.LocationProvider import io.blueeye.core.scanner.throttle.ScanThrottler import io.blueeye.core.data.repository.handler.common.DeviceTypePriorityHelper import io.blueeye.core.model.DeviceType import io.blueeye.core.model.TrackingStatus import kotlinx.coroutines.test.runTest import org.junit.Test import org.mockito.kotlin.any import org.mockito.kotlin.eq import org.mockito.kotlin.mock import org.mockito.kotlin.never import org.mockito.kotlin.verify import org.mockito.kotlin.whenever</ID>
+    <ID>ImportOrdering:DeviceRepositoryImpl.kt$import io.blueeye.core.data.db.dao.DeviceDao import io.blueeye.core.data.db.dao.SignalSampleDao import io.blueeye.core.data.db.entity.SignalSampleEntity import io.blueeye.core.data.mapper.toDomain import io.blueeye.core.data.repository.handler.ble.BleScanHandler import io.blueeye.core.data.repository.handler.classic.ClassicScanHandler import io.blueeye.core.data.repository.handler.paired.ProbeResultHandler import io.blueeye.core.domain.repository.DeviceRepository import io.blueeye.core.model.Device import kotlinx.coroutines.flow.Flow import kotlinx.coroutines.flow.map import io.blueeye.core.data.utils.asResult import javax.inject.Inject import javax.inject.Singleton</ID>
+    <ID>ImportOrdering:WatchlistRepositoryImpl.kt$import io.blueeye.core.data.db.dao.DeviceDao import io.blueeye.core.data.db.dao.WatchlistDao import io.blueeye.core.data.db.entity.WatchlistEntity import io.blueeye.core.data.mapper.toDomain import io.blueeye.core.domain.repository.WatchlistDeviceItem import io.blueeye.core.domain.repository.WatchlistRepository import io.blueeye.core.model.AlertType import io.blueeye.core.model.Device import kotlinx.coroutines.flow.Flow import kotlinx.coroutines.flow.combine import io.blueeye.core.data.db.entity.DeviceEntity import io.blueeye.core.data.utils.asResult import javax.inject.Inject import javax.inject.Singleton</ID>
+    <ID>Indentation:AlertDecisionEngine.kt$AlertDecisionEngine$ </ID>
+    <ID>Indentation:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest$ </ID>
+    <ID>Indentation:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeDeviceDao$ </ID>
+    <ID>Indentation:BleScanHandler.kt$BleScanHandler$ </ID>
+    <ID>Indentation:ClassicDevicePersister.kt$ClassicDevicePersister$ </ID>
+    <ID>Indentation:CorrelationAnalysisTest.kt$CorrelationAnalysisTest$ </ID>
+    <ID>Indentation:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$ </ID>
+    <ID>Indentation:DevicePersister.kt$DevicePersister$ </ID>
+    <ID>Indentation:DeviceTypePriorityHelper.kt$DeviceTypePriorityHelper$ </ID>
+    <ID>Indentation:FollowMeSessionManager.kt$FollowMeSessionManager$ </ID>
+    <ID>Indentation:GattServicesStrategy.kt$GattServicesStrategy$ </ID>
+    <ID>Indentation:ProbeResultHandler.kt$ProbeResultHandler$ </ID>
+    <ID>Indentation:RfcommProbeService.kt$RfcommProbeService$ </ID>
+    <ID>Indentation:ScoreDiagnosticLogger.kt$ScoreDiagnosticLogger$ </ID>
+    <ID>Indentation:TrackerAlertService.kt$TrackerAlertService$ </ID>
+    <ID>LongParameterList:AddressCarryoverTracker.kt$AddressCarryoverTracker$( mac: String, rssi: Int, timestamp: Long, payloadHash: Int, uuidSet: Set&lt;String&gt;, deviceName: String?, payload: ByteArray?, interval: Long? )</ID>
+    <ID>LongParameterList:AddressCarryoverTracker.kt$AddressCarryoverTracker$( mac: String, targetId: String, rssi: Int, timestamp: Long, payloadHash: Int, interval: Long?, deviceName: String? )</ID>
+    <ID>LongParameterList:AddressCarryoverTracker.kt$AddressCarryoverTracker$( rssi: Int, timestamp: Long, payloadHash: Int, uuidSet: Set&lt;String&gt;, deviceName: String?, payload: ByteArray?, interval: Long? )</ID>
+    <ID>LongParameterList:BleScanHandler.kt$BleScanHandler$( private val deviceDao: DeviceDao, private val macAddressResolver: MacAddressResolver, private val deviceEnricher: DeviceEnricher, private val classifier: ScanResultClassifier, private val persister: DevicePersister, private val tacticalAlertService: TacticalAlertService, private val followMeScoreCalculator: io.blueeye.core.data.tracker.FollowMeScoreCalculator, private val trackerAlertService: io.blueeye.core.alert.TrackerAlertService, private val diagnosticLogger: io.blueeye.core.data.diagnostics.ScoreDiagnosticLogger, private val locationProvider: io.blueeye.core.location.LocationProvider, private val sessionManager: io.blueeye.core.data.tracker.session.FollowMeSessionManager, private val alertDecisionEngine: io.blueeye.core.data.tracker.alert.AlertDecisionEngine, )</ID>
+    <ID>LoopWithTooManyJumpStatements:AddressCarryoverTracker.kt$AddressCarryoverTracker$for</ID>
+    <ID>LoopWithTooManyJumpStatements:AddressCarryoverTracker.kt$AddressCarryoverTracker.Companion$while</ID>
+    <ID>LoopWithTooManyJumpStatements:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$while</ID>
+    <ID>MagicNumber:AddressCarryoverTracker.kt$AddressCarryoverTracker$90</ID>
+    <ID>MagicNumber:AddressCarryoverTracker.kt$AddressCarryoverTracker.Companion$0.625</ID>
+    <ID>MagicNumber:AddressCarryoverTracker.kt$AddressCarryoverTracker.Companion$0x1A</ID>
+    <ID>MagicNumber:AddressCarryoverTracker.kt$AddressCarryoverTracker.Companion$0xFF</ID>
+    <ID>MagicNumber:AddressCarryoverTracker.kt$AddressCarryoverTracker.Companion$3</ID>
+    <ID>MagicNumber:AddressCarryoverTracker.kt$AddressCarryoverTracker.Companion$8</ID>
+    <ID>MagicNumber:BleScanHandler.kt$BleScanHandler$10</ID>
+    <ID>MagicNumber:BleScanHandler.kt$BleScanHandler$1000</ID>
+    <ID>MagicNumber:BleScanHandler.kt$BleScanHandler$90</ID>
+    <ID>MagicNumber:ClassicDevicePersister.kt$ClassicDevicePersister$10</ID>
+    <ID>MagicNumber:ClassicDevicePersister.kt$ClassicDevicePersister$15</ID>
+    <ID>MagicNumber:ClassicDevicePersister.kt$ClassicDevicePersister$300_000</ID>
+    <ID>MagicNumber:ClassicDevicePersister.kt$ClassicDevicePersister$30_000</ID>
+    <ID>MagicNumber:ClassicDevicePersister.kt$ClassicDevicePersister$76</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$0.1</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$0.2</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$0.5f</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$0.8f</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$0.99f</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$0.9f</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$0xFF</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$10</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$1000</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$20</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$3</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$4</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$50</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$6</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$75</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$76</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$8</ID>
+    <ID>MagicNumber:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$95</ID>
+    <ID>MagicNumber:DeviceTypePriorityHelper.kt$DeviceTypePriorityHelper$3</ID>
+    <ID>MagicNumber:DeviceTypeResolver.kt$DeviceTypeResolver$100</ID>
+    <ID>MagicNumber:DeviceTypeResolver.kt$DeviceTypeResolver$20</ID>
+    <ID>MagicNumber:DeviceTypeResolver.kt$DeviceTypeResolver$40</ID>
+    <ID>MagicNumber:DeviceTypeResolver.kt$DeviceTypeResolver$60</ID>
+    <ID>MagicNumber:DeviceTypeResolver.kt$DeviceTypeResolver$80</ID>
+    <ID>MagicNumber:FollowMeSessionManager.kt$FollowMeSessionManager$6371000.0</ID>
+    <ID>MagicNumber:TacticalMsdDecoder.kt$TacticalMsdDecoder$0x03</ID>
+    <ID>MagicNumber:TacticalProcessor.kt$TacticalProcessor$6</ID>
+    <ID>MagicNumber:TrackerAlertService.kt$TrackerAlertService$1000</ID>
+    <ID>MagicNumber:TrackerAlertService.kt$TrackerAlertService$3000</ID>
+    <ID>MagicNumber:TrackerAlertService.kt$TrackerAlertService$8</ID>
+    <ID>MaxLineLength:AddressCarryoverTracker.kt$AddressCarryoverTracker$target.update(data.rssi, data.timestamp, payloadHash, uuidSet, deviceName, data.rawData ?: data.manufacturerData, advertisingInterval)</ID>
+    <ID>MaxLineLength:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeDeviceDao$override suspend fun updateProbeData(fingerprint: String, status: String, attempts: Int, timestamp: Long, model: String?, serial: String?, firmware: String?, hardware: String?, software: String?, manufacturer: String?, battery: Int?, services: String?, charData: String?, error: String?, newDeviceType: DeviceType)</ID>
+    <ID>MaxLineLength:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeSignalSampleDao$override suspend fun getSamplesInTimeRange(fingerprint: String, startTime: Long, endTime: Long): List&lt;SignalSampleEntity&gt;</ID>
+    <ID>MaxLineLength:BleScanHandler.kt$BleScanHandler$val isPending = ctx.existingDevice?.connectionStatus == "NONE" || ctx.existingDevice?.deviceType == io.blueeye.core.model.DeviceType.UNKNOWN</ID>
+    <ID>MaxLineLength:ClassicDevicePersister.kt$ClassicDevicePersister$(existing.lastDeviceName == "Apple, Inc. Device" || existing.lastDeviceName == "Apple Device" || existing.lastDeviceName.isNullOrBlank())</ID>
+    <ID>MaxLineLength:DeviceClassifier.kt$DeviceClassifier$fun</ID>
+    <ID>MaxLineLength:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$android.util.Log.i("ShadowMatch", "Concurrent Apple Merge (${if(dataIsShadow) "S-&gt;T" else "T-&gt;S"}): ${data.mac} -&gt; ${target.primaryMac} (dt=${timeDiff}ms, dRsum=${rssiDiff})")</ID>
+    <ID>MaxLineLength:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$android.util.Log.i("ShadowMatch", "Same Name MATCH: ${data.mac} (${data.name}) -&gt; ${target.primaryMac}. RSSI: ${data.rssi}/${target.lastRssi}")</ID>
+    <ID>MaxLineLength:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$android.util.Log.i("ShadowMatch", "Shadow MATCH: ${data.mac} (${data.name}) -&gt; ${target.primaryMac} (${target.lastDeviceName}). RSSI: ${data.rssi}/${target.lastRssi}")</ID>
+    <ID>MaxLineLength:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$android.util.Log.v("ShadowMatch", "Same Name REJECT: ${data.mac} vs ${target.primaryMac}. Name '${data.name}'. RSSI: ${data.rssi}/${target.lastRssi} (Diff: $rssiDiff)")</ID>
+    <ID>MaxLineLength:DeviceDao.kt$DeviceDao$@Query("SELECT * FROM devices WHERE lastDeviceName = :name OR lastDeviceName = :altName ORDER BY isInWatchlist DESC, firstSeenAt ASC LIMIT 1")</ID>
+    <ID>MaxLineLength:DevicePersister.kt$DevicePersister$android.util.Log.e(TAG, "Failed to merge rescue candidate ${duplicate.fingerprint} into ${oldest.fingerprint}: ${e.message}")</ID>
+    <ID>MaxLineLength:DeviceTypePriorityHelper.kt$DeviceTypePriorityHelper$android.util.Log.i("DeviceTypePriority", "Prevented downgrade: $current ($currentPriority) kept over $candidate ($candidatePriority)")</ID>
+    <ID>MaxLineLength:RepositoryModule.kt$RepositoryModule$abstract</ID>
+    <ID>MaxLineLength:RfcommProbeService.kt$RfcommProbeService$model = null</ID>
+    <ID>MaxLineLength:TrackerAlertService.kt$TrackerAlertService$if</ID>
+    <ID>MaxLineLength:TrackerAlertService.kt$TrackerAlertService$val</ID>
+    <ID>MaximumLineLength:AddressCarryoverTracker.kt$AddressCarryoverTracker$ </ID>
+    <ID>MaximumLineLength:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeDeviceDao$ </ID>
+    <ID>MaximumLineLength:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeSignalSampleDao$ </ID>
+    <ID>MaximumLineLength:BleScanHandler.kt$BleScanHandler$ </ID>
+    <ID>MaximumLineLength:ClassicDevicePersister.kt$ClassicDevicePersister$ </ID>
+    <ID>MaximumLineLength:CorrelationAnalysisTest.kt$CorrelationAnalysisTest$ </ID>
+    <ID>MaximumLineLength:DeviceClassifier.kt$DeviceClassifier$ </ID>
+    <ID>MaximumLineLength:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$ </ID>
+    <ID>MaximumLineLength:DeviceDao.kt$DeviceDao$ </ID>
+    <ID>MaximumLineLength:DevicePersister.kt$DevicePersister$ </ID>
+    <ID>MaximumLineLength:DeviceRepositoryImpl.kt$DeviceRepositoryImpl$ </ID>
+    <ID>MaximumLineLength:DeviceTypePriorityHelper.kt$DeviceTypePriorityHelper$ </ID>
+    <ID>MaximumLineLength:DeviceTypeResolver.kt$DeviceTypeResolver$ </ID>
+    <ID>MaximumLineLength:ProbeResultHandler.kt$ProbeResultHandler$ </ID>
+    <ID>MaximumLineLength:RepositoryModule.kt$RepositoryModule$ </ID>
+    <ID>MaximumLineLength:RfcommProbeService.kt$RfcommProbeService$ </ID>
+    <ID>MaximumLineLength:ScoreDiagnosticLogger.kt$ScoreDiagnosticLogger$ </ID>
+    <ID>MaximumLineLength:TacticalProcessor.kt$TacticalProcessor$ </ID>
+    <ID>MaximumLineLength:TrackerAlertService.kt$TrackerAlertService$ </ID>
+    <ID>MultiLineIfElse:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$0f</ID>
+    <ID>NestedBlockDepth:DevicePersister.kt$DevicePersister$private suspend fun tryRescueCarryover(ctx: ScanDataContext): String?</ID>
+    <ID>NoBlankLineBeforeRbrace:ClassicDevicePersister.kt$ClassicDevicePersister$ </ID>
+    <ID>NoBlankLineBeforeRbrace:DeviceSearchDao.kt$DeviceSearchDao$ </ID>
+    <ID>NoBlankLineBeforeRbrace:RfcommProbeService.kt$RfcommProbeService$ </ID>
+    <ID>NoBlankLineBeforeRbrace:ScoreDiagnosticLogger.kt$ScoreDiagnosticLogger$ </ID>
+    <ID>NoConsecutiveBlankLines:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest$ </ID>
+    <ID>NoConsecutiveBlankLines:BleScanHandler.kt$ </ID>
+    <ID>NoConsecutiveBlankLines:BleScanHandler.kt$BleScanHandler$ </ID>
+    <ID>NoConsecutiveBlankLines:ClassicDevicePersister.kt$ClassicDevicePersister$ </ID>
+    <ID>NoConsecutiveBlankLines:DeviceSearchDao.kt$DeviceSearchDao$ </ID>
+    <ID>NoConsecutiveBlankLines:ScanDataContext.kt$ScanDataContext$ </ID>
+    <ID>NoTrailingSpaces:AddressCarryoverTracker.kt$AddressCarryoverTracker$ </ID>
+    <ID>NoTrailingSpaces:AddressCarryoverTrackerTest.kt$AddressCarryoverTrackerTest$ </ID>
+    <ID>NoTrailingSpaces:AlertDecisionEngine.kt$AlertDecisionEngine$ </ID>
+    <ID>NoTrailingSpaces:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest$ </ID>
+    <ID>NoTrailingSpaces:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest$// Note: AddressCarryoverTracker updates internal state. </ID>
+    <ID>NoTrailingSpaces:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest$// Simulate persistence of T1 name so next scan sees it? </ID>
+    <ID>NoTrailingSpaces:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeDeviceDao$ </ID>
+    <ID>NoTrailingSpaces:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeSignalSampleDao$ </ID>
+    <ID>NoTrailingSpaces:BleScanHandler.kt$BleScanHandler$ </ID>
+    <ID>NoTrailingSpaces:ClassicDevicePersister.kt$ClassicDevicePersister$ </ID>
+    <ID>NoTrailingSpaces:ClassicScanDataContext.kt$ClassicScanDataContext$ </ID>
+    <ID>NoTrailingSpaces:CorrelationAnalysisTest.kt$CorrelationAnalysisTest$ </ID>
+    <ID>NoTrailingSpaces:CorrelationAnalysisTest.kt$CorrelationAnalysisTest$// We use a simplified version of the logic that ignores time windows </ID>
+    <ID>NoTrailingSpaces:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$ </ID>
+    <ID>NoTrailingSpaces:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$// Actually, we should return the Data part ONLY? </ID>
+    <ID>NoTrailingSpaces:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$// Apply RSSI Penalty. </ID>
+    <ID>NoTrailingSpaces:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$// Check for 0x06 00 in typical offsets. </ID>
+    <ID>NoTrailingSpaces:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$// Expert said: Sequence Continuity weight 0.9. </ID>
+    <ID>NoTrailingSpaces:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$// If both devices identify as "Apple Watch" (or any same name) and are very close, </ID>
+    <ID>NoTrailingSpaces:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$// Return payload WITHOUT this Company ID (3 bytes: Type FF + C1 + C2 replaced by... nothing? </ID>
+    <ID>NoTrailingSpaces:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy.Companion$ </ID>
+    <ID>NoTrailingSpaces:DevicePersister.kt$DevicePersister$ </ID>
+    <ID>NoTrailingSpaces:DevicePersister.kt$DevicePersister$// Optimizing this would require an extra DB read, which might defeat the purpose. </ID>
+    <ID>NoTrailingSpaces:DevicePersisterDebounceTest.kt$DevicePersisterDebounceTest$ </ID>
+    <ID>NoTrailingSpaces:DeviceTypePriorityHelper.kt$DeviceTypePriorityHelper$ </ID>
+    <ID>NoTrailingSpaces:FollowMeScoreCalculatorRealLifeTest.kt$FollowMeScoreCalculatorRealLifeTest$ </ID>
+    <ID>NoTrailingSpaces:FollowMeScoreCalculatorRealLifeTest.kt$FollowMeScoreCalculatorRealLifeTest$// </ID>
+    <ID>NoTrailingSpaces:FollowMeScoreCalculatorRealLifeTest.kt$FollowMeScoreCalculatorRealLifeTest$// FLAW CHECK: Is 54/100 too high for a bus ride? </ID>
+    <ID>NoTrailingSpaces:FollowMeScoreCalculatorTest.kt$FollowMeScoreCalculatorTest$ </ID>
+    <ID>NoTrailingSpaces:FollowMeSessionManager.kt$FollowMeSessionManager$ </ID>
+    <ID>NoTrailingSpaces:FollowMeSessionManagerTest.kt$FollowMeSessionManagerTest$ </ID>
+    <ID>NoTrailingSpaces:GenericRfcommHandler.kt$GenericRfcommHandler$ </ID>
+    <ID>NoTrailingSpaces:MacAddressResolver.kt$MacAddressResolver$ </ID>
+    <ID>NoTrailingSpaces:NameUtils.kt$NameUtils$ </ID>
+    <ID>NoTrailingSpaces:RfcommProbeService.kt$RfcommProbeService$ </ID>
+    <ID>NoTrailingSpaces:ScoreDiagnosticLogger.kt$ScoreDiagnosticLogger$ </ID>
+    <ID>NoTrailingSpaces:TacticalMsdDecoder.kt$TacticalMsdDecoder$ </ID>
+    <ID>NoTrailingSpaces:TacticalProcessor.kt$TacticalProcessor$ </ID>
+    <ID>NoTrailingSpaces:TrackerAlertService.kt$TrackerAlertService$ </ID>
+    <ID>NoUnusedImports:AddressCarryoverTracker.kt$io.blueeye.core.data.tracker.AddressCarryoverTracker.kt</ID>
+    <ID>NoUnusedImports:AddressCarryoverTrackerTest.kt$io.blueeye.core.data.tracker.AddressCarryoverTrackerTest.kt</ID>
+    <ID>NoUnusedImports:AppleDeduplicationScenariosTest.kt$io.blueeye.core.data.verify.AppleDeduplicationScenariosTest.kt</ID>
+    <ID>NoUnusedImports:DeviceRepositoryImpl.kt$io.blueeye.core.data.repository.DeviceRepositoryImpl.kt</ID>
+    <ID>NoWildcardImports:AlertDecisionEngineTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:FollowMeSessionManagerTest.kt$import org.junit.Assert.*</ID>
+    <ID>ParameterListWrapping:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeDeviceDao$( fingerprint: String, mac: String?, timestamp: Long, rssi: Int, technology: String, name: String?, vendor: String?, newType: DeviceType, sensor: String?, tx: Int?, connectable: Boolean, phy1: Int?, phy2: Int?, interval: Long?, beacon: String?, rawData: String?, services: String?, probeError: String? )</ID>
+    <ID>ParameterListWrapping:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeDeviceDao$(fingerprint: String, status: String, attempts: Int, timestamp: Long, model: String?, serial: String?, firmware: String?, hardware: String?, software: String?, manufacturer: String?, battery: Int?, services: String?, charData: String?, error: String?, newDeviceType: DeviceType)</ID>
+    <ID>ParameterListWrapping:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeDeviceDao$(gattServices: String, excludeFingerprint: String)</ID>
+    <ID>ParameterListWrapping:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeSignalSampleDao$(fingerprint: String, startTime: Long, endTime: Long)</ID>
+    <ID>ParameterListWrapping:RepositoryModule.kt$RepositoryModule$(impl: io.blueeye.core.data.repository.WatchlistRepositoryImpl)</ID>
+    <ID>ReturnCount:AddressCarryoverTracker.kt$AddressCarryoverTracker$private fun isDataStrong( name: String?, uuids: Set&lt;String&gt;, manufacturerData: ByteArray?, rssi: Int ): Boolean</ID>
+    <ID>ReturnCount:AddressCarryoverTracker.kt$AddressCarryoverTracker.Companion$fun extractAdvertisingInterval(bytes: ByteArray?): Long?</ID>
+    <ID>ReturnCount:AlertDecisionEngine.kt$AlertDecisionEngine$fun shouldAlert( isIgnored: Boolean, isKnownTracker: Boolean, userHasMoved: Boolean, isZastane: Boolean, trackingStatus: TrackingStatus ): Boolean</ID>
+    <ID>ReturnCount:BleScanSource.kt$BleScanSource$@SuppressLint("MissingPermission") fun start( macFilter: String? = null, onResult: (ScanResult) -&gt; Unit, onError: (Int) -&gt; Unit, ): Boolean</ID>
+    <ID>ReturnCount:ClassicDevicePersister.kt$ClassicDevicePersister$private suspend fun persistNewDevice(ctx: ClassicScanDataContext)</ID>
+    <ID>ReturnCount:ClassicScanSource.kt$ClassicScanSource$@SuppressLint("MissingPermission") fun start(callback: (BluetoothDevice, Int, Int?, List&lt;ParcelUuid&gt;?) -&gt; Unit): Boolean</ID>
+    <ID>ReturnCount:CorrelationAnalysisTest.kt$CorrelationAnalysisTest$private fun matchPayloadFuzzy(payloadA: ByteArray?, payloadB: ByteArray?): Float</ID>
+    <ID>ReturnCount:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$fun findMatch( data: BleScanResultData, deviceName: String?, advertisingInterval: Long?, targets: Collection&lt;TrackedTarget&gt;, ): String?</ID>
+    <ID>ReturnCount:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$private fun hasAppleManufacturerData(payload: ByteArray?): Boolean</ID>
+    <ID>ReturnCount:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$private fun matchMicrosoft( data: BleScanResultData, target: TrackedTarget ): Float</ID>
+    <ID>ReturnCount:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$private fun matchPayloadFuzzy(payloadA: ByteArray?, payloadB: ByteArray?): Float</ID>
+    <ID>ReturnCount:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$private fun matchSameNameHeuristic( data: BleScanResultData, target: TrackedTarget ): Float</ID>
+    <ID>ReturnCount:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$private fun matchSequenceHeuristic(a: ByteArray?, b: ByteArray?): Float</ID>
+    <ID>ReturnCount:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$private fun matchShadow( data: BleScanResultData, target: TrackedTarget ): Float</ID>
+    <ID>ReturnCount:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$private fun stripHeaders(payload: ByteArray?): ByteArray?</ID>
+    <ID>ReturnCount:DeviceTypePriorityHelper.kt$DeviceTypePriorityHelper$fun resolveBetterType(current: DeviceType, candidate: DeviceType): DeviceType</ID>
+    <ID>ReturnCount:FollowMeSessionManager.kt$FollowMeSessionManager$fun updateMovement(currentLat: Double?, currentLon: Double?): Boolean</ID>
+    <ID>ReturnCount:NameUtils.kt$NameUtils$fun resolveBestName(current: String?, candidate: String?): String?</ID>
+    <ID>ReturnCount:RfcommProbeService.kt$RfcommProbeService$@SuppressLint("MissingPermission") suspend fun probeDevice(macAddress: String): RfcommProbeResult?</ID>
+    <ID>ReturnCount:ScannerService.kt$ScannerService$private fun startForegroundService()</ID>
+    <ID>ReturnCount:TacticalMsdDecoder.kt$TacticalMsdDecoder$private fun decodeMotorola(data: ByteArray): TacticalState?</ID>
+    <ID>ReturnCount:TrackerAlertService.kt$TrackerAlertService$private suspend fun playAlertSound()</ID>
+    <ID>SpacingAroundKeyword:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$if</ID>
+    <ID>SpacingAroundOperators:BleScanHandler.kt$BleScanHandler$/</ID>
+    <ID>SpacingAroundOperators:TrackerAlertService.kt$TrackerAlertService$/</ID>
+    <ID>SpacingBetweenDeclarationsWithAnnotations:DeviceUpdateDao.kt$DeviceUpdateDao$@Query( """ UPDATE devices SET lastDeviceName = CASE WHEN :name IS NOT NULL THEN :name ELSE lastDeviceName END, lastRssi = :rssi, lastSeenAt = :timestamp, classOfDevice = CASE WHEN :cod IS NOT NULL THEN :cod ELSE classOfDevice END, technology = :technology, vendorName = CASE WHEN :vendor IS NOT NULL THEN :vendor ELSE vendorName END, deviceType = CASE WHEN :deviceType != 'UNKNOWN' THEN :deviceType ELSE deviceType END, encounterCount = encounterCount + 1, advertisingIntervalMs = :interval WHERE fingerprint = :fingerprint """, ) suspend fun updateClassicScanData( fingerprint: String, name: String?, rssi: Int, timestamp: Long, cod: Int?, technology: String, vendor: String?, deviceType: DeviceType, interval: Long? )</ID>
+    <ID>SpacingBetweenDeclarationsWithAnnotations:FollowMeSessionManager.kt$FollowMeSessionManager$@Volatile private var startLocationLon: Double? = null</ID>
+    <ID>SpacingBetweenDeclarationsWithAnnotations:FollowMeSessionManager.kt$FollowMeSessionManager$@Volatile private var userHasMoved: Boolean = false</ID>
+    <ID>SpacingBetweenDeclarationsWithAnnotations:TrackerAlertService.kt$TrackerAlertService$@Volatile private var isHeadsUpEnabled: Boolean = true</ID>
+    <ID>SpacingBetweenDeclarationsWithAnnotations:TrackerAlertService.kt$TrackerAlertService$@Volatile private var isSoundEnabled: Boolean = true</ID>
+    <ID>SpacingBetweenDeclarationsWithAnnotations:TrackerAlertService.kt$TrackerAlertService$@Volatile private var isVibrationEnabled: Boolean = true</ID>
+    <ID>SpacingBetweenDeclarationsWithComments:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.Companion$// 02011A 020A0C 0BFF4C001006021D3334AA78</ID>
+    <ID>SpacingBetweenDeclarationsWithComments:DevicePersister.kt$DevicePersister.Companion$// Lowered from 32 to 20 to support packets with just Flags + Small MfgData</ID>
+    <ID>StringTemplate:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$${rssiDiff}</ID>
+    <ID>StringTemplate:ProbeResultHandler.kt$ProbeResultHandler$${fingerprint}</ID>
+    <ID>TooGenericExceptionCaught:BleJsonParser.kt$BleJsonParser$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BleScanHandler.kt$BleScanHandler$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BleScanSource.kt$BleScanSource$e: RuntimeException</ID>
+    <ID>TooGenericExceptionCaught:DevicePersister.kt$DevicePersister$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ProbeResultHandler.kt$ProbeResultHandler$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RfcommConnectionManager.kt$RfcommConnectionManager$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:RfcommProbeService.kt$RfcommProbeService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ScannerService.kt$ScannerService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ScoreDiagnosticLogger.kt$ScoreDiagnosticLogger$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:TrackerAlertService.kt$TrackerAlertService$e: Exception</ID>
+    <ID>TooManyFunctions:AddressCarryoverTracker.kt$AddressCarryoverTracker</ID>
+    <ID>TooManyFunctions:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy</ID>
+    <ID>TooManyFunctions:RfcommConnectionManager.kt$RfcommConnectionManager</ID>
+    <ID>TooManyFunctions:ScannerService.kt$ScannerService : Service</ID>
+    <ID>UnusedParameter:CorrelationAnalysisTest.kt$CorrelationAnalysisTest$payloadHash: Int</ID>
+    <ID>UnusedParameter:CorrelationAnalysisTest.kt$CorrelationAnalysisTest$strategy: DeviceCorrelationStrategy</ID>
+    <ID>UnusedPrivateProperty:RfcommConnectionManager.kt$RfcommConnectionManager$val verificationJob = GlobalScope.launch(Dispatchers.IO) { try { this@connectSuspending.connect() if (continuation.isActive) continuation.resume(Unit) } catch (t: Throwable) { if (continuation.isActive) continuation.resumeWithException(t) } }</ID>
+    <ID>VariableNaming:BleScanHandler.kt$BleScanHandler$private val CLEANUP_INTERVAL_MS = 30_000L // Run every 30s</ID>
+    <ID>VariableNaming:BleScanHandler.kt$BleScanHandler$private val REPROBE_INTERVAL_MS = 5 * 60 * 1000L</ID>
+    <ID>VariableNaming:BleScanHandler.kt$BleScanHandler$private val RETENTION_THRESHOLD_MS = 180_000L // Delete if inactive for 3m</ID>
+    <ID>VariableNaming:FollowMeSessionManager.kt$FollowMeSessionManager$val R = 6371000.0 // Earth radius in meters</ID>
+    <ID>VariableNaming:ScoreDiagnosticLogger.kt$ScoreDiagnosticLogger$// Limit log size to ~10MB to avoid eating storage private val MAX_FILE_SIZE = 10 * 1024 * 1024L</ID>
+    <ID>VariableNaming:ScoreDiagnosticLogger.kt$ScoreDiagnosticLogger$private val HEARTBEAT_MS = 30_000L // Log at least every 30s if active</ID>
+    <ID>WildcardImport:AlertDecisionEngineTest.kt$import org.junit.Assert.*</ID>
+    <ID>WildcardImport:FollowMeSessionManagerTest.kt$import org.junit.Assert.*</ID>
+    <ID>Wrapping:AppleDeduplicationScenariosTest.kt$AppleDeduplicationScenariosTest.FakeDeviceDao${}</ID>
+    <ID>Wrapping:DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$(</ID>
+    <ID>Wrapping:TacticalProcessor.kt$TacticalProcessor$(</ID>
+  </CurrentIssues>
+</SmellBaseline>

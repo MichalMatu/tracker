@@ -1,0 +1,26 @@
+package io.blueeye.core.model
+
+data class SensorData(
+    val temperatureCelcius: Double? = null,
+    val humidityPercent: Double? = null,
+    val batteryLevel: Int? = null,
+    val pressureHpa: Double? = null,
+    val accelerationX: Double? = null,
+    val accelerationY: Double? = null,
+    val accelerationZ: Double? = null,
+    val txPower: Int? = null,
+    val movementDetected: Boolean? = null,
+    val illuminanceLux: Double? = null,
+    val co2Ppm: Int? = null,
+    val soilMoisturePercent: Double? = null,
+    val voltageV: Double? = null,
+    val doorOpen: Boolean? = null,
+    val fertilityUsCm: Int? = null,
+    val pm25Ugm3: Int? = null,
+    val pm10Ugm3: Int? = null,
+    val formaldehydeMgm3: Double? = null,
+    val sensorStatus: String? = null,
+    val beaconType: String? = null,
+    val rawData: String? = null,
+    val weightKg: Double? = null,
+)

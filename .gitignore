@@ -1,0 +1,43 @@
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+local.properties
+.idea/
+*.iml
+.gradle_android
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Temporary files
+*.tmp
+*.bak
+*~
+.tmp/
+
+# Android Studio
+*.apk
+*.ap_
+*.dex
+captures/
+db_dump/
+datasets/
+exports/
+db_dump/
+matching_engine/
+
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+verification_logs*.txt
+
+# Secret scanning reports
+gitleaks-report.*
+*.sarif

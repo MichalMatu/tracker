@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">BlueEye</string>
+    
+    <!-- Radar Feature -->
+    <string name="radar_active">RADAR ACTIVE</string>
+    <string name="baseline_active">BASELINE ACTIVE</string>
+    <string name="scanning_started">Scanning for signals...</string>
+    <string name="scanning_paused">Press ▶ to start scanning</string>
+    <string name="scanning_no_devices">Scanning... no devices found yet</string>
+    <string name="devices_nearby_format">%1$d devices nearby</string>
+    <string name="devices_filtered_format">%1$d of %2$d devices</string>
+    <string name="permission_ble_required">Bluetooth permissions are required to scan</string>
+    <string name="loading">Loading...</string>
+    <string name="device_toast">Device: %1$s</string>
+    
+    <!-- Clear All Dialog -->
+    <string name="clear_all_title">Clear All Data</string>
+    <string name="clear_all_message">This will delete all scanned devices and signal history. Are you sure?</string>
+    <string name="clear_all_confirm">Clear</string>
+    <string name="clear_all_done">All data cleared</string>
+    <string name="cancel">Cancel</string>
+    
+    <!-- Filter Feature -->
+    <string name="filter_title">Filter Devices</string>
+    <string name="filter_clear_all">Clear All</string>
+    <string name="filter_apply">Apply Filters</string>
+    <string name="filter_section_technology">Technology</string>
+    <string name="filter_section_device_type">Device Type</string>
+    <string name="filter_section_vendor">Vendor / Brand</string>
+    <string name="filter_section_options">Options</string>
+    <string name="filter_ble_4">Legacy BLE</string>
+    <string name="filter_ble_5">BLE Extended / Coded</string>
+    <string name="filter_classic">Classic</string>
+    <string name="filter_only_connectable">Show only connectable devices</string>
+    <string name="filter_hide_unknown">Hide unknown devices</string>
+    <string name="filter_no_match">No devices match filters\n(%1$d total scanned)</string>
+    
+    <!-- Tech Badges -->
+    <string name="tech_ble">BLE</string>
+    <string name="tech_ble_5">BLE 5</string>
+    <string name="tech_classic">Classic</string>
+</resources>
+
