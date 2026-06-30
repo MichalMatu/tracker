@@ -1,29 +1,76 @@
-# BlueEye MVP Goal Prompt
+# BlueEye Field MVP Goal Prompt
+
+## Operator Decision
+
+Nie rob pelnej aplikacji komercyjnej. Zrob dzisiaj kod w ksztalcie Field MVP: build gotowy do instalacji, diagnostyka widoczna, alerty spojne, ekran mniej zaszumiony, eksport sesji uzyteczny do pierwszych testow terenowych.
+
+Zgoda na sprint 2-3h dotyczy tylko tego zakresu. Dobry prompt nie usuwa ograniczen Androida i nie zastepuje testu na telefonie. Po tym sprincie MVP ma byc gotowe do pierwszych sesji terenowych, nie do sprzedazy w Google Play.
 
 ## Master Goal
 
-Doprowadz projekt BlueEye Tracker do pierwszej wersji terenowej MVP, ktora ma realna wartosc uzytkowa:
+Doprowadz projekt BlueEye Tracker do "Field MVP build":
 
-- niezawodnie pokazuje, czy telefon faktycznie zbiera sygnaly BLE/Classic w czasie sesji,
-- uczciwie rozroznia ograniczenia Androida, broad scan, filtered/watchlist scan i aktywne zbieranie,
-- ma spojny system alertow: watchlist, follow-me i public-safety-like signals,
-- pozwala uruchomic pierwsze sesje terenowe z eksportem danych i kalibracja progow,
-- nie obiecuje wykrycia osoby, intencji ani kazdego urzadzenia sledzacego.
+- aplikacja buduje sie i przechodzi minimalny quality gate,
+- UI nie jest zasypane przypadkowymi termometrami/smart-home/sensorami,
+- scanner pokazuje, czy realnie zbiera BLE/Classic po odblokowaniu i po zablokowaniu telefonu,
+- alerty watchlist/follow-me/public-safety-like ida przez jedna polityke,
+- ustawienia wibracji, dzwieku i heads-up sa przewidywalne,
+- Settings ma test alertu i diagnostyke blokad systemowych,
+- eksport sesji zawiera dane potrzebne do kalibracji,
+- Sony headphones sa traktowane jako smoke test widocznosci/klasyfikacji audio, nie jako tracker,
+- aplikacja nie obiecuje wykrycia osoby, intencji ani kazdego trackera.
 
-Pracuj bez branchy, bez XML layoutow, bez Fragments, bez LiveData, bez RxJava. Uzywaj Kotlin, Jetpack Compose, Hilt, Flow/StateFlow, Result<T>, Navigation Compose i istniejacej architektury feature-first. Wszystkie zmiany rob na `main`.
+## Hard Scope
 
-## Execution Rules
+Zostaje w MVP:
 
-Po kazdym podgolu:
+- watchlist return alerts,
+- passive BLE/Classic observation,
+- Follow-Me score jako ostrozna heurystyka,
+- public-safety-like evidence jako klasyfikacja sygnalu, nie claim obecnosci sluzb,
+- Apple/Google/Samsung/Tile/Chipolo/Fast Pair/audio/generic beacon evidence,
+- Sony/audio recognition,
+- evidence timeline/export,
+- active GATT only jako jawny opt-in.
 
-1. Uruchom minimalne testy dla dotknietych modulow.
-2. Jesli podgol dotyka build/runtime, uruchom tez `./gradlew :app:assembleDebug`.
-3. Zaktualizuj checklisty w tym pliku: zmien `[ ]` na `[x]` tylko dla faktycznie wykonanych punktow.
-4. Zrob commit z konkretnym komunikatem.
-5. Wypchnij `main`.
-6. Nie przechodz do nastepnego podgolu, jesli obecny nie ma zielonej weryfikacji albo jawnie opisanego blokera.
+Wyrzuc albo wylacz z produkcyjnego bindingu MVP:
 
-Minimalna weryfikacja lokalna:
+- termometry,
+- wilgotnosciomierze,
+- wagi,
+- hydrometry,
+- smart-home czujniki,
+- BBQ/kitchen/environmental parsers,
+- inne dekodery, ktore daja "sensor data" bez wartosci dla watchlist/follow-me/evidence MVP.
+
+Nie zostawiaj ukrytej kompatybilnosci. Jezeli parser jest usuwany z MVP, usun jego Hilt binding, testy zalezne od produkcyjnego uzycia i UI copy, ktore sugeruje wsparcie. Pliki parserow mozna usunac, jezeli nie sa potrzebne do testow/fuzz ani wspolnych modeli. Jezeli bezpieczniej jest najpierw tylko odpiac bindingi, zrob to jawnie i opisz w commit message.
+
+## Architecture Rules
+
+- Pracuj na `main`.
+- Nie tworz branchy.
+- Kotlin only.
+- Compose only.
+- No XML layouts, no Fragments, no LiveData, no RxJava.
+- Domain methods return `Result<T>`.
+- UI state przez `StateFlow`.
+- Bluetooth Android SDK nie wycieka do UI.
+- Nie dodawaj nowych parserow przed pierwszymi sesjami terenowymi.
+- Usuwaj stare galezie i fallbacki po migracji callerow.
+
+## Execution Protocol
+
+Po kazdym subgoal:
+
+1. Zmien checklisty w tym pliku z `[ ]` na `[x]` tylko dla wykonanych punktow.
+2. Uruchom minimalne testy dotknietych modulow.
+3. Jezeli zmiana dotyka runtime/build, uruchom `./gradlew :app:assembleDebug`.
+4. Uruchom `git diff --check`.
+5. Zrob commit.
+6. Wypchnij `main`.
+7. Nie przechodz dalej, jezeli obecny subgoal nie jest zielony albo nie ma jawnego blokera.
+
+Standard quality gate:
 
 ```bash
 export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
@@ -32,213 +79,230 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
 git diff --check
 ```
 
-Jezeli JDK 17 nie istnieje lokalnie, pierwszy podgol polega na naprawie toolchainu albo udokumentowaniu dokladnej blokady. Nie zgaduj wynikow testow.
+Jezeli JDK 17 nie istnieje, napraw toolchain jako pierwszy commit albo zapisz blocker. Nie zgaduj wyniku testow.
 
-## Non-Negotiable Product Line
+## Definition Of Done For Today
 
-Aplikacja nie ma byc "magiczny wykrywacz sledzenia". MVP ma byc narzedziem dowodowym:
+Field MVP jest gotowe, gdy:
 
-- "co telefon zaobserwowal",
-- "kiedy to zaobserwowal",
-- "dlaczego tak sklasyfikowal",
-- "jak pewna jest klasyfikacja",
-- "czy alert byl technicznie mozliwy i faktycznie wyslany".
+- debug APK buduje sie lokalnie,
+- Settings/Radar pokazuje status skanera i alertow,
+- da sie wyslac test alert,
+- UI/eksport odroznia brak danych od zablokowanego alertu,
+- noisy sensor parsers nie zasmiecaja widoku,
+- watchlist/follow-me/public-safety-like alerty respektuja jedna polityke,
+- eksport sesji zawiera diagnostyke skanera, decyzje alertowe, evidence, RSSI, movement/baseline i active probe state,
+- README albo docs maja krotka instrukcje pierwszej sesji terenowej.
 
-Jesli Android ogranicza skanowanie po zablokowaniu ekranu, UI i eksport maja to pokazac zamiast ukrywac.
+## Subgoal 0: Make The Repo Executable
 
-## Subgoal 0: Toolchain And Quality Gate
+Cel: zanim zmienisz produkt, projekt musi byc testowalny.
 
-Cel: projekt musi dac sie budowac i testowac lokalnie przed zmianami produktowymi.
-
-- [ ] Zweryfikuj JDK 17 i ustaw `JAVA_HOME` zgodnie z `docs/QUALITY_GATE.md`.
+- [ ] Zweryfikuj lokalne JDK 17.
 - [ ] Uruchom `./gradlew qualityCheck`.
 - [ ] Uruchom `./gradlew :app:assembleDebug`.
-- [ ] Jesli quality gate pada przez istniejace problemy, zapisz dokladna liste awarii i napraw tylko blokery potrzebne do dalszej pracy.
-- [ ] Nie zmieniaj logiki BLE/alertow w tym podgolu.
+- [ ] Jesli build pada, napraw tylko blokery toolchain/build.
+- [ ] Nie zmieniaj logiki BLE/alertow w tym subgoal.
 
 Acceptance:
 
-- `qualityCheck` i `assembleDebug` przechodza albo blocker jest jednoznacznie opisany w commit message i w tym pliku.
+- Build/test dzialaja albo blocker jest udokumentowany w tym pliku.
 
-Suggested commit:
+Commit:
 
 ```text
-Stabilize local quality gate
+Stabilize Field MVP quality gate
 ```
 
-## Subgoal 1: Scanner Runtime Diagnostics For Field Sessions
+## Subgoal 1: Cut MVP Noise From Decoder Pipeline
 
-Cel: przed poprawianiem detekcji aplikacja ma mierzyc, czy skaner w ogole dziala w realnych warunkach.
+Cel: aplikacja ma przestac wygladac jak przypadkowy skaner termometrow.
 
-- [ ] Dodaj domenowy model diagnostyki skanera, np. runtime state, last BLE result time, last Classic result time, BLE results/min, Classic results/min, dropped queue events, scan start time, screen/lock related state if available.
-- [ ] Przekazuj diagnostyke z `BleScanner`, `BleScanSource`, `ClassicScanSource` i `ScannerService` do domenowego API przez Flow/StateFlow.
-- [ ] Pokaz diagnostyke w Settings albo Radar jako sekcje developersko-terenowa, bez marketingowego tekstu.
-- [ ] Dodaj eksport diagnostyki do sesji JSON, z timestampami i licznikami.
-- [ ] Dodaj testy jednostkowe dla formatowania/mapperow diagnostyki.
+- [ ] Zmapuj Hilt bindings dekoderow w `app/src/main/java/io/blueeye/core/di`.
+- [ ] Zostaw w produkcyjnym setcie tylko dekodery potrzebne do MVP: tracker/beacon/audio/public-safety/vendor identity.
+- [ ] Odetnij smart-home/environmental/thermometer/humidity/scale/hydrometer parsers od produkcyjnego `Set<BleBeaconDecoder>`.
+- [ ] Usun albo zdezaktywuj UI copy pokazujace sensor-first workflow.
+- [ ] Zachowaj neutralne raw evidence tam, gdzie przydaje sie do diagnostyki.
+- [ ] Dodaj/zmien test, ktory potwierdza, ze MVP decoder set nie zawiera sensor-noise decoders.
+- [ ] Nie dodawaj nowych parserow.
 
 Acceptance:
 
-- Uzytkownik widzi, czy po zablokowaniu telefonu dalej pojawiaja sie wyniki.
-- Eksport sesji pozwala porownac: ekran wlaczony, ekran zablokowany, 5/15/30 minut.
-- Brak claimow, ze background broad scan jest niezawodny.
+- Radar/Details nie sa zasypywane sensorami niezwiazanymi z celem aplikacji.
+- Zostaja tylko dekodery, ktore pomagaja watchlist/follow-me/audio/public-safety/evidence.
 
-Suggested commit:
+Commit:
 
 ```text
-Add scanner runtime diagnostics for field sessions
+Trim decoder pipeline to Field MVP scope
 ```
 
-## Subgoal 2: Background Scanning Strategy
+## Subgoal 2: Add Scanner Runtime Diagnostics
 
-Cel: naprawic problem "powiadomienia nie dzialaja po zablokowaniu" u zrodla, czyli rozroznic brak alertu od braku danych.
+Cel: uzytkownik i developer maja widziec, czy telefon faktycznie zbiera dane.
 
-- [ ] Sprawdz oficjalne ograniczenia Androida dla BLE background scanning i zapisz w komentarzu/README tylko praktyczna konsekwencje, bez dlugiej dokumentacji.
-- [ ] Nie udawaj, ze unfiltered `startScan(..., ScanCallback)` bedzie niezawodny po screen-off.
-- [ ] Dla broad discovery zostaw tryb foreground/live scan i opomiaruj jego skutecznosc.
-- [ ] Dla watchlist/background alerts dodaj filtered scan path dla znanych fingerprintow/MAC/service/manufacturer clues tam, gdzie da sie stworzyc sensowny `ScanFilter`.
-- [ ] Jesli uzywasz `PendingIntent` scan path, dodaj osobny odbiornik i testowalna warstwe mappera intent -> scan event.
-- [ ] Jesli nie da sie stworzyc filtra dla danego watchlist entry, pokaz w UI/export "background reliability limited".
-- [ ] Nie dodawaj agresywnego wake-lock/probing obejscia jako glownego rozwiazania.
+- [ ] Dodaj domenowy model diagnostyki skanera: scan state, start time, last BLE result, last Classic result, BLE results/min, Classic results/min, dropped queue events, last scan error.
+- [ ] Aktualizuj diagnostyke z `BleScanner`, `BleScanSource`, `ClassicScanSource` i `ScannerService`.
+- [ ] Wystaw diagnostyke przez domenowy `ScannerRuntimeController` albo rownowazny Flow/StateFlow kontrakt.
+- [ ] Pokaz diagnostyke w Settings lub Radar w zwartym panelu.
+- [ ] Dodaj testy mapperow/formatterow diagnostyki.
+- [ ] Dodaj diagnostyke do eksportu sesji.
 
 Acceptance:
 
-- Watchlist ma najlepsza dostepna sciezke dla lock screen.
-- Unknown broad detection pozostaje opisana jako ograniczona przez Androida.
-- Diagnostyka pokazuje, czy problemem byl brak scan result, decyzja alert policy, permission, czy notification channel.
+- Po lock screen da sie sprawdzic, czy skaner nadal dostaje wyniki.
+- Eksport pokazuje, kiedy ostatni raz widziano BLE/Classic.
 
-Suggested commit:
+Commit:
 
 ```text
-Separate live and background watchlist scanning paths
+Add scanner runtime diagnostics
 ```
 
-## Subgoal 3: Unified Alert Settings And Dispatcher
+## Subgoal 3: Separate Live Scan From Background Watchlist Scan
 
-Cel: przelaczniki wibracji, dzwieku i popupow maja dzialac przewidywalnie dla wszystkich typow alertow.
+Cel: usunac falszywe zalozenie, ze broad unfiltered scan callback jest niezawodny po zablokowaniu telefonu.
 
-- [ ] Zaprojektuj jeden domenowy model ustawien alertow dla kategorii: watchlist return, follow-me, public-safety-like.
-- [ ] Kazda kategoria ma jawne ustawienia: enabled, notification/tray, heads-up, sound, vibration.
-- [ ] Zastap rozproszone uzycie `WatchlistPreferences` w alert path jednym `AlertSettingsRepository` albo rownowaznym kontraktem domenowym.
-- [ ] Zastap rozproszone wywolania notyfikacji/wibracji jednym `AlertDispatcher`.
-- [ ] Usun stare wewnetrzne galezie/fallbacki po migracji aktualnych callerow. Nie zostawiaj redundantnej kompatybilnosci API.
-- [ ] Dodaj testy dla kazdej kombinacji: master off, category off, vibration off, heads-up off, notification permission missing.
-- [ ] Dodaj w Settings proste sterowanie wszystkimi kategoriami.
+- [ ] Opisz w kodzie/docs praktyczna konsekwencje Android BLE screen-off restrictions.
+- [ ] Zostaw broad scan jako live/foreground observation mode.
+- [ ] Dodaj background/watchlist scan path oparty o najlepsze dostepne filtry: MAC, service UUID, manufacturer data albo inne stabilne clues.
+- [ ] Jezeli entry nie ma filtra, oznacz je jako `backgroundReliabilityLimited`.
+- [ ] Jezeli uzywasz `PendingIntent` scan path, dodaj BroadcastReceiver i mapper intent -> scan event.
+- [ ] Dodaj testy dla wyboru scan strategy.
+- [ ] Nie polegaj na samym wake lock jako rozwiazaniu produktu.
 
 Acceptance:
 
-- Wylaczenie wibracji znaczy: zadna kategoria, ktora korzysta z tego ustawienia, nie wibruje.
-- Wylaczenie heads-up nie kasuje przypadkiem calej historii ani nie wplywa na dzwiek/wibracje, chyba ze UI jawnie tak mowi.
+- Watchlist ma osobna, bardziej realistyczna sciezke na lock screen.
+- Unknown broad detection jest jawnie ograniczona.
+
+Commit:
+
+```text
+Separate live scan from background watchlist scan
+```
+
+## Subgoal 4: Unify Alert Policy And Dispatch
+
+Cel: ustawienia wibracji/popupow/dzwieku maja dzialac dla wszystkich alertow tak samo.
+
+- [ ] Dodaj domenowy model kategorii alertow: `WATCHLIST_RETURN`, `FOLLOW_ME`, `PUBLIC_SAFETY_SIGNAL`, `TEST`.
+- [ ] Dodaj jeden model ustawien: enabled, tray notification, heads-up, sound, vibration.
+- [ ] Zastap rozproszone czytanie `WatchlistPreferences` w alert path jednym repo/contractem ustawien alertow.
+- [ ] Dodaj jeden `AlertDispatcher` odpowiedzialny za notification, sound i vibration.
+- [ ] Zmigruj `TrackerAlertService` i `TacticalAlertService` albo rozbij je tak, zeby nie omijaly dispatcher policy.
+- [ ] Usun stare galezie/fallbacki po migracji.
+- [ ] Dodaj testy: category off, vibration off, heads-up off, sound off, notification permission missing, cooldown.
+
+Acceptance:
+
+- Jeden test potwierdza, ze wylaczenie vibration blokuje wibracje w kazdej kategorii.
 - Watchlist return nie omija globalnej polityki alertow.
+- Heads-up off nie kasuje przypadkiem calego systemu alertow.
 
-Suggested commit:
+Commit:
 
 ```text
-Unify alert settings and dispatch policy
+Unify alert policy and dispatch
 ```
 
-## Subgoal 4: Notification Reliability Diagnostics And Test Alert
+## Subgoal 5: Add Alert Delivery Diagnostics And Test Alert
 
-Cel: uzytkownik ma wiedziec, czy alert moze pojawic sie na zablokowanym telefonie.
+Cel: uzytkownik ma umiec sprawdzic alert przed spacerem.
 
-- [ ] Dodaj "Test alert" w Settings dla kazdej kategorii lub jeden test z wyborem kategorii.
-- [ ] Pokaz status: `POST_NOTIFICATIONS`, notification channel importance, heads-up enabled, sound enabled, vibration enabled.
-- [ ] Jesli permission/channel blokuje alert, pokaz konkretny stan w UI.
-- [ ] Dodaj lock-screen-safe notification ustawienia tam, gdzie to ma sens: priority/importance, visibility, category.
-- [ ] Nie uzywaj fake popupow jako substytutu notyfikacji systemowej.
-- [ ] Dodaj testy dla `AlertContentFormatter`, `AlertDispatcher` i diagnostyki kanalow.
+- [ ] Dodaj w Settings przycisk "Test alert".
+- [ ] Pokaz status `POST_NOTIFICATIONS`.
+- [ ] Pokaz status kanalow: importance, enabled/blocked, sound, vibration.
+- [ ] Pokaz ostatni wynik dispatchu: posted, blocked by policy, blocked by permission, blocked by channel.
+- [ ] Ustaw notification category/visibility/priority/importance zgodnie z Android notifications.
+- [ ] Nie rob fake popupow zamiast system notification.
+- [ ] Dodaj testy diagnostyki alert delivery.
 
 Acceptance:
 
-- Da sie recznie wyslac test alert i zobaczyc, czy system go blokuje.
-- Eksport albo diagnostyka odroznia "alert policy blocked" od "Android notification blocked".
+- Na odblokowanym i zablokowanym ekranie da sie recznie sprawdzic alert.
+- UI mowi, dlaczego alert nie doszedl.
 
-Suggested commit:
+Commit:
 
 ```text
 Add alert delivery diagnostics and test alert
 ```
 
-## Subgoal 5: Field Session Export Contract
+## Subgoal 6: Make Session Export Calibration-Ready
 
-Cel: pierwsze sesje terenowe maja produkowac dane, z ktorych da sie podjac decyzje o progach i detekcji.
+Cel: pierwsze sesje terenowe maja dawac dane, nie tylko logcat.
 
-- [ ] Upewnij sie, ze eksport zawiera: scanner diagnostics, alert decisions, notification delivery result, scan counts, evidence, RSSI samples, movement/baseline state, active probe state.
-- [ ] Dodaj `sessionScenario` albo notatke sesji: home baseline, walk without tracker, walk with known device, city, car/transit.
-- [ ] Dodaj czytelny "session readiness" status: czy sesja ma wystarczajaco danych do kalibracji.
-- [ ] Dodaj testy JSON mapperow dla nowych pol.
-- [ ] Zachowaj schemat eksportu jako jawnie wersjonowany.
+- [ ] Eksport zawiera scanner diagnostics.
+- [ ] Eksport zawiera alert decisions i alert delivery result.
+- [ ] Eksport zawiera evidence list, RSSI samples, movement state, baseline state, active probe state.
+- [ ] Dodaj pole scenario/notatke sesji: home baseline, walk no tracker, walk with watchlist device, city, car/transit.
+- [ ] Dodaj session readiness summary.
+- [ ] Zweryfikuj schema version i testy JSON mapperow.
 
 Acceptance:
 
-- Po jednej sesji terenowej da sie odpowiedziec: ile danych zebrano, czy screen-off przerwal skan, czy alert mial szanse dojsc, dlaczego score wzrosl.
+- Po eksporcie da sie odpowiedziec: czy telefon widzial urzadzenie, czy policy alertow je zablokowala, czy Android zablokowal powiadomienie, dlaczego score wzrosl.
 
-Suggested commit:
+Commit:
 
 ```text
-Extend session export for field calibration
+Make session export calibration-ready
 ```
 
-## Subgoal 6: Sony Headphones Recognition Smoke Path
+## Subgoal 7: Sony Audio Smoke Path
 
-Cel: nie traktowac sluchawek Sony jako trackerow, ale uzyc ich jako realnego testu rozpoznawania i widocznosci Bluetooth.
+Cel: sluchawki Sony maja byc testem widocznosci Bluetooth i klasyfikacji audio, nie ryzyka.
 
-- [ ] Dodaj reczny scenariusz testowy w aplikacji/eksportach: Sony headphones nearby/pairing/connected/off.
-- [ ] Zweryfikuj BLE Fast Pair, Classic discovery, SDP UUID i name-based classification path.
-- [ ] Jesli sluchawki nie sa widoczne, UI/export ma pokazac "not observed", a nie bledna klasyfikacje.
-- [ ] Dodaj testy dla istniejacego Sony/Fast Pair/classic evidence mapping, tylko tam gdzie brakuje pokrycia.
-- [ ] Nie podbijaj follow-me score dla zwyklych sluchawek bez niezaleznego patternu ruchu.
+- [ ] Zweryfikuj sciezki: BLE Fast Pair, Classic discovery, SDP UUID, name classifier, vendor strategy.
+- [ ] Dodaj/napraw evidence dla Sony/audio, jezeli brakuje uzasadnienia w UI/export.
+- [ ] Jesli sluchawki nie sa zaobserwowane, pokaz `not observed`, nie zgaduj.
+- [ ] Nie podbijaj Follow-Me score tylko dlatego, ze to sluchawki.
+- [ ] Dodaj test dla Sony/audio evidence albo popraw istniejacy.
 
 Acceptance:
 
-- Aplikacja potrafi wyjasnic jedno z trzech: wykryto jako Sony/audio, wykryto tylko generic audio, albo telefon nie zaobserwowal urzadzenia.
+- Aplikacja pokazuje jedno z trzech: Sony/audio observed, generic audio observed, not observed.
 
-Suggested commit:
+Commit:
 
 ```text
-Harden Sony audio recognition evidence
+Harden Sony audio evidence path
 ```
 
-## Subgoal 7: First Field Session Checklist
+## Subgoal 8: First Field Session Readiness Doc
 
-Cel: przygotowac projekt do pierwszych realnych sesji, bez dalszego kodowania parserow.
+Cel: po buildzie user wie dokladnie, co zrobic na telefonie.
 
-- [ ] Zbuduj debug APK.
-- [ ] Zainstaluj na telefonie.
-- [ ] Wykonaj test alertu na odblokowanym i zablokowanym ekranie.
-- [ ] Wykonaj 10-min home baseline.
-- [ ] Wykonaj 10-min spacer bez znanego trackera.
-- [ ] Wykonaj 10-min spacer z wlasnym znanym urzadzeniem/watchlist item.
-- [ ] Wyeksportuj kazda sesje.
-- [ ] Oznacz false positives i known safe.
-- [ ] Nie zmieniaj progow scoringu przed przejrzeniem eksportow.
+- [ ] Dodaj krotki plik `FIELD_SESSION_CHECKLIST.md` w root albo docs.
+- [ ] Checklist zawiera: install APK, grant permissions, disable battery restrictions if needed, test alert unlocked, test alert locked, home baseline, walk no tracker, walk with watchlist device, export.
+- [ ] Opisz, czego nie zmieniac przed zebraniem eksportow: progi scoringu i nowe parsery.
+- [ ] Podaj minimalny zestaw danych, ktory trzeba przyniesc z telefonu.
 
 Acceptance:
 
-- Sa minimum trzy eksporty z realnego telefonu.
-- Jest lista konkretnych false positives/false negatives.
-- Nastepny etap to kalibracja progow na danych, nie zgadywanie.
+- Projekt jest gotowy do pierwszych realnych sesji bez dodatkowych decyzji produktowych.
 
-Suggested commit:
+Commit:
 
 ```text
-Document first field session checklist
+Add first field session checklist
 ```
 
 ## Stop Conditions
 
-Przerwij i napisz blocker, jesli:
+Przerwij sprint i wpisz blocker, jezeli:
 
-- build/test nie startuje przez toolchain,
-- Android permission/channel blokuje alert i nie da sie tego naprawic kodem,
-- broad scan nie daje wynikow po screen-off mimo foreground service,
-- zmiana wymaga odejscia od Compose/Clean Architecture/Hilt/Flow,
-- dane terenowe pokazuja, ze Follow-Me score nie odroznia baseline od ruchu.
+- JDK/build nie dziala i nie da sie go naprawic lokalnie,
+- alert test jest blokowany przez systemowy permission/channel, ktorego aplikacja nie moze sama obejsc,
+- broad scan nie daje wynikow po screen-off i nie ma stabilnych watchlist filtrow dla danego urzadzenia,
+- zmiana wymagalaby powrotu do legacy Android UI/API,
+- testy pokazuja, ze Follow-Me score miesza baseline z ruchem.
 
-## Commercial Decision Gate
+## Final Decision After Sprint
 
-Po wykonaniu Subgoal 7 podejmij decyzje:
+Po Subgoal 8 decyzja:
 
-- GO: watchlist alerts sa niezawodne, eksport jest uzyteczny, diagnostyka wyjasnia ograniczenia.
-- PIVOT: broad unknown tracker detection jest za slabe, ale app ma wartosc jako BLE evidence/session tool.
-- STOP: alerty/watchlist nie dzialaja na realnym telefonie po lock screen i nie ma platformowej sciezki obejscia.
-
+- GO: instaluj debug APK i rob pierwsze sesje.
+- PIVOT: jesli broad unknown detection jest slabe, pozycjonuj app jako BLE evidence/watchlist tool.
+- STOP: jesli watchlist alert i test alert nie dzialaja na realnym telefonie po lock screen.
