@@ -3,6 +3,11 @@ package io.blueeye.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.blueeye.core.domain.alert.AlertCategory
+import io.blueeye.core.domain.alert.AlertDeliveryDiagnostics
+import io.blueeye.core.domain.alert.AlertDispatcher
+import io.blueeye.core.domain.alert.AlertRequest
+import io.blueeye.core.domain.alert.AlertVibrationPattern
 import io.blueeye.core.domain.calibration.suppressesTracking
 import io.blueeye.core.domain.calibration.toCalibrationDeviceConfig
 import io.blueeye.core.domain.repository.ActiveCollectionRepository
@@ -11,6 +16,7 @@ import io.blueeye.core.domain.repository.SettingsPreferencesRepository
 import io.blueeye.core.domain.repository.TrackerAlertSetting
 import io.blueeye.core.domain.repository.WatchlistRepository
 import io.blueeye.core.domain.scanner.ScannerRuntimeController
+import io.blueeye.core.domain.scanner.ScannerRuntimeDiagnostics
 import io.blueeye.core.domain.settings.ReferenceDatabaseCounts
 import io.blueeye.core.domain.settings.ReferenceDatabaseRepository
 import io.blueeye.core.model.DeviceCalibrationLabel
@@ -44,6 +50,8 @@ data class SettingsUiState(
     val sessionNotes: String = "",
     val sessionStats: SessionStats = SessionStats(),
     val sessionReviewReadiness: SessionReviewReadiness = SessionReviewReadiness(),
+    val scannerDiagnostics: ScannerRuntimeDiagnostics = ScannerRuntimeDiagnostics(),
+    val alertDeliveryDiagnostics: AlertDeliveryDiagnostics = AlertDeliveryDiagnostics(),
 )
 
 @HiltViewModel
@@ -65,6 +73,7 @@ class SettingsViewModel
         private val watchlistRepository: WatchlistRepository,
         private val databaseExporter: DatabaseExporter,
         private val scannerRuntimeController: ScannerRuntimeController,
+        private val alertDispatcher: AlertDispatcher,
         sessionStatsProvider: SessionStatsProvider,
     ) : ViewModel() {
         private val _counts = MutableStateFlow(ReferenceDatabaseCounts())
@@ -113,14 +122,28 @@ class SettingsViewModel
                 )
             }
 
+        private val runtimeDiagnosticsFlow =
+            combine(
+                appSessionFlow,
+                scannerRuntimeController.diagnostics,
+                alertDispatcher.diagnostics,
+            ) { appSession, scannerDiagnostics, alertDiagnostics ->
+                AppRuntimeDiagnosticsState(
+                    appSession = appSession,
+                    scannerDiagnostics = scannerDiagnostics,
+                    alertDiagnostics = alertDiagnostics,
+                )
+            }
+
         val uiState: StateFlow<SettingsUiState> =
             combine(
                 _counts,
                 _updateStatus,
                 _isUpdating,
                 alertPreferencesFlow,
-                appSessionFlow
-            ) { counts, status, isUpdating, alerts, appSession ->
+                runtimeDiagnosticsFlow,
+            ) { counts, status, isUpdating, alerts, runtimeDiagnostics ->
+                val appSession = runtimeDiagnostics.appSession
                 val prefs = appSession.preferences
                 val sessionStats = appSession.sessionStats
                 SettingsUiState(
@@ -158,6 +181,8 @@ class SettingsViewModel
                                     ),
                             ),
                         ),
+                    scannerDiagnostics = runtimeDiagnostics.scannerDiagnostics,
+                    alertDeliveryDiagnostics = runtimeDiagnostics.alertDiagnostics,
                 )
             }.stateIn(
                 scope = viewModelScope,
@@ -167,6 +192,7 @@ class SettingsViewModel
 
         init {
             loadData()
+            alertDispatcher.refreshDiagnostics()
         }
 
         private fun loadData() {
@@ -296,6 +322,26 @@ class SettingsViewModel
             viewModelScope.launch {
                 val json = databaseExporter.export()
                 onResult(json)
+            }
+        }
+
+        fun sendTestAlert() {
+            viewModelScope.launch {
+                alertDispatcher.refreshDiagnostics()
+                alertDispatcher.dispatch(
+                    AlertRequest(
+                        category = AlertCategory.TEST,
+                        key = "settings-test-alert",
+                        title = "BlueEye test alert",
+                        body = "Manual Settings test. Delivery follows current notification, sound, and vibration policy.",
+                        vibrationPattern = AlertVibrationPattern.MEDIUM,
+                        cooldownMs = 0L,
+                    ),
+                ).onSuccess { result ->
+                    _updateStatus.value = result.message
+                }.onFailure { error ->
+                    _updateStatus.value = "Test alert failed: ${error.message}"
+                }
             }
         }
 
@@ -488,4 +534,10 @@ private data class SettingsPreferencesState(
 private data class AppSessionState(
     val preferences: SettingsPreferencesState,
     val sessionStats: SessionStats,
+)
+
+private data class AppRuntimeDiagnosticsState(
+    val appSession: AppSessionState,
+    val scannerDiagnostics: ScannerRuntimeDiagnostics,
+    val alertDiagnostics: AlertDeliveryDiagnostics,
 )
