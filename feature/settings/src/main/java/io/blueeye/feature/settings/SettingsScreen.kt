@@ -173,14 +173,14 @@ fun MainSettingsList(onNavigate: (SettingsSection) -> Unit) {
 
         SettingsCategoryCard(
             title = "Appearance",
-            icon = Icons.Default.Edit, // Using Edit as Palette might require extended icons or specific import check
+            icon = Icons.Default.Edit,
             description = "Theme, colors, and dynamic styling",
             onClick = { onNavigate(SettingsSection.APPEARANCE) }
         )
 
         SettingsCategoryCard(
             title = "Database & Updates",
-            icon = Icons.Default.Info, // Generic Info/Storage icon
+            icon = Icons.Default.Info,
             description = "Manage manufacturers, MACs, and GATT data",
             onClick = { onNavigate(SettingsSection.DATABASE) }
         )
@@ -261,6 +261,11 @@ fun AlertSettingsContent(
             onSoundChange = { viewModel.setTrackerSoundEnabled(it) },
             onHeadsUpChange = { viewModel.setTrackerHeadsUpEnabled(it) },
             onAutoActiveProbeChange = onAutoActiveProbeChange,
+        )
+        Spacer(Modifier.height(Dimens.PaddingMedium))
+        FieldMvpDiagnosticsCard(
+            uiState = uiState,
+            onTestAlert = { viewModel.sendTestAlert() },
         )
     }
 }
@@ -403,7 +408,6 @@ fun DatabaseContent(
 }
 
 @Composable
-@Suppress("LongParameterList")
 fun AlertSettingsCard(
     detectionEnabled: Boolean,
     vibrateEnabled: Boolean,
@@ -536,7 +540,7 @@ fun AppearanceCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Dynamic Colors (Material You)", style = MaterialTheme.typography.bodyLarge)
-                    androidx.compose.material3.Switch(
+                    Switch(
                         checked = useDynamicColors,
                         onCheckedChange = onDynamicColorToggle
                     )
