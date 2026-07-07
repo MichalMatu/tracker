@@ -251,16 +251,22 @@ fun AlertSettingsContent(
                 .verticalScroll(rememberScrollState())
     ) {
         AlertSettingsCard(
-            detectionEnabled = uiState.trackerDetectionEnabled,
-            vibrateEnabled = uiState.trackerVibrationEnabled,
-            soundEnabled = uiState.trackerSoundEnabled,
-            headsUpEnabled = uiState.trackerHeadsUpEnabled,
-            autoActiveProbeEnabled = uiState.autoActiveProbeEnabled,
-            onDetectionChange = { viewModel.setTrackerDetectionEnabled(it) },
-            onVibrateChange = { viewModel.setTrackerVibrationEnabled(it) },
-            onSoundChange = { viewModel.setTrackerSoundEnabled(it) },
-            onHeadsUpChange = { viewModel.setTrackerHeadsUpEnabled(it) },
-            onAutoActiveProbeChange = onAutoActiveProbeChange,
+            state =
+                AlertSettingsCardState(
+                    detectionEnabled = uiState.trackerDetectionEnabled,
+                    vibrateEnabled = uiState.trackerVibrationEnabled,
+                    soundEnabled = uiState.trackerSoundEnabled,
+                    headsUpEnabled = uiState.trackerHeadsUpEnabled,
+                    autoActiveProbeEnabled = uiState.autoActiveProbeEnabled,
+                ),
+            actions =
+                AlertSettingsCardActions(
+                    onDetectionChange = { viewModel.setTrackerDetectionEnabled(it) },
+                    onVibrateChange = { viewModel.setTrackerVibrationEnabled(it) },
+                    onSoundChange = { viewModel.setTrackerSoundEnabled(it) },
+                    onHeadsUpChange = { viewModel.setTrackerHeadsUpEnabled(it) },
+                    onAutoActiveProbeChange = onAutoActiveProbeChange,
+                ),
         )
         Spacer(Modifier.height(Dimens.PaddingMedium))
         FieldMvpDiagnosticsCard(
@@ -408,17 +414,9 @@ fun DatabaseContent(
 }
 
 @Composable
-fun AlertSettingsCard(
-    detectionEnabled: Boolean,
-    vibrateEnabled: Boolean,
-    soundEnabled: Boolean,
-    headsUpEnabled: Boolean,
-    autoActiveProbeEnabled: Boolean,
-    onDetectionChange: (Boolean) -> Unit,
-    onVibrateChange: (Boolean) -> Unit,
-    onSoundChange: (Boolean) -> Unit,
-    onHeadsUpChange: (Boolean) -> Unit,
-    onAutoActiveProbeChange: (Boolean) -> Unit,
+private fun AlertSettingsCard(
+    state: AlertSettingsCardState,
+    actions: AlertSettingsCardActions,
 ) {
     androidx.compose.material3.Card(
         modifier = Modifier.fillMaxWidth(),
@@ -431,41 +429,57 @@ fun AlertSettingsCard(
             SettingsSwitch(
                 title = "Tracker Detection",
                 subtitle = "Master switch for all tracker alerts",
-                checked = detectionEnabled,
-                onCheckedChange = onDetectionChange
+                checked = state.detectionEnabled,
+                onCheckedChange = actions.onDetectionChange
             )
             androidx.compose.material3.HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             SettingsSwitch(
                 title = "Automatic Active Collection",
                 subtitle = "Explicit opt-in: connect to every connectable BLE device one at a time for GATT evidence",
-                checked = autoActiveProbeEnabled,
-                onCheckedChange = onAutoActiveProbeChange
+                checked = state.autoActiveProbeEnabled,
+                onCheckedChange = actions.onAutoActiveProbeChange
             )
             androidx.compose.material3.HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             SettingsSwitch(
                 title = "Vibration",
                 subtitle = "Vibrate on alert",
-                checked = vibrateEnabled,
-                onCheckedChange = onVibrateChange,
-                enabled = detectionEnabled
+                checked = state.vibrateEnabled,
+                onCheckedChange = actions.onVibrateChange,
+                enabled = state.detectionEnabled
             )
             SettingsSwitch(
                 title = "Sound",
                 subtitle = "Play alarm sound",
-                checked = soundEnabled,
-                onCheckedChange = onSoundChange,
-                enabled = detectionEnabled
+                checked = state.soundEnabled,
+                onCheckedChange = actions.onSoundChange,
+                enabled = state.detectionEnabled
             )
             SettingsSwitch(
                 title = "Heads-Up Notification",
                 subtitle = "Show popup banner",
-                checked = headsUpEnabled,
-                onCheckedChange = onHeadsUpChange,
-                enabled = detectionEnabled
+                checked = state.headsUpEnabled,
+                onCheckedChange = actions.onHeadsUpChange,
+                enabled = state.detectionEnabled
             )
         }
     }
 }
+
+private data class AlertSettingsCardState(
+    val detectionEnabled: Boolean,
+    val vibrateEnabled: Boolean,
+    val soundEnabled: Boolean,
+    val headsUpEnabled: Boolean,
+    val autoActiveProbeEnabled: Boolean,
+)
+
+private data class AlertSettingsCardActions(
+    val onDetectionChange: (Boolean) -> Unit,
+    val onVibrateChange: (Boolean) -> Unit,
+    val onSoundChange: (Boolean) -> Unit,
+    val onHeadsUpChange: (Boolean) -> Unit,
+    val onAutoActiveProbeChange: (Boolean) -> Unit,
+)
 
 @androidx.compose.foundation.layout.ExperimentalLayoutApi
 @Composable

@@ -678,9 +678,7 @@ class DeviceEvidenceFactoryTest {
 
     @Test
     fun `domain device exposes deterministic evidence`() {
-        val domainDevice =
-            device(mac = "00:25:DF:11:22:33")
-                .toDomain()
+        val domainDevice = device(mac = "00:25:DF:11:22:33").toDomain()
 
         assertTrue(domainDevice.evidence.any { it.source == EvidenceSource.OUI })
     }

@@ -116,7 +116,8 @@ constructor(
             }
     }
 
-    fun isBluetoothEnabled(): Boolean = adapter?.isEnabled == true
+    val isBluetoothEnabled: Boolean
+        get() = adapter?.isEnabled == true
 
     @SuppressLint("MissingPermission")
     fun startScanning() {
@@ -326,26 +327,26 @@ constructor(
             _state.value = ScannerState.Error(message)
         }
     }
-
-    private fun describeBleScanError(errorCode: Int): String {
-        val reason =
-            when (errorCode) {
-                android.bluetooth.le.ScanCallback.SCAN_FAILED_ALREADY_STARTED -> "already started"
-                android.bluetooth.le.ScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED ->
-                    "application registration failed"
-                android.bluetooth.le.ScanCallback.SCAN_FAILED_INTERNAL_ERROR -> "internal error"
-                android.bluetooth.le.ScanCallback.SCAN_FAILED_FEATURE_UNSUPPORTED ->
-                    "feature unsupported"
-                android.bluetooth.le.ScanCallback.SCAN_FAILED_OUT_OF_HARDWARE_RESOURCES ->
-                    "out of hardware resources"
-                android.bluetooth.le.ScanCallback.SCAN_FAILED_SCANNING_TOO_FREQUENTLY ->
-                    "scanning too frequently"
-                else -> "error code $errorCode"
-            }
-
-        return "BLE scan failed: $reason"
-    }
 }
 
 private fun List<ParcelUuid>?.toServiceUuidStrings(): List<String> =
     this?.map { it.uuid.toString() }.orEmpty()
+
+private fun describeBleScanError(errorCode: Int): String {
+    val reason =
+        when (errorCode) {
+            android.bluetooth.le.ScanCallback.SCAN_FAILED_ALREADY_STARTED -> "already started"
+            android.bluetooth.le.ScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED ->
+                "application registration failed"
+            android.bluetooth.le.ScanCallback.SCAN_FAILED_INTERNAL_ERROR -> "internal error"
+            android.bluetooth.le.ScanCallback.SCAN_FAILED_FEATURE_UNSUPPORTED ->
+                "feature unsupported"
+            android.bluetooth.le.ScanCallback.SCAN_FAILED_OUT_OF_HARDWARE_RESOURCES ->
+                "out of hardware resources"
+            android.bluetooth.le.ScanCallback.SCAN_FAILED_SCANNING_TOO_FREQUENTLY ->
+                "scanning too frequently"
+            else -> "error code $errorCode"
+        }
+
+    return "BLE scan failed: $reason"
+}

@@ -15,7 +15,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.blueeye.core.data.classifier.vendor.tactical.ConfidenceLevel
-import io.blueeye.core.domain.alert.AlertCategory
 import io.blueeye.core.domain.alert.AlertChannelDiagnostics
 import io.blueeye.core.domain.alert.AlertDeliveryDiagnostics
 import io.blueeye.core.domain.alert.AlertDeliveryResult
@@ -53,7 +52,13 @@ class AndroidAlertDispatcher
                 ensureChannels()
                 val policy = settingsPreferencesRepository.trackerAlerts.first()
                 val timestamp = System.currentTimeMillis()
-                val targetChannelId = if (policy.headsUpEnabled) HEADS_UP_CHANNEL_ID else TRAY_CHANNEL_ID
+                val alertPostPolicy =
+                    AlertPostPolicy(
+                        channelId = if (policy.headsUpEnabled) HEADS_UP_CHANNEL_ID else TRAY_CHANNEL_ID,
+                        headsUpEnabled = policy.headsUpEnabled,
+                        soundEnabled = policy.soundEnabled,
+                        vibrationEnabled = policy.vibrationEnabled,
+                    )
                 val cooldownKey = "${request.category}:${request.key}"
                 val lastDelivery = lastDeliveryByKey[cooldownKey] ?: 0L
 
@@ -77,7 +82,7 @@ class AndroidAlertDispatcher
                                 message = "Alert blocked: POST_NOTIFICATIONS is not granted.",
                                 timestamp = timestamp,
                             )
-                        isChannelBlocked(targetChannelId) ->
+                        isChannelBlocked(alertPostPolicy.channelId) ->
                             request.blocked(
                                 status = AlertDeliveryStatus.BLOCKED_BY_CHANNEL,
                                 message = "Alert blocked: Android notification channel is disabled.",
@@ -86,10 +91,7 @@ class AndroidAlertDispatcher
                         else ->
                             postAlert(
                                 request = request,
-                                channelId = targetChannelId,
-                                headsUpEnabled = policy.headsUpEnabled,
-                                soundEnabled = policy.soundEnabled,
-                                vibrationEnabled = policy.vibrationEnabled,
+                                policy = alertPostPolicy,
                                 timestamp = timestamp,
                             )
                     }
@@ -119,10 +121,7 @@ class AndroidAlertDispatcher
 
         private fun postAlert(
             request: AlertRequest,
-            channelId: String,
-            headsUpEnabled: Boolean,
-            soundEnabled: Boolean,
-            vibrationEnabled: Boolean,
+            policy: AlertPostPolicy,
             timestamp: Long,
         ): AlertDeliveryResult {
             val pendingIntent =
@@ -138,7 +137,7 @@ class AndroidAlertDispatcher
                     }
 
             val notification =
-                NotificationCompat.Builder(context, channelId)
+                NotificationCompat.Builder(context, policy.channelId)
                     .setSmallIcon(android.R.drawable.ic_dialog_alert)
                     .setContentTitle(request.title)
                     .setContentText(request.body)
@@ -146,7 +145,7 @@ class AndroidAlertDispatcher
                     .setCategory(NotificationCompat.CATEGORY_ALARM)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setPriority(
-                        if (headsUpEnabled) {
+                        if (policy.headsUpEnabled) {
                             NotificationCompat.PRIORITY_HIGH
                         } else {
                             NotificationCompat.PRIORITY_DEFAULT
@@ -157,16 +156,16 @@ class AndroidAlertDispatcher
                     .build()
 
             @Suppress("MissingPermission")
-            notificationManagerCompat.notify(request.notificationTag(), request.key.hashCode(), notification)
+            notificationManagerCompat.notify(request.category.name, request.key.hashCode(), notification)
 
             val vibrationTriggered =
-                if (vibrationEnabled && request.vibrationPattern != AlertVibrationPattern.NONE) {
+                if (policy.vibrationEnabled && request.vibrationPattern != AlertVibrationPattern.NONE) {
                     triggerVibration(request.vibrationPattern)
                     true
                 } else {
                     false
                 }
-            val soundPlayed = if (soundEnabled) playAlertSound() else false
+            val soundPlayed = if (policy.soundEnabled) playAlertSound() else false
 
             return AlertDeliveryResult(
                 category = request.category,
@@ -191,18 +190,21 @@ class AndroidAlertDispatcher
         }
 
         private fun playAlertSound(): Boolean {
-            val uri = android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI
-                ?: android.provider.Settings.System.DEFAULT_NOTIFICATION_URI
-                ?: android.provider.Settings.System.DEFAULT_RINGTONE_URI
-                ?: return false
-            val ringtone = RingtoneManager.getRingtone(context, uri) ?: return false
-            ringtone.audioAttributes =
+            val ringtone =
+                listOfNotNull(
+                    android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI,
+                    android.provider.Settings.System.DEFAULT_NOTIFICATION_URI,
+                    android.provider.Settings.System.DEFAULT_RINGTONE_URI,
+                ).firstOrNull()
+                    ?.let { uri -> RingtoneManager.getRingtone(context, uri) }
+
+            ringtone?.audioAttributes =
                 AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_ALARM)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build()
-            ringtone.play()
-            return true
+            ringtone?.play()
+            return ringtone != null
         }
 
         private fun ensureChannels() {
@@ -271,32 +273,31 @@ class AndroidAlertDispatcher
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
                 notificationManager.getNotificationChannel(channelId)?.importance == NotificationManager.IMPORTANCE_NONE
 
-        private fun AlertRequest.blocked(
-            status: AlertDeliveryStatus,
-            message: String,
-            timestamp: Long,
-        ): AlertDeliveryResult =
-            AlertDeliveryResult(
-                category = category,
-                key = key,
-                status = status,
-                postedNotification = false,
-                soundPlayed = false,
-                vibrationTriggered = false,
-                message = message,
-                timestamp = timestamp,
-            )
-
-        private fun AlertRequest.notificationTag(): String =
-            when (category) {
-                AlertCategory.WATCHLIST_RETURN -> "watchlist-return"
-                AlertCategory.FOLLOW_ME -> "follow-me"
-                AlertCategory.PUBLIC_SAFETY_SIGNAL -> "public-safety-signal"
-                AlertCategory.TEST -> "test-alert"
-            }
-
         private companion object {
             private const val HEADS_UP_CHANNEL_ID = "field_mvp_alerts_heads_up_v1"
             private const val TRAY_CHANNEL_ID = "field_mvp_alerts_tray_v1"
         }
     }
+
+private fun AlertRequest.blocked(
+    status: AlertDeliveryStatus,
+    message: String,
+    timestamp: Long,
+): AlertDeliveryResult =
+    AlertDeliveryResult(
+        category = category,
+        key = key,
+        status = status,
+        postedNotification = false,
+        soundPlayed = false,
+        vibrationTriggered = false,
+        message = message,
+        timestamp = timestamp,
+    )
+
+private data class AlertPostPolicy(
+    val channelId: String,
+    val headsUpEnabled: Boolean,
+    val soundEnabled: Boolean,
+    val vibrationEnabled: Boolean,
+)
