@@ -26,12 +26,14 @@ class AndroidScannerRuntimeController
 
         override fun startScanning(): Result<Unit> =
             runCatching {
+                ScannerRuntimeDiagnosticsStore.recordState(ScannerRuntimeState.Starting)
                 ScannerServiceController.start(context)
             }
 
         override fun stopScanning(): Result<Unit> =
             runCatching {
                 ScannerServiceController.stop(context)
+                ScannerRuntimeDiagnosticsStore.recordState(ScannerRuntimeState.Idle)
             }
 
         override fun resetTrackingMemory(): Result<Unit> =
