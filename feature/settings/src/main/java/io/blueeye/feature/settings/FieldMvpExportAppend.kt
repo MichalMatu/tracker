@@ -10,7 +10,7 @@ internal fun String.withFieldMvpDiagnostics(uiState: SettingsUiState): String {
         ,
           "fieldMvpDiagnostics": {
             "scanner": {
-              "state": "${scanner.state}",
+              "state": ${scanner.state.toString().jsonStringOrNull()},
               "startedAt": ${scanner.startedAt.jsonValue()},
               "lastBleSeenAt": ${scanner.lastBleResultAt.jsonValue()},
               "lastClassicSeenAt": ${scanner.lastClassicResultAt.jsonValue()},
