@@ -49,8 +49,11 @@ object ScannerRuntimeDiagnosticsStore {
             bleEvents.addLast(timestamp)
             prune(bleEvents, timestamp)
             prune(classicEvents, timestamp)
+            val previous = _diagnostics.value
             _diagnostics.value =
-                _diagnostics.value.copy(
+                previous.copy(
+                    state = ScannerRuntimeState.Running,
+                    startedAt = previous.startedAt ?: timestamp,
                     lastBleResultAt = timestamp,
                     lastBleMac = mac,
                     bleResultsPerMinute = bleEvents.size,
@@ -66,8 +69,11 @@ object ScannerRuntimeDiagnosticsStore {
             classicEvents.addLast(timestamp)
             prune(bleEvents, timestamp)
             prune(classicEvents, timestamp)
+            val previous = _diagnostics.value
             _diagnostics.value =
-                _diagnostics.value.copy(
+                previous.copy(
+                    state = ScannerRuntimeState.Running,
+                    startedAt = previous.startedAt ?: timestamp,
                     lastClassicResultAt = timestamp,
                     lastClassicMac = mac,
                     bleResultsPerMinute = bleEvents.size,
