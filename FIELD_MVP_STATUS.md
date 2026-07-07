@@ -13,15 +13,18 @@ Branch: `field-mvp-work`
 - Session export is enriched with Field MVP scanner and alert diagnostics before copy/share.
 - A root `FIELD_SESSION_CHECKLIST.md` documents the first phone test sessions and MVP boundaries.
 
+## Verified locally
+
+- `JAVA_HOME=/Users/michal/.local/jdks/jdk-17.0.19+10/Contents/Home ./gradlew qualityCheck`
+- `JAVA_HOME=/Users/michal/.local/jdks/jdk-17.0.19+10/Contents/Home ./gradlew :app:assembleDebug`
+- `git diff --check`
+
 ## Not verified in this environment
 
-- `./gradlew qualityCheck`
-- `./gradlew :app:assembleDebug`
-- `git diff --check`
 - Real phone screen-off BLE behavior
 - Real notification heads-up behavior on a locked phone
 
-The execution environment could not clone GitHub over DNS, so local Gradle validation must be run on a machine with the Android toolchain.
+Gradle requires a Java 17 toolchain. This machine has Java 17 under `~/.local/jdks`, while the default `java` is newer.
 
 ## Known remaining work after local validation
 

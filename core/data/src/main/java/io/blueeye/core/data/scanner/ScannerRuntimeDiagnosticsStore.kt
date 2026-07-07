@@ -110,7 +110,7 @@ object ScannerRuntimeDiagnosticsStore {
         events: ArrayDeque<Long>,
         timestamp: Long,
     ) {
-        while (events.isNotEmpty() && timestamp - events.peekFirst() > WINDOW_MS) {
+        while (events.peekFirst()?.let { firstEventAt -> timestamp - firstEventAt > WINDOW_MS } == true) {
             events.removeFirst()
         }
     }

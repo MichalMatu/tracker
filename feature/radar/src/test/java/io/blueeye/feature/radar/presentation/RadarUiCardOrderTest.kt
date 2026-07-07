@@ -23,7 +23,12 @@ class RadarUiCardOrderTest {
     fun `same signal bucket uses rssi before recency`() {
         val sorted =
             listOf(
-                item(fingerprint = "medium-weaker-new", displayName = "A medium", rssi = -78, firstSeenAt = NOW + 2_000),
+                item(
+                    fingerprint = "medium-weaker-new",
+                    displayName = "A medium",
+                    rssi = -78,
+                    firstSeenAt = NOW + 2_000,
+                ),
                 item(fingerprint = "medium-stronger-old", displayName = "B medium", rssi = -65, firstSeenAt = NOW),
             ).sortedWith(RadarUiCardOrder.comparator)
 
@@ -35,8 +40,8 @@ class RadarUiCardOrderTest {
         val sorted =
             listOf(
                 item(fingerprint = "ordinary", displayName = "A ordinary"),
-                item(fingerprint = "new", displayName = "B new", isNew = true),
-                item(fingerprint = "watch", displayName = "C watch", isInWatchlist = true),
+                item(fingerprint = "new", displayName = "B new", priority = RadarItemPriority.NEW),
+                item(fingerprint = "watch", displayName = "C watch", priority = RadarItemPriority.WATCHLIST),
             ).sortedWith(RadarUiCardOrder.comparator)
 
         assertEquals(listOf("watch", "new", "ordinary"), sorted.map { it.fingerprint })
@@ -46,9 +51,8 @@ class RadarUiCardOrderTest {
         fingerprint: String,
         displayName: String,
         rssi: Int = -60,
-        isInWatchlist: Boolean = false,
-        isNew: Boolean = false,
         firstSeenAt: Long = NOW,
+        priority: RadarItemPriority = RadarItemPriority.ORDINARY,
     ): RadarUiItem =
         RadarUiMapper.mapToUi(
             device =
@@ -64,7 +68,7 @@ class RadarUiCardOrderTest {
                     trackingStatus = TrackingStatus.SAFE,
                     followingScore = 0f,
                     isSafeBeacon = false,
-                    isInWatchlist = isInWatchlist,
+                    isInWatchlist = priority == RadarItemPriority.WATCHLIST,
                     userAlias = null,
                     userNotes = null,
                     alertSound = false,
@@ -74,9 +78,15 @@ class RadarUiCardOrderTest {
                     rssi = rssi,
                     encounterCount = 1,
                 ),
-            isNew = isNew,
+            isNew = priority == RadarItemPriority.NEW,
             activeProbeMac = null,
         )
+
+    private enum class RadarItemPriority {
+        ORDINARY,
+        NEW,
+        WATCHLIST,
+    }
 
     private companion object {
         private const val NOW = 1_789_000_000_000L
