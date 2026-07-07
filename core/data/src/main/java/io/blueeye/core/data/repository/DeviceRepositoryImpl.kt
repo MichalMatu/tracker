@@ -5,6 +5,7 @@ import io.blueeye.core.data.mapper.toDomain
 import io.blueeye.core.data.repository.handler.ble.BleScanHandler
 import io.blueeye.core.data.repository.handler.classic.ClassicScanHandler
 import io.blueeye.core.data.repository.handler.paired.ProbeResultHandler
+import io.blueeye.core.data.scanner.ScannerRuntimeDiagnosticsStore
 import io.blueeye.core.data.utils.asResult
 import io.blueeye.core.domain.repository.DeviceRepository
 import io.blueeye.core.model.Device
@@ -127,6 +128,7 @@ constructor(
     }
 
     override suspend fun handleScanResult(params: io.blueeye.core.domain.repository.ScanResultParams): Result<Unit> = runCatching {
+        ScannerRuntimeDiagnosticsStore.recordBleResult(params.mac)
         bleScanHandler.handle(
             io.blueeye.core.scanner.model.BleScanResultData(
                 mac = params.mac,
@@ -156,6 +158,7 @@ constructor(
         classOfDevice: Int?,
         serviceUuids: List<String>,
     ): Result<Unit> = runCatching {
+        ScannerRuntimeDiagnosticsStore.recordClassicResult(mac)
         classicScanHandler.handle(
             mac = mac,
             name = name,
