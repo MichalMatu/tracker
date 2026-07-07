@@ -5,6 +5,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.blueeye.core.data.tracker.AddressCarryoverTracker
 import io.blueeye.core.data.tracker.session.FollowMeSessionManager
 import io.blueeye.core.domain.scanner.ScannerRuntimeController
+import io.blueeye.core.domain.scanner.ScannerRuntimeDiagnostics
 import io.blueeye.core.domain.scanner.ScannerRuntimeState
 import io.blueeye.service.ScannerService
 import io.blueeye.service.ScannerServiceController
@@ -21,6 +22,7 @@ class AndroidScannerRuntimeController
         private val sessionManager: FollowMeSessionManager,
     ) : ScannerRuntimeController {
         override val scannerState: StateFlow<ScannerRuntimeState> = ScannerService.scannerState
+        override val diagnostics: StateFlow<ScannerRuntimeDiagnostics> = ScannerRuntimeDiagnosticsStore.diagnostics
 
         override fun startScanning(): Result<Unit> =
             runCatching {
