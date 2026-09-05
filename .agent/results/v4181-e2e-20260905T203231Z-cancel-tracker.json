@@ -1,0 +1,11 @@
+{
+  "id": "v4181-e2e-20260905T203231Z-cancel-tracker",
+  "status": "failed",
+  "failure_reason": "interrupted_previous_attempt",
+  "task_digest": "9c1d295e48eb3e52adc796776ef2dec886208cabad42834aae208972a2c8f3ad",
+  "attempt_id": "29c9d4d78506b9187b673860",
+  "daemon_version": "4.18.1",
+  "started_at": "2026-09-05T20:33:45.591080+00:00",
+  "finished_at": "2026-09-05T20:35:56.938214+00:00",
+  "error": "Previous daemon instance ended while this task was claimed. Automatic replay was blocked."
+}
