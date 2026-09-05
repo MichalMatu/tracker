@@ -1,0 +1,14 @@
+{
+  "id": "v4182-e2e-20260905T204248Z-cancel-tracker-cancel",
+  "action": "cancel_task",
+  "status": "accepted",
+  "daemon_version": "4.18.2",
+  "updated_at": "2026-09-05T20:44:05.019849+00:00",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "control_branch": "agent-control",
+  "default_branch": "main",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "task_id": "v4182-e2e-20260905T204248Z-cancel-tracker",
+  "result": "terminating_active_task"
+}
