@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "v4180-e2e-20260905T154547Z-onboarding-tracker",
+  "task_digest": "c6cf24718bcfee02d0f7f8317b365e13d657290b529ed927aa9f0ec6a7963073",
+  "idle_timeout": 360,
+  "task_timeout": 600,
+  "memory_limit_mb": 256,
+  "started_at": "2026-09-05T15:48:54.052872+00:00",
+  "attempt_id": "50b38a18ec057c72c17d3096",
+  "daemon_version": "4.18.0",
+  "daemon_pid": 96823,
+  "updated_at": "2026-09-05T15:48:54.053034+00:00",
+  "pid": 96823
+}
