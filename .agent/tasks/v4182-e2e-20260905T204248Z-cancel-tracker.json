@@ -1,0 +1,19 @@
+{
+  "id": "v4182-e2e-20260905T204248Z-cancel-tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 360,
+  "idle_timeout": 360,
+  "task_timeout": 600,
+  "memory_limit_mb": 256,
+  "steps": [
+    {
+      "name": "release-e2e-cancel",
+      "command": "python3 -u -c 'import os,time; print('\"'\"'LA418_E2E_STARTED v4182-e2e-20260905T204248Z-cancel-tracker'\"'\"', os.getpid(), flush=True); time.sleep(300); print('\"'\"'LA418_E2E_COMPLETED v4182-e2e-20260905T204248Z-cancel-tracker'\"'\"', flush=True)'",
+      "timeout": 360
+    }
+  ]
+}
