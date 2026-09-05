@@ -1,0 +1,61 @@
+{
+  "id": "v4180-e2e-20260905T154547Z-onboarding-tracker",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-05T15:48:54.052951+00:00",
+  "command_timeout": 360,
+  "edits": {},
+  "commands": [
+    {
+      "command": "python3 -u -c 'import os,time; print('\"'\"'LA418_E2E_STARTED v4180-e2e-20260905T154547Z-onboarding-tracker'\"'\"', os.getpid(), flush=True); time.sleep(0); print('\"'\"'LA418_E2E_COMPLETED v4180-e2e-20260905T154547Z-onboarding-tracker'\"'\"', flush=True)'",
+      "exit_code": 0,
+      "output": "LA418_E2E_STARTED v4180-e2e-20260905T154547Z-onboarding-tracker 96984\nLA418_E2E_COMPLETED v4180-e2e-20260905T154547Z-onboarding-tracker\n",
+      "elapsed_seconds": 0.403,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 256,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 1.27,
+      "output_policy": "stream",
+      "captured_output_chars": 136,
+      "output_truncated": false,
+      "current_rss_mb": 1.27,
+      "stage_name": "release-e2e-onboarding",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "stage_timeout": 360
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "release-e2e-onboarding",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.403
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.081
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.067
+  },
+  "finished_at": "2026-09-05T15:48:56.201221+00:00",
+  "task_digest": "c6cf24718bcfee02d0f7f8317b365e13d657290b529ed927aa9f0ec6a7963073",
+  "idle_timeout": 360,
+  "task_timeout": 600,
+  "memory_limit_mb": 256,
+  "attempt_id": "50b38a18ec057c72c17d3096",
+  "daemon_version": "4.18.0"
+}
