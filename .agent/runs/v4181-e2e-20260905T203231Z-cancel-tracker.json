@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "v4181-e2e-20260905T203231Z-cancel-tracker",
+  "task_digest": "9c1d295e48eb3e52adc796776ef2dec886208cabad42834aae208972a2c8f3ad",
+  "idle_timeout": 360,
+  "task_timeout": 600,
+  "memory_limit_mb": 256,
+  "started_at": "2026-09-05T20:33:45.671306+00:00",
+  "attempt_id": "29c9d4d78506b9187b673860",
+  "daemon_version": "4.18.1",
+  "daemon_pid": 37557,
+  "updated_at": "2026-09-05T20:33:45.671456+00:00",
+  "pid": 37557
+}
