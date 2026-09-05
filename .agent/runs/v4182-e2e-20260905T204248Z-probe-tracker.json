@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "v4182-e2e-20260905T204248Z-probe-tracker",
   "task_digest": "340795c6eb281a7eeb32c33abb1442f1cee721453eb80f613c74d80b8951f0fa",
-  "idle_timeout": 360,
-  "task_timeout": 600,
-  "memory_limit_mb": 256,
-  "started_at": "2026-09-05T20:43:36.886270+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-05T20:43:38.771364+00:00",
   "attempt_id": "21228b736068668037d08e57",
   "daemon_version": "4.18.2",
   "daemon_pid": 54102,
-  "updated_at": "2026-09-05T20:43:36.886326+00:00",
+  "updated_at": "2026-09-05T20:43:38.952784+00:00",
   "pid": 54102
 }
