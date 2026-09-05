@@ -98,3 +98,28 @@ The project (`io.blueeye.core.ui.theme`) uses a strict 3-layer styling architect
     * **Theme Strategy:** Determine if you need Layer 2 (Standard M3) or Layer 3 (Extended Domain Colors).
 3.  **Implement:** Write the Composable last.
 4.  **Verify:** Check imports. If you see `android.view.View`, `R.color.*`, or hardcoded `Color(0xFF...)`, you have failed. Fix it immediately.
+
+## Local Agent workflow
+
+This repository is registered on the shared Mac executor:
+
+- repository: `MichalMatu/tracker`;
+- repository id: `tracker`;
+- agent binding: `be481b25-9d97-4205-b93f-95f5c5827441`;
+- source branch: `main` (the Git workflow above remains authoritative);
+- control branch: `agent-control`;
+- workspace: `~/agent-workspace/repos/tracker/{control,work,checkpoints}`.
+
+Before local execution, read `.agent/binding.json` and `.agent/status/daemon.json` on `agent-control`. The registry, control binding and task `agent_binding` must match exactly. Read the live daemon version/revision from status and compare with canonical `MichalMatu/local-agent/main` when compatibility matters.
+
+Queue local tasks as `.agent/tasks/<unique-id>.json`; inspect `.agent/runs/<id>.json` and the terminal `.agent/results/<id>.json`. Never edit the daemon's local control clone. Interrupted tasks are not replayed; a changed payload or intentional retry needs a new id. Use `resources: []` for repository-local Android builds/tests without an exclusive external device. Device operations declare a stable resource for the concrete device; `machine` is reserved for whole-host exclusivity. The RSS bound is independent from resource classification. Preserve Gradle/build caches and checkpoint dirty workspaces before cleanup. Do not restart or self-update the shared supervisor from a repository task.
+
+The onboarding probe verifies local execution and result publication; it is not evidence of an Android build or device test.
+
+### Direct GitHub work and local execution
+
+Use an available GitHub tool with write permission for bounded source/configuration/documentation changes when the exact diff and relevant CI can verify the outcome. A commit proves publication, not successful execution. Report the exact commit and completed checks. Do not create an artificial Local Agent task when GitHub evidence already provides the required verification.
+
+Use Local Agent for Mac command execution, local builds/tests, device access and machine-specific evidence. A hybrid flow may edit through GitHub and run a read-only local verification task for the exact committed SHA; verify that SHA explicitly in an early stage (`expected_head` is not a supported task field). Check current daemon/run evidence before a direct write and avoid racing a local task that is modifying the same branch. Follow this repository's branch policy.
+
+Local tasks retain their unique immutable ids, exact `agent_binding`, explicit `resources`, bounded limits and terminal result requirement. When Chat Bridge is active, both paths remain confined to its immutable repository binding. Use `STOP` only after the goal has the required CI or local result evidence. A different repository requires explicit operator Rebind. Canonical policy: `MichalMatu/local-agent/main/docs/AUTONOMOUS_CHAT_LOOP.md` and `docs/OPERATIONS.md`.
