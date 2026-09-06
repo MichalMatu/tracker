@@ -1,0 +1,114 @@
+name: Tester Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tester release tag (must start with v, e.g. v1.0.0-stable-core.1)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tester-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GRADLE_OPTS: >-
+        -Dorg.gradle.jvmargs=-Xmx3072m -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC -Dfile.encoding=UTF-8
+        -Dkotlin.daemon.jvmargs=-Xmx1024m -XX:MaxMetaspaceSize=512m
+        -Dorg.gradle.vfs.watch=false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-cleanup: on-success
+
+      - name: Resolve release tag
+        id: release_tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+            TAG="${GITHUB_REF_NAME}"
+          else
+            TAG="${{ inputs.tag }}"
+          fi
+
+          if [[ ! "${TAG}" =~ ^v[0-9] ]]; then
+            echo "Release tag must start with v followed by a number, got: ${TAG}" >&2
+            exit 2
+          fi
+
+          echo "tag=${TAG}" >> "${GITHUB_OUTPUT}"
+
+      - name: Quality gate
+        run: ./gradlew --parallel --max-workers=3 qualityCheck --stacktrace
+
+      - name: Build tester APK
+        run: ./gradlew --parallel --max-workers=3 :app:assembleDebug --stacktrace
+
+      - name: Package release assets
+        id: assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.release_tag.outputs.tag }}"
+          mkdir -p release
+          APK="release/BlueEye-Tracker-${TAG}-debug.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "${APK}"
+          sha256sum "${APK}" > "${APK}.sha256"
+          echo "apk=${APK}" >> "${GITHUB_OUTPUT}"
+          echo "sha=${APK}.sha256" >> "${GITHUB_OUTPUT}"
+
+      - name: Publish GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.release_tag.outputs.tag }}"
+          APK="${{ steps.assets.outputs.apk }}"
+          SHA_FILE="${{ steps.assets.outputs.sha }}"
+
+          cat > release/RELEASE_NOTES.md <<EOF
+          ## BlueEye Tracker tester build
+
+          - Tag: \`${TAG}\`
+          - Commit: \`${GITHUB_SHA}\`
+          - Channel: stabilization tester build
+          - Signing: Android debug signing (not production / Play Store signing)
+
+          This build passed the repository \`qualityCheck\` and \`:app:assembleDebug\` gates before publication.
+
+          See the repository README and \`docs/RELEASES_AND_ARTIFACTS.md\` for installation and artifact guidance.
+          EOF
+
+          if gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" "${APK}" "${SHA_FILE}" --clobber --repo "${GITHUB_REPOSITORY}"
+          else
+            gh release create "${TAG}" "${APK}" "${SHA_FILE}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --target "${GITHUB_SHA}" \
+              --title "BlueEye Tracker ${TAG}" \
+              --notes-file release/RELEASE_NOTES.md \
+              --prerelease
+          fi
