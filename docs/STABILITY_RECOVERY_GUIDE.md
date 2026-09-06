@@ -17,7 +17,7 @@
 
 ### NEXT ACTION
 
-- [ ] Phase 1 — create the Stable Core runtime profile: BLE-only passive collection, with Classic discovery and automatic active probing disabled from the normal runtime path.
+- [ ] Phase 2 — make scanner/service lifecycle deterministic: one owner, idempotent Start/Stop, explicit teardown and restart behavior.
 
 When the next task is completed, update this line to the next unfinished item and add an entry to the Work Log at the bottom of this file.
 
@@ -246,23 +246,23 @@ Target runtime path:
 
 Disable from normal automatic operation:
 
-- [ ] continuous Classic discovery,
-- [ ] automatic active GATT probing,
-- [ ] automatic RFCOMM probing,
-- [ ] nonessential tactical/public-safety alert emission,
-- [ ] any enrichment that can block or significantly delay raw ingest.
+- [x] continuous Classic discovery,
+- [x] automatic active GATT probing,
+- [x] automatic RFCOMM probing,
+- [x] nonessential tactical/public-safety alert emission,
+- [x] automatic enrichment paths outside passive BLE ingest are gated; deeper queue/coalescing/ingest optimization remains explicitly in Phase 3.
 
 Keep code available behind explicit disabled flags or diagnostic actions where practical.
 
 Implementation checklist:
 
-- [ ] Define a single Stable Core runtime/profile contract.
-- [ ] BLE-only is the default collection path.
-- [ ] Verify disabling advanced paths does not delete existing data/features from source.
-- [ ] Expose active runtime profile in diagnostics.
-- [ ] Add tests proving Classic/probe are not started in Stable Core.
-- [ ] Run quality gate.
-- [ ] Build APK.
+- [x] Define a single Stable Core runtime/profile contract.
+- [x] BLE-only is the default collection path.
+- [x] Verify disabling advanced paths does not delete existing data/features from source.
+- [x] Expose active runtime profile in diagnostics.
+- [x] Add tests proving Classic/probe are not started in Stable Core.
+- [x] Run quality gate.
+- [x] Build APK.
 
 Exit criterion: app can continuously collect BLE-only observations without automatically starting Classic or active probes.
 
@@ -647,6 +647,31 @@ Do not claim a runtime bug fixed only because unit tests/build are green when th
 ## 9. Work Log
 
 Append newest entries at the top of this section.
+
+### 2026-09-06 — Phase 1 BLE Stable Core
+
+- Status: **COMPLETE (software gate)**; physical-device stability acceptance remains Phase 7.
+- Implementation commit: `59e594952a9bd436e5af85f7d4ea741cd0bf5726`.
+- Runtime profile: `STABLE_CORE` / BLE-only passive collection.
+- Automatic paths gated off: continuous Classic, automatic GATT, automatic RFCOMM and nonessential tactical/public-safety alert side effects.
+- Persisted `autoActiveProbeEnabled=true` cannot bypass the runtime profile; Settings exposes the feature as unavailable while Stable Core is active.
+- Runtime profile is exposed through scanner diagnostics and session-export diagnostics.
+- Focused regression evidence:
+  - actual `BleScanner` passive start starts BLE and performs zero Classic-start interactions,
+  - persisted automatic probe preference cannot enqueue/connect,
+  - active-collection repository exposes automatic probing as disabled and rejects enable attempts,
+  - domain policy test locks Classic/GATT/RFCOMM/public-safety side-effect flags off and diagnostics profile on.
+- Sandbox verification on JDK 21 / JVM 17 target:
+  - focused tests PASS,
+  - `:core:data:testDebugUnitTest` PASS,
+  - `:feature:settings:testDebugUnitTest` PASS,
+  - `qualityCheck` PASS (`BUILD SUCCESSFUL`, 491 tasks),
+  - `:app:assembleDebug` PASS (`BUILD SUCCESSFUL`),
+  - `git diff --check` PASS.
+- Explicitly deferred: lifecycle ownership/restart behavior (Phase 2), queue/coalescing/drop diagnostics (Phase 3), alert ownership/cancellation (Phase 4), identity (Phase 5), Radar/history semantics (Phase 6).
+- Next action: Phase 2 — deterministic scanner/service lifecycle.
+
+---
 
 ### 2026-09-06 — Sandbox-first/JDK 21 build infrastructure
 

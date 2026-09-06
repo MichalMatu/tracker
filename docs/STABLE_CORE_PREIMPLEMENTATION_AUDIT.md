@@ -1,7 +1,7 @@
 # Stable Core Preimplementation Audit
 
 Date: 2026-09-06
-Status: READY FOR PHASE 1 IMPLEMENTATION
+Status: PHASE 1 IMPLEMENTED AND SOFTWARE-VERIFIED
 Canonical plan: `docs/STABILITY_RECOVERY_GUIDE.md`
 
 ## Purpose
@@ -190,6 +190,12 @@ Use documents in this order when instructions conflict:
 
 `MVP_GOAL_PROMPT.md`, `docs/PIPELINE_AUDIT.md`, and `FIELD_SESSION_CHECKLIST.md` contain useful historical context but their old execution order must not override the recovery guide while feature freeze is active.
 
+## Completion evidence
+
+Phase 1 implementation commit: `59e594952a9bd436e5af85f7d4ea741cd0bf5726`.
+
+The acceptance criteria were software-verified with focused regression tests, the full repository `qualityCheck`, debug APK assembly, and `git diff --check`. The implementation keeps later recovery work out of scope: lifecycle remains Phase 2, ingest/queue pressure remains Phase 3, alert ownership remains Phase 4, identity remains Phase 5, and Radar/history semantics remain Phase 6. Physical-device stability acceptance remains Phase 7.
+
 ## Next action
 
-Implement Phase 1 exactly in the order above. Do not begin Phase 2 until the Phase 1 acceptance criteria are checked off in `docs/STABILITY_RECOVERY_GUIDE.md`.
+Proceed to Phase 2 exactly as defined in `docs/STABILITY_RECOVERY_GUIDE.md`: establish deterministic scanner/service lifecycle ownership and Start/Stop/restart behavior.
