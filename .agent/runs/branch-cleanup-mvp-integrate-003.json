@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "branch-cleanup-mvp-integrate-003",
+  "task_digest": "778f281a063c0aa71a1c2d6de2486a56764e7dbd21cea3732fa54901fe758b8c",
+  "idle_timeout": 900,
+  "task_timeout": 10800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-06T04:49:42.762596+00:00",
+  "attempt_id": "d21a999d7ff38973595d5631",
+  "daemon_version": "4.18.4",
+  "daemon_pid": 18451,
+  "updated_at": "2026-09-06T04:49:42.762752+00:00",
+  "pid": 18451
+}
