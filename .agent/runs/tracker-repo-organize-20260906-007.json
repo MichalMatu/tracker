@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-repo-organize-20260906-007",
+  "task_digest": "81997f7bcdea1017a898e5ac0baf5e617cd378cfdbc47f0e5dfffc7c8eab28cd",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-06T17:44:59.235078+00:00",
+  "attempt_id": "086befd0e620d70a94060b59",
+  "daemon_version": "4.18.4",
+  "daemon_pid": 91744,
+  "updated_at": "2026-09-06T17:44:59.235294+00:00",
+  "pid": 91744
+}
