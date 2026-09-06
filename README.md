@@ -10,6 +10,16 @@ Feature development is frozen while the runtime is reduced to a verified BLE-onl
 
 Work directly on `main`; `agent-control` is reserved for Local Agent infrastructure. Historical MVP/audit documents remain useful context, but they do not override the recovery checklist while the feature freeze is active.
 
+## Engineering Execution Model
+
+During stabilization, use the compute workers by role instead of treating the Mac as the default CI machine:
+
+- **ChatGPT sandbox** — source inspection, patch preparation, static work, test selection, pure JVM/Kotlin probes and Android Gradle work when an offline cache pack is restored.
+- **GitHub Actions** — canonical Java 17 `qualityCheck`, debug APK build, dependency/network work and reusable sandbox pack generation.
+- **Local Agent / Mac** — ADB, physical phone, lock-screen, Bluetooth runtime and other Mac/device-specific evidence.
+
+The canonical bootstrap/cache policy, sandbox memory profile and fresh-session steps are in [docs/SANDBOX_EXECUTION_FLOW.md](docs/SANDBOX_EXECUTION_FLOW.md). Portable sandbox bootstrap assets are kept in ChatGPT Library under `/Tracker/Sandbox/`.
+
 ## Current Scope
 
 - Passive BLE and Bluetooth observation.
@@ -35,7 +45,7 @@ Known architecture gaps are documented in [docs/ARCHITECTURE_CURRENT.md](docs/AR
 
 ## Quality Gate
 
-Use Java 17:
+Use Java 17 for the canonical full gate:
 
 ```bash
 export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
@@ -55,6 +65,7 @@ Details, current exceptions, and baseline policy are in [docs/QUALITY_GATE.md](d
 
 - [Stability recovery guide](docs/STABILITY_RECOVERY_GUIDE.md)
 - [Stable Core preimplementation audit](docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md)
+- [Sandbox-first execution flow](docs/SANDBOX_EXECUTION_FLOW.md)
 - [Product goal](docs/PRODUCT_GOAL.md)
 - [Current architecture](docs/ARCHITECTURE_CURRENT.md)
 - [Pipeline audit](docs/PIPELINE_AUDIT.md)
