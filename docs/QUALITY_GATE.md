@@ -1,9 +1,9 @@
 # Quality Gate
 
-Use Java 17 before running Gradle locally:
+Use JDK 21 before running Gradle. The build runtime/toolchain is 21; generated Android/JVM bytecode remains JVM 17 during stability recovery:
 
 ```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 ```
 
 ## Main Command
@@ -35,7 +35,7 @@ gitleaks git --config .gitleaks.toml --redact --verbose
 
 | Tool | Status | Problem | Recommendation |
 | --- | --- | --- | --- |
-| Gradle | Configured | Java 17 is required and not always auto-discovered | Keep the `JAVA_HOME` command documented |
+| Gradle | Configured | JDK 21 is the single installed build runtime/toolchain; bytecode target remains JVM 17 | Keep JDK 21 consistent across sandbox, CI and Mac |
 | ktlint | Configured globally | `core:data/src` and `core:decoders/src` are excluded due existing large formatting debt | Pay down one excluded module at a time |
 | detekt | Configured globally | Existing debt is baseline-gated in multiple modules | Treat baseline reduction as explicit refactor work |
 | Android lint | Available via `lintDebug` | Must be run with Android toolchain available | Keep inside `qualityCheck` |
@@ -69,9 +69,11 @@ Reason: these modules have large existing formatting debt. Formatting them shoul
 Minimum:
 
 ```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 ./gradlew qualityCheck
 ./gradlew :app:assembleDebug
 gitleaks git --config .gitleaks.toml --redact --verbose
 git diff --check
 ```
+
+In the ChatGPT sandbox, use the restored offline Android/Gradle pack and `tools/sandbox/run-sandbox-gradle.sh`. Focused module gates may use 3 workers; broad `qualityCheck` and `:app:assembleDebug` use the bounded 2-worker sandbox profile and should be run sequentially.
