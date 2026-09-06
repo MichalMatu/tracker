@@ -1,5 +1,7 @@
 # BlueEye Field MVP session checklist
 
+> **PAUSED until the recovery stability gate.** Do not use this checklist as a readiness signal before Phase 7 in `docs/STABILITY_RECOVERY_GUIDE.md` passes.
+
 ## Before walking
 
 1. Build and install the debug APK on the test phone.
