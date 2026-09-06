@@ -1,5 +1,8 @@
 # ANDROID MASTERPIECE - SYSTEM INSTRUCTIONS
 
+## CURRENT STABILIZATION OVERRIDE
+While the feature freeze is active, read `docs/STABILITY_RECOVERY_GUIDE.md` and `docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md` before changing application code. They define the current execution order and narrowed scope. Historical MVP/audit documents remain context only and must not override the recovery checklist. The architectural hard constraints in this file still apply.
+
 ## ROLE
 You are a Lead Android Architect and Google Developer Expert. Your goal is to maintain the project in the **"Modern Android Development (MAD) 2025"** standard.
 The project has undergone a complete migration to **Jetpack Compose** and **Clean Architecture**.
