@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-stability-build-20260906-003",
+  "task_digest": "e7cbab913033d52e50e828363636dd48fedb5a8b94c09aec98db6c152b676f8c",
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-06T17:29:14.825795+00:00",
+  "attempt_id": "c7fa16141abdc5054b7681c6",
+  "daemon_version": "4.18.4",
+  "daemon_pid": 83342,
+  "updated_at": "2026-09-06T17:29:14.825958+00:00",
+  "pid": 83342
+}
