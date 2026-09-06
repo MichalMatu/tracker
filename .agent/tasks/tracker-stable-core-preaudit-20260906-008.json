@@ -1,0 +1,29 @@
+{
+  "id": "tracker-stable-core-preaudit-20260906-008",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1800,
+  "idle_timeout": 300,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "steps": [
+    {
+      "name": "stable-core-targeted-audit",
+      "command": "set -eu; git fetch --prune --tags origin; git reset --hard origin/main; echo '=== HEAD/TAGS ==='; git log -1 --oneline --decorate; git tag --points-at 61f9f29a028fc31f6e1640daf4cfa12fdc1badeb; git tag --points-at $(git rev-parse HEAD); echo '=== PHASE1 RUNTIME STARTERS ==='; git grep -n -E 'startClassicDiscovery|classicScanSource.start|autoActiveProbe|enqueueCandidate|SCAN_MODE_LOW_LATENCY|setReportDelay|START_NOT_STICKY|START_STICKY|onDestroy|resetSession|DROP_OLDEST|Channel.BUFFERED|capacity = 4096' -- core app feature || true; echo '=== ALERT OWNERSHIP ==='; git grep -n -E 'RingtoneManager|getRingtone|ringtone.*play|ringtone.*stop|cancelAll|cancelVibration|stopSound|vibrator.cancel' -- core app feature || true; echo '=== RADAR RECENCY ==='; git grep -n -E 'sinceSecondsAgo = 180|REFRESH_INTERVAL_MS|getRecentDevices' -- core feature || true; echo '=== DROP DIAGNOSTIC WIRING ==='; git grep -n 'recordDroppedQueueEvents' -- core app feature || true; echo '=== STABLE CORE FLAGS/PROFILES ==='; git grep -n -E 'StableCore|RuntimeProfile|CollectionProfile|BLE_ONLY|stable core' -- core app feature || true; echo '=== ACTIVE PROBE DEFAULTS ==='; git grep -n -E 'autoActiveProbeEnabled|setAutoActiveProbeEnabled|AUTO.*PROBE' -- core app feature || true; echo '=== CLASSIC TEST COVERAGE ==='; find core app feature -type f | grep -E 'Test.kt$|Test.java$' | xargs grep -l -E 'ClassicScanSource|startClassicDiscovery|autoActiveProbe|ScannerService|DROP_OLDEST|recordDroppedQueueEvents|stopSound|cancelAll' 2>/dev/null || true; echo '=== DOC CONFLICTS ==='; grep -R -n -E 'passive BLE/Classic|Classic discovery|background/watchlist scan|Work directly on main|Pracuj na main|STABILITY_RECOVERY_GUIDE' README.md AGENTS.md MVP_GOAL_PROMPT.md FIELD_SESSION_CHECKLIST.md docs 2>/dev/null || true",
+      "timeout": 1200
+    },
+    {
+      "name": "core-tests",
+      "command": "set -eu; export JAVA_HOME=$HOME/.local/jdks/jdk-17.0.19+10/Contents/Home; ./gradlew :core:data:testDebugUnitTest --stacktrace",
+      "timeout": 1800
+    },
+    {
+      "name": "quality-and-build",
+      "command": "set -eu; export JAVA_HOME=$HOME/.local/jdks/jdk-17.0.19+10/Contents/Home; ./gradlew qualityCheck :app:assembleDebug --stacktrace; git diff --check; git status --short --branch",
+      "timeout": 1800
+    }
+  ]
+}
