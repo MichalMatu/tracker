@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
 
       # setup-gradle owns the Gradle User Home cache. Avoid a second competing
       # Gradle cache in setup-java.
