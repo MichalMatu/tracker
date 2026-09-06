@@ -39,6 +39,7 @@ jobs:
             sha256sum settings.gradle.kts
             find . -name build.gradle.kts -type f -print0 | sort -z | xargs -0 sha256sum
           } > .sandbox-pack/meta/dependency-inputs.sha256
+          printf '%s\n' "jdk=21" >> .sandbox-pack/meta/dependency-inputs.sha256
           sha256sum .sandbox-pack/meta/dependency-inputs.sha256 | awk '{print $1}' > .sandbox-pack/meta/dependency-key.txt
 
       - name: Create exact source snapshot
@@ -72,12 +73,12 @@ jobs:
             echo "enabled=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Set up Java 17
+      - name: Set up Java 21
         if: steps.offline.outputs.enabled == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
 
       - name: Set up Gradle cache
         if: steps.offline.outputs.enabled == 'true'
