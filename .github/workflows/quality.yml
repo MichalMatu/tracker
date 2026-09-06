@@ -16,6 +16,12 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      # Override the repository's Mac survival-mode limits on the CI runner.
+      GRADLE_OPTS: >-
+        -Dorg.gradle.jvmargs=-Xmx3072m -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC -Dfile.encoding=UTF-8
+        -Dkotlin.daemon.jvmargs=-Xmx1024m -XX:MaxMetaspaceSize=512m
+        -Dorg.gradle.vfs.watch=false
     steps:
       - uses: actions/checkout@v4
 
@@ -23,12 +29,17 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-          cache: gradle
 
+      # setup-gradle owns the Gradle User Home cache. Avoid a second competing
+      # Gradle cache in setup-java.
       - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-cleanup: on-success
 
       - name: Static analysis, lint and unit tests
-        run: ./gradlew qualityCheck --stacktrace
+        run: ./gradlew --parallel --max-workers=3 qualityCheck --stacktrace
 
+      # Keep this in the same job so compilation/configuration caches from the
+      # quality gate remain hot for the APK build.
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace
+        run: ./gradlew --parallel --max-workers=3 :app:assembleDebug --stacktrace
