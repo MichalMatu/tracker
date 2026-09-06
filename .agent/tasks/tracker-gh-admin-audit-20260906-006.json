@@ -1,0 +1,19 @@
+{
+  "id": "tracker-gh-admin-audit-20260906-006",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1200,
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 2048,
+  "steps": [
+    {
+      "name": "github-admin-audit",
+      "command": "set -eu; echo '=== WORKSPACE ==='; pwd; git status --short --branch; git remote -v; echo '=== GH AUTH ==='; gh auth status; echo '=== REPO PERMISSION ==='; gh repo view MichalMatu/tracker --json defaultBranchRef,viewerPermission,isPrivate,nameWithOwner; echo '=== FETCH ==='; git fetch --prune --tags origin; echo '=== BRANCHES ==='; git branch -a -vv; echo '=== TAGS ==='; git tag --sort=-creatordate; echo '=== OPEN PRS ==='; gh pr list --state open --limit 50; echo '=== PROTECTION ==='; gh api repos/MichalMatu/tracker/branches/main/protection || true; echo '=== RULESETS ==='; gh api repos/MichalMatu/tracker/rulesets || true; echo '=== GUIDE CHECKS ==='; gh api repos/MichalMatu/tracker/commits/9d94f0f76dfb51373efeae48e31ea696f55eef83/check-runs --jq '.check_runs[] | [.name,.status,.conclusion] | @tsv' || true; echo '=== DOCS ==='; find . -maxdepth 2 -type f | sort | grep -E 'md$|AGENTS' || true; echo '=== HISTORY ==='; git log --oneline --decorate --graph --all -n 50",
+      "timeout": 1200
+    }
+  ]
+}
