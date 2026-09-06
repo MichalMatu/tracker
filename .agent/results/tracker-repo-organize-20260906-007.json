@@ -1,0 +1,61 @@
+{
+  "id": "tracker-repo-organize-20260906-007",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-06T17:44:59.235202+00:00",
+  "command_timeout": 1200,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; git fetch --prune --tags origin; test $(git rev-parse origin/main) = 61f9f29a028fc31f6e1640daf4cfa12fdc1badeb; echo 'Removing main branch protection'; gh api -X DELETE repos/MichalMatu/tracker/branches/main/protection; echo 'Creating immutable baseline tags'; if ! git rev-parse -q --verify refs/tags/stability-baseline-2026-09-06 >/dev/null; then git tag -a stability-baseline-2026-09-06 61f9f29a028fc31f6e1640daf4cfa12fdc1badeb -m 'Baseline before Stable Core recovery'; fi; if ! git rev-parse -q --verify refs/tags/archive-field-mvp-2026-07-07 >/dev/null; then git tag -a archive-field-mvp-2026-07-07 ce222cf770112d54065bb2c2992b43a826e01e13 -m 'Archived Field MVP work snapshot'; fi; git push origin refs/tags/stability-baseline-2026-09-06 refs/tags/archive-field-mvp-2026-07-07; echo 'Merging stability guide PR'; gh pr merge 3 --merge --delete-branch; git fetch --prune --tags origin; NEWMAIN=$(git rev-parse origin/main); echo NEWMAIN=$NEWMAIN; if ! git rev-parse -q --verify refs/tags/stability-plan-v1 >/dev/null; then git tag -a stability-plan-v1 $NEWMAIN -m 'Stable Core recovery plan accepted'; fi; git push origin refs/tags/stability-plan-v1; if git ls-remote --heads origin archive/field-mvp-work-20260707 | grep -q archive/field-mvp-work-20260707; then git push origin --delete archive/field-mvp-work-20260707; fi; echo '=== FINAL REMOTE BRANCHES ==='; git fetch --prune origin; git branch -r; echo '=== FINAL TAGS ==='; git tag --sort=-creatordate; echo '=== MAIN PROTECTION CHECK ==='; gh api repos/MichalMatu/tracker/branches/main/protection || true; echo '=== OPEN PRS ==='; gh pr list --state open --limit 20; echo '=== MAIN HEAD ==='; git log -1 --oneline origin/main",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n   d620ff5..42a513d  agent-control -> origin/agent-control\nRemoving main branch protection\nCreating immutable baseline tags\nTo https://github.com/MichalMatu/tracker.git\n * [new tag]         stability-baseline-2026-09-06 -> stability-baseline-2026-09-06\n * [new tag]         archive-field-mvp-2026-07-07 -> archive-field-mvp-2026-07-07\nMerging stability guide PR\nFrom https://github.com/MichalMatu/tracker\n - [deleted]         (none)        -> origin/temp-stability-guide\n   61f9f29..dc75dc1  main          -> origin/main\n   42a513d..872a612  agent-control -> origin/agent-control\nNEWMAIN=dc75dc1709b00a421645f1ddc5fa174ef7517d75\nTo https://github.com/MichalMatu/tracker.git\n * [new tag]         stability-plan-v1 -> stability-plan-v1\nTo https://github.com/MichalMatu/tracker.git\n - [deleted]         archive/field-mvp-work-20260707\n=== FINAL REMOTE BRANCHES ===\n  origin/HEAD -> origin/main\n  origin/agent-control\n  origin/main\n=== FINAL TAGS ===\nstability-plan-v1\narchive-field-mvp-2026-07-07\nstability-baseline-2026-09-06\n=== MAIN PROTECTION CHECK ===\n{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}gh: Branch not protected (HTTP 404)\n=== OPEN PRS ===\n=== MAIN HEAD ===\ndc75dc1 Merge pull request #3 from MichalMatu/temp-stability-guide\n",
+      "elapsed_seconds": 16.072,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 49.3,
+      "output_policy": "stream",
+      "captured_output_chars": 1384,
+      "output_truncated": false,
+      "current_rss_mb": 18.69,
+      "stage_name": "unlock-and-organize-github",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "stage_timeout": 1200
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "unlock-and-organize-github",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 16.072
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.125
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.08
+  },
+  "finished_at": "2026-09-06T17:45:17.213366+00:00",
+  "task_digest": "81997f7bcdea1017a898e5ac0baf5e617cd378cfdbc47f0e5dfffc7c8eab28cd",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 2048,
+  "attempt_id": "086befd0e620d70a94060b59",
+  "daemon_version": "4.18.4"
+}
