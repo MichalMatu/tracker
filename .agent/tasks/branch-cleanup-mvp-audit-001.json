@@ -1,0 +1,19 @@
+{
+  "id": "branch-cleanup-mvp-audit-001",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "integration/mvp-cleanup",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 900,
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 1024,
+  "steps": [
+    {
+      "name": "audit-field-mvp-history",
+      "command": "set -eu; git fetch origin main field-mvp-work portfolio/p1-quality-20260827 integration/mvp-cleanup; echo '=== BINDING/BRANCH ==='; git status --short --branch; echo '=== DIVERGENCE ==='; git rev-list --left-right --count origin/main...origin/field-mvp-work; echo '=== MVP COMMITS OLDEST FIRST ==='; git log --reverse --format='%H%x09%s' origin/main..origin/field-mvp-work; echo '=== FILES PER MVP COMMIT ==='; for c in $(git rev-list --reverse origin/main..origin/field-mvp-work); do echo; git show --no-renames --format='--- %H %s' --name-status --stat --oneline $c; done; echo; echo '=== CURRENT NET DIFF ==='; git diff --stat origin/main...origin/field-mvp-work; git diff --name-status origin/main...origin/field-mvp-work; echo; echo '=== MERGE-TREE CONFLICT PROBE ==='; base=$(git merge-base origin/main origin/field-mvp-work); git merge-tree "$base" origin/main origin/field-mvp-work | grep -E '^(<<<<<<<|=======|>>>>>>>|changed in both|added in both|removed in|CONFLICT)' -C 2 || true; echo; echo '=== QUALITY PR COMMITS ==='; git log --reverse --format='%H%x09%s' origin/main..origin/portfolio/p1-quality-20260827",
+      "timeout": 900
+    }
+  ]
+}
