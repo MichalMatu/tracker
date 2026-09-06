@@ -1,0 +1,19 @@
+{
+  "id": "tracker-stability-build-20260906-003",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1800,
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "steps": [
+    {
+      "name": "baseline-debug-build",
+      "command": "set -eu; test \"$(git rev-parse HEAD)\" = \"61f9f29a028fc31f6e1640daf4cfa12fdc1badeb\"; export JAVA_HOME=$HOME/.local/jdks/jdk-17.0.19+10/Contents/Home; ./gradlew :app:assembleDebug --stacktrace; git diff --check; git status --short --branch",
+      "timeout": 1800
+    }
+  ]
+}
