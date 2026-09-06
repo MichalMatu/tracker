@@ -45,11 +45,24 @@ Current measured sandbox baseline (2026-09-06):
 
 Therefore a new sandbox must restore tool/cache assets from Library rather than attempting ad-hoc internet installation.
 
+### Java/JVM standard
+
+During stability recovery there is exactly one installed JDK baseline:
+
+- **JDK 21** runs Gradle and the Kotlin/Java compilers in sandbox, GitHub Actions and Local Agent/Mac.
+- JVM modules use JDK 21 toolchains.
+- Android/Java `sourceCompatibility` and `targetCompatibility` stay at **17**.
+- Kotlin `jvmTarget` stays at **17**.
+- Do not install JDK 17 merely to produce JVM 17 bytecode.
+- Do not raise application bytecode to JVM 21 during the recovery freeze; that is a separate post-stability modernization task.
+
+This keeps one runtime/toolchain version without changing the Android compatibility surface while runtime bugs are being isolated.
+
 ### B. GitHub Actions — canonical full Android build worker
 
 Use for:
 
-- Java 17 canonical verification,
+- JDK 21 canonical verification,
 - dependency resolution/network downloads,
 - `qualityCheck`,
 - `:app:assembleDebug`,
@@ -89,8 +102,10 @@ Future cache packs use these names:
 
 - `tracker-source-<git-sha>.tar.zst`
 - `tracker-source-<git-sha>.tar.zst.sha256`
-- `tracker-android-offline-<dependency-key>.tar.zst`
-- `tracker-android-offline-<dependency-key>.tar.zst.sha256`
+- `tracker-android-offline-<dependency-key>/manifest/*`
+- `tracker-android-offline-<dependency-key>/part-00` ... `part-N`
+
+The full offline pack is split into transport chunks below 512 MiB because connector artifact downloads have a per-file size limit. Reassemble chunks and verify both per-part and full-pack SHA-256 before extraction.
 
 Never put GitHub tokens, signing keys, Android keystores, account cookies or other secrets in Library cache packs.
 
@@ -114,7 +129,8 @@ A future chat that needs substantial Tracker work should do this before expensiv
 
 9. Restore a source snapshot matching the intended SHA, or generate a new source snapshot when the cached one is stale.
 10. Run `bin/sandbox-doctor.sh`.
-11. Run focused work/tests before the broad gate.
+11. If a matching offline Android/Gradle pack is present, run focused Android tests in `--offline` mode before the broad gate.
+12. Use GitHub Actions as the canonical networked cross-check; use Local Agent only for device/Mac evidence.
 
 Do not silently use a source snapshot with a different SHA than the task target.
 
@@ -122,12 +138,12 @@ Do not silently use a source snapshot with a different SHA than the task target.
 
 The project-level `gradle.properties` is intentionally conservative because it was tuned for an 8 GB Mac. The sandbox must use an isolated `GRADLE_USER_HOME` profile instead of rewriting the project file for every environment.
 
-Sandbox target for 5 vCPU / ~5.8 GiB RAM:
+Sandbox base profile for 5 vCPU / ~5.8 GiB RAM:
 
 ```properties
-org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=768m -XX:+UseG1GC -Dfile.encoding=UTF-8
+org.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=640m -XX:+UseG1GC -Dfile.encoding=UTF-8
 org.gradle.parallel=true
-org.gradle.workers.max=3
+org.gradle.workers.max=2
 org.gradle.caching=true
 org.gradle.configuration-cache=true
 org.gradle.daemon=true
@@ -135,18 +151,22 @@ org.gradle.daemon.idletimeout=600000
 org.gradle.vfs.watch=false
 kotlin.incremental=true
 kotlin.incremental.java=true
-kotlin.daemon.jvmargs=-Xmx768m -XX:MaxMetaspaceSize=384m
+kotlin.daemon.jvmargs=-Xmx512m -XX:MaxMetaspaceSize=320m
 ```
 
-Rationale:
+Execution profiles:
 
-- 5 Gradle workers is too aggressive for 5.8 GiB once kapt/Hilt/Room/lint run concurrently.
-- 3 workers gives useful CPU parallelism while keeping room for Kotlin daemon, OS and test JVMs.
-- 2 GiB Gradle heap is enough for this project without starving the Kotlin daemon.
+- **Focused module tests/builds:** `tools/sandbox/run-sandbox-gradle.sh` uses 3 workers for CPU throughput.
+- **Broad `qualityCheck` / `:app:assembleDebug`:** the wrapper automatically drops to 2 workers.
+- Run `qualityCheck` and `:app:assembleDebug` as separate commands in the sandbox. Keeping them sequential avoids holding lint/test/build peaks at once.
+
+Measured reason for this split (2026-09-06): a full offline gate at 3 workers with a 2 GiB Gradle heap caused the Gradle daemon to be killed while lint/detekt/tests overlapped. Reducing to 2 workers and a 1.5 GiB Gradle heap removed that memory-pressure failure mode; do not raise heap as the first response to an OOM.
+
+Other rationale:
+
 - file watching is disabled because sandbox workspaces are disposable and VFS watch gives little value.
 - configuration/build cache stay enabled because repeated focused checks are common.
-
-If memory pressure/OOM appears, reduce workers to 2 before raising heap. Do not blindly increase heap past roughly half of available RAM.
+- the sandbox wrapper uses `--offline`; a missing dependency is a cache invalidation signal, not a reason to improvise network installation.
 
 ## 6. Test ladder — fastest evidence first
 
@@ -225,7 +245,8 @@ push exact source to main
         |
         v
 GitHub Actions
-  - Java 17
+  - JDK 21 runtime/toolchain
+  - JVM 17 bytecode target
   - qualityCheck
   - assembleDebug
   - gitleaks
@@ -260,7 +281,8 @@ Dependency key must include at least hashes/versions of:
 - `gradle/libs.versions.toml`,
 - root/module `build.gradle.kts`,
 - `settings.gradle.kts`,
-- compile SDK/build-tools requirement.
+- compile SDK/build-tools requirement,
+- build JDK major version (21).
 
 A source-only Kotlin change should not invalidate the dependency pack.
 
