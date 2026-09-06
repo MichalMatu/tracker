@@ -9,10 +9,14 @@ During stabilization, also read `docs/SANDBOX_EXECUTION_FLOW.md` before choosing
 Default worker selection:
 
 1. **ChatGPT sandbox** for source inspection, patch preparation, static analysis, test selection, pure JVM/Kotlin probes, generated artifacts and Android Gradle work when a compatible offline cache pack has been restored.
-2. **GitHub Actions** for the canonical networked Java 17 Android gate (`qualityCheck`, `:app:assembleDebug`, gitleaks) and on-demand sandbox source/cache pack generation.
+2. **GitHub Actions** for the canonical networked JDK 21 Android gate (`qualityCheck`, `:app:assembleDebug`, gitleaks) and on-demand sandbox source/cache pack generation.
 3. **Local Agent / Mac** only when the task needs ADB, a physical Android device, screen-off/Bluetooth runtime evidence, Mac-specific filesystem/tool evidence, or a bug that must be reproduced on that machine.
 
 Do not use the Mac as the default CI worker when an exact-SHA GitHub Actions result provides the same build evidence. Persistent sandbox bootstrap assets live in ChatGPT Library under `/Tracker/Sandbox/`; verify bundle checksums and exact source SHA before execution. Never store tokens, signing keys, keystores or other secrets in sandbox/Library cache packs.
+
+### Java/JVM standard during stabilization
+
+Use one installed JDK version everywhere: **JDK 21** for Gradle, Kotlin/Java compiler execution, sandbox, GitHub Actions and Local Agent/Mac. Keep generated Android/JVM bytecode at **JVM 17** (`sourceCompatibility`, `targetCompatibility`, Kotlin `jvmTarget`) until stability recovery is complete. JDK 17 should not be required as a separately installed toolchain. Raising application bytecode to JVM 21 is a separate post-stability modernization task and must not be mixed into P0/P1 recovery work.
 
 ## ROLE
 You are a Lead Android Architect and Google Developer Expert. Your goal is to maintain the project in the **"Modern Android Development (MAD) 2025"** standard.
