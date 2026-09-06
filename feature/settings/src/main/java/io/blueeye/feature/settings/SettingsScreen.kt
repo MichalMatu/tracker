@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.blueeye.core.domain.scanner.ScannerRuntimeProfile
 import io.blueeye.core.ui.theme.Dimens
 
 @OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
@@ -258,6 +259,8 @@ fun AlertSettingsContent(
                     soundEnabled = uiState.trackerSoundEnabled,
                     headsUpEnabled = uiState.trackerHeadsUpEnabled,
                     autoActiveProbeEnabled = uiState.autoActiveProbeEnabled,
+                    autoActiveProbeAvailable =
+                        uiState.scannerDiagnostics.runtimeProfile != ScannerRuntimeProfile.STABLE_CORE,
                 ),
             actions =
                 AlertSettingsCardActions(
@@ -435,9 +438,15 @@ private fun AlertSettingsCard(
             androidx.compose.material3.HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             SettingsSwitch(
                 title = "Automatic Active Collection",
-                subtitle = "Explicit opt-in: connect to every connectable BLE device one at a time for GATT evidence",
+                subtitle =
+                    if (state.autoActiveProbeAvailable) {
+                        "Explicit opt-in: connect to every connectable BLE device one at a time for GATT evidence"
+                    } else {
+                        "Unavailable while the STABLE_CORE runtime profile is active"
+                    },
                 checked = state.autoActiveProbeEnabled,
-                onCheckedChange = actions.onAutoActiveProbeChange
+                onCheckedChange = actions.onAutoActiveProbeChange,
+                enabled = state.autoActiveProbeAvailable
             )
             androidx.compose.material3.HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             SettingsSwitch(
@@ -471,6 +480,7 @@ private data class AlertSettingsCardState(
     val soundEnabled: Boolean,
     val headsUpEnabled: Boolean,
     val autoActiveProbeEnabled: Boolean,
+    val autoActiveProbeAvailable: Boolean,
 )
 
 private data class AlertSettingsCardActions(

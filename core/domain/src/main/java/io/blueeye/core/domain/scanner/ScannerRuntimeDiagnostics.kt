@@ -1,6 +1,7 @@
 package io.blueeye.core.domain.scanner
 
 data class ScannerRuntimeDiagnostics(
+    val runtimeProfile: ScannerRuntimeProfile = ScannerRuntimePolicy.profile,
     val state: ScannerRuntimeState = ScannerRuntimeState.Idle,
     val startedAt: Long? = null,
     val lastBleResultAt: Long? = null,

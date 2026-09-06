@@ -43,6 +43,7 @@ fun FieldMvpDiagnosticsCard(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
+            DiagnosticRow("Runtime profile", scanner.runtimeProfile.name)
             DiagnosticRow("Scanner", scanner.state.label())
             DiagnosticRow("BLE last seen", scanner.lastBleResultAt.formatTime())
             DiagnosticRow("Classic last seen", scanner.lastClassicResultAt.formatTime())

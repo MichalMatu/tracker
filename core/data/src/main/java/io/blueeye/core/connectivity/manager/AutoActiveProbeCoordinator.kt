@@ -5,6 +5,7 @@ import dagger.Lazy
 import io.blueeye.core.data.db.dao.DeviceDao
 import io.blueeye.core.data.preferences.WatchlistPreferences
 import io.blueeye.core.data.repository.ProbeStateManager
+import io.blueeye.core.domain.scanner.ScannerRuntimePolicy
 import io.blueeye.core.model.DeviceConnectionState
 import io.blueeye.core.model.DeviceType
 import kotlinx.coroutines.CoroutineScope
@@ -57,18 +58,23 @@ class AutoActiveProbeCoordinator @Inject constructor(
     private var timeoutJob: Job? = null
 
     init {
-        scope.launch {
-            watchlistPreferences.autoActiveProbeEnabled.collect { isEnabled ->
-                enabled.set(isEnabled)
-                Log.i(TAG, "Auto active GATT collection ${if (isEnabled) "enabled" else "disabled"}")
-                if (!isEnabled) {
-                    clearQueue(disconnectActive = true)
+        if (ScannerRuntimePolicy.allowsAutomaticActiveProbe) {
+            scope.launch {
+                watchlistPreferences.autoActiveProbeEnabled.collect { isEnabled ->
+                    enabled.set(isEnabled)
+                    Log.i(TAG, "Auto active GATT collection ${if (isEnabled) "enabled" else "disabled"}")
+                    if (!isEnabled) {
+                        clearQueue(disconnectActive = true)
+                    }
                 }
             }
+        } else {
+            Log.i(TAG, "Auto active GATT suppressed by runtime profile ${ScannerRuntimePolicy.profile}")
         }
     }
 
     fun enqueueCandidate(candidate: AutoActiveProbeScanCandidate) {
+        if (!ScannerRuntimePolicy.allowsAutomaticActiveProbe) return
         val decision =
             AutoActiveProbePolicy.evaluate(
                 AutoActiveProbeCandidate(

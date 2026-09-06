@@ -7,6 +7,7 @@ import io.blueeye.core.domain.alert.AlertCategory
 import io.blueeye.core.domain.alert.AlertDispatcher
 import io.blueeye.core.domain.alert.AlertRequest
 import io.blueeye.core.domain.alert.AlertVibrationPattern
+import io.blueeye.core.domain.scanner.ScannerRuntimePolicy
 import io.blueeye.core.model.DetectionEvidence
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -72,7 +73,9 @@ class TacticalAlertService @Inject constructor(
             cleanupOldDevices()
             updateFlows()
 
-            if (TacticalSignalAlertPolicy.shouldVibrate(isNewDevice, request.evidenceSource)) {
+            if (ScannerRuntimePolicy.allowsAutomaticPublicSafetyAlertSideEffects &&
+                TacticalSignalAlertPolicy.shouldVibrate(isNewDevice, request.evidenceSource)
+            ) {
                 dispatchPublicSafetySignalAlert(
                     request = request,
                     evidence = detectionEvidence,

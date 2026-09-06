@@ -10,6 +10,7 @@ internal fun String.withFieldMvpDiagnostics(uiState: SettingsUiState): String {
         ,
           "fieldMvpDiagnostics": {
             "scanner": {
+              "runtimeProfile": "${scanner.runtimeProfile.name}",
               "state": ${scanner.state.toString().jsonStringOrNull()},
               "startedAt": ${scanner.startedAt.jsonValue()},
               "lastBleSeenAt": ${scanner.lastBleResultAt.jsonValue()},

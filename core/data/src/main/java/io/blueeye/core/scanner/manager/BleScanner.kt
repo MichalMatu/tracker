@@ -8,6 +8,7 @@ import android.os.ParcelUuid
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.blueeye.core.domain.repository.DeviceRepository
+import io.blueeye.core.domain.scanner.ScannerRuntimePolicy
 import io.blueeye.core.permission.PermissionManager
 import io.blueeye.core.scanner.source.BleScanSource
 import io.blueeye.core.scanner.source.ClassicScanSource
@@ -151,7 +152,7 @@ constructor(
         }
     }
 
-    private suspend fun performPassiveBleScan() {
+    internal suspend fun performPassiveBleScan() {
         try {
             // If we were scanning (e.g. focused), stop first safely
             if (bleScanSource.isScanning()) {
@@ -179,7 +180,11 @@ constructor(
                 return
             }
 
-            startClassicDiscovery()
+            if (ScannerRuntimePolicy.allowsClassicDiscovery) {
+                startClassicDiscovery()
+            } else {
+                Log.i(TAG, "Classic discovery suppressed by runtime profile ${ScannerRuntimePolicy.profile}")
+            }
             _state.value = ScannerState.Scanning
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Log.e(TAG, "Error starting passive BLE scan", e)
