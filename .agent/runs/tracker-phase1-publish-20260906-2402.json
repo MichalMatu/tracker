@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase1-publish-20260906-2402",
+  "task_digest": "322662e317e4f6bb1fa111cd817496b6a39b381f11d270485b130ace9b4482cb",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-06T22:23:00.685475+00:00",
+  "attempt_id": "fb96b4abc4f3d68850fefd4a",
+  "daemon_version": "4.18.4",
+  "daemon_pid": 1775,
+  "updated_at": "2026-09-06T22:23:00.685526+00:00",
+  "pid": 1775
+}
