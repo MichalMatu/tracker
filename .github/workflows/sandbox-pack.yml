@@ -1,0 +1,120 @@
+name: Sandbox Pack
+
+on:
+  workflow_dispatch:
+    inputs:
+      include_offline_android:
+        description: "Build and upload Android/Gradle offline cache pack"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sandbox-pack-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Record source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .sandbox-pack/meta
+          printf '%s\n' "$GITHUB_SHA" > .sandbox-pack/meta/git-sha.txt
+          {
+            sha256sum gradle/wrapper/gradle-wrapper.properties
+            sha256sum gradle/libs.versions.toml
+            sha256sum settings.gradle.kts
+            find . -name build.gradle.kts -type f -print0 | sort -z | xargs -0 sha256sum
+          } > .sandbox-pack/meta/dependency-inputs.sha256
+          sha256sum .sandbox-pack/meta/dependency-inputs.sha256 | awk '{print $1}' > .sandbox-pack/meta/dependency-key.txt
+
+      - name: Create exact source snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git archive --format=tar HEAD | zstd -T0 -10 -o "tracker-source-${GITHUB_SHA}.tar.zst"
+          sha256sum "tracker-source-${GITHUB_SHA}.tar.zst" > "tracker-source-${GITHUB_SHA}.tar.zst.sha256"
+
+      - name: Upload source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracker-source-${{ github.sha }}
+          path: |
+            tracker-source-${{ github.sha }}.tar.zst
+            tracker-source-${{ github.sha }}.tar.zst.sha256
+            .sandbox-pack/meta/git-sha.txt
+            .sandbox-pack/meta/dependency-key.txt
+            .sandbox-pack/meta/dependency-inputs.sha256
+          retention-days: 30
+          compression-level: 0
+
+      - name: Set up Java 17
+        if: ${{ inputs.include_offline_android }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle cache
+        if: ${{ inputs.include_offline_android }}
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-cleanup: on-success
+
+      - name: Warm project dependencies and Android build cache
+        if: ${{ inputs.include_offline_android }}
+        shell: bash
+        env:
+          GRADLE_OPTS: >-
+            -Dorg.gradle.jvmargs=-Xmx3072m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8
+            -Dkotlin.daemon.jvmargs=-Xmx1024m
+        run: |
+          set -euo pipefail
+          ./gradlew --parallel --max-workers=3 qualityCheck :app:assembleDebug --stacktrace
+
+      - name: Build offline Android/Gradle pack
+        if: ${{ inputs.include_offline_android }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          KEY=$(cat .sandbox-pack/meta/dependency-key.txt)
+          ROOT=.sandbox-pack/offline
+          mkdir -p "$ROOT/gradle-home" "$ROOT/android-sdk" "$ROOT/meta"
+          cp .sandbox-pack/meta/* "$ROOT/meta/"
+
+          # Preserve dependency/wrapper state needed for offline Gradle execution.
+          cp -a "$HOME/.gradle/caches" "$ROOT/gradle-home/"
+          cp -a "$HOME/.gradle/wrapper" "$ROOT/gradle-home/"
+
+          # Keep only Android SDK components required by this project build.
+          mkdir -p "$ROOT/android-sdk/platforms" "$ROOT/android-sdk/build-tools"
+          cp -a "$ANDROID_HOME/platforms/android-34" "$ROOT/android-sdk/platforms/"
+          cp -a "$ANDROID_HOME/build-tools/34.0.0" "$ROOT/android-sdk/build-tools/"
+          if [[ -d "$ANDROID_HOME/licenses" ]]; then
+            cp -a "$ANDROID_HOME/licenses" "$ROOT/android-sdk/"
+          fi
+
+          tar --zstd -cf "tracker-android-offline-${KEY}.tar.zst" -C .sandbox-pack offline
+          sha256sum "tracker-android-offline-${KEY}.tar.zst" > "tracker-android-offline-${KEY}.tar.zst.sha256"
+
+      - name: Upload offline Android/Gradle pack
+        if: ${{ inputs.include_offline_android }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracker-android-offline
+          path: |
+            tracker-android-offline-*.tar.zst
+            tracker-android-offline-*.tar.zst.sha256
+            .sandbox-pack/meta/dependency-key.txt
+            .sandbox-pack/meta/dependency-inputs.sha256
+          retention-days: 14
+          compression-level: 0
