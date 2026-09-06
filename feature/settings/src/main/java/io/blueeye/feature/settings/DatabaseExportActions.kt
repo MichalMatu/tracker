@@ -16,7 +16,7 @@ internal fun prepareDatabaseExport(
         if (json == null) {
             Toast.makeText(context, "Export failed", Toast.LENGTH_SHORT).show()
         } else {
-            onExportReady(json)
+            onExportReady(json.withFieldMvpDiagnostics(viewModel.uiState.value))
         }
     }
 }

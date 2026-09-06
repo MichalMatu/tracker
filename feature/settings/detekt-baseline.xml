@@ -2,8 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
-    <ID>ArgumentListWrapping:DatabaseExporter.kt$DatabaseExporter$("devices", JsonArray( devicesExport.map { devMap -&gt; buildJsonObject { devMap.forEach { (k, v) -&gt; when (v) { is String -&gt; put(k, v) is Number -&gt; put(k, v) is Boolean -&gt; put(k, v) null -&gt; put(k, JsonNull) else -&gt; put(k, v.toString()) } } } } ) )</ID>
-    <ID>ArgumentListWrapping:DatabaseExporter.kt$DatabaseExporter$("signalSamples", JsonArray( samples.map { sample -&gt; buildJsonObject { put("deviceFingerprint", sample.deviceFingerprint) put("rssi", sample.rssi) put("timestamp", sample.timestamp) put("latitude", sample.latitude) put("longitude", sample.longitude) put("locationAccuracy", sample.locationAccuracy) } } ) )</ID>
     <ID>ArgumentListWrapping:SettingsScreen.kt$("GATT Characteristics", uiState.gattCharacteristicCount, uiState.isUpdating)</ID>
     <ID>ArgumentListWrapping:SettingsScreen.kt$("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())</ID>
     <ID>ArgumentListWrapping:SettingsScreen.kt$(2.dp, MaterialTheme.colorScheme.primary)</ID>
@@ -29,9 +27,6 @@
     <ID>MaxLineLength:SettingsScreen.kt$val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager</ID>
     <ID>MaxLineLength:SettingsScreen.kt$val previewColor = io.blueeye.core.ui.theme.getThemePrimaryColor(scheme, themeMode == "Dark" || (themeMode == "System" &amp;&amp; androidx.compose.foundation.isSystemInDarkTheme()))</ID>
     <ID>MaximumLineLength:SettingsScreen.kt$ </ID>
-    <ID>NoWildcardImports:DatabaseExporter.kt$import kotlinx.serialization.json.*</ID>
-    <ID>WildcardImport:DatabaseExporter.kt$import kotlinx.serialization.json.*</ID>
-    <ID>Wrapping:DatabaseExporter.kt$DatabaseExporter$(</ID>
     <ID>Wrapping:SettingsScreen.kt$androidx.compose.runtime.mutableStateOf(SettingsSection.MAIN)</ID>
     <ID>Wrapping:SettingsScreen.kt$viewModel.updateGattCharacteristics()</ID>
   </CurrentIssues>

@@ -33,20 +33,14 @@ class AlertDecisionEngine @Inject constructor() {
         userHasMoved: Boolean,
         isZastane: Boolean,
         trackingStatus: TrackingStatus
-    ): Boolean {
-        // Rule 1: Ignored devices never alert
-        if (isIgnored) return false
-
-        // Rule 2: No movement = no movement-pattern alerts.
-        if (!userHasMoved) return false
-
-        // Rule 3: Baseline devices don't alert
-        if (isZastane) return false
-
-        // Rule 4: Alert based on status. Known tracker type is evidence, not an alert by itself.
-        return trackingStatus == TrackingStatus.DANGEROUS ||
-            trackingStatus == TrackingStatus.SUSPICIOUS
-    }
+    ): Boolean =
+        !isIgnored &&
+            userHasMoved &&
+            !isZastane &&
+            (
+                trackingStatus == TrackingStatus.DANGEROUS ||
+                    trackingStatus == TrackingStatus.SUSPICIOUS
+            )
 
     /**
      * Get a human-readable explanation for why an alert was/wasn't triggered.

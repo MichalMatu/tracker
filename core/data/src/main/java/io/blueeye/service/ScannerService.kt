@@ -126,7 +126,7 @@ class ScannerService : Service() {
             return
         }
 
-        if (!bleScanner.isBluetoothEnabled()) {
+        if (!bleScanner.isBluetoothEnabled) {
             failStartup("Bluetooth is off or unavailable.")
             return
         }

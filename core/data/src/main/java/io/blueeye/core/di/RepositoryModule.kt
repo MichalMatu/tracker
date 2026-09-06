@@ -4,12 +4,14 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.blueeye.core.alert.AndroidAlertDispatcher
 import io.blueeye.core.data.publicsafety.PublicSafetySignalMonitorImpl
 import io.blueeye.core.data.repository.ActiveCollectionRepositoryImpl
 import io.blueeye.core.data.repository.DeviceRepositoryImpl
 import io.blueeye.core.data.repository.SettingsPreferencesRepositoryImpl
 import io.blueeye.core.data.repository.WatchlistRepositoryImpl
 import io.blueeye.core.data.scanner.AndroidScannerRuntimeController
+import io.blueeye.core.domain.alert.AlertDispatcher
 import io.blueeye.core.domain.publicsafety.PublicSafetySignalMonitor
 import io.blueeye.core.domain.repository.ActiveCollectionRepository
 import io.blueeye.core.domain.repository.DeviceRepository
@@ -43,6 +45,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindScannerRuntimeController(impl: AndroidScannerRuntimeController): ScannerRuntimeController
+
+    @Binds
+    @Singleton
+    abstract fun bindAlertDispatcher(impl: AndroidAlertDispatcher): AlertDispatcher
 
     @Binds
     @Singleton

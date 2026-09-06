@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface ScannerRuntimeController {
     val scannerState: StateFlow<ScannerRuntimeState>
+    val diagnostics: StateFlow<ScannerRuntimeDiagnostics>
 
     fun startScanning(): Result<Unit>
 

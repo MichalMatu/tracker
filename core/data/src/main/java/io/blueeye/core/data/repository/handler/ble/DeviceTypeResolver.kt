@@ -69,16 +69,13 @@ object DeviceTypeResolver {
     private fun resolveExplicitNameConflict(
         nameType: DeviceType,
         resolvedType: DeviceType,
-    ): DeviceType {
-        if (nameType == DeviceType.UNKNOWN) return resolvedType
-        if (resolvedType == DeviceType.UNKNOWN || resolvedType == nameType) return nameType
-
-        return if (nameType in EXPLICIT_NAME_TYPES && resolvedType in CONSUMER_IDENTITY_TYPES) {
-            nameType
-        } else {
-            resolvedType
+    ): DeviceType =
+        when {
+            nameType == DeviceType.UNKNOWN -> resolvedType
+            resolvedType == DeviceType.UNKNOWN || resolvedType == nameType -> nameType
+            nameType in EXPLICIT_NAME_TYPES && resolvedType in CONSUMER_IDENTITY_TYPES -> nameType
+            else -> resolvedType
         }
-    }
 
     private val EXPLICIT_NAME_TYPES =
         setOf(
