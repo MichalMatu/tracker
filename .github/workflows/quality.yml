@@ -43,3 +43,25 @@ jobs:
       # quality gate remain hot for the APK build.
       - name: Build debug APK
         run: ./gradlew --parallel --max-workers=3 :app:assembleDebug --stacktrace
+
+      - name: Package exact source snapshot
+        if: always()
+        run: git archive --format=tar.gz --output="tracker-source-${GITHUB_SHA}.tar.gz" HEAD
+
+      - name: Upload debug APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracker-debug-${{ github.sha }}
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload exact source snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracker-source-${{ github.sha }}
+          path: tracker-source-${{ github.sha }}.tar.gz
+          if-no-files-found: error
+          retention-days: 30
