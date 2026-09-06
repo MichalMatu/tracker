@@ -1,0 +1,61 @@
+{
+  "id": "tracker-gh-admin-audit-20260906-006",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-06T17:43:58.293175+00:00",
+  "command_timeout": 1200,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; echo '=== WORKSPACE ==='; pwd; git status --short --branch; git remote -v; echo '=== GH AUTH ==='; gh auth status; echo '=== REPO PERMISSION ==='; gh repo view MichalMatu/tracker --json defaultBranchRef,viewerPermission,isPrivate,nameWithOwner; echo '=== FETCH ==='; git fetch --prune --tags origin; echo '=== BRANCHES ==='; git branch -a -vv; echo '=== TAGS ==='; git tag --sort=-creatordate; echo '=== OPEN PRS ==='; gh pr list --state open --limit 50; echo '=== PROTECTION ==='; gh api repos/MichalMatu/tracker/branches/main/protection || true; echo '=== RULESETS ==='; gh api repos/MichalMatu/tracker/rulesets || true; echo '=== GUIDE CHECKS ==='; gh api repos/MichalMatu/tracker/commits/9d94f0f76dfb51373efeae48e31ea696f55eef83/check-runs --jq '.check_runs[] | [.name,.status,.conclusion] | @tsv' || true; echo '=== DOCS ==='; find . -maxdepth 2 -type f | sort | grep -E 'md$|AGENTS' || true; echo '=== HISTORY ==='; git log --oneline --decorate --graph --all -n 50",
+      "exit_code": 0,
+      "output": "=== WORKSPACE ===\n/Users/michal/agent-workspace/repos/tracker/work\n## agent-work...origin/main\norigin\thttps://github.com/MichalMatu/tracker.git (fetch)\norigin\thttps://github.com/MichalMatu/tracker.git (push)\n=== GH AUTH ===\ngithub.com\n  ✓ Logged in to github.com account MichalMatu (keyring)\n  - Active account: true\n  - Git operations protocol: ssh\n  - Token: gho_************************************\n  - Token scopes: 'gist', 'read:org', 'repo'\n=== REPO PERMISSION ===\n{\"defaultBranchRef\":{\"name\":\"main\"},\"isPrivate\":false,\"nameWithOwner\":\"MichalMatu/tracker\",\"viewerPermission\":\"ADMIN\"}\n=== FETCH ===\nFrom https://github.com/MichalMatu/tracker\n - [deleted]         (none)               -> origin/field-mvp-work\n - [deleted]         (none)               -> origin/integration/mvp-cleanup\n - [deleted]         (none)               -> origin/portfolio/p1-quality-20260827\n   e922297..d620ff5  agent-control        -> origin/agent-control\n * [new branch]      archive/field-mvp-work-20260707 -> origin/archive/field-mvp-work-20260707\n * [new branch]      temp-stability-guide -> origin/temp-stability-guide\n=== BRANCHES ===\n* agent-work                                     61f9f29 [origin/main] Integrate MVP diagnostics and unified alerts\n  main                                           979e650 [origin/main: behind 2] Add Local Agent autopilot workflow\n  remotes/origin/HEAD                            -> origin/main\n  remotes/origin/agent-control                   d620ff5 Agent progress: tracker-gh-admin-audit-20260906-006\n  remotes/origin/archive/field-mvp-work-20260707 ce222cf Refactor alert settings management and improve diagnostics handling\n  remotes/origin/main                            61f9f29 Integrate MVP diagnostics and unified alerts\n  remotes/origin/temp-stability-guide            9d94f0f Add stability recovery guide\n=== TAGS ===\n=== OPEN PRS ===\n3\tAdd stability recovery guide\ttemp-stability-guide\tOPEN\t2026-09-06T17:35:35Z\n=== PROTECTION ===\n{\"url\":\"https://api.github.com/repos/MichalMatu/tracker/branches/main/protection\",\"required_status_checks\":{\"url\":\"https://api.github.com/repos/MichalMatu/tracker/branches/main/protection/required_status_checks\",\"strict\":true,\"contexts\":[\"Quality\",\"Secret Scan\"],\"contexts_url\":\"https://api.github.com/repos/MichalMatu/tracker/branches/main/protection/required_status_checks/contexts\",\"checks\":[{\"context\":\"Quality\",\"app_id\":null},{\"context\":\"Secret Scan\",\"app_id\":null}]},\"required_pull_request_reviews\":{\"url\":\"https://api.github.com/repos/MichalMatu/tracker/branches/main/protection/required_pull_request_reviews\",\"dismiss_stale_reviews\":false,\"require_code_owner_reviews\":false,\"require_last_push_approval\":false,\"required_approving_review_count\":0},\"required_signatures\":{\"url\":\"https://api.github.com/repos/MichalMatu/tracker/branches/main/protection/required_signatures\",\"enabled\":false},\"enforce_admins\":{\"url\":\"https://api.github.com/repos/MichalMatu/tracker/branches/main/protection/enforce_admins\",\"enabled\":true},\"required_linear_history\":{\"enabled\":false},\"allow_force_pushes\":{\"enabled\":false},\"allow_deletions\":{\"enabled\":false},\"block_creations\":{\"enabled\":false},\"required_conversation_resolution\":{\"enabled\":true},\"lock_branch\":{\"enabled\":false},\"allow_fork_syncing\":{\"enabled\":false}}=== RULESETS ===\n[]=== GUIDE CHECKS ===\ngitleaks\tcompleted\tsuccess\nquality\tcompleted\tsuccess\n=== DOCS ===\n./AGENTS.md\n./FIELD_SESSION_CHECKLIST.md\n./LOCAL_AGENT_AUTOPILOT.md\n./LOCAL_AGENT_FLOW.md\n./MVP_GOAL_PROMPT.md\n./README.md\n./deep-research-report.md\n./docs/ARCHITECTURE_CURRENT.md\n./docs/DETECTION_CONFIDENCE.md\n./docs/EVIDENCE_MODEL.md\n./docs/PIPELINE_AUDIT.md\n./docs/PRODUCT_GOAL.md\n./docs/QUALITY_GATE.md\n=== HISTORY ===\n* d620ff5 (origin/agent-control) Agent progress: tracker-gh-admin-audit-20260906-006\n* 5e9303e Agent repository status: tracker running\n* 8d9c744 Queue GitHub admin and repository structure audit\n* 15543aa Agent repository status: tracker idle\n* 0cc0586 Agent result: tracker-org-audit-20260906-005\n* 79b01fe Agent progress: tracker-org-audit-20260906-005\n* ebed9cb Agent progress: tracker-org-audit-20260906-005\n* 4a4020f Agent repository status: tracker running\n* 4aff20e Queue corrected repository organization audit\n* 0a2c703 Agent progress: tracker-org-audit-20260906-004\n* 2ba8bef Agent result: tracker-org-audit-20260906-004\n* 85c9f3c Queue repository organization audit\n* 0cad764 Agent repository status: tracker idle\n* dd2cee8 Agent repository status: tracker idle\n* 7d759d1 Agent repository status: tracker idle\n* 74aac7b Agent result: tracker-stability-build-20260906-003\n* 01428f7 Agent progress: tracker-stability-build-20260906-003\n* dcc0b14 Agent progress: tracker-stability-build-20260906-003\n* 78cddfb Agent progress: tracker-stability-build-20260906-003\n* c04fd43 Agent repository status: tracker running\n* b08458b Queue tracker baseline debug build\n* 4aa68c1 Agent repository status: tracker idle\n* 92938cc Agent result: tracker-stability-audit-20260906-002\n* 27e925c Agent progress: tracker-stability-audit-20260906-002\n* c1e41da Agent progress: tracker-stability-audit-20260906-002\n* 3d319e1 Agent progress: tracker-stability-audit-20260906-002\n* 10b8ca3 Agent progress: tracker-stability-audit-20260906-002\n* d5c290e Agent repository status: tracker running\n* d0e2861 Queue corrected tracker stability audit\n* 061dcb1 Agent repository status: tracker idle\n* cbb786c Agent progress: tracker-stability-audit-20260906-001\n* ac2d569 Agent result: tracker-stability-audit-20260906-001\n* e11f925 Queue tracker stability audit\n* 6d39040 Agent repository status: tracker idle\n* c638972 Agent repository status: tracker idle\n* f4d96ef Agent repository status: tracker idle\n* 09fcab5 Agent repository status: tracker idle\n* eba4424 Agent repository status: tracker idle\n* b55fec4 Agent repository status: tracker idle\n* 5be6504 Agent repository status: tracker idle\n* 42d488b Agent repository status: tracker idle\n* e9162bc Agent repository status: tracker idle\n* 67700a7 Agent repository status: tracker idle\n* fd7ec8c Agent repository status: tracker idle\n* d297cc7 Agent repository status: tracker idle\n* ce17b40 Agent repository status: tracker idle\n* 73d93da Agent repository status: tracker idle\n* af66254 Agent repository status: tracker idle\n* fe6b8b1 Agent repository status: tracker idle\n* 9d3847a Agent repository status: tracker idle\n",
+      "elapsed_seconds": 5.806,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 47.86,
+      "output_policy": "stream",
+      "captured_output_chars": 6358,
+      "output_truncated": false,
+      "current_rss_mb": 47.86,
+      "stage_name": "github-admin-audit",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "stage_timeout": 1200
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "github-admin-audit",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 5.806
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.105
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.077
+  },
+  "finished_at": "2026-09-06T17:44:05.961810+00:00",
+  "task_digest": "c8f06c0cdb2489c1e825c4010f23b010fef89b8a227b245a6d414ed983d5eec1",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 2048,
+  "attempt_id": "808eabbd22dce17a31f4d6e4",
+  "daemon_version": "4.18.4"
+}
