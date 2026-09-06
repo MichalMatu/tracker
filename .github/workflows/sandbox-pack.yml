@@ -1,6 +1,10 @@
 name: Sandbox Pack
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/sandbox-pack.yml"
   workflow_dispatch:
     inputs:
       include_offline_android:
@@ -58,20 +62,20 @@ jobs:
           compression-level: 0
 
       - name: Set up Java 17
-        if: ${{ inputs.include_offline_android }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_offline_android }}
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Gradle cache
-        if: ${{ inputs.include_offline_android }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_offline_android }}
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-cleanup: on-success
 
       - name: Warm project dependencies and Android build cache
-        if: ${{ inputs.include_offline_android }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_offline_android }}
         shell: bash
         env:
           GRADLE_OPTS: >-
@@ -82,7 +86,7 @@ jobs:
           ./gradlew --parallel --max-workers=3 qualityCheck :app:assembleDebug --stacktrace
 
       - name: Build offline Android/Gradle pack
-        if: ${{ inputs.include_offline_android }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_offline_android }}
         shell: bash
         run: |
           set -euo pipefail
@@ -107,7 +111,7 @@ jobs:
           sha256sum "tracker-android-offline-${KEY}.tar.zst" > "tracker-android-offline-${KEY}.tar.zst.sha256"
 
       - name: Upload offline Android/Gradle pack
-        if: ${{ inputs.include_offline_android }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_offline_android }}
         uses: actions/upload-artifact@v4
         with:
           name: tracker-android-offline
