@@ -1,5 +1,7 @@
 # BlueEye Field MVP Goal Prompt
 
+> **Historical execution plan.** During the stability feature freeze, do not execute this checklist in order. `docs/STABILITY_RECOVERY_GUIDE.md` is authoritative, and `docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md` defines the current Phase 1 implementation boundary.
+
 ## Operator Decision
 
 Nie rob pelnej aplikacji komercyjnej. Zrob dzisiaj kod w ksztalcie Field MVP: build gotowy do instalacji, diagnostyka widoczna, alerty spojne, ekran mniej zaszumiony, eksport sesji uzyteczny do pierwszych testow terenowych.
