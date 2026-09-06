@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 3,
-  "command": "export JAVA_HOME=$HOME/.local/jdks/jdk-17.0.19+10/Contents/Home; ./gradlew :core:data:testDebugUnitTest --stacktrace",
-  "pid": 81328,
+  "command": "export JAVA_HOME=$HOME/.local/jdks/jdk-17.0.19+10/Contents/Home; ./gradlew qualityCheck --stacktrace; git diff --check; git status --short --branch",
+  "pid": 81504,
   "timeout": 1800,
   "idle_timeout": 600,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-06T17:26:04.191776+00:00",
-  "stage_name": "core-data-tests",
-  "stage_index": 2,
+  "started_at": "2026-09-06T17:26:15.769424+00:00",
+  "stage_name": "quality-gate",
+  "stage_index": 3,
   "stage_total": 3,
   "stage_phase": "commands",
   "stage_timeout": 1800,
@@ -19,5 +19,5 @@
   "task_digest": "a8ed51b11b77927cd5564982890ba5329db51f0d53ff301084283ad91ea74dbd",
   "daemon_version": "4.18.4",
   "daemon_pid": 81152,
-  "updated_at": "2026-09-06T17:26:04.263160+00:00"
+  "updated_at": "2026-09-06T17:26:15.788855+00:00"
 }
