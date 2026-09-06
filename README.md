@@ -15,7 +15,7 @@ Work directly on `main`; `agent-control` is reserved for Local Agent infrastruct
 During stabilization, use the compute workers by role instead of treating the Mac as the default CI machine:
 
 - **ChatGPT sandbox** — source inspection, patch preparation, static work, test selection, pure JVM/Kotlin probes and Android Gradle work when an offline cache pack is restored.
-- **GitHub Actions** — canonical Java 17 `qualityCheck`, debug APK build, dependency/network work and reusable sandbox pack generation.
+- **GitHub Actions** — canonical JDK 21 `qualityCheck`, debug APK build, dependency/network work and reusable sandbox pack generation.
 - **Local Agent / Mac** — ADB, physical phone, lock-screen, Bluetooth runtime and other Mac/device-specific evidence.
 
 The canonical bootstrap/cache policy, sandbox memory profile and fresh-session steps are in [docs/SANDBOX_EXECUTION_FLOW.md](docs/SANDBOX_EXECUTION_FLOW.md). Portable sandbox bootstrap assets are kept in ChatGPT Library under `/Tracker/Sandbox/`.
@@ -45,10 +45,10 @@ Known architecture gaps are documented in [docs/ARCHITECTURE_CURRENT.md](docs/AR
 
 ## Quality Gate
 
-Use Java 17 for the canonical full gate:
+Use JDK 21 as the build runtime/toolchain. Android/Kotlin bytecode remains targeted at JVM 17 during stability recovery:
 
 ```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 ./gradlew qualityCheck
 ./gradlew :app:assembleDebug
 ```
