@@ -4,6 +4,12 @@ Android app for observing nearby Bluetooth/BLE devices, keeping a watchlist, and
 
 This repository is a Kotlin / Jetpack Compose Android project. The current code is usable for development, but detection confidence and architecture still need hardening before the app should present strong claims to the user.
 
+## Current Stabilization Status
+
+Feature development is frozen while the runtime is reduced to a verified BLE-only Stable Core. The canonical execution checklist is [docs/STABILITY_RECOVERY_GUIDE.md](docs/STABILITY_RECOVERY_GUIDE.md), and the exact Phase 1 boundary is [docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md](docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md).
+
+Work directly on `main`; `agent-control` is reserved for Local Agent infrastructure. Historical MVP/audit documents remain useful context, but they do not override the recovery checklist while the feature freeze is active.
+
 ## Current Scope
 
 - Passive BLE and Bluetooth observation.
@@ -47,6 +53,8 @@ Details, current exceptions, and baseline policy are in [docs/QUALITY_GATE.md](d
 
 ## Documentation
 
+- [Stability recovery guide](docs/STABILITY_RECOVERY_GUIDE.md)
+- [Stable Core preimplementation audit](docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md)
 - [Product goal](docs/PRODUCT_GOAL.md)
 - [Current architecture](docs/ARCHITECTURE_CURRENT.md)
 - [Pipeline audit](docs/PIPELINE_AUDIT.md)
