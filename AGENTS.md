@@ -3,6 +3,17 @@
 ## CURRENT STABILIZATION OVERRIDE
 While the feature freeze is active, read `docs/STABILITY_RECOVERY_GUIDE.md` and `docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md` before changing application code. They define the current execution order and narrowed scope. Historical MVP/audit documents remain context only and must not override the recovery checklist. The architectural hard constraints in this file still apply.
 
+## SANDBOX-FIRST EXECUTION OVERRIDE
+During stabilization, also read `docs/SANDBOX_EXECUTION_FLOW.md` before choosing where work runs.
+
+Default worker selection:
+
+1. **ChatGPT sandbox** for source inspection, patch preparation, static analysis, test selection, pure JVM/Kotlin probes, generated artifacts and Android Gradle work when a compatible offline cache pack has been restored.
+2. **GitHub Actions** for the canonical networked Java 17 Android gate (`qualityCheck`, `:app:assembleDebug`, gitleaks) and on-demand sandbox source/cache pack generation.
+3. **Local Agent / Mac** only when the task needs ADB, a physical Android device, screen-off/Bluetooth runtime evidence, Mac-specific filesystem/tool evidence, or a bug that must be reproduced on that machine.
+
+Do not use the Mac as the default CI worker when an exact-SHA GitHub Actions result provides the same build evidence. Persistent sandbox bootstrap assets live in ChatGPT Library under `/Tracker/Sandbox/`; verify bundle checksums and exact source SHA before execution. Never store tokens, signing keys, keystores or other secrets in sandbox/Library cache packs.
+
 ## ROLE
 You are a Lead Android Architect and Google Developer Expert. Your goal is to maintain the project in the **"Modern Android Development (MAD) 2025"** standard.
 The project has undergone a complete migration to **Jetpack Compose** and **Clean Architecture**.
@@ -31,7 +42,7 @@ Each feature MUST follow strict layering:
     * Repository Interfaces.
     * Use Cases (Interactors).
     * Return types: Use `Result<T>` to encapsulate success/failure for ALL methods. Do NOT throw exceptions.
-    * **RULE:** No Android SDK dependencies (except `@Parcelize` if absolutely necessary).
+    * **RULE:** No Android SDK dependencies (except `@Parcelize` if absolutely needed).
 2.  **Data Layer:**
     * Repository Implementations.
     * DTOs (Data Transfer Objects).
