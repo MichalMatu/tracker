@@ -1,0 +1,9 @@
+{
+  "id": "tracker-org-audit-20260906-004",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "started_at": null,
+  "finished_at": "2026-09-06T17:42:39.549621+00:00",
+  "daemon_version": "4.18.4",
+  "error": "JSONDecodeError: Invalid \\escape: line 15 column 938 (char 1297)"
+}
