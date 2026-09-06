@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-gh-admin-audit-20260906-006",
+  "task_digest": "c8f06c0cdb2489c1e825c4010f23b010fef89b8a227b245a6d414ed983d5eec1",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-06T17:43:58.293086+00:00",
+  "attempt_id": "808eabbd22dce17a31f4d6e4",
+  "daemon_version": "4.18.4",
+  "daemon_pid": 90942,
+  "updated_at": "2026-09-06T17:43:58.293251+00:00",
+  "pid": 90942
+}
