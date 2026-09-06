@@ -4,26 +4,24 @@ BlueEye Tracker uses two complementary distribution channels.
 
 ## GitHub Releases — persistent tester builds
 
-Use Releases when a tester needs a stable download URL:
+### Rolling tester release
 
-- <https://github.com/MichalMatu/tracker/releases>
+Use this for the normal phone-testing flow:
 
-The Release workflow builds from a version tag and publishes:
+- <https://github.com/MichalMatu/tracker/releases/tag/latest-tester>
 
-- `BlueEye-Tracker-<tag>-debug.apk`
-- `BlueEye-Tracker-<tag>-debug.apk.sha256`
+After every successful **Quality** run on `main`, `.github/workflows/release.yml` automatically moves the `latest-tester` tag to the verified commit and refreshes:
 
-These builds are intentionally marked as **prerelease/tester** builds while stabilization is active. They are debug-signed and are not production/Play Store artifacts.
+- `BlueEye-Tracker-latest-tester-debug.apk`
+- `BlueEye-Tracker-latest-tester-debug.apk.sha256`
 
-### Creating a tester release
+The URL stays stable while the APK contents advance with verified `main`.
 
-Preferred path:
+### Versioned tester releases
 
-1. choose a version tag such as `v1.0.0-stable-core.1`,
-2. push the tag,
-3. `.github/workflows/release.yml` runs the full quality gate, builds the APK and creates/updates the GitHub Release.
+For milestone builds, push a version tag such as `v1.0.0-stable-core.1` or manually dispatch the Release workflow with a `v...` tag. The workflow runs `qualityCheck`, builds the APK, and publishes a separate prerelease with a matching checksum.
 
-The workflow also supports manual dispatch with an explicit `v...` tag.
+All current tester builds are **debug-signed**, not production/Play Store artifacts.
 
 ## GitHub Actions — exact per-commit artifacts
 
@@ -40,6 +38,7 @@ Actions artifacts are ideal for engineering/debugging because the artifact name 
 
 ## Which one should I use?
 
-- **Tester / phone install:** GitHub Releases
+- **Tester / phone install:** rolling `latest-tester` Release
+- **Milestone / shareable version:** versioned `v...` Release
 - **Developer / exact SHA reproduction:** GitHub Actions artifacts
 - **Production distribution:** not implemented yet; requires stable signing and release policy

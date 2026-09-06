@@ -1,25 +1,107 @@
 name: Tester Release
 
 on:
+  workflow_run:
+    workflows: ["Quality"]
+    types: [completed]
   push:
     tags:
       - "v*"
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tester release tag (must start with v, e.g. v1.0.0-stable-core.1)"
+        description: "Versioned tester tag (must start with v, e.g. v1.0.0-stable-core.1)"
         required: true
         type: string
 
 permissions:
+  actions: read
   contents: write
 
 concurrency:
-  group: tester-release-${{ github.ref }}
+  group: tester-release-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  release:
+  rolling-tester:
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download APK from successful Quality run
+        uses: actions/download-artifact@v4
+        with:
+          name: tracker-debug-${{ github.event.workflow_run.head_sha }}
+          path: release/input
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Prepare rolling tester assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release/out
+          APK="release/out/BlueEye-Tracker-latest-tester-debug.apk"
+          cp release/input/app-debug.apk "${APK}"
+          sha256sum "${APK}" > "${APK}.sha256"
+
+          cat > release/out/RELEASE_NOTES.md <<EOF_NOTES
+          ## Latest BlueEye Tracker tester build
+
+          - Commit: \`${{ github.event.workflow_run.head_sha }}\`
+          - Quality run: [#${{ github.event.workflow_run.run_number }}](${{ github.event.workflow_run.html_url }})
+          - Channel: rolling stabilization tester build
+          - Signing: Android debug signing (not production / Play Store signing)
+
+          This release is refreshed automatically after every successful **Quality** run on \`main\`.
+          EOF_NOTES
+
+      - name: Move rolling tag to verified commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/latest-tester" >/dev/null 2>&1; then
+            gh api --method PATCH "repos/${GITHUB_REPOSITORY}/git/refs/tags/latest-tester" \
+              -f sha="${VERIFIED_SHA}" \
+              -F force=true >/dev/null
+          else
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+              -f ref='refs/tags/latest-tester' \
+              -f sha="${VERIFIED_SHA}" >/dev/null
+          fi
+
+      - name: Publish rolling tester release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="release/out/BlueEye-Tracker-latest-tester-debug.apk"
+          SHA_FILE="${APK}.sha256"
+          NOTES="release/out/RELEASE_NOTES.md"
+
+          if gh release view latest-tester --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release upload latest-tester "${APK}" "${SHA_FILE}" --clobber --repo "${GITHUB_REPOSITORY}"
+            gh release edit latest-tester \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "BlueEye Tracker — Latest Tester" \
+              --notes-file "${NOTES}"
+          else
+            gh release create latest-tester "${APK}" "${SHA_FILE}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "BlueEye Tracker — Latest Tester" \
+              --notes-file "${NOTES}" \
+              --prerelease
+          fi
+
+  versioned-tester:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -27,7 +109,6 @@ jobs:
         -Dorg.gradle.jvmargs=-Xmx3072m -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC -Dfile.encoding=UTF-8
         -Dkotlin.daemon.jvmargs=-Xmx1024m -XX:MaxMetaspaceSize=512m
         -Dorg.gradle.vfs.watch=false
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -42,7 +123,7 @@ jobs:
         with:
           cache-cleanup: on-success
 
-      - name: Resolve release tag
+      - name: Resolve versioned release tag
         id: release_tag
         shell: bash
         run: |
@@ -66,7 +147,7 @@ jobs:
       - name: Build tester APK
         run: ./gradlew --parallel --max-workers=3 :app:assembleDebug --stacktrace
 
-      - name: Package release assets
+      - name: Package versioned release assets
         id: assets
         shell: bash
         run: |
@@ -79,7 +160,7 @@ jobs:
           echo "apk=${APK}" >> "${GITHUB_OUTPUT}"
           echo "sha=${APK}.sha256" >> "${GITHUB_OUTPUT}"
 
-      - name: Publish GitHub prerelease
+      - name: Publish versioned GitHub prerelease
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -89,18 +170,16 @@ jobs:
           APK="${{ steps.assets.outputs.apk }}"
           SHA_FILE="${{ steps.assets.outputs.sha }}"
 
-          cat > release/RELEASE_NOTES.md <<EOF
+          cat > release/RELEASE_NOTES.md <<EOF_NOTES
           ## BlueEye Tracker tester build
 
           - Tag: \`${TAG}\`
           - Commit: \`${GITHUB_SHA}\`
-          - Channel: stabilization tester build
+          - Channel: versioned stabilization tester build
           - Signing: Android debug signing (not production / Play Store signing)
 
-          This build passed the repository \`qualityCheck\` and \`:app:assembleDebug\` gates before publication.
-
-          See the repository README and \`docs/RELEASES_AND_ARTIFACTS.md\` for installation and artifact guidance.
-          EOF
+          This build passed \`qualityCheck\` and \`:app:assembleDebug\` before publication.
+          EOF_NOTES
 
           if gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
             gh release upload "${TAG}" "${APK}" "${SHA_FILE}" --clobber --repo "${GITHUB_REPOSITORY}"

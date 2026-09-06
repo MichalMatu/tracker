@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://github.com/MichalMatu/tracker/actions/workflows/quality.yml"><img alt="Quality" src="https://img.shields.io/github/actions/workflow/status/MichalMatu/tracker/quality.yml?branch=main&label=quality"></a>
   <a href="https://github.com/MichalMatu/tracker/actions/workflows/gitleaks.yml"><img alt="Secret Scan" src="https://img.shields.io/github/actions/workflow/status/MichalMatu/tracker/gitleaks.yml?branch=main&label=secret-scan"></a>
-  <a href="https://github.com/MichalMatu/tracker/releases"><img alt="Release" src="https://img.shields.io/github/v/release/MichalMatu/tracker?include_prereleases&label=tester-release"></a>
+  <a href="https://github.com/MichalMatu/tracker/releases/tag/latest-tester"><img alt="Latest Tester APK" src="https://img.shields.io/badge/tester_APK-latest-2ea44f"></a>
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android-3DDC84">
   <img alt="Language" src="https://img.shields.io/badge/language-Kotlin-7F52FF">
   <img alt="Build JDK" src="https://img.shields.io/badge/JDK-21-blue">
@@ -52,14 +52,17 @@ Core execution docs:
 
 ### Tester build — persistent download
 
-Versioned tester APKs are published under **GitHub Releases** and do not expire like CI artifacts.
+A rolling tester APK is refreshed automatically after every successful **Quality** run on `main` and does not expire like a CI artifact.
 
-- [Download the latest tester release](https://github.com/MichalMatu/tracker/releases)
+- [Download the latest tester release](https://github.com/MichalMatu/tracker/releases/tag/latest-tester)
+- [Browse all releases](https://github.com/MichalMatu/tracker/releases)
 
-Release assets are named like:
+The rolling release contains:
 
-- `BlueEye-Tracker-vX.Y.Z-...-debug.apk`
+- `BlueEye-Tracker-latest-tester-debug.apk`
 - matching `.sha256` checksum
+
+Version tags such as `v1.0.0-stable-core.1` can also create immutable versioned tester releases.
 
 > Current releases are **debug-signed tester builds**, not production-signed Play Store releases. Installing over an APK signed with another debug key may require uninstalling the previous build first.
 
