@@ -38,6 +38,8 @@ jobs:
             sha256sum gradle/libs.versions.toml
             sha256sum settings.gradle.kts
             find . -name build.gradle.kts -type f -print0 | sort -z | xargs -0 sha256sum
+            sha256sum tools/sandbox/gradle-sandbox.properties
+            sha256sum tools/sandbox/run-sandbox-gradle.sh
           } > .sandbox-pack/meta/dependency-inputs.sha256
           printf '%s\n' "jdk=21" >> .sandbox-pack/meta/dependency-inputs.sha256
           sha256sum .sandbox-pack/meta/dependency-inputs.sha256 | awk '{print $1}' > .sandbox-pack/meta/dependency-key.txt
