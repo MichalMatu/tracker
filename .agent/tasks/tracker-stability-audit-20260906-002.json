@@ -1,0 +1,29 @@
+{
+  "id": "tracker-stability-audit-20260906-002",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1800,
+  "idle_timeout": 600,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "steps": [
+    {
+      "name": "verify-head-and-audit-risk-paths",
+      "command": "set -eu; echo '=== HEAD ==='; git rev-parse HEAD; test \"$(git rev-parse HEAD)\" = \"61f9f29a028fc31f6e1640daf4cfa12fdc1badeb\"; echo '=== STATUS ==='; git status --short --branch; echo '=== SCANNER SERVICE ==='; git grep -n -E 'START_NOT_STICKY|START_STICKY|PARTIAL_WAKE_LOCK|SCAN_MODE_LOW_LATENCY|startClassicDiscovery|DROP_OLDEST|resetSession|stopScanning|startScanning' -- app core feature || true; echo '=== ALERTS ==='; git grep -n -E 'Ringtone|playAlertSound|vibrate|cancel|notify|setAutoCancel|cooldown|detectionEnabled|soundEnabled|vibrationEnabled' -- app core feature || true; echo '=== IDENTITY PERSISTENCE ==='; git grep -n -E 'fingerprint|carryover|upsert|updateScanData|getByFingerprint|lastSeenAt|encounterCount|deleteOldDevices|isProvisional' -- core/data/src/main/java | head -n 1200 || true; echo '=== TEST INVENTORY ==='; find core/data/src/test app/src/androidTest -type f | sort | sed -n '1,500p'",
+      "timeout": 900
+    },
+    {
+      "name": "core-data-tests",
+      "command": "export JAVA_HOME=$HOME/.local/jdks/jdk-17.0.19+10/Contents/Home; ./gradlew :core:data:testDebugUnitTest --stacktrace",
+      "timeout": 1800
+    },
+    {
+      "name": "quality-gate",
+      "command": "export JAVA_HOME=$HOME/.local/jdks/jdk-17.0.19+10/Contents/Home; ./gradlew qualityCheck --stacktrace; git diff --check; git status --short --branch",
+      "timeout": 1800
+    }
+  ]
+}
