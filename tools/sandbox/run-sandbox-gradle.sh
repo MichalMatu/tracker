@@ -11,6 +11,15 @@ if [[ ! -x ./gradlew ]]; then
   exit 2
 fi
 
-# Root gradle.properties is deliberately conservative for the 8 GB Mac.
-# The isolated GRADLE_USER_HOME supplies the sandbox resource profile.
-exec ./gradlew --parallel --max-workers=3 "$@"
+# The sandbox has no reliable direct network. The restored Gradle/Android pack is
+# authoritative, so fail fast instead of attempting downloads.
+workers=3
+for arg in "$@"; do
+  case "$arg" in
+    qualityCheck|:app:assembleDebug) workers=2 ;;
+  esac
+done
+
+# Focused module tests get 3 workers for speed. Broad lint/detekt/test/APK gates use
+# 2 workers to stay below the ~5.8 GiB sandbox memory ceiling.
+exec ./gradlew --offline --parallel --max-workers="$workers" "$@"
