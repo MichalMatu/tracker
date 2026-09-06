@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-06T17:23:08.163331+00:00",
+  "task_id": "tracker-stability-audit-20260906-001",
+  "daemon_version": "4.18.4",
+  "pid": 79735
+}
