@@ -62,20 +62,29 @@ jobs:
           compression-level: 0
 
       - name: Set up Java 17
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_offline_android }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Gradle cache
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_offline_android }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-cleanup: on-success
 
+      - name: Ensure required Android SDK components
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+
       - name: Warm project dependencies and Android build cache
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_offline_android }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
         shell: bash
         env:
           GRADLE_OPTS: >-
@@ -86,7 +95,7 @@ jobs:
           ./gradlew --parallel --max-workers=3 qualityCheck :app:assembleDebug --stacktrace
 
       - name: Build offline Android/Gradle pack
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_offline_android }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
         shell: bash
         run: |
           set -euo pipefail
@@ -111,7 +120,7 @@ jobs:
           sha256sum "tracker-android-offline-${KEY}.tar.zst" > "tracker-android-offline-${KEY}.tar.zst.sha256"
 
       - name: Upload offline Android/Gradle pack
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_offline_android }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
         uses: actions/upload-artifact@v4
         with:
           name: tracker-android-offline
