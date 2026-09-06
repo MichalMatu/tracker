@@ -1,5 +1,7 @@
 # Current Architecture
 
+> **Stabilization note (2026-09-06):** this document describes the broader architecture, but recovery work must follow `STABILITY_RECOVERY_GUIDE.md`. During Phase 1, the BLE-only Stable Core takes precedence over older recommendations that keep Classic in the default passive path.
+
 Status after tooling review: the project is modern Android in framework choices, but not yet clean in dependency direction.
 
 Pipeline-specific issues are tracked in [PIPELINE_AUDIT.md](PIPELINE_AUDIT.md).
@@ -51,6 +53,8 @@ Passive BLE/Classics observation is the default. Active GATT collection is behin
 Detekt baselines exist for current debt. Ktlint excludes `core:data/src` and `core:decoders/src` for now. This is acceptable as a temporary quality gate, but not as the final standard.
 
 ## Recommended Next Refactor Order
+
+The list below is broader architectural follow-up and is **paused while the stability recovery guide is active**.
 
 1. Keep active probing explicit and add a separate RFCOMM opt-in boundary only if product evidence shows it is worth the cost.
 2. Use real session review outcomes for Follow-Me and identity/carryover tuning before raising confidence thresholds.
