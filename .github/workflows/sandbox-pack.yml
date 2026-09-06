@@ -61,21 +61,32 @@ jobs:
           retention-days: 30
           compression-level: 0
 
+      - name: Decide whether offline pack is needed
+        id: offline
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.include_offline_android }}" == "true" ]] || \
+             [[ "${{ github.event_name }}" == "push" && "${{ contains(github.event.head_commit.message, '[sandbox-offline]') }}" == "true" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set up Java 17
-        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
+        if: steps.offline.outputs.enabled == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Gradle cache
-        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
+        if: steps.offline.outputs.enabled == 'true'
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-cleanup: on-success
 
       - name: Ensure required Android SDK components
-        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
+        if: steps.offline.outputs.enabled == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -84,7 +95,7 @@ jobs:
           "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Warm project dependencies and Android build cache
-        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
+        if: steps.offline.outputs.enabled == 'true'
         shell: bash
         env:
           GRADLE_OPTS: >-
@@ -94,21 +105,19 @@ jobs:
           set -euo pipefail
           ./gradlew --parallel --max-workers=3 qualityCheck :app:assembleDebug --stacktrace
 
-      - name: Build offline Android/Gradle pack
-        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
+      - name: Build and split offline Android/Gradle pack
+        if: steps.offline.outputs.enabled == 'true'
         shell: bash
         run: |
           set -euo pipefail
           KEY=$(cat .sandbox-pack/meta/dependency-key.txt)
           ROOT=.sandbox-pack/offline
-          mkdir -p "$ROOT/gradle-home" "$ROOT/android-sdk" "$ROOT/meta"
+          mkdir -p "$ROOT/gradle-home" "$ROOT/android-sdk" "$ROOT/meta" .sandbox-pack/chunks
           cp .sandbox-pack/meta/* "$ROOT/meta/"
 
-          # Preserve dependency/wrapper state needed for offline Gradle execution.
           cp -a "$HOME/.gradle/caches" "$ROOT/gradle-home/"
           cp -a "$HOME/.gradle/wrapper" "$ROOT/gradle-home/"
 
-          # Keep only Android SDK components required by this project build.
           mkdir -p "$ROOT/android-sdk/platforms" "$ROOT/android-sdk/build-tools"
           cp -a "$ANDROID_HOME/platforms/android-34" "$ROOT/android-sdk/platforms/"
           cp -a "$ANDROID_HOME/build-tools/34.0.0" "$ROOT/android-sdk/build-tools/"
@@ -116,18 +125,84 @@ jobs:
             cp -a "$ANDROID_HOME/licenses" "$ROOT/android-sdk/"
           fi
 
-          tar --zstd -cf "tracker-android-offline-${KEY}.tar.zst" -C .sandbox-pack offline
-          sha256sum "tracker-android-offline-${KEY}.tar.zst" > "tracker-android-offline-${KEY}.tar.zst.sha256"
+          PACK="tracker-android-offline-${KEY}.tar.zst"
+          tar -C .sandbox-pack -cf - offline | zstd -T0 -10 -o "$PACK"
+          sha256sum "$PACK" > .sandbox-pack/chunks/full-pack.sha256
+          printf '%s\n' "$PACK" > .sandbox-pack/chunks/full-pack.name
+          split -b 180M -d -a 2 "$PACK" .sandbox-pack/chunks/part-
+          sha256sum .sandbox-pack/chunks/part-* > .sandbox-pack/chunks/parts.sha256
+          ls -lh .sandbox-pack/chunks
 
-      - name: Upload offline Android/Gradle pack
-        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.include_offline_android) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[sandbox-offline]')) }}
+      - name: Upload offline manifest
+        if: steps.offline.outputs.enabled == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: tracker-android-offline
+          name: tracker-android-offline-manifest
           path: |
-            tracker-android-offline-*.tar.zst
-            tracker-android-offline-*.tar.zst.sha256
+            .sandbox-pack/chunks/full-pack.name
+            .sandbox-pack/chunks/full-pack.sha256
+            .sandbox-pack/chunks/parts.sha256
             .sandbox-pack/meta/dependency-key.txt
             .sandbox-pack/meta/dependency-inputs.sha256
+          retention-days: 14
+          compression-level: 0
+
+      - name: Upload offline part 00
+        if: steps.offline.outputs.enabled == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracker-android-offline-part-00
+          path: .sandbox-pack/chunks/part-00
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+      - name: Upload offline part 01
+        if: steps.offline.outputs.enabled == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracker-android-offline-part-01
+          path: .sandbox-pack/chunks/part-01
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+      - name: Upload offline part 02
+        if: steps.offline.outputs.enabled == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracker-android-offline-part-02
+          path: .sandbox-pack/chunks/part-02
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+      - name: Upload offline part 03
+        if: steps.offline.outputs.enabled == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracker-android-offline-part-03
+          path: .sandbox-pack/chunks/part-03
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+      - name: Upload offline part 04
+        if: steps.offline.outputs.enabled == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracker-android-offline-part-04
+          path: .sandbox-pack/chunks/part-04
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+      - name: Upload offline part 05
+        if: steps.offline.outputs.enabled == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracker-android-offline-part-05
+          path: .sandbox-pack/chunks/part-05
+          if-no-files-found: error
           retention-days: 14
           compression-level: 0
