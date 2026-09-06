@@ -1,0 +1,61 @@
+{
+  "id": "tracker-adb-readiness-20260907-0100",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-06T23:52:43.809332+00:00",
+  "command_timeout": 120,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -u\necho '=== TRACKER LOCAL/ADB READINESS ==='\nprintf 'repo='; git remote get-url origin 2>/dev/null || true\nprintf 'head='; git rev-parse HEAD 2>/dev/null || true\necho '--- git status --short ---'\ngit status --short 2>/dev/null || true\necho '--- adb binary ---'\nif command -v adb >/dev/null 2>&1; then\n  command -v adb\n  adb version || true\n  echo '--- adb devices -l ---'\n  adb devices -l || true\n  DEVICE_LINES=$(adb devices 2>/dev/null | tail -n +2 | sed '/^[[:space:]]*$/d' || true)\n  if [ -z \"$DEVICE_LINES\" ]; then\n    echo 'ADB_FLOW_STATUS=READY_NO_DEVICE'\n  elif printf '%s\\n' \"$DEVICE_LINES\" | grep -q $'\\tunauthorized'; then\n    echo 'ADB_FLOW_STATUS=DEVICE_UNAUTHORIZED'\n  elif printf '%s\\n' \"$DEVICE_LINES\" | grep -q $'\\tdevice'; then\n    echo 'ADB_FLOW_STATUS=DEVICE_CONNECTED'\n  else\n    echo 'ADB_FLOW_STATUS=DEVICE_OTHER_STATE'\n  fi\nelse\n  echo 'adb not found in PATH'\n  echo 'ADB_FLOW_STATUS=ADB_MISSING'\nfi\nexit 0\n",
+      "exit_code": 0,
+      "output": "=== TRACKER LOCAL/ADB READINESS ===\nrepo=https://github.com/MichalMatu/tracker.git\nhead=a2953e6c3b8b0c7759e8530eac340cad6cc2b9df\n--- git status --short ---\n--- adb binary ---\n/opt/homebrew/bin/adb\nAndroid Debug Bridge version 1.0.41\nVersion 37.0.0-14910828\nInstalled as /opt/homebrew/bin/adb\nRunning on Darwin 25.5.0 (arm64)\n--- adb devices -l ---\n* daemon not running; starting now at tcp:5037\n* daemon started successfully\nList of devices attached\n\nADB_FLOW_STATUS=READY_NO_DEVICE\n",
+      "elapsed_seconds": 3.866,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 8.12,
+      "output_policy": "stream",
+      "captured_output_chars": 483,
+      "output_truncated": false,
+      "current_rss_mb": 8.12,
+      "stage_name": "adb-readiness",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "stage_timeout": 120
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "adb-readiness",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 3.866
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.138
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.078
+  },
+  "finished_at": "2026-09-06T23:52:49.913178+00:00",
+  "task_digest": "59f5be7422366f98515571fb9fac94188694e6338b6581f7b15dcea7267ecdf6",
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "memory_limit_mb": 512,
+  "attempt_id": "ea2abeb0061f609960fd43c7",
+  "daemon_version": "4.18.4"
+}
