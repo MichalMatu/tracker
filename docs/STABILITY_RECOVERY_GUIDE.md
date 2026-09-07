@@ -17,7 +17,7 @@
 
 ### NEXT ACTION
 
-- [ ] Phase 2 — make scanner/service lifecycle deterministic: one owner, idempotent Start/Stop, explicit teardown and restart behavior.
+- [ ] Phase 2 device acceptance — install `latest-tester` build `84b31d08bac81b6f46e44d11ccfe06071438b66a` and run ADB scenarios: Start/Stop x20, Bluetooth OFF/ON, lock/unlock, background/foreground and process kill/relaunch.
 
 When the next task is completed, update this line to the next unfinished item and add an entry to the Work Log at the bottom of this file.
 
@@ -272,26 +272,28 @@ Exit criterion: app can continuously collect BLE-only observations without autom
 
 Purpose: Start/Stop/restart behavior must be deterministic.
 
+Status: **SOFTWARE GATE PASS; DEVICE ACCEPTANCE PENDING.** Implementation commit: `84b31d08bac81b6f46e44d11ccfe06071438b66a`.
+
 Checklist:
 
-- [ ] Define one owner of scanner lifecycle.
-- [ ] Make Start idempotent.
-- [ ] Make Stop idempotent.
-- [ ] `ScannerService.onDestroy()` guarantees scanner shutdown.
-- [ ] No singleton scanner continues scanning after service teardown.
-- [ ] Decide and document intentional service restart policy (`START_STICKY`, explicit user restart, or another justified design).
+- [x] Define one owner of scanner lifecycle.
+- [x] Make Start idempotent.
+- [x] Make Stop idempotent.
+- [x] `ScannerService.onDestroy()` guarantees scanner shutdown.
+- [x] No singleton scanner continues scanning after service teardown (software ownership assertion; physical verification pending).
+- [x] Decide and document intentional service restart policy: `START_NOT_STICKY`; restart is explicit rather than automatic.
 - [ ] Bluetooth OFF moves runtime to a clear state and stops underlying scan resources.
 - [ ] Bluetooth ON does not create duplicate scan callbacks.
 - [ ] Screen lock/unlock does not create a second scanner instance.
 - [ ] Process recreation has explicit behavior.
-- [ ] Follow-Me session reset is separated from low-level scanner technical restart.
-- [ ] Diagnostics record service start/stop/destroy/recovery transitions.
+- [x] Follow-Me session reset is separated from low-level scanner technical restart.
+- [x] Diagnostics record service start/stop/destroy/recovery transitions.
 
 Required regression scenarios:
 
-- [ ] Start -> Start.
-- [ ] Stop -> Stop.
-- [ ] Start -> Stop -> Start x20.
+- [x] Start -> Start.
+- [x] Stop -> Stop.
+- [x] Start -> Stop -> Start x20 (policy regression test).
 - [ ] Bluetooth ON -> OFF -> ON.
 - [ ] lock screen -> unlock.
 - [ ] app background -> foreground.
@@ -717,3 +719,17 @@ The recovery initiative is complete only when:
 - [ ] documentation and diagnostics allow a new chat/developer to determine current system health without relying on memory.
 
 After that point the feature freeze can be lifted and normal product development resumed.
+
+### 2026-09-07 — Phase 2 lifecycle software gate PASS; device acceptance pending
+
+- Implementation commit: `84b31d08bac81b6f46e44d11ccfe06071438b66a` (`Stabilize scanner service lifecycle`).
+- `ScannerService` is the sole owner of `BleScanner` start/focused/stop transitions; Device Details no longer directly owns the global scanner.
+- Start/Stop are idempotent and startup ownership uses a generation gate to invalidate stale startup work across rapid Start -> Stop -> Start transitions.
+- `ScannerService.onDestroy()` performs scanner teardown; technical scanner restart no longer resets Follow-Me session state.
+- Focused scan can return deterministically to passive BLE scanning.
+- Lifecycle transitions are exposed through runtime diagnostics/export.
+- Sandbox: focused lifecycle tests PASS; full `:core:data:testDebugUnitTest` PASS; `:feature:settings:testDebugUnitTest` PASS; `qualityCheck` PASS; `:app:assembleDebug` PASS; `git diff --check` PASS.
+- Local Agent: focused lifecycle tests PASS and publisher task completed cleanly.
+- Canonical GitHub Quality #48 PASS for the exact implementation SHA, including static analysis/lint/unit tests, APK build and artifact upload. Secret Scan and Sandbox Pack also PASS.
+- Rolling `latest-tester` release now contains the APK built from this exact SHA.
+- Phase 2 is not fully accepted yet: Bluetooth OFF/ON, lock/unlock, background/foreground, process kill/relaunch and physical Start/Stop cycling remain for ADB/device validation.
