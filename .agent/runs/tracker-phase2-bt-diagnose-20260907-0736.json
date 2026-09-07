@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase2-bt-diagnose-20260907-0736",
+  "task_digest": "63bbd055b0f41ee761f03813983862bb9999ba2255f9f5d3804445a9e49cbc8f",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-07T05:36:22.055223+00:00",
+  "attempt_id": "040b5882c2d43bf144a3600b",
+  "daemon_version": "4.18.13",
+  "daemon_pid": 29659,
+  "updated_at": "2026-09-07T05:36:22.055401+00:00",
+  "pid": 29659
+}
