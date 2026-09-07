@@ -123,13 +123,13 @@ A future chat that needs substantial Tracker work should do this before expensiv
 8. Run:
 
    ```bash
-   bin/bootstrap-sandbox.sh /mnt/data/tracker-sandbox
+   tools/sandbox/bootstrap-sandbox.sh /mnt/data/tracker-sandbox
    source /mnt/data/tracker-sandbox/env.sh
    ```
 
 9. Restore a source snapshot matching the intended SHA, or generate a new source snapshot when the cached one is stale.
-10. Run `bin/sandbox-doctor.sh`.
-11. If a matching offline Android/Gradle pack is present, run focused Android tests in `--offline` mode before the broad gate.
+10. Run `tools/sandbox/sandbox-doctor.sh`.
+11. If a matching offline Android/Gradle pack is present, use `tools/sandbox/run-sandbox-check.sh` for focused/broad offline checks.
 12. Use GitHub Actions as the canonical networked cross-check; use Local Agent only for device/Mac evidence.
 
 Do not silently use a source snapshot with a different SHA than the task target.
@@ -154,11 +154,23 @@ kotlin.incremental.java=true
 kotlin.daemon.jvmargs=-Xmx512m -XX:MaxMetaspaceSize=320m
 ```
 
+Common sandbox entrypoint:
+
+```bash
+tools/sandbox/run-sandbox-check.sh doctor
+tools/sandbox/run-sandbox-check.sh quality
+tools/sandbox/run-sandbox-check.sh build
+tools/sandbox/run-sandbox-check.sh full
+tools/sandbox/run-sandbox-check.sh gradle :core:model:test
+```
+
+`full` intentionally runs `qualityCheck` and `:app:assembleDebug` sequentially to avoid overlapping memory peaks.
+
 Execution profiles:
 
 - **Focused module tests/builds:** `tools/sandbox/run-sandbox-gradle.sh` uses 3 workers for CPU throughput.
 - **Broad `qualityCheck` / `:app:assembleDebug`:** the wrapper automatically drops to 2 workers.
-- Run `qualityCheck` and `:app:assembleDebug` as separate commands in the sandbox. Keeping them sequential avoids holding lint/test/build peaks at once.
+- Run `qualityCheck` and `:app:assembleDebug` sequentially in the sandbox. Keeping them sequential avoids holding lint/test/build peaks at once.
 
 Measured reason for this split (2026-09-06): a full offline gate at 3 workers with a 2 GiB Gradle heap caused the Gradle daemon to be killed while lint/detekt/tests overlapped. Reducing to 2 workers and a 1.5 GiB Gradle heap removed that memory-pressure failure mode; do not raise heap as the first response to an OOM.
 
@@ -191,7 +203,7 @@ Examples:
 - `:feature:details:testDebugUnitTest`
 - `:feature:watchlist:testDebugUnitTest`
 
-Use `tools/sandbox/select-gate.sh` to derive a first-pass command from changed paths.
+Use `tools/sandbox/select-gate.sh` to derive a first-pass command from changed paths, then execute the selected task through `tools/sandbox/run-sandbox-check.sh gradle <task>`.
 
 ### Level 2 — focused static/tooling gate
 
@@ -200,13 +212,13 @@ Run the directly affected module's detekt/ktlint/lint task where applicable.
 ### Level 3 — repository gate
 
 ```bash
-./gradlew qualityCheck
+tools/sandbox/run-sandbox-check.sh quality
 ```
 
 ### Level 4 — debug application build
 
 ```bash
-./gradlew :app:assembleDebug
+tools/sandbox/run-sandbox-check.sh build
 ```
 
 ### Level 5 — physical phone
