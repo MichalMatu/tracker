@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase2-close-docs-r3-20260907-0948",
+  "task_digest": "3c16ce9f106d07b639c93586993447d13ba20be5e29aa5e0fb80463aea5b6db2",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-07T07:48:34.286971+00:00",
+  "attempt_id": "bbceff6a9346864421a4a6dc",
+  "daemon_version": "4.18.13",
+  "daemon_pid": 91901,
+  "updated_at": "2026-09-07T07:48:34.287191+00:00",
+  "pid": 91901
+}
