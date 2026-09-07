@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase2-final-reaudit-static-r2-20260907-0910",
+  "task_digest": "e3a2eb685165a332e15098b6111988ea82bc6c3c91d43c5e74d5b405adac9873",
+  "idle_timeout": 600,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-07T07:17:41.680396+00:00",
+  "attempt_id": "d3f5f7f5853ad2b786e974ad",
+  "daemon_version": "4.18.13",
+  "daemon_pid": 64206,
+  "updated_at": "2026-09-07T07:17:41.680460+00:00",
+  "pid": 64206
+}
