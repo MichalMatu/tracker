@@ -1,0 +1,14 @@
+{
+  "id": "tracker-phase2-final-gate-20260907-0932",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "resources": [],
+  "command_timeout": 3600,
+  "idle_timeout": 1200,
+  "task_timeout": 5400,
+  "commands": [
+    "set -eu\ngit fetch origin main\ngit switch main\ngit merge --ff-only origin/main\nHEAD=$(git rev-parse HEAD)\necho REPO_HEAD=$HEAD\n[ \"$HEAD\" = \"53c56fa54e92a713e555979f2d1778dc44dfaf98\" ] || { echo EXACT_HEAD_GATE=FAIL; exit 21; }\ntest -z \"$(git status --porcelain)\" || { git status --short; echo CLEAN_BASE_GATE=FAIL; exit 22; }\necho EXACT_HEAD_GATE=PASS\nexport JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home\njava -version\n./gradlew --no-daemon qualityCheck\n./gradlew --no-daemon :app:assembleDebug\ngit diff --check\ntest -z \"$(git status --porcelain)\" || { git status --short; echo FINAL_WORKTREE_GATE=FAIL; exit 23; }\necho QUALITY_GATE=PASS\necho APK_GATE=PASS\necho DIFF_CHECK=PASS\necho FINAL_WORKTREE_GATE=PASS\necho PHASE2_FINAL_BUILD_GATE=PASS"
+  ]
+}
