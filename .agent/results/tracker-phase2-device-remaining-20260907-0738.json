@@ -1,0 +1,61 @@
+{
+  "id": "tracker-phase2-device-remaining-20260907-0738",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-07T05:59:41.985346+00:00",
+  "command_timeout": 1800,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu\nPKG=io.blueeye\nadb start-server >/dev/null\nSERIAL=$(adb devices | awk 'NR>1 && $2==\"device\"{print $1; exit}')\n[ -n \"$SERIAL\" ] || exit 31\nadbx(){ adb -s \"$SERIAL\" \"$@\"; }\nOUT=/tmp/tracker-phase2-remaining\nrm -rf \"$OUT\"; mkdir -p \"$OUT/db\"\n\n# Obtain current Scan button coordinate after fresh launch.\nadbx shell am force-stop $PKG; sleep 2\nadbx logcat -c\nadbx shell am start -W -n $PKG/.MainActivity >/dev/null; sleep 3\nSERVICE_IDLE=$(adbx shell dumpsys activity services $PKG | grep -c 'ServiceRecord.*io.blueeye/.service.ScannerService' || true)\necho IDLE_RELAUNCH_SERVICE=$SERVICE_IDLE\n[ \"$SERVICE_IDLE\" -eq 0 ] || { echo IDLE_RELAUNCH_GATE=FAIL; exit 32; }\nadbx shell uiautomator dump /sdcard/blueeye-window.xml >/dev/null 2>&1\nadbx exec-out cat /sdcard/blueeye-window.xml > \"$OUT/window.xml\"\nXY=$(python3 - \"$OUT/window.xml\" <<'PY'\nimport re,sys,xml.etree.ElementTree as ET\nfor n in ET.parse(sys.argv[1]).getroot().iter('node'):\n if n.attrib.get('content-desc')=='Scan':\n  m=re.match(r'\\[(\\d+),(\\d+)\\]\\[(\\d+),(\\d+)\\]',n.attrib.get('bounds',''))\n  if m:\n   a,b,c,d=map(int,m.groups()); print((a+c)//2,(b+d)//2); break\nPY\n)\n[ -n \"$XY\" ] || exit 33\nX=$(echo \"$XY\"|awk '{print $1}'); Y=$(echo \"$XY\"|awk '{print $2}')\ntap_scan(){ adbx shell input tap \"$X\" \"$Y\" >/dev/null; }\n\n# Idle Bluetooth OFF/ON must not create service.\nadbx shell svc bluetooth disable >/dev/null 2>&1 || true; sleep 5\nadbx shell svc bluetooth enable >/dev/null 2>&1 || true; sleep 8\nSERVICE_IDLE_BT=$(adbx shell dumpsys activity services $PKG | grep -c 'ServiceRecord.*io.blueeye/.service.ScannerService' || true)\necho IDLE_BT_SERVICE=$SERVICE_IDLE_BT\n[ \"$SERVICE_IDLE_BT\" -eq 0 ] || { echo IDLE_BT_GATE=FAIL; exit 34; }\necho IDLE_BT_GATE=PASS\n\n# Explicit start then process force-stop/relaunch.\ntap_scan; sleep 6\nSERVICE_STARTED=$(adbx shell dumpsys activity services $PKG | grep -c 'ServiceRecord.*io.blueeye/.service.ScannerService' || true)\n[ \"$SERVICE_STARTED\" -eq 1 ] || { echo PROCESS_GATE=FAIL_START; exit 35; }\nPID_BEFORE=$(adbx shell pidof $PKG | tr -d '\\r' || true)\nadbx shell am force-stop $PKG; sleep 4\nPID_STOP=$(adbx shell pidof $PKG | tr -d '\\r' || true)\nSERVICE_STOP=$(adbx shell dumpsys activity services $PKG | grep -c 'ServiceRecord.*io.blueeye/.service.ScannerService' || true)\necho PROCESS_BEFORE=$PID_BEFORE AFTER_FORCE_STOP=\"$PID_STOP\" SERVICE_AFTER_FORCE_STOP=$SERVICE_STOP\n[ -z \"$PID_STOP\" ] && [ \"$SERVICE_STOP\" -eq 0 ] || { echo PROCESS_GATE=FAIL_FORCE_STOP; exit 36; }\nadbx shell am start -W -n $PKG/.MainActivity >/dev/null; sleep 4\nSERVICE_RELAUNCH=$(adbx shell dumpsys activity services $PKG | grep -c 'ServiceRecord.*io.blueeye/.service.ScannerService' || true)\necho SERVICE_AFTER_RELAUNCH=$SERVICE_RELAUNCH\n[ \"$SERVICE_RELAUNCH\" -eq 0 ] || { echo PROCESS_GATE=FAIL_AUTO_START; exit 37; }\n# refresh coordinate after process recreation\nadbx shell uiautomator dump /sdcard/blueeye-window.xml >/dev/null 2>&1; adbx exec-out cat /sdcard/blueeye-window.xml > \"$OUT/window2.xml\"\nXY=$(python3 - \"$OUT/window2.xml\" <<'PY'\nimport re,sys,xml.etree.ElementTree as ET\nfor n in ET.parse(sys.argv[1]).getroot().iter('node'):\n if n.attrib.get('content-desc')=='Scan':\n  m=re.match(r'\\[(\\d+),(\\d+)\\]\\[(\\d+),(\\d+)\\]',n.attrib.get('bounds',''))\n  if m:\n   a,b,c,d=map(int,m.groups()); print((a+c)//2,(b+d)//2); break\nPY\n)\nX=$(echo \"$XY\"|awk '{print $1}'); Y=$(echo \"$XY\"|awk '{print $2}')\ntap_scan; sleep 6\nSERVICE_RESTART=$(adbx shell dumpsys activity services $PKG | grep -c 'ServiceRecord.*io.blueeye/.service.ScannerService' || true)\n[ \"$SERVICE_RESTART\" -eq 1 ] || { echo PROCESS_GATE=FAIL_EXPLICIT_START; exit 38; }\necho PROCESS_GATE=PASS\n\n# Screen sleep/wake should preserve same service without lifecycle restart.\nSTART0=$(adbx logcat -d | grep -c 'ScannerService: lifecycle=START_REQUESTED' || true)\nRUN0=$(adbx logcat -d | grep -c 'ScannerService: lifecycle=RUNNING' || true)\nPID0=$(adbx shell pidof $PKG | tr -d '\\r')\nadbx shell input keyevent KEYCODE_SLEEP; sleep 10\nPIDS=$(adbx shell pidof $PKG | tr -d '\\r' || true)\nSERVICE_SLEEP=$(adbx shell dumpsys activity services $PKG | grep -c 'ServiceRecord.*io.blueeye/.service.ScannerService' || true)\nadbx shell input keyevent KEYCODE_WAKEUP; sleep 5\nSTART1=$(adbx logcat -d | grep -c 'ScannerService: lifecycle=START_REQUESTED' || true)\nRUN1=$(adbx logcat -d | grep -c 'ScannerService: lifecycle=RUNNING' || true)\necho SCREEN_PID=$PID0/$PIDS SERVICE=$SERVICE_SLEEP START=$START0/$START1 RUNNING=$RUN0/$RUN1\n[ \"$PID0\" = \"$PIDS\" ] && [ \"$SERVICE_SLEEP\" -eq 1 ] && [ \"$START0\" = \"$START1\" ] && [ \"$RUN0\" = \"$RUN1\" ] || { echo SCREEN_GATE=FAIL; exit 39; }\necho SCREEN_GATE=PASS\n\n# DB snapshot/integrity after all lifecycle stress; no deletion.\nadbx shell am force-stop $PKG; sleep 2\nLIST=$(adbx shell run-as $PKG ls -1 databases 2>/dev/null | tr -d '\\r' || true)\nprintf '%s\\n' \"$LIST\" | while IFS= read -r f; do [ -n \"$f\" ] || continue; adbx exec-out run-as $PKG cat \"databases/$f\" > \"$OUT/db/$f\" 2>/dev/null || rm -f \"$OUT/db/$f\"; done\npython3 - \"$OUT/db\" <<'PY'\nimport os,sqlite3,sys,json\nd=sys.argv[1]; ok=False\nfor f in os.listdir(d):\n if f.endswith(('-wal','-shm','-journal')): continue\n p=os.path.join(d,f)\n try:\n  c=sqlite3.connect(f'file:{p}?mode=ro',uri=True); integ=c.execute('pragma integrity_check').fetchone()[0]\n  tables=[r[0] for r in c.execute(\"select name from sqlite_master where type='table' and name not like 'sqlite_%' order by name\")]\n  counts={t:c.execute('select count(*) from \"'+t.replace('\\\"','\\\"\\\"')+'\"').fetchone()[0] for t in tables}\n  print('DB_FINAL',json.dumps({'file':f,'integrity':integ,'tables':counts},sort_keys=True)); c.close(); ok |= integ=='ok'\n except Exception: pass\nif not ok: raise SystemExit(40)\nPY\necho DB_GATE=PASS\n\n# Relaunch but leave scanner stopped, user can continue using phone normally.\nadbx shell am start -W -n $PKG/.MainActivity >/dev/null || true\nadbx logcat -d -v threadtime | grep -E 'ScannerService.*lifecycle=|FATAL EXCEPTION|ANR in io.blueeye|SecurityException' | tail -800 > \"$OUT/final-log.txt\" || true\npython3 - \"$OUT/final-log.txt\" <<'PY'\nimport sys\ns=open(sys.argv[1],errors='ignore').read(); print('FATAL_COUNT',s.count('FATAL EXCEPTION')); print('ANR_COUNT',s.count('ANR in io.blueeye')); print('SECURITY_EXCEPTION_COUNT',s.count('SecurityException'))\nif s.count('FATAL EXCEPTION') or s.count('ANR in io.blueeye') or s.count('SecurityException'): raise SystemExit(41)\nPY\necho REMAINING_DEVICE_FLOW=PASS\n",
+      "exit_code": 33,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\nIDLE_RELAUNCH_SERVICE=0\n",
+      "elapsed_seconds": 14.961,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 9.47,
+      "output_policy": "stream",
+      "captured_output_chars": 101,
+      "output_truncated": false,
+      "current_rss_mb": 7.95,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 14.961
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.106
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.074
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-07T05:59:58.807796+00:00",
+  "task_digest": "502d2d3e1451c302e53904fb534f1e9f8a4acd00cca1d377eb44b6443e7dea13",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "attempt_id": "2f94ff6239a2bfa10a596cc3",
+  "daemon_version": "4.18.13"
+}
