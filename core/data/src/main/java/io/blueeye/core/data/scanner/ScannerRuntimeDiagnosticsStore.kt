@@ -1,5 +1,6 @@
 package io.blueeye.core.data.scanner
 
+import io.blueeye.core.domain.scanner.ScannerLifecycleTransition
 import io.blueeye.core.domain.scanner.ScannerRuntimeDiagnostics
 import io.blueeye.core.domain.scanner.ScannerRuntimeState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +27,20 @@ object ScannerRuntimeDiagnosticsStore {
                     state = state,
                     startedAt = state.startedAt(previous.startedAt, timestamp),
                     lastScanError = if (state is ScannerRuntimeState.Error) state.message else previous.lastScanError,
+                    updatedAt = timestamp,
+                )
+        }
+    }
+
+    fun recordLifecycleTransition(transition: ScannerLifecycleTransition) {
+        synchronized(lock) {
+            val timestamp = now()
+            val previous = _diagnostics.value
+            _diagnostics.value =
+                previous.copy(
+                    lastLifecycleTransition = transition,
+                    lastLifecycleTransitionAt = timestamp,
+                    lifecycleTransitionCount = previous.lifecycleTransitionCount + 1,
                     updatedAt = timestamp,
                 )
         }

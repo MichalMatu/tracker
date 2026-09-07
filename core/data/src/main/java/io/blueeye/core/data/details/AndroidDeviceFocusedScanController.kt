@@ -1,7 +1,9 @@
 package io.blueeye.core.data.details
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.blueeye.core.domain.details.DeviceFocusedScanController
-import io.blueeye.core.scanner.manager.BleScanner
+import io.blueeye.service.ScannerServiceController
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -9,15 +11,11 @@ import javax.inject.Singleton
 class AndroidDeviceFocusedScanController
     @Inject
     constructor(
-        private val bleScanner: BleScanner,
+        @ApplicationContext private val context: Context,
     ) : DeviceFocusedScanController {
         override fun startFocusedScan(macAddress: String): Result<Unit> =
-            runCatching {
-                bleScanner.startFocusedScan(macAddress)
-            }
+            ScannerServiceController.startFocusedScan(context, macAddress)
 
         override fun resumePassiveScan(): Result<Unit> =
-            runCatching {
-                bleScanner.startScanning()
-            }
+            ScannerServiceController.resumePassiveScan(context)
     }

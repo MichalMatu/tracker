@@ -18,7 +18,10 @@ internal fun String.withFieldMvpDiagnostics(uiState: SettingsUiState): String {
               "bleResultsPerMinute": ${scanner.bleResultsPerMinute},
               "classicResultsPerMinute": ${scanner.classicResultsPerMinute},
               "droppedQueueEvents": ${scanner.droppedQueueEvents},
-              "lastError": ${scanner.lastScanError.jsonStringOrNull()}
+              "lastError": ${scanner.lastScanError.jsonStringOrNull()},
+              "lastLifecycleTransition": ${scanner.lastLifecycleTransition?.name.jsonStringOrNull()},
+              "lastLifecycleTransitionAt": ${scanner.lastLifecycleTransitionAt.jsonValue()},
+              "lifecycleTransitionCount": ${scanner.lifecycleTransitionCount}
             },
             "alerts": {
               "postNotificationsGranted": ${alerts.postNotificationsGranted},

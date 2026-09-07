@@ -2,8 +2,8 @@ package io.blueeye.core.data.scanner
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.blueeye.core.data.repository.handler.ble.BleScanHandler
 import io.blueeye.core.data.tracker.AddressCarryoverTracker
-import io.blueeye.core.data.tracker.session.FollowMeSessionManager
 import io.blueeye.core.domain.scanner.ScannerRuntimeController
 import io.blueeye.core.domain.scanner.ScannerRuntimeDiagnostics
 import io.blueeye.core.domain.scanner.ScannerRuntimeState
@@ -19,26 +19,24 @@ class AndroidScannerRuntimeController
     constructor(
         @ApplicationContext private val context: Context,
         private val carryoverTracker: AddressCarryoverTracker,
-        private val sessionManager: FollowMeSessionManager,
+        private val bleScanHandler: BleScanHandler,
     ) : ScannerRuntimeController {
         override val scannerState: StateFlow<ScannerRuntimeState> = ScannerService.scannerState
         override val diagnostics: StateFlow<ScannerRuntimeDiagnostics> = ScannerRuntimeDiagnosticsStore.diagnostics
 
         override fun startScanning(): Result<Unit> =
             runCatching {
-                ScannerRuntimeDiagnosticsStore.recordState(ScannerRuntimeState.Starting)
                 ScannerServiceController.start(context)
             }
 
         override fun stopScanning(): Result<Unit> =
             runCatching {
                 ScannerServiceController.stop(context)
-                ScannerRuntimeDiagnosticsStore.recordState(ScannerRuntimeState.Idle)
             }
 
         override fun resetTrackingMemory(): Result<Unit> =
             runCatching {
                 carryoverTracker.clear()
-                sessionManager.resetSession()
+                bleScanHandler.resetSession()
             }
     }

@@ -298,7 +298,7 @@ class BleScanHandler @Inject constructor(
         }
     }
 
-    /** Reset session state when scanning starts or restarts. */
+    /** Reset logical tracking memory only on an explicit tracking reset, never on a technical scan restart. */
     fun resetSession() {
         sessionManager.resetSession()
         rssiBuffer.clear()

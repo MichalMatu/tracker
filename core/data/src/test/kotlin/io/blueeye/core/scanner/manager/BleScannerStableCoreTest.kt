@@ -6,7 +6,9 @@ import io.blueeye.core.scanner.extractor.ScanResultExtractor
 import io.blueeye.core.scanner.source.BleScanSource
 import io.blueeye.core.scanner.source.ClassicScanSource
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -38,5 +40,14 @@ class BleScannerStableCoreTest {
         verify(bleScanSource).start(anyOrNull(), any(), any())
         verify(classicScanSource, never()).start(any())
         assertSame(ScannerState.Scanning, scanner.state.value)
+    }
+
+    @Test
+    fun `focused scan may resume passive while duplicate passive starts remain idempotent`() {
+        assertTrue(ScannerState.Focused("AA:BB:CC:DD:EE:FF").allowsPassiveStart())
+        assertTrue(ScannerState.Idle.allowsPassiveStart())
+        assertTrue(ScannerState.Error("failed").allowsPassiveStart())
+        assertFalse(ScannerState.Starting.allowsPassiveStart())
+        assertFalse(ScannerState.Scanning.allowsPassiveStart())
     }
 }

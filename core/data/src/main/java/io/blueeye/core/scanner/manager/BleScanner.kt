@@ -38,6 +38,9 @@ sealed interface ScannerState {
     data class Error(val message: String) : ScannerState
 }
 
+internal fun ScannerState.allowsPassiveStart(): Boolean =
+    this !is ScannerState.Starting && this !is ScannerState.Scanning
+
 /**
  * Internal sealed class for scan result processing via Channel. This replaces fire-and-forget
  * coroutines with a sequential queue.
@@ -124,10 +127,7 @@ constructor(
     fun startScanning() {
         val hasPermissions = PermissionManager.hasBlePermissions(context)
         val isEnabled = adapter != null && adapter.isEnabled
-        val isNotAlreadyScanning =
-            _state.value !is ScannerState.Starting &&
-                _state.value !is ScannerState.Scanning &&
-                _state.value !is ScannerState.Focused
+        val isNotAlreadyScanning = _state.value.allowsPassiveStart()
 
         when {
             !hasPermissions -> {
@@ -249,6 +249,7 @@ constructor(
     fun stopScanning() {
         Log.i(TAG, "Stopping ALL Scans")
         scanJob?.cancel()
+        scanJob = null
         bleScanSource.stop()
         classicScanSource.stop()
         _state.value = ScannerState.Idle

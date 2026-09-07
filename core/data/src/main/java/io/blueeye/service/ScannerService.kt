@@ -13,7 +13,9 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import dagger.hilt.android.AndroidEntryPoint
+import io.blueeye.core.data.scanner.ScannerRuntimeDiagnosticsStore
 import io.blueeye.core.domain.repository.DeviceRepository
+import io.blueeye.core.domain.scanner.ScannerLifecycleTransition
 import io.blueeye.core.domain.scanner.ScannerRuntimeState
 import io.blueeye.core.permission.PermissionManager
 import io.blueeye.core.scanner.manager.BleScanner
@@ -34,8 +36,12 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ScannerService : Service() {
     companion object {
+        private const val TAG = "ScannerService"
         const val ACTION_START = "ACTION_START"
         const val ACTION_STOP = "ACTION_STOP"
+        const val ACTION_FOCUSED_SCAN = "ACTION_FOCUSED_SCAN"
+        const val ACTION_RESUME_PASSIVE = "ACTION_RESUME_PASSIVE"
+        const val EXTRA_FOCUSED_MAC = "EXTRA_FOCUSED_MAC"
         const val NOTIFICATION_ID = 101
         const val CHANNEL_ID = "scanner_channel"
 
@@ -53,6 +59,7 @@ class ScannerService : Service() {
 
         internal fun publishError(message: String) {
             _scannerState.value = ScannerRuntimeState.Error(message)
+            ScannerRuntimeDiagnosticsStore.recordScanError(message)
         }
     }
 
@@ -60,13 +67,12 @@ class ScannerService : Service() {
 
     @Inject lateinit var deviceRepository: DeviceRepository
 
-    @Inject lateinit var bleScanHandler: io.blueeye.core.data.repository.handler.ble.BleScanHandler
-
     @Inject lateinit var carryoverTracker: io.blueeye.core.data.tracker.AddressCarryoverTracker
 
     @Inject lateinit var deviceDao: io.blueeye.core.data.db.dao.DeviceDao
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val startupOwnership = ScannerStartupOwnership()
     private var startupJob: Job? = null
     private var cleanupJob: Job? = null
     private var scannerStateJob: Job? = null
@@ -90,6 +96,7 @@ class ScannerService : Service() {
                 if (state == BluetoothAdapter.STATE_TURNING_OFF ||
                     state == BluetoothAdapter.STATE_OFF
                 ) {
+                    recordLifecycleTransition(ScannerLifecycleTransition.BLUETOOTH_OFF)
                     failScanner("Bluetooth is off or unavailable.")
                 }
             }
@@ -97,42 +104,37 @@ class ScannerService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        recordLifecycleTransition(ScannerLifecycleTransition.SERVICE_CREATED)
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
-            ACTION_START -> startForegroundService()
-            ACTION_STOP -> stopForegroundService()
+            ACTION_START -> startScannerService()
+            ACTION_STOP -> stopScannerService(startId)
+            ACTION_FOCUSED_SCAN -> startFocusedScan(intent.getStringExtra(EXTRA_FOCUSED_MAC))
+            ACTION_RESUME_PASSIVE -> resumePassiveScan()
+            null -> Log.i(TAG, "Ignoring null restart intent; scanner restart is explicit")
         }
+        // Stability policy: the OS must not recreate scanning after process/service teardown.
+        // A fresh user/runtime Start command is required.
         return START_NOT_STICKY
     }
 
-    private fun startForegroundService() {
-        if (_scannerState.value is ScannerRuntimeState.Running) {
+    private fun startScannerService() {
+        if (!ScannerServiceLifecyclePolicy.shouldStart(_scannerState.value, startupJob?.isActive == true)) {
+            recordLifecycleTransition(ScannerLifecycleTransition.START_IGNORED_ALREADY_ACTIVE)
             return
         }
 
+        recordLifecycleTransition(ScannerLifecycleTransition.START_REQUESTED)
         publishStarting()
+        ScannerRuntimeDiagnosticsStore.recordState(ScannerRuntimeState.Starting)
 
-        val missingPermissions = PermissionManager.getMissingScannerStartupPermissions(this)
-        if (missingPermissions.isNotEmpty()) {
-            failStartup(PermissionManager.missingPermissionsMessage(missingPermissions))
-            return
-        }
+        if (!prepareScannerStartup()) return
 
-        if (!promoteToForeground()) {
-            return
-        }
-
-        if (!bleScanner.isBluetoothEnabled) {
-            failStartup("Bluetooth is off or unavailable.")
-            return
-        }
-
-        registerBluetoothStateReceiver()
-
+        val startupToken = startupOwnership.beginStartup()
         startupJob =
             serviceScope.launch {
                 try {
@@ -141,7 +143,7 @@ class ScannerService : Service() {
                             val existingDevices = deviceDao.getAllDevices()
                             carryoverTracker.rehydrateFromDatabase(existingDevices)
                         }.onFailure { error ->
-                            Log.e("ScannerService", "Failed to rehydrate carryover tracker", error)
+                            Log.e(TAG, "Failed to rehydrate carryover tracker", error)
                         }.isSuccess
 
                     if (!rehydrated) {
@@ -149,22 +151,46 @@ class ScannerService : Service() {
                         return@launch
                     }
 
-                    // Reset Follow-Me tracking session state (session-based timing)
-                    bleScanHandler.resetSession()
-
+                    val startupContext = kotlinx.coroutines.currentCoroutineContext()
                     try {
-                        bleScanner.startScanning()
-                        observeScannerState()
+                        val started =
+                            startupOwnership.runIfCurrent(startupToken) {
+                                if (!startupContext.isActive) return@runIfCurrent
+                                bleScanner.startScanning()
+                                observeScannerState()
+                                startCleanupJob()
+                                acquireWakeLock()
+                            }
+                        if (!started || !startupContext.isActive) return@launch
                     } catch (e: Exception) {
                         failScanner("Scanner failed to start: ${e.message ?: e.javaClass.simpleName}", e)
                         return@launch
                     }
-                    startCleanupJob()
-                    acquireWakeLock()
                 } finally {
-                    startupJob = null
+                    if (startupOwnership.isCurrent(startupToken)) {
+                        startupJob = null
+                    }
                 }
             }
+    }
+
+    private fun prepareScannerStartup(): Boolean {
+        val missingPermissions = PermissionManager.getMissingScannerStartupPermissions(this)
+        return when {
+            missingPermissions.isNotEmpty() -> {
+                failStartup(PermissionManager.missingPermissionsMessage(missingPermissions))
+                false
+            }
+            !promoteToForeground() -> false
+            !bleScanner.isBluetoothEnabled -> {
+                failStartup("Bluetooth is off or unavailable.")
+                false
+            }
+            else -> {
+                registerBluetoothStateReceiver()
+                true
+            }
+        }
     }
 
     private fun promoteToForeground(): Boolean {
@@ -185,34 +211,48 @@ class ScannerService : Service() {
         }
     }
 
-    private fun stopForegroundService() {
-        startupJob?.cancel()
-        startupJob = null
-        scannerStateJob?.cancel()
-        scannerStateJob = null
-        unregisterBluetoothStateReceiver()
-        bleScanner.stopScanning()
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        cleanupJob?.cancel()
-        releaseWakeLock()
+    private fun stopScannerService(startId: Int) {
+        if (!ScannerServiceLifecyclePolicy.shouldStop(_scannerState.value, startupJob?.isActive == true)) {
+            recordLifecycleTransition(ScannerLifecycleTransition.STOP_IGNORED_ALREADY_IDLE)
+            stopSelfResult(startId)
+            return
+        }
+
+        recordLifecycleTransition(ScannerLifecycleTransition.STOP_REQUESTED)
+        teardownScannerRuntime(removeForeground = true)
         _scannerState.value = ScannerRuntimeState.Idle
-        stopSelf()
+        ScannerRuntimeDiagnosticsStore.recordState(ScannerRuntimeState.Idle)
+        stopSelfResult(startId)
+    }
+
+    private fun startFocusedScan(macAddress: String?) {
+        if (!ScannerServiceLifecyclePolicy.canSwitchScanMode(_scannerState.value)) return
+        val mac = macAddress?.takeIf { it.isNotBlank() } ?: return
+        recordLifecycleTransition(ScannerLifecycleTransition.FOCUSED_SCAN_REQUESTED)
+        bleScanner.startFocusedScan(mac)
+    }
+
+    private fun resumePassiveScan() {
+        if (!ScannerServiceLifecyclePolicy.canSwitchScanMode(_scannerState.value)) return
+        recordLifecycleTransition(ScannerLifecycleTransition.PASSIVE_SCAN_RESUMED)
+        bleScanner.startScanning()
     }
 
     private fun startCleanupJob() {
         cleanupJob?.cancel()
-        cleanupJob = serviceScope.launch {
-            delay(CLEANUP_INITIAL_DELAY_MS)
-            while (isActive) {
-                try {
-                    val maxAge = DEVICE_MAX_AGE_HOURS * HOUR_TO_MS
-                    deviceRepository.deleteOldDevices(maxAge)
-                } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                    Log.e("ScannerService", "Cleanup error", e)
+        cleanupJob =
+            serviceScope.launch {
+                delay(CLEANUP_INITIAL_DELAY_MS)
+                while (isActive) {
+                    try {
+                        val maxAge = DEVICE_MAX_AGE_HOURS * HOUR_TO_MS
+                        deviceRepository.deleteOldDevices(maxAge)
+                    } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                        Log.e(TAG, "Cleanup error", e)
+                    }
+                    delay(CLEANUP_INTERVAL_MS)
                 }
-                delay(CLEANUP_INTERVAL_MS)
             }
-        }
     }
 
     private fun acquireWakeLock() {
@@ -229,16 +269,14 @@ class ScannerService : Service() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        startupJob?.cancel()
-        startupJob = null
-        scannerStateJob?.cancel()
-        unregisterBluetoothStateReceiver()
+        recordLifecycleTransition(ScannerLifecycleTransition.DESTROYED)
+        teardownScannerRuntime(removeForeground = true)
         if (_scannerState.value !is ScannerRuntimeState.Error) {
             _scannerState.value = ScannerRuntimeState.Idle
+            ScannerRuntimeDiagnosticsStore.recordState(ScannerRuntimeState.Idle)
         }
         serviceScope.cancel()
-        releaseWakeLock()
+        super.onDestroy()
     }
 
     private fun observeScannerState() {
@@ -248,9 +286,21 @@ class ScannerService : Service() {
                 bleScanner.state.collect { state ->
                     when (state) {
                         ScannerState.Idle -> Unit
-                        ScannerState.Starting -> publishStarting()
+                        ScannerState.Starting -> {
+                            if (_scannerState.value !is ScannerRuntimeState.Running) {
+                                publishStarting()
+                                ScannerRuntimeDiagnosticsStore.recordState(ScannerRuntimeState.Starting)
+                            }
+                        }
                         ScannerState.Scanning,
-                        is ScannerState.Focused -> _scannerState.value = ScannerRuntimeState.Running
+                        is ScannerState.Focused -> {
+                            val wasRunning = _scannerState.value is ScannerRuntimeState.Running
+                            _scannerState.value = ScannerRuntimeState.Running
+                            ScannerRuntimeDiagnosticsStore.recordState(ScannerRuntimeState.Running)
+                            if (!wasRunning) {
+                                recordLifecycleTransition(ScannerLifecycleTransition.RUNNING)
+                            }
+                        }
                         is ScannerState.Error -> failScanner(state.message)
                     }
                 }
@@ -262,12 +312,14 @@ class ScannerService : Service() {
         throwable: Throwable? = null,
     ) {
         if (throwable == null) {
-            Log.e("ScannerService", message)
+            Log.e(TAG, message)
         } else {
-            Log.e("ScannerService", message, throwable)
+            Log.e(TAG, message, throwable)
         }
+        recordLifecycleTransition(ScannerLifecycleTransition.START_FAILED)
         cleanupAfterFailure()
         _scannerState.value = ScannerRuntimeState.Error(message)
+        ScannerRuntimeDiagnosticsStore.recordScanError(message)
         stopSelf()
     }
 
@@ -276,25 +328,42 @@ class ScannerService : Service() {
         throwable: Throwable? = null,
     ) {
         if (throwable == null) {
-            Log.e("ScannerService", message)
+            Log.e(TAG, message)
         } else {
-            Log.e("ScannerService", message, throwable)
+            Log.e(TAG, message, throwable)
         }
+        recordLifecycleTransition(ScannerLifecycleTransition.SCANNER_FAILED)
         cleanupAfterFailure()
         _scannerState.value = ScannerRuntimeState.Error(message)
+        ScannerRuntimeDiagnosticsStore.recordScanError(message)
         stopSelf()
     }
 
     private fun cleanupAfterFailure() {
+        teardownScannerRuntime(removeForeground = true)
+    }
+
+    private fun teardownScannerRuntime(removeForeground: Boolean) {
         startupJob?.cancel()
         startupJob = null
         scannerStateJob?.cancel()
         scannerStateJob = null
         cleanupJob?.cancel()
+        cleanupJob = null
         unregisterBluetoothStateReceiver()
-        runCatching { bleScanner.stopScanning() }
-        runCatching { stopForeground(STOP_FOREGROUND_REMOVE) }
+        startupOwnership.invalidate {
+            runCatching { bleScanner.stopScanning() }
+                .onFailure { error -> Log.w(TAG, "Scanner teardown failed", error) }
+        }
+        if (removeForeground) {
+            runCatching { stopForeground(STOP_FOREGROUND_REMOVE) }
+        }
         releaseWakeLock()
+    }
+
+    private fun recordLifecycleTransition(transition: ScannerLifecycleTransition) {
+        Log.i(TAG, "lifecycle=$transition")
+        ScannerRuntimeDiagnosticsStore.recordLifecycleTransition(transition)
     }
 
     private fun registerBluetoothStateReceiver() {
@@ -330,7 +399,7 @@ class ScannerService : Service() {
                 this,
                 0,
                 it,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
             )
         }
 
@@ -339,7 +408,7 @@ class ScannerService : Service() {
             this,
             0,
             stopIntent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT,
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)

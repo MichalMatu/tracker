@@ -51,6 +51,9 @@ fun FieldMvpDiagnosticsCard(
             DiagnosticRow("Classic/min", scanner.classicResultsPerMinute.toString())
             DiagnosticRow("Dropped queue events", scanner.droppedQueueEvents.toString())
             DiagnosticRow("Last scan error", scanner.lastScanError ?: "None")
+            DiagnosticRow("Lifecycle", scanner.lastLifecycleTransition?.name ?: "None")
+            DiagnosticRow("Lifecycle at", scanner.lastLifecycleTransitionAt.formatTime())
+            DiagnosticRow("Lifecycle transitions", scanner.lifecycleTransitionCount.toString())
 
             Spacer(Modifier.height(4.dp))
             DiagnosticRow("POST_NOTIFICATIONS", if (alerts.postNotificationsGranted) "Granted" else "Missing")
