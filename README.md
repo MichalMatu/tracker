@@ -37,13 +37,15 @@ This project is currently in a **stability recovery phase**. The code works, but
 ## Current status
 
 - **Current branch policy:** work directly on `main`
-- **Current recovery phase:** **Phase 2 — deterministic scanner/service lifecycle**
-- **Last completed milestone:** **Phase 1 — BLE-only Stable Core**
+- **Current recovery phase:** **Phase 3 — ingest pressure, queueing and drop visibility**
+- **Last completed milestone:** **Phase 2 — deterministic scanner/service lifecycle (software + physical acceptance PASS)**
 - **Build/runtime standard:** **JDK 21** runtime/toolchain, **JVM 17** bytecode target
 
 Core execution docs:
 
 - [Stability Recovery Guide](docs/STABILITY_RECOVERY_GUIDE.md)
+- [Phase 2 Closure Re-Audit](docs/PHASE2_CLOSURE_AUDIT.md)
+- [Phase 3 New-Chat Handoff](docs/PHASE3_HANDOFF.md)
 - [Stable Core Preimplementation Audit](docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md)
 - [Sandbox Execution Flow](docs/SANDBOX_EXECUTION_FLOW.md)
 - [Quality Gate](docs/QUALITY_GATE.md)
@@ -96,7 +98,7 @@ flowchart LR
 The project is intentionally being recovered in phases.
 
 1. **Phase 1 — BLE-only Stable Core** ✅
-2. **Phase 2 — deterministic scanner/service lifecycle**
+2. **Phase 2 — deterministic scanner/service lifecycle** ✅
 3. **Phase 3 — ingest pressure, queueing and drop visibility**
 4. **Phase 4 — alert ownership and cancellation**
 5. **Phase 5 — identity and deduplication hardening**
@@ -177,6 +179,8 @@ Short version:
 - [Detection Confidence](docs/DETECTION_CONFIDENCE.md)
 - [Evidence Model](docs/EVIDENCE_MODEL.md)
 - [Stability Recovery Guide](docs/STABILITY_RECOVERY_GUIDE.md)
+- [Phase 2 Closure Re-Audit](docs/PHASE2_CLOSURE_AUDIT.md)
+- [Phase 3 New-Chat Handoff](docs/PHASE3_HANDOFF.md)
 - [Stable Core Preimplementation Audit](docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md)
 - [Sandbox Execution Flow](docs/SANDBOX_EXECUTION_FLOW.md)
 - [Quality Gate](docs/QUALITY_GATE.md)

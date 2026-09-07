@@ -3,8 +3,10 @@
 Use JDK 21 before running Gradle. The build runtime/toolchain is 21; generated Android/JVM bytecode remains JVM 17 during stability recovery:
 
 ```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
 ```
+
+On macOS, resolve JDK 21 through `/usr/libexec/java_home` instead of hard-coding a Homebrew path. The Phase 2 closure gate on 2026-09-07 used Eclipse Temurin 21.0.2 successfully.
 
 ## Main Command
 
@@ -69,7 +71,7 @@ Reason: these modules have large existing formatting debt. Formatting them shoul
 Minimum:
 
 ```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
 ./gradlew qualityCheck
 ./gradlew :app:assembleDebug
 gitleaks git --config .gitleaks.toml --redact --verbose

@@ -12,12 +12,12 @@
   - [x] `:core:data:testDebugUnitTest`
   - [x] `qualityCheck`
   - [x] `:app:assembleDebug`
-- Runtime stability: **NOT YET ACCEPTED**
+- Runtime stability: **NOT YET ACCEPTED** overall — Phase 2 lifecycle is accepted, while full product/device stability acceptance remains Phase 7.
 - Feature freeze: **ACTIVE**
 
 ### NEXT ACTION
 
-- [ ] Phase 2 device acceptance — install `latest-tester` build `84b31d08bac81b6f46e44d11ccfe06071438b66a` and run ADB scenarios: Start/Stop x20, Bluetooth OFF/ON, lock/unlock, background/foreground and process kill/relaunch.
+- [ ] Phase 3 — make ingest loss observable and bounded. Start with `docs/PHASE3_HANDOFF.md`; keep scope limited to queue/ingest metrics, bounded processing and synthetic burst evidence.
 
 When the next task is completed, update this line to the next unfinished item and add an entry to the Work Log at the bottom of this file.
 
@@ -272,7 +272,7 @@ Exit criterion: app can continuously collect BLE-only observations without autom
 
 Purpose: Start/Stop/restart behavior must be deterministic.
 
-Status: **SOFTWARE GATE PASS; DEVICE ACCEPTANCE PENDING.** Implementation commit: `84b31d08bac81b6f46e44d11ccfe06071438b66a`.
+Status: **COMPLETE — SOFTWARE + PHYSICAL DEVICE ACCEPTANCE PASS.** Implementation commit: `84b31d08bac81b6f46e44d11ccfe06071438b66a`. Closure audit: `docs/PHASE2_CLOSURE_AUDIT.md`.
 
 Checklist:
 
@@ -280,12 +280,12 @@ Checklist:
 - [x] Make Start idempotent.
 - [x] Make Stop idempotent.
 - [x] `ScannerService.onDestroy()` guarantees scanner shutdown.
-- [x] No singleton scanner continues scanning after service teardown (software ownership assertion; physical verification pending).
+- [x] No singleton scanner continues scanning after service teardown (software ownership assertion plus physical lifecycle acceptance).
 - [x] Decide and document intentional service restart policy: `START_NOT_STICKY`; restart is explicit rather than automatic.
-- [ ] Bluetooth OFF moves runtime to a clear state and stops underlying scan resources.
-- [ ] Bluetooth ON does not create duplicate scan callbacks.
-- [ ] Screen lock/unlock does not create a second scanner instance.
-- [ ] Process recreation has explicit behavior.
+- [x] Bluetooth OFF moves runtime to a clear state and stops underlying scan resources.
+- [x] Bluetooth ON does not auto-restart scanning; explicit restart returns to one owned scanner lifecycle without duplicate lifecycle starts.
+- [x] Screen lock/unlock does not create a second scanner instance.
+- [x] Process recreation has explicit behavior: relaunch remains Idle until explicit Start.
 - [x] Follow-Me session reset is separated from low-level scanner technical restart.
 - [x] Diagnostics record service start/stop/destroy/recovery transitions.
 
@@ -294,12 +294,14 @@ Required regression scenarios:
 - [x] Start -> Start.
 - [x] Stop -> Stop.
 - [x] Start -> Stop -> Start x20 (policy regression test).
-- [ ] Bluetooth ON -> OFF -> ON.
-- [ ] lock screen -> unlock.
-- [ ] app background -> foreground.
-- [ ] swipe/kill process -> relaunch.
+- [x] Bluetooth ON -> OFF -> ON.
+- [x] lock screen -> unlock.
+- [x] app background -> foreground.
+- [x] swipe/kill process -> relaunch.
 
-Exit criterion: one scanner exists, Stop stops it, restart never silently resets unrelated logical session state.
+Exit criterion: one scanner exists, Stop stops it, restart never silently resets unrelated logical session state. **MET on 2026-09-07.**
+
+Physical lifecycle evidence: Samsung SM-S906B, Android 16 / SDK 36. Clean R3 acceptance verified Bluetooth OFF teardown, no automatic restart on Bluetooth ON, explicit restart, background/foreground, force-stop/relaunch, screen sleep/wake, SQLite integrity and zero app FATAL/ANR. Earlier physical Start/Stop cycling also passed.
 
 ---
 
@@ -720,7 +722,7 @@ The recovery initiative is complete only when:
 
 After that point the feature freeze can be lifted and normal product development resumed.
 
-### 2026-09-07 — Phase 2 lifecycle software gate PASS; device acceptance pending
+### 2026-09-07 — Phase 2 COMPLETE; closure re-audit PASS
 
 - Implementation commit: `84b31d08bac81b6f46e44d11ccfe06071438b66a` (`Stabilize scanner service lifecycle`).
 - `ScannerService` is the sole owner of `BleScanner` start/focused/stop transitions; Device Details no longer directly owns the global scanner.
@@ -732,4 +734,9 @@ After that point the feature freeze can be lifted and normal product development
 - Local Agent: focused lifecycle tests PASS and publisher task completed cleanly.
 - Canonical GitHub Quality #48 PASS for the exact implementation SHA, including static analysis/lint/unit tests, APK build and artifact upload. Secret Scan and Sandbox Pack also PASS.
 - Rolling `latest-tester` release now contains the APK built from this exact SHA.
-- Phase 2 is not fully accepted yet: Bluetooth OFF/ON, lock/unlock, background/foreground, process kill/relaunch and physical Start/Stop cycling remain for ADB/device validation.
+- Physical device acceptance PASS on Samsung SM-S906B / Android 16 (SDK 36): clean R3 verified Bluetooth OFF -> ON policy, explicit restart, background/foreground, force-stop/relaunch, screen sleep/wake, database persistence/integrity, `APP_FATAL_COUNT=0`, `APP_ANR_COUNT=0` and `CLEAN_DEVICE_FLOW_R3=PASS`.
+- Database remained healthy and grew normally during R3: `devices` 24 -> 25, `follow_me_observations` 177 -> 180, `signal_samples` 3323 -> 3601, with `PRAGMA integrity_check=ok` before and after.
+- Final static closure re-audit on `main=53c56fa54e92a713e555979f2d1778dc44dfaf98` confirmed feature-module dependency direction, sole `BleScanner` lifecycle ownership in `ScannerService`, clean worktree, and recorded god-object/tooling debt without a Phase 2 blocker.
+- Final Local Agent JDK 21 gate on the same exact SHA: `qualityCheck` PASS, `:app:assembleDebug` PASS, `git diff --check` PASS, clean worktree PASS.
+- Known architectural debt is captured in `docs/PHASE2_CLOSURE_AUDIT.md`; it must not be mixed into Phase 3 unless directly required by queue/ingest observability.
+- Next action: Phase 3 via `docs/PHASE3_HANDOFF.md`.

@@ -1,7 +1,7 @@
 # ANDROID MASTERPIECE - SYSTEM INSTRUCTIONS
 
 ## CURRENT STABILIZATION OVERRIDE
-While the feature freeze is active, read `docs/STABILITY_RECOVERY_GUIDE.md` and `docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md` before changing application code. They define the current execution order and narrowed scope. Historical MVP/audit documents remain context only and must not override the recovery checklist. The architectural hard constraints in this file still apply.
+While the feature freeze is active, read `docs/STABILITY_RECOVERY_GUIDE.md` and `docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md` before changing application code. When `NEXT ACTION` is Phase 3, also read `docs/PHASE3_HANDOFF.md`. They define the current execution order and narrowed scope. Historical MVP/audit documents remain context only and must not override the recovery checklist. The architectural hard constraints in this file still apply.
 
 ## SANDBOX-FIRST EXECUTION OVERRIDE
 During stabilization, also read `docs/SANDBOX_EXECUTION_FLOW.md` before choosing where work runs.
