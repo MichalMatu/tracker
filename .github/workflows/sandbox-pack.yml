@@ -2,9 +2,9 @@ name: Sandbox Pack
 
 on:
   push:
-    branches: [main]
-    paths:
-      - ".github/workflows/sandbox-pack.yml"
+    branches:
+      - main
+      - 'work/**'
   workflow_dispatch:
     inputs:
       include_offline_android:
@@ -48,7 +48,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git archive --format=tar HEAD | zstd -T0 -10 -o "tracker-source-${GITHUB_SHA}.tar.zst"
+          ROOT=.sandbox-pack/source-root
+          mkdir -p "$ROOT/.sandbox-snapshot"
+          git archive --format=tar HEAD | tar -xf - -C "$ROOT"
+          cp .sandbox-pack/meta/git-sha.txt "$ROOT/.sandbox-snapshot/git-sha.txt"
+          cp .sandbox-pack/meta/dependency-key.txt "$ROOT/.sandbox-snapshot/dependency-key.txt"
+          tar -C "$ROOT" -cf - . | zstd -T0 -10 -o "tracker-source-${GITHUB_SHA}.tar.zst"
           sha256sum "tracker-source-${GITHUB_SHA}.tar.zst" > "tracker-source-${GITHUB_SHA}.tar.zst.sha256"
 
       - name: Upload source snapshot
@@ -133,7 +138,10 @@ jobs:
           sha256sum "$PACK" > .sandbox-pack/chunks/full-pack.sha256
           printf '%s\n' "$PACK" > .sandbox-pack/chunks/full-pack.name
           split -b 180M -d -a 2 "$PACK" .sandbox-pack/chunks/part-
-          sha256sum .sandbox-pack/chunks/part-* > .sandbox-pack/chunks/parts.sha256
+          (
+            cd .sandbox-pack/chunks
+            sha256sum part-* > parts.sha256
+          )
           ls -lh .sandbox-pack/chunks
 
       - name: Upload offline manifest
