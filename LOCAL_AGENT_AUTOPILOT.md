@@ -47,7 +47,7 @@ Never infer another repository from conversation context. When Chat Bridge is ac
 - every Local Agent task in this repository uses `resources: []`, including Kotlin/Compose/Gradle work and ADB/install/logcat or physical-phone validation;
 - detect and verify the intended device inside the task; do not declare named resources or `machine` from this repository.
 
-Do not use `machine` merely because Gradle is expensive. `memory_limit_mb` is an independent watchdog.
+`memory_limit_mb` is an independent watchdog and does not change the repository-wide `resources: []` policy.
 
 ## Verification strategy
 

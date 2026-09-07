@@ -86,7 +86,7 @@ Every task must declare `resources` explicitly.
 - do not declare named resources or `machine` from this repository; host-global maintenance belongs to the supervisor/administration path;
 - `memory_limit_mb` is independent from resource classification.
 
-A software-only task may use a larger RSS watchdog without becoming machine-exclusive.
+A task may use a larger RSS watchdog without changing the repository-wide `resources: []` policy.
 
 ## Java and Gradle
 
