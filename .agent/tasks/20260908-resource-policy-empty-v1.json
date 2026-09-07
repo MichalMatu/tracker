@@ -1,0 +1,16 @@
+{
+  "id": "20260908-resource-policy-empty-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 512,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 900,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; python3 - <<'PY'\nfrom pathlib import Path\n\ndef repl(path, old, new):\n    p=Path(path); s=p.read_text(); c=s.count(old); assert c==1,(path,c,old); p.write_text(s.replace(old,new))\n\nflow='LOCAL_AGENT_FLOW.md'\nrepl(flow, '- use `resources: []` for normal Android/Kotlin source work, Gradle builds, tests, lint, Detekt, ktlint and repository-local Git operations;\\n- use `resources: [\\\"device:android-phone\\\"]` for ADB/install/logcat or tests requiring the connected physical phone;\\n- use `resources: [\\\"machine\\\"]` only for genuine whole-host operations such as host-global toolchain mutation;\\n- `memory_limit_mb` is independent from resource classification.', '- every executable task in this repository uses `resources: []`, including Android/Kotlin work, Gradle builds/tests/lint and ADB/install/logcat or physical-phone validation;\\n- detect and verify the intended Android device inside the task instead of reserving it as a scheduler resource;\\n- do not declare named resources or `machine` from this repository; host-global maintenance belongs to the supervisor/administration path;\\n- `memory_limit_mb` is independent from resource classification.')\nrepl(flow, '6. Classify resources conservatively.', '6. Set `resources: []`; this repository does not use named or `machine` resource reservations.')\n\nauto='LOCAL_AGENT_AUTOPILOT.md'\nrepl(auto, '3. classify resources;', '3. set `resources: []`;')\nrepl(auto, '- normal Kotlin/Compose/Gradle/build/test/lint work: `resources: []`;\\n- work requiring the connected physical Android phone through ADB/install/logcat: `resources: [\\\"device:android-phone\\\"]`;\\n- genuine host-global mutation only: `resources: [\\\"machine\\\"]`.', '- every Local Agent task in this repository uses `resources: []`, including ADB/install/logcat and physical-phone work;\\n- detect and verify the intended device inside the task; do not declare named resources or `machine` from this repository.')\nPY\ngit diff --check; ! grep -R -n -E 'device:android-phone|resources: \\\[\\\"machine\\\"\\\]' LOCAL_AGENT_FLOW.md LOCAL_AGENT_AUTOPILOT.md; git diff -- LOCAL_AGENT_FLOW.md LOCAL_AGENT_AUTOPILOT.md",
+    "set -euo pipefail; git add LOCAL_AGENT_FLOW.md LOCAL_AGENT_AUTOPILOT.md; git commit -m 'Simplify Local Agent resource policy'; git push origin HEAD:main"
+  ]
+}
