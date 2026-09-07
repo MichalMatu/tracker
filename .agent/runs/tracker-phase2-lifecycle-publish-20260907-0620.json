@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase2-lifecycle-publish-20260907-0620",
+  "task_digest": "7b8b3fd5d14bd6835cc5199f4dbcba2e34b2038d1db31dbb2296b9d35560138b",
+  "idle_timeout": 600,
+  "task_timeout": 5400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-07T04:15:32.833828+00:00",
+  "attempt_id": "f96e402c4e56acb7eb65a234",
+  "daemon_version": "4.18.13",
+  "daemon_pid": 58687,
+  "updated_at": "2026-09-07T04:15:32.833889+00:00",
+  "pid": 58687
+}
