@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.18.13",
   "state": "idle",
-  "pid": 89784,
-  "updated_at": "2026-09-07T06:25:57.716977+00:00",
+  "pid": 91447,
+  "updated_at": "2026-09-07T06:27:04.372134+00:00",
   "self_revision": "a32e54858c3bcb9687334b3232b71ae6ff130208",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 89784,
-  "supervisor_pid": 80240,
-  "last_task_id": "tracker-phase2-adb-service-smoke-20260907-0820",
+  "worker_pid": 91447,
+  "supervisor_pid": 91313,
   "execution_variant": "parallel"
 }
