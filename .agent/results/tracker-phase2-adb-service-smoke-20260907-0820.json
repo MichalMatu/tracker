@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase2-adb-service-smoke-20260907-0820",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-07T06:25:25.865153+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu\nPKG=io.blueeye\nSERVICE=io.blueeye/io.blueeye.service.ScannerService\nadb start-server >/dev/null\nSERIAL=$(adb devices | awk 'NR>1 && $2==\"device\"{print $1; exit}')\n[ -n \"$SERIAL\" ] || { adb devices -l; exit 31; }\nadbx(){ adb -s \"$SERIAL\" \"$@\"; }\nservice_count(){ adbx shell dumpsys activity services $PKG | grep -c 'ServiceRecord.*io.blueeye/.service.ScannerService' || true; }\nadbx shell am force-stop $PKG; sleep 2\nadbx shell svc bluetooth enable >/dev/null 2>&1 || true; sleep 3\necho SERVICE_BEFORE=$(service_count)\nadbx shell am start -W -n $PKG/.MainActivity >/dev/null; sleep 2\necho SERVICE_AFTER_ACTIVITY=$(service_count)\nadbx shell run-as $PKG am start-foreground-service --user 0 -a ACTION_START -n $SERVICE\nsleep 6\necho SERVICE_AFTER_EXPLICIT=$(service_count)\nadbx logcat -d -v threadtime | grep -E 'ScannerService: lifecycle=|SecurityException' | tail -100 || true\nCOUNT=$(service_count)\n[ \"$COUNT\" -eq 1 ] || { echo ADB_SERVICE_SMOKE=FAIL; exit 32; }\necho ADB_SERVICE_SMOKE=PASS\nadbx shell am force-stop $PKG\n",
+      "exit_code": 0,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\nSERVICE_BEFORE=0\nSERVICE_AFTER_ACTIVITY=0\nStarting service: Intent { act=ACTION_START cmp=io.blueeye/.service.ScannerService }\nSERVICE_AFTER_EXPLICIT=1\n09-07 08:25:39.042 26715 26715 I ScannerService: lifecycle=SERVICE_CREATED\n09-07 08:25:39.043 26715 26715 I ScannerService: lifecycle=START_REQUESTED\n09-07 08:25:39.090 26715 26751 I ScannerService: lifecycle=RUNNING\nADB_SERVICE_SMOKE=PASS\n",
+      "elapsed_seconds": 18.692,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 8.33,
+      "output_policy": "stream",
+      "captured_output_chars": 469,
+      "output_truncated": false,
+      "current_rss_mb": 2.02,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 18.692
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.12
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.074
+  },
+  "finished_at": "2026-09-07T06:25:46.439975+00:00",
+  "task_digest": "a056c7f179e056dfac626aba1a8de40b7864abb4859801c1760ec977ef9401ee",
+  "idle_timeout": 300,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "attempt_id": "541d82c69392e72dd314f588",
+  "daemon_version": "4.18.13"
+}
