@@ -14,7 +14,7 @@ Within the active ChatGPT turn:
 
 1. confirm the exact tracker repository/binding identity;
 2. inspect source and prepare the smallest deterministic patch;
-3. classify resources;
+3. set `resources: []`;
 4. queue the task with the exact tracker `agent_binding`;
 5. follow `.agent/results/<task-id>.json` on `agent-control`;
 6. inspect exit codes, output, `git_status` and `git_diff`;
@@ -44,9 +44,8 @@ Never infer another repository from conversation context. When Chat Bridge is ac
 
 ## Resource rules
 
-- normal Kotlin/Compose/Gradle/build/test/lint work: `resources: []`;
-- work requiring the connected physical Android phone through ADB/install/logcat: `resources: ["device:android-phone"]`;
-- genuine host-global mutation only: `resources: ["machine"]`.
+- every Local Agent task in this repository uses `resources: []`, including Kotlin/Compose/Gradle work and ADB/install/logcat or physical-phone validation;
+- detect and verify the intended device inside the task; do not declare named resources or `machine` from this repository.
 
 Do not use `machine` merely because Gradle is expensive. `memory_limit_mb` is an independent watchdog.
 

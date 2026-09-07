@@ -81,9 +81,9 @@ Task ids and payloads are immutable within this repository. Use a new unique id 
 
 Every task must declare `resources` explicitly.
 
-- use `resources: []` for normal Android/Kotlin source work, Gradle builds, tests, lint, Detekt, ktlint and repository-local Git operations;
-- use `resources: ["device:android-phone"]` for ADB/install/logcat or tests requiring the connected physical phone;
-- use `resources: ["machine"]` only for genuine whole-host operations such as host-global toolchain mutation;
+- every executable task in this repository uses `resources: []`, including Android/Kotlin source work, Gradle builds/tests/lint and ADB/install/logcat or physical-phone validation;
+- detect and verify the intended Android device inside the task instead of reserving it as a scheduler resource;
+- do not declare named resources or `machine` from this repository; host-global maintenance belongs to the supervisor/administration path;
 - `memory_limit_mb` is independent from resource classification.
 
 A software-only task may use a larger RSS watchdog without becoming machine-exclusive.
@@ -152,7 +152,7 @@ Adapt commands to the actual affected modules. Exactly one final `full` stage is
 3. Confirm repository id, repository and agent binding match this file.
 4. Inspect source on the intended work branch, normally `main`.
 5. Diagnose the requested change in ChatGPT and prepare the smallest deterministic edit.
-6. Classify resources conservatively.
+6. Set `resources: []`; this repository does not use named or `machine` resource reservations.
 7. Queue a unique task with the exact `tracker` agent binding.
 8. Follow the same task attempt while it runs; do not queue duplicates.
 9. Inspect terminal exit codes, output, `git_status` and `git_diff`.
