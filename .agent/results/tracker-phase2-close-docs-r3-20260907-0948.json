@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase2-close-docs-r3-20260907-0948",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-07T07:48:34.287083+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu\ngit fetch origin main agent-control\ngit show origin/agent-control:.agent/tasks/tracker-phase2-close-docs-r2-20260907-0945.json > /tmp/tracker-phase2-close-docs-r2.json\npython3 - <<'PY'\nimport json, subprocess\nfrom pathlib import Path\np=Path('/tmp/tracker-phase2-close-docs-r2.json')\ndata=json.loads(p.read_text())\ncmd=data['commands'][0]\nneedle=\"git diff --check\\n! grep -q 'Current recovery phase.*Phase 2' README.md\"\ninsert=\"python3 - <<'PY2'\\nfrom pathlib import Path\\nfor name in ['docs/PHASE2_CLOSURE_AUDIT.md','docs/PHASE3_HANDOFF.md']:\\n    p=Path(name)\\n    p.write_text('\\\\n'.join(line.rstrip() for line in p.read_text().splitlines()) + '\\\\n')\\nPY2\\ngit diff --check\\n! grep -q 'Current recovery phase.*Phase 2' README.md\"\nif needle not in cmd:\n    raise SystemExit('injection point not found')\ncmd=cmd.replace(needle,insert,1)\nraise SystemExit(subprocess.call(['/bin/sh','-c',cmd]))\nPY\n",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main          -> FETCH_HEAD\n * branch            agent-control -> FETCH_HEAD\n   72a2e4d..0674528  agent-control -> origin/agent-control\nFrom https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\nSwitched to branch 'main'\nYour branch is up to date with 'origin/main'.\nAlready up to date.\nBASE=53c56fa54e92a713e555979f2d1778dc44dfaf98\nACTUAL_SCOPE=AGENTS.md README.md docs/ARCHITECTURE_CURRENT.md docs/PHASE2_CLOSURE_AUDIT.md docs/PHASE3_HANDOFF.md docs/QUALITY_GATE.md docs/STABILITY_RECOVERY_GUIDE.md\nEXPECTED_SCOPE=AGENTS.md README.md docs/ARCHITECTURE_CURRENT.md docs/PHASE2_CLOSURE_AUDIT.md docs/PHASE3_HANDOFF.md docs/QUALITY_GATE.md docs/STABILITY_RECOVERY_GUIDE.md\n[main 8d6e9b8] Close Phase 2 and hand off Phase 3\n 7 files changed, 240 insertions(+), 24 deletions(-)\n create mode 100644 docs/PHASE2_CLOSURE_AUDIT.md\n create mode 100644 docs/PHASE3_HANDOFF.md\nTo https://github.com/MichalMatu/tracker.git\n   53c56fa..8d6e9b8  main -> main\nPUBLISHED_SHA=8d6e9b8acda156045cb461e41c8e624441cc5f34\nDOC_CLOSURE_GATE=PASS\n",
+      "elapsed_seconds": 4.479,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 35.12,
+      "output_policy": "stream",
+      "captured_output_chars": 1116,
+      "output_truncated": false,
+      "current_rss_mb": 35.12,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 4.479
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.155
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.082
+  },
+  "finished_at": "2026-09-07T07:48:40.960842+00:00",
+  "task_digest": "3c16ce9f106d07b639c93586993447d13ba20be5e29aa5e0fb80463aea5b6db2",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 4096,
+  "attempt_id": "bbceff6a9346864421a4a6dc",
+  "daemon_version": "4.18.13"
+}
