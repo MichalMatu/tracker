@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase2-device-acceptance-20260907-0730",
+  "task_digest": "10cfaa492951398eaeeb4d4dc07a39c8f9377a8c12246964f0288629c370988c",
+  "idle_timeout": 900,
+  "task_timeout": 5400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-07T05:29:03.262069+00:00",
+  "attempt_id": "50e134b806fe89a9e782d01f",
+  "daemon_version": "4.18.13",
+  "daemon_pid": 22155,
+  "updated_at": "2026-09-07T05:29:03.262216+00:00",
+  "pid": 22155
+}
