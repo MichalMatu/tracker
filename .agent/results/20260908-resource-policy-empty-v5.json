@@ -1,0 +1,41 @@
+{
+  "id": "20260908-resource-policy-empty-v5",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-07T22:45:54.733437+00:00",
+  "command_timeout": 300,
+  "edits": {
+    "patch": {
+      "applied": false,
+      "reason": "git_apply_check_failed",
+      "check": {
+        "exit_code": 1,
+        "output": "error: patch failed: LOCAL_AGENT_FLOW.md:1\nerror: LOCAL_AGENT_FLOW.md: patch does not apply\nerror: patch failed: LOCAL_AGENT_AUTOPILOT.md:1\nerror: LOCAL_AGENT_AUTOPILOT.md: patch does not apply\n",
+        "elapsed_seconds": 0.068
+      }
+    }
+  },
+  "commands": [],
+  "verification": [],
+  "stages": [],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.086
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.065
+  },
+  "failure_reason": "patch_failed",
+  "finished_at": "2026-09-07T22:45:57.062288+00:00",
+  "task_digest": "e386de11d9427802d3587f4b5f7935325b0833b6fedf57bed59f8b5aa5560a0d",
+  "idle_timeout": 120,
+  "task_timeout": 900,
+  "memory_limit_mb": 512,
+  "attempt_id": "37b20b820f676ec98cbb4fa0",
+  "daemon_version": "4.18.13"
+}
