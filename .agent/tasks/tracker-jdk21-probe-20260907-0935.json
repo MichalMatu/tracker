@@ -1,0 +1,14 @@
+{
+  "id": "tracker-jdk21-probe-20260907-0935",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "resources": [],
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -eu\necho CURRENT_JAVA=$(command -v java || true)\njava -version 2>&1 || true\necho JAVA_HOME_TOOL\n/usr/libexec/java_home -V 2>&1 || true\necho JDK_DIRS\nls -la /Library/Java/JavaVirtualMachines 2>/dev/null || true\nls -la \"$HOME/Library/Java/JavaVirtualMachines\" 2>/dev/null || true\necho HOMEBREW_OPENJDK\nls -d /opt/homebrew/opt/openjdk* 2>/dev/null || true\nfor v in 21 21.0 21.0.1 21.0.2; do /usr/libexec/java_home -v \"$v\" 2>/dev/null && break || true; done"
+  ]
+}
