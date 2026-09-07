@@ -1,0 +1,16 @@
+{
+  "id": "20260908-resource-policy-empty-v4",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 512,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 900,
+  "commands": [
+    "python3 -c \"from pathlib import Path; p=Path('LOCAL_AGENT_FLOW.md'); s=p.read_text(); s=s.replace('- use `resources: []` for normal Android/Kotlin source work, Gradle builds, tests, lint, Detekt, ktlint and repository-local Git operations;', '- every executable task in this repository uses `resources: []`, including Android/Kotlin work, Gradle builds/tests/lint and ADB/install/logcat or physical-phone validation;'); s=s.replace('- use `resources: [\\\"device:android-phone\\\"]` for ADB/install/logcat or tests requiring the connected physical phone;', '- detect and verify the intended Android device inside the task instead of reserving it as a scheduler resource;'); s=s.replace('- use `resources: [\\\"machine\\\"]` only for genuine whole-host operations such as host-global toolchain mutation;', '- do not declare named resources or `machine` from this repository; host-global maintenance belongs to the supervisor/administration path;'); s=s.replace('6. Classify resources conservatively.', '6. Set `resources: []`; this repository does not use named or `machine` resource reservations.'); p.write_text(s); p=Path('LOCAL_AGENT_AUTOPILOT.md'); s=p.read_text(); s=s.replace('3. classify resources;', '3. set `resources: []`;'); s=s.replace('- normal Kotlin/Compose/Gradle/build/test/lint work: `resources: [];', '- every Local Agent task in this repository uses `resources: []`, including ADB/install/logcat and physical-phone work;'); s=s.replace('- work requiring the connected physical Android phone through ADB/install/logcat: `resources: [\\\"device:android-phone\\\"]`;', '- detect and verify the intended device inside the task;'); s=s.replace('- genuine host-global mutation only: `resources: [\\\"machine\\\"]`.', '- do not declare named resources or `machine` from this repository.'); p.write_text(s)\"",
+    "git diff --check && git add LOCAL_AGENT_FLOW.md LOCAL_AGENT_AUTOPILOT.md && git commit -m 'Simplify Local Agent resource policy' && git push origin HEAD:main"
+  ]
+}
