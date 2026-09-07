@@ -1,0 +1,13 @@
+{
+  "id": "tracker-phase2-bt-diagnose-20260907-0736",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "resources": ["device:android-phone"],
+  "command_timeout": 1200,
+  "task_timeout": 1800,
+  "commands": [
+    "set -eu\nPKG=io.blueeye\nadb start-server >/dev/null\nAUTH=$(adb devices | awk 'NR>1 && $2==\"device\"{print $1}')\nCOUNT=$(printf '%s\\n' \"$AUTH\" | sed '/^$/d' | wc -l | tr -d ' ')\n[ \"$COUNT\" = 1 ] || { adb devices -l; exit 31; }\nSERIAL=$(printf '%s\\n' \"$AUTH\" | head -1)\nadbx(){ adb -s \"$SERIAL\" \"$@\"; }\necho SERIAL=$SERIAL\necho '=== CURRENT PROCESS ==='\nadbx shell pidof $PKG || true\necho '=== CURRENT SERVICE DUMP ==='\nadbx shell dumpsys activity services $PKG || true\necho '=== COMPONENT DUMP ==='\nadbx shell dumpsys activity service $PKG/io.blueeye.service.ScannerService || true\necho '=== RECENT LIFECYCLE LOG ==='\nadbx logcat -d -v threadtime | grep -E 'ScannerService.*lifecycle=|ScannerService.*Bluetooth|BleScanner|FATAL EXCEPTION|ANR in io.blueeye|SecurityException' | tail -600 || true\necho '=== TEMP REPORT FILES ==='\nls -la /tmp/tracker-phase2-device-acceptance 2>/dev/null || true\nfor f in /tmp/tracker-phase2-device-acceptance/log-bt* /tmp/tracker-phase2-device-acceptance/log-cycles.txt /tmp/tracker-phase2-device-acceptance/db-before.txt; do\n  [ -f \"$f\" ] || continue\n  echo \"--- $f ---\"\n  tail -300 \"$f\" || true\ndone\necho BT_DIAG=PASS\n"
+  ]
+}
