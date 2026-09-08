@@ -1,0 +1,19 @@
+{
+  "id": "tracker-phase3-ingest-finalize-v4",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 4096,
+  "command_timeout": 3600,
+  "idle_timeout": 600,
+  "task_timeout": 12000,
+  "commands": [
+    "test \"$(git rev-parse HEAD)\" = \"86f09b579bdd4dc480bb5807c0fb44b922e793e8\" && test -z \"$(git status --porcelain)\" && git apply --check /Users/michal/agent-workspace/repos/tracker/checkpoints/tracker-phase3-ingest-finalize-v1/1788843182156832000-task-exit/tracked.patch && git apply /Users/michal/agent-workspace/repos/tracker/checkpoints/tracker-phase3-ingest-finalize-v1/1788843182156832000-task-exit/tracked.patch && cp -R /Users/michal/agent-workspace/repos/tracker/checkpoints/tracker-phase3-ingest-finalize-v1/1788843182156832000-task-exit/untracked/. . && git diff --check",
+    "export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; java -version; ./gradlew :core:data:testDebugUnitTest :feature:settings:testDebugUnitTest :core:data:detekt :feature:settings:detekt :feature:settings:lintDebug --no-daemon",
+    "export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew qualityCheck --no-daemon",
+    "export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew :app:assembleDebug --no-daemon",
+    "git diff --check && git add core/data core/domain feature/settings docs/PHASE3_FIELD_COLLECTION.md docs/PHASE3_PREIMPLEMENTATION_AUDIT.md && git diff --cached --check && git commit -m 'Stabilize Phase 3 BLE ingest accounting' && git push origin HEAD:main && git rev-parse HEAD"
+  ]
+}
