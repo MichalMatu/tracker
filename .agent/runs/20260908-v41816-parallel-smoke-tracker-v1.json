@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 2,
-  "command": "python -c \"import time; print('tracker-start', flush=True); time.sleep(20); print('tracker-end', flush=True)\"",
-  "pid": 7348,
+  "command": "git status --porcelain",
+  "pid": 7756,
   "timeout": 60,
   "idle_timeout": 45,
   "memory_limit_mb": 256,
-  "started_at": "2026-09-08T05:35:10.488883+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-08T05:35:30.839241+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 2,
   "stage_phase": "commands",
   "task_id": "20260908-v41816-parallel-smoke-tracker-v1",
@@ -18,5 +18,5 @@
   "task_digest": "ed640ad9aad54a25169e23274911285ec98ae1ad0bc5ceb0a38c10114ae90a83",
   "daemon_version": "4.18.16",
   "daemon_pid": 7195,
-  "updated_at": "2026-09-08T05:35:10.489057+00:00"
+  "updated_at": "2026-09-08T05:35:30.867748+00:00"
 }
