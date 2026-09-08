@@ -1,0 +1,15 @@
+{
+  "id": "tracker-ui-emulator-deep-probe-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 300,
+  "idle_timeout": 300,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; EXPECTED='d7c792ff0a591011fa64c86e2f37bb85a111687f'; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; for p in \"$HOME/Library/Android/sdk/emulator/emulator\" \"$HOME/Android/Sdk/emulator/emulator\" \"/Applications/Android Studio.app/Contents/emulator/emulator\"; do if [ -x \"$p\" ]; then echo \"EMULATOR=$p\"; \"$p\" -version | head -3; echo AVDS; \"$p\" -list-avds; fi; done; echo AVD_DIR; ls -la \"$HOME/.android/avd\" 2>/dev/null || true; echo SDK_DIRS; find \"$HOME/Library/Android\" \"$HOME/.android\" -maxdepth 4 -type f -name emulator -print 2>/dev/null | head -20 || true; echo DEVICES; adb devices -l"
+  ]
+}
