@@ -1,0 +1,23 @@
+{
+  "id": "tracker-ui-smoke-foreign-anr-guard-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 300,
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "commands": [
+    "set -euo pipefail; EXPECTED='eb87276824acb30a404830d92f6983d92197f255'; FILE='tools/ui-smoke/run-android-ui-smoke.sh'; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; git fetch --no-tags origin main; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; python3 - <<'PY'\nfrom pathlib import Path\np=Path('tools/ui-smoke/run-android-ui-smoke.sh')\ns=p.read_text()\nold='''log() { printf '[ui-smoke] %s\\n' \"$*\"; }\n\ndump_ui() {\n  adb shell uiautomator dump /sdcard/blueeye-ui.xml >/dev/null\n  adb exec-out cat /sdcard/blueeye-ui.xml > \"$XML\"\n}\n'''
+new='''log() { printf '[ui-smoke] %s\\n' \"$*\"; }\n\nraw_dump_ui() {\n  adb shell uiautomator dump /sdcard/blueeye-ui.xml >/dev/null\n  adb exec-out cat /sdcard/blueeye-ui.xml > \"$XML\"\n}\n\ncapture_failure() {\n  raw_dump_ui || true\n  cp \"$XML\" \"$OUT/failure.xml\" 2>/dev/null || true\n  adb exec-out screencap -p > \"$OUT/failure.png\" 2>/dev/null || true\n  adb logcat -d > \"$OUT/failure-logcat.log\" 2>/dev/null || true\n}\n\ndismiss_foreign_system_dialog() {\n  raw_dump_ui\n  if grep -Fq \"isn't responding\" \"$XML\" || grep -Fq \"keeps stopping\" \"$XML\"; then\n    if grep -Eiq 'BlueEye|io\\.blueeye' \"$XML\"; then\n      log \"BlueEye system error dialog detected\"\n      capture_failure\n      return 1\n    fi\n\n    local action=''\n    local dialog_coords=\"$OUT/system-dialog.coords\"\n    if python3 \"$ROOT/tools/ui-smoke/ui_node.py\" \"$XML\" text \"Close app\" > \"$dialog_coords\" 2>/dev/null; then\n      action='Close app'\n    elif python3 \"$ROOT/tools/ui-smoke/ui_node.py\" \"$XML\" text \"Wait\" > \"$dialog_coords\" 2>/dev/null; then\n      action='Wait'\n    fi\n\n    if [[ -n \"$action\" ]]; then\n      local x y\n      read -r x y < \"$dialog_coords\"\n      log \"dismiss foreign system dialog via '$action' at $x,$y\"\n      adb shell input tap \"$x\" \"$y\"\n      sleep 1\n    fi\n  fi\n}\n\ndump_ui() {\n  dismiss_foreign_system_dialog || return 1\n  raw_dump_ui\n}\n'''
+if old not in s:
+    raise SystemExit('expected dump_ui block not found')
+s=s.replace(old,new,1)\nold2='''  log \"missing target: $attribute=$value\"\n  dump_ui || true\n  cp \"$XML\" \"$OUT/failure.xml\" || true\n  adb exec-out screencap -p > \"$OUT/failure.png\" 2>/dev/null || true\n  adb logcat -d > \"$OUT/failure-logcat.log\" 2>/dev/null || true\n  return 1\n'''
+new2='''  log \"missing target: $attribute=$value\"\n  capture_failure\n  return 1\n'''
+if old2 not in s:
+    raise SystemExit('expected wait_target failure block not found')
+s=s.replace(old2,new2,1)\np.write_text(s)\nPY\n    bash -n \"$FILE\"; git diff --check; test \"$(git diff --name-only | wc -l | tr -d ' ')\" = '1'; test \"$(git diff --name-only)\" = \"$FILE\"; grep -q 'dismiss_foreign_system_dialog' \"$FILE\"; grep -q 'BlueEye system error dialog detected' \"$FILE\"; git add \"$FILE\"; git commit -m 'Ignore foreign emulator ANR dialogs in UI smoke'; git push origin HEAD:main; printf 'ui_smoke_guard_sha=%s\\n' \"$(git rev-parse HEAD)\""
+  ]
+}
