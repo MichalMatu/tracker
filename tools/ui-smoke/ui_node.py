@@ -21,6 +21,7 @@ def main() -> int:
     parser.add_argument("attribute", choices=("text", "content-desc"))
     parser.add_argument("value")
     parser.add_argument("--raw", action="store_true")
+    parser.add_argument("--nearest-checkable", action="store_true")
     args = parser.parse_args()
 
     root = ET.parse(args.xml).getroot()
@@ -36,7 +37,30 @@ def main() -> int:
 
     node = matches[0]
     target = node
-    if not args.raw:
+    if args.nearest_checkable:
+        label_x, label_y = center(node.attrib.get("bounds", ""))
+        candidates = []
+        for candidate in root.iter("node"):
+            if candidate.attrib.get("enabled", "true") != "true":
+                continue
+            if candidate.attrib.get("checkable") != "true":
+                continue
+            try:
+                candidate_x, candidate_y = center(candidate.attrib.get("bounds", ""))
+            except ValueError:
+                continue
+            candidates.append(
+                (
+                    abs(candidate_y - label_y),
+                    abs(candidate_x - label_x),
+                    candidate,
+                )
+            )
+        if not candidates:
+            return 3
+        candidates.sort(key=lambda item: (item[0], item[1]))
+        target = candidates[0][2]
+    elif not args.raw:
         while target.attrib.get("clickable") != "true" and target in parent:
             target = parent[target]
         if target.attrib.get("clickable") != "true":

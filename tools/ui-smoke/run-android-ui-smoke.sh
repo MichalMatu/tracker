@@ -57,17 +57,15 @@ tap_target() {
 tap_text() { tap_target text "$1"; }
 tap_desc() { tap_target content-desc "$1"; }
 
-screen_width() {
-  adb shell wm size | sed -n 's/.*Physical size: \([0-9]*\)x.*/\1/p' | head -1
-}
-
 tap_switch_for_text() {
   local label=$1
   wait_target text "$label"
-  read -r _ y < <(coords text "$label" raw)
-  local width
-  width=$(screen_width)
-  local x=$((width - 72))
+  dump_ui
+  local x y
+  read -r x y < <(
+    python3 "$ROOT/tools/ui-smoke/ui_node.py" \
+      "$XML" text "$label" --nearest-checkable
+  )
   log "tap switch for '$label' at $x,$y"
   adb shell input tap "$x" "$y"
   sleep 1
