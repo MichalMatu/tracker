@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-golden-checkpoint-tag-v2",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 300,
+  "idle_timeout": 300,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; EXPECTED='d7c792ff0a591011fa64c86e2f37bb85a111687f'; TAG='checkpoint-phase3-golden-2026-09-08'; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; git fetch --no-tags origin main; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; if git ls-remote --exit-code --tags origin \"refs/tags/$TAG\" >/tmp/checkpoint-tag.remote 2>/dev/null; then git fetch --no-tags origin \"refs/tags/$TAG:refs/tags/$TAG\"; test \"$(git rev-list -n1 \"$TAG\")\" = \"$EXPECTED\"; else git tag -a \"$TAG\" \"$EXPECTED\" -m 'Phase 3 golden checkpoint: Quality #59 PASS; Secret Scan #89 PASS; Tester Release #16 PASS'; git push origin \"refs/tags/$TAG\"; fi; PEELED=\"$(git ls-remote --tags origin \"refs/tags/$TAG^{}\" | awk '{print $1}')\"; test \"$PEELED\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; printf 'checkpoint_tag=%s\\ncheckpoint_sha=%s\\n' \"$TAG\" \"$EXPECTED\""
+  ]
+}
