@@ -1,0 +1,18 @@
+{
+  "id": "tracker-quality-hardening-audit-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 2048,
+  "command_timeout": 1200,
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "commands": [
+    "git rev-parse HEAD && git status --short && find core feature app -type f -name '*.kt' -print0 | xargs -0 wc -l | sort -nr | head -40",
+    "grep -RIn --include='*.kt' -E '@Suppress\\(.*(TooManyFunctions|LongMethod|LargeClass|ComplexMethod|LongParameterList)|TODO|FIXME' core feature app | head -200 || true",
+    "grep -RIn --include='*.kt' -E 'class (BleScanner|DevicePersister|BleScanHandler)|object ScannerRuntimeDiagnosticsStore|data class ScannerIngestDiagnostics' core/data core/domain feature/settings",
+    "find docs -maxdepth 1 -type f -print | sort && grep -RIn -E 'Phase 3|PHASE3|ingest|checkpoint|tag' docs README.md AGENTS.md | head -200 || true"
+  ]
+}
