@@ -1,0 +1,16 @@
+{
+  "id": "20260908-v41816-parallel-smoke-tracker-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 256,
+  "command_timeout": 60,
+  "idle_timeout": 45,
+  "task_timeout": 180,
+  "commands": [
+    "python -c \"import time; print('tracker-start', flush=True); time.sleep(20); print('tracker-end', flush=True)\"",
+    "git status --porcelain"
+  ]
+}
