@@ -16,6 +16,25 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
 
+internal enum class SignalSamplePersistenceOutcome {
+    WRITTEN,
+    THROTTLED,
+    FAILED,
+}
+
+internal data class BlePersistenceOutcome(
+    val deviceUpdated: Boolean,
+    val deviceUpdateThrottled: Boolean,
+    val signalSampleOutcome: SignalSamplePersistenceOutcome,
+)
+
+private data class DevicePersistenceStageOutcome(
+    val shouldRecordFollowMeObservation: Boolean,
+    val deviceUpdated: Boolean,
+    val deviceUpdateThrottled: Boolean,
+    val earlySignalSampleOutcome: SignalSamplePersistenceOutcome? = null,
+)
+
 @Singleton
 class DevicePersister @Inject constructor(
     private val deviceDao: DeviceDao,
@@ -26,21 +45,35 @@ class DevicePersister @Inject constructor(
     private val priorityHelper: DeviceTypePriorityHelper,
 ) {
 
-    suspend fun persist(ctx: ScanDataContext, classifier: ScanResultClassifier) {
+    internal suspend fun persist(
+        ctx: ScanDataContext,
+        classifier: ScanResultClassifier,
+    ): BlePersistenceOutcome {
         val existing = ctx.existingDevice
         val sensorDataString = SensorDataFormatter.format(ctx.sensorData)
 
-        val shouldRecordFollowMeObservation = if (existing != null) {
-            persistExistingDevice(ctx, existing, sensorDataString, classifier)
-        } else {
-            persistNewDevice(ctx, sensorDataString, classifier)
-        }
+        val stageOutcome =
+            if (existing != null) {
+                persistExistingDevice(ctx, existing, sensorDataString, classifier)
+            } else {
+                DevicePersistenceStageOutcome(
+                    shouldRecordFollowMeObservation = persistNewDevice(ctx, sensorDataString, classifier),
+                    deviceUpdated = true,
+                    deviceUpdateThrottled = false,
+                )
+            }
 
-        if (shouldRecordFollowMeObservation) {
+        if (stageOutcome.shouldRecordFollowMeObservation) {
             followMeObservationRecorder.record(ctx)
         }
 
-        recordSignalSample(ctx, classifier)
+        val signalSampleOutcome =
+            stageOutcome.earlySignalSampleOutcome ?: recordSignalSample(ctx, classifier)
+        return BlePersistenceOutcome(
+            deviceUpdated = stageOutcome.deviceUpdated,
+            deviceUpdateThrottled = stageOutcome.deviceUpdateThrottled,
+            signalSampleOutcome = signalSampleOutcome,
+        )
     }
 
     private suspend fun persistExistingDevice(
@@ -48,7 +81,7 @@ class DevicePersister @Inject constructor(
         existing: DeviceEntity,
         sensorDataString: String?,
         classifier: ScanResultClassifier,
-    ): Boolean {
+    ): DevicePersistenceStageOutcome {
         val candidateType = classifier.resolveType(ctx)
         val bestName = NameUtils.resolveBestName(existing.lastDeviceName, ctx.name ?: ctx.vendorModel ?: ctx.beaconType)
         val nameCorrectedType =
@@ -73,10 +106,18 @@ class DevicePersister @Inject constructor(
         val trackingChanged = updateTrackingIfChanged(ctx, existing)
 
         if (!scanThrottler.shouldUpdateDevice(params)) {
-            if (scanThrottler.shouldWriteSample(ctx.mac, isPriorityDevice = isTactical)) {
-                recordSignalSampleDirect(ctx, classifier)
-            }
-            return trackingChanged
+            val earlySignalSampleOutcome =
+                if (scanThrottler.shouldWriteSample(ctx.mac, isPriorityDevice = isTactical)) {
+                    recordSignalSampleDirect(ctx, classifier)
+                } else {
+                    SignalSamplePersistenceOutcome.THROTTLED
+                }
+            return DevicePersistenceStageOutcome(
+                shouldRecordFollowMeObservation = trackingChanged,
+                deviceUpdated = trackingChanged,
+                deviceUpdateThrottled = true,
+                earlySignalSampleOutcome = earlySignalSampleOutcome,
+            )
         }
 
         val currentServices = ctx.serviceUuids.toSet()
@@ -117,7 +158,11 @@ class DevicePersister @Inject constructor(
         )
 
         mergeSecondaryRecordIfPresent(ctx, contextLabel = "scan update")
-        return trackingChanged
+        return DevicePersistenceStageOutcome(
+            shouldRecordFollowMeObservation = trackingChanged,
+            deviceUpdated = true,
+            deviceUpdateThrottled = false,
+        )
     }
 
     private suspend fun persistNewDevice(
@@ -289,17 +334,19 @@ class DevicePersister @Inject constructor(
     private suspend fun recordSignalSample(
         ctx: ScanDataContext,
         classifier: ScanResultClassifier,
-    ) {
+    ): SignalSamplePersistenceOutcome {
         val isTactical = ctx.isTactical
-        if (scanThrottler.shouldWriteSample(ctx.mac, isPriorityDevice = isTactical)) {
+        return if (scanThrottler.shouldWriteSample(ctx.mac, isPriorityDevice = isTactical)) {
             recordSignalSampleDirect(ctx, classifier)
+        } else {
+            SignalSamplePersistenceOutcome.THROTTLED
         }
     }
 
     private suspend fun recordSignalSampleDirect(
         ctx: ScanDataContext,
         classifier: ScanResultClassifier,
-    ) {
+    ): SignalSamplePersistenceOutcome {
         val location = locationProvider.getFreshCoordinates()
         val sample = SignalSampleEntity(
             deviceFingerprint = ctx.fingerprint,
@@ -333,10 +380,12 @@ class DevicePersister @Inject constructor(
             tacticalCategory = ctx.tacticalCategory,
             probeError = ctx.probeError,
         )
-        try {
+        return try {
             signalSampleDao.insert(sample)
+            SignalSamplePersistenceOutcome.WRITTEN
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Log.w(TAG, "Sample insert failed: ${e.message}")
+            SignalSamplePersistenceOutcome.FAILED
         }
     }
 

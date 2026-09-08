@@ -3,6 +3,7 @@ package io.blueeye.core.data.repository
 import io.blueeye.core.data.db.dao.DeviceDao
 import io.blueeye.core.data.mapper.toDomain
 import io.blueeye.core.data.repository.handler.ble.BleScanHandler
+import io.blueeye.core.data.repository.handler.ble.SignalSamplePersistenceOutcome
 import io.blueeye.core.data.repository.handler.classic.ClassicScanHandler
 import io.blueeye.core.data.repository.handler.paired.ProbeResultHandler
 import io.blueeye.core.data.scanner.ScannerRuntimeDiagnosticsStore
@@ -128,27 +129,46 @@ constructor(
     }
 
     override suspend fun handleScanResult(params: io.blueeye.core.domain.repository.ScanResultParams): Result<Unit> = runCatching {
-        ScannerRuntimeDiagnosticsStore.recordBleResult(params.mac)
-        bleScanHandler.handle(
-            io.blueeye.core.scanner.model.BleScanResultData(
-                mac = params.mac,
-                rssi = params.rssi,
-                timestamp = params.timestamp,
-                technology = params.technology,
-                name = params.name,
-                manufacturerId = params.manufacturerId,
-                manufacturerData = params.manufacturerData,
-                manufacturerDataById = params.manufacturerDataById,
-                serviceUuids = params.serviceUuids,
-                serviceDataByUuid = params.serviceDataByUuid,
-                appearance = params.appearance,
-                txPower = params.txPower,
-                isConnectable = params.isConnectable,
-                primaryPhy = params.primaryPhy,
-                secondaryPhy = params.secondaryPhy,
-                rawData = params.rawData,
+        ScannerRuntimeDiagnosticsStore.recordBleResult()
+        val outcome =
+            bleScanHandler.handle(
+                io.blueeye.core.scanner.model.BleScanResultData(
+                    mac = params.mac,
+                    rssi = params.rssi,
+                    timestamp = params.timestamp,
+                    technology = params.technology,
+                    name = params.name,
+                    manufacturerId = params.manufacturerId,
+                    manufacturerData = params.manufacturerData,
+                    manufacturerDataById = params.manufacturerDataById,
+                    serviceUuids = params.serviceUuids,
+                    serviceDataByUuid = params.serviceDataByUuid,
+                    appearance = params.appearance,
+                    txPower = params.txPower,
+                    isConnectable = params.isConnectable,
+                    primaryPhy = params.primaryPhy,
+                    secondaryPhy = params.secondaryPhy,
+                    rawData = params.rawData,
+                )
             )
-        )
+
+        if (outcome.provisionalDiscarded) {
+            ScannerRuntimeDiagnosticsStore.recordProvisionalDiscarded()
+        }
+        outcome.persistenceOutcome?.let { persistence ->
+            ScannerRuntimeDiagnosticsStore.recordDevicePersistenceOutcome(
+                deviceUpdated = persistence.deviceUpdated,
+                deviceUpdateThrottled = persistence.deviceUpdateThrottled,
+            )
+            when (persistence.signalSampleOutcome) {
+                SignalSamplePersistenceOutcome.WRITTEN ->
+                    ScannerRuntimeDiagnosticsStore.recordSignalSampleWritten()
+                SignalSamplePersistenceOutcome.THROTTLED ->
+                    ScannerRuntimeDiagnosticsStore.recordSignalSampleThrottled()
+                SignalSamplePersistenceOutcome.FAILED ->
+                    ScannerRuntimeDiagnosticsStore.recordSignalSampleWriteFailed()
+            }
+        }
     }
 
     override suspend fun handleClassicDiscovery(

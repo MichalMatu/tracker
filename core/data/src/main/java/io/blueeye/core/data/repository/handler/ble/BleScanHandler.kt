@@ -34,6 +34,11 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
+internal data class BleScanProcessingOutcome(
+    val provisionalDiscarded: Boolean,
+    val persistenceOutcome: BlePersistenceOutcome?,
+)
+
 /**
  * Main coordinator for handling BLE scan results.
  *
@@ -71,7 +76,7 @@ class BleScanHandler @Inject constructor(
      * Main entry point for processing a BLE scan result.
      * Orchestrates the processing pipeline and triggers alerts.
      */
-    suspend fun handle(data: BleScanResultData) {
+    internal suspend fun handle(data: BleScanResultData): BleScanProcessingOutcome {
         try {
             val ctx = ScanDataContext.fromScan(data)
 
@@ -84,18 +89,27 @@ class BleScanHandler @Inject constructor(
             calculateFollowMeScore(ctx)
             logBeaconDetection(ctx)
 
-            if (!ctx.isProvisional) {
-                persister.persist(ctx, classifier)
-                ctx.followMeAlertEvidence?.let { evidence ->
-                    alertEvidenceEventRecorder.recordFollowMeAlert(
-                        deviceFingerprint = ctx.fingerprint,
-                        observedMac = ctx.mac,
-                        evidence = evidence,
-                    )
-                }
-                recordPublicSafetyEvidenceEvents(ctx)
-                queueAutoActiveProbe(ctx)
+            if (ctx.isProvisional) {
+                return BleScanProcessingOutcome(
+                    provisionalDiscarded = true,
+                    persistenceOutcome = null,
+                )
             }
+
+            val persistenceOutcome = persister.persist(ctx, classifier)
+            ctx.followMeAlertEvidence?.let { evidence ->
+                alertEvidenceEventRecorder.recordFollowMeAlert(
+                    deviceFingerprint = ctx.fingerprint,
+                    observedMac = ctx.mac,
+                    evidence = evidence,
+                )
+            }
+            recordPublicSafetyEvidenceEvents(ctx)
+            queueAutoActiveProbe(ctx)
+            return BleScanProcessingOutcome(
+                provisionalDiscarded = false,
+                persistenceOutcome = persistenceOutcome,
+            )
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

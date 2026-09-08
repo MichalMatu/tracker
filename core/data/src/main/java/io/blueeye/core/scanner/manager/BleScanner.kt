@@ -7,6 +7,7 @@ import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.blueeye.core.data.scanner.ScannerRuntimeDiagnosticsStore
 import io.blueeye.core.domain.repository.DeviceRepository
 import io.blueeye.core.domain.scanner.ScannerRuntimePolicy
 import io.blueeye.core.permission.PermissionManager
@@ -16,12 +17,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,11 +42,22 @@ internal fun ScannerState.allowsPassiveStart(): Boolean =
     this !is ScannerState.Starting && this !is ScannerState.Scanning
 
 /**
- * Internal sealed class for scan result processing via Channel. This replaces fire-and-forget
- * coroutines with a sequential queue.
+ * Internal scan event for bounded sequential ingest. This replaces fire-and-forget
+ * coroutines with a latest-per-device pending buffer.
  */
 private sealed interface ScanEvent {
-    data class BleResult(val result: ScanResult) : ScanEvent
+    val queueKey: String
+    val receivedAtMonotonicMs: Long
+    val observedAtEpochMs: Long
+
+    data class BleResult(
+        val result: ScanResult,
+        val mac: String,
+        override val receivedAtMonotonicMs: Long,
+        override val observedAtEpochMs: Long,
+    ) : ScanEvent {
+        override val queueKey: String = "ble:$mac"
+    }
 
     data class ClassicResult(
         val mac: String,
@@ -54,7 +65,11 @@ private sealed interface ScanEvent {
         val rssi: Int,
         val classOfDevice: Int?,
         val serviceUuids: List<String>,
-    ) : ScanEvent
+        override val receivedAtMonotonicMs: Long,
+        override val observedAtEpochMs: Long,
+    ) : ScanEvent {
+        override val queueKey: String = "classic:$mac"
+    }
 }
 
 @Singleton
@@ -70,8 +85,8 @@ constructor(
 ) {
     companion object {
         private const val TAG = "BleScanner"
-        private const val SCAN_EVENT_CHANNEL_CAPACITY = 4_096
-        private const val SCAN_EVENT_DROP_LOG_INTERVAL = 100L
+        private const val SCAN_EVENT_BUFFER_CAPACITY = 4_096
+        private const val SCAN_EVENT_REJECTION_LOG_INTERVAL = 100L
     }
 
     // Use SupervisorJob so child failures don't cancel the parent
@@ -82,18 +97,10 @@ constructor(
 
     private var scanJob: Job? = null
     private var processingJob: Job? = null
-    private val droppedScanEvents = AtomicLong(0L)
+    private val rejectedScanEvents = AtomicLong(0L)
 
-    // Channel for sequential processing of scan results (replaces fire-and-forget)
-    // Explicit capacity avoids JVM's tiny default buffered channel under dense BLE traffic.
-    private val scanEventChannel =
-        Channel<ScanEvent>(
-            capacity = SCAN_EVENT_CHANNEL_CAPACITY,
-            onBufferOverflow = BufferOverflow.DROP_OLDEST,
-            onUndeliveredElement = {
-                recordDroppedScanEvent("queue overflow or shutdown")
-            },
-        )
+    private val scanEventBuffer =
+        LatestPerKeyScanBuffer<String, ScanEvent>(capacity = SCAN_EVENT_BUFFER_CAPACITY)
 
     init {
         // Start the event processing loop
@@ -107,13 +114,30 @@ constructor(
     private fun startEventProcessor() {
         processingJob =
             scope.launch {
-                for (event in scanEventChannel) {
+                while (true) {
+                    val bufferedEvent = scanEventBuffer.receive()
+                    val event = bufferedEvent.value
+                    val processingStartedAt = monotonicNowMs()
+                    ScannerRuntimeDiagnosticsStore.recordProcessingStarted(
+                        queueDepth = bufferedEvent.queueDepthAfterDequeue,
+                        queueWaitMs = processingStartedAt - event.receivedAtMonotonicMs,
+                    )
                     try {
-                        when (event) {
-                            is ScanEvent.BleResult -> handleBleResult(event.result)
-                            is ScanEvent.ClassicResult -> handleClassicResult(event)
+                        val succeeded =
+                            when (event) {
+                                is ScanEvent.BleResult -> handleBleResult(event)
+                                is ScanEvent.ClassicResult -> handleClassicResult(event)
+                            }
+                        val durationMs = monotonicNowMs() - processingStartedAt
+                        if (succeeded) {
+                            ScannerRuntimeDiagnosticsStore.recordProcessingSucceeded(durationMs)
+                        } else {
+                            ScannerRuntimeDiagnosticsStore.recordProcessingFailed(durationMs)
                         }
                     } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                        ScannerRuntimeDiagnosticsStore.recordProcessingFailed(
+                            monotonicNowMs() - processingStartedAt
+                        )
                         Log.e(TAG, "Error processing scan event", e)
                     }
                 }
@@ -152,6 +176,7 @@ constructor(
         }
     }
 
+    @SuppressLint("MissingPermission")
     internal suspend fun performPassiveBleScan() {
         try {
             // If we were scanning (e.g. focused), stop first safely
@@ -166,7 +191,7 @@ constructor(
             val bleStarted = bleScanSource.start(
                 macFilter = null,
                 onResult = { result ->
-                    enqueueScanEvent(ScanEvent.BleResult(result))
+                    recordRawBleCallback(result)
                 },
                 onError = { errorCode ->
                     val message = describeBleScanError(errorCode)
@@ -223,7 +248,7 @@ constructor(
                     val bleStarted = bleScanSource.start(
                         macFilter = macAddress,
                         onResult = { result ->
-                            enqueueScanEvent(ScanEvent.BleResult(result))
+                            recordRawBleCallback(result)
                         },
                         onError = { errorCode ->
                             val message = "Focused ${describeBleScanError(errorCode)}"
@@ -266,6 +291,8 @@ constructor(
                         rssi = rssi,
                         classOfDevice = classOfDevice,
                         serviceUuids = uuids.toServiceUuidStrings(),
+                        receivedAtMonotonicMs = monotonicNowMs(),
+                        observedAtEpochMs = System.currentTimeMillis(),
                     )
                 )
             }
@@ -275,29 +302,55 @@ constructor(
         }
     }
 
-    private fun enqueueScanEvent(event: ScanEvent) {
-        val enqueueResult = scanEventChannel.trySend(event)
-        if (enqueueResult.isFailure) {
-            recordDroppedScanEvent("enqueue failed")
-        }
+    @SuppressLint("MissingPermission")
+    private fun recordRawBleCallback(result: ScanResult) {
+        val mac = result.device.address
+        val receivedAtMonotonicMs = monotonicNowMs()
+        val observedAtEpochMs = System.currentTimeMillis()
+        ScannerRuntimeDiagnosticsStore.recordRawBleCallback(mac)
+        enqueueScanEvent(
+            ScanEvent.BleResult(
+                result = result,
+                mac = mac,
+                receivedAtMonotonicMs = receivedAtMonotonicMs,
+                observedAtEpochMs = observedAtEpochMs,
+            )
+        )
     }
 
-    private fun recordDroppedScanEvent(reason: String) {
-        val dropped = droppedScanEvents.incrementAndGet()
-        if (dropped == 1L || dropped % SCAN_EVENT_DROP_LOG_INTERVAL == 0L) {
-            Log.w(TAG, "Dropped $dropped scan event(s): $reason")
+    private fun enqueueScanEvent(event: ScanEvent) {
+        when (
+            val offerResult = scanEventBuffer.offer(
+                key = event.queueKey,
+                value = event,
+            )
+        ) {
+            is ScanBufferOfferResult.Enqueued ->
+                ScannerRuntimeDiagnosticsStore.recordQueueAccepted(
+                    queueDepth = offerResult.queueDepth,
+                    queueHighWaterMark = offerResult.queueHighWaterMark,
+                )
+            is ScanBufferOfferResult.Coalesced ->
+                ScannerRuntimeDiagnosticsStore.recordCoalescedEvent()
+            is ScanBufferOfferResult.Rejected -> {
+                val rejected = rejectedScanEvents.incrementAndGet()
+                ScannerRuntimeDiagnosticsStore.recordQueueRejected()
+                if (rejected == 1L || rejected % SCAN_EVENT_REJECTION_LOG_INTERVAL == 0L) {
+                    Log.w(TAG, "Rejected $rejected scan event(s): ingest capacity exhausted")
+                }
+            }
         }
     }
 
     /** Handles BLE scan result - called sequentially from event processor. */
     @SuppressLint("MissingPermission")
-    private suspend fun handleBleResult(result: ScanResult) {
-        val data = scanResultExtractor.extract(result)
+    private suspend fun handleBleResult(event: ScanEvent.BleResult): Boolean {
+        val data = scanResultExtractor.extract(event.result)
 
         val params = io.blueeye.core.domain.repository.ScanResultParams(
             mac = data.mac,
             rssi = data.rssi,
-            timestamp = System.currentTimeMillis(),
+            timestamp = event.observedAtEpochMs,
             technology = data.technology,
             name = data.name,
             manufacturerId = data.manufacturerId,
@@ -312,26 +365,30 @@ constructor(
             secondaryPhy = data.secondaryPhy,
             rawData = data.rawData,
         )
-        repository.handleScanResult(params)
-            .onFailure { error ->
-                val message = "Scan processing failed: ${error.message ?: error.javaClass.simpleName}"
-                Log.e(TAG, message, error)
-                _state.value = ScannerState.Error(message)
-            }
+        val processingResult = repository.handleScanResult(params)
+        processingResult.onFailure { error ->
+            val message = "Scan processing failed: ${error.message ?: error.javaClass.simpleName}"
+            Log.e(TAG, message, error)
+            _state.value = ScannerState.Error(message)
+        }
+        return processingResult.isSuccess
     }
 
-    private suspend fun handleClassicResult(result: ScanEvent.ClassicResult) {
-        repository.handleClassicDiscovery(
-            mac = result.mac,
-            name = result.name,
-            rssi = result.rssi,
-            classOfDevice = result.classOfDevice,
-            serviceUuids = result.serviceUuids,
-        ).onFailure { error ->
+    private suspend fun handleClassicResult(result: ScanEvent.ClassicResult): Boolean {
+        val processingResult =
+            repository.handleClassicDiscovery(
+                mac = result.mac,
+                name = result.name,
+                rssi = result.rssi,
+                classOfDevice = result.classOfDevice,
+                serviceUuids = result.serviceUuids,
+            )
+        processingResult.onFailure { error ->
             val message = "Classic scan processing failed: ${error.message ?: error.javaClass.simpleName}"
             Log.e(TAG, message, error)
             _state.value = ScannerState.Error(message)
         }
+        return processingResult.isSuccess
     }
 }
 
@@ -356,3 +413,5 @@ private fun describeBleScanError(errorCode: Int): String {
 
     return "BLE scan failed: $reason"
 }
+
+private fun monotonicNowMs(): Long = TimeUnit.NANOSECONDS.toMillis(System.nanoTime())

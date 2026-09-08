@@ -248,7 +248,14 @@ class DevicePersisterDebounceTest {
         whenever(scanThrottler.shouldUpdateDevice(any())).thenReturn(true)
         whenever(scanThrottler.shouldWriteSample(eq("MAC"), eq(false), any())).thenReturn(true)
 
-        persister.persist(ctx, mock { whenever(it.resolveType(any())).thenReturn(DeviceType.TRACKER) })
+        val outcome = persister.persist(
+            ctx,
+            mock { whenever(it.resolveType(any())).thenReturn(DeviceType.TRACKER) },
+        )
+
+        assertEquals(true, outcome.deviceUpdated)
+        assertEquals(false, outcome.deviceUpdateThrottled)
+        assertEquals(SignalSamplePersistenceOutcome.WRITTEN, outcome.signalSampleOutcome)
 
         val captor = argumentCaptor<io.blueeye.core.data.db.entity.SignalSampleEntity>()
         verify(signalSampleDao).insert(captor.capture())
@@ -279,6 +286,74 @@ class DevicePersisterDebounceTest {
         assertEquals("020106", sample.rawDataHex)
         assertEquals(TrackingStatus.SUSPICIOUS.name, sample.trackingStatus)
         assertEquals(42f, sample.followingScore)
+    }
+
+    @Test
+    fun `persist reports throttled device and signal sample separately`() = runTest {
+        val fingerprint = "FINGERPRINT_1"
+        val existing = createDeviceEntity(fingerprint, TrackingStatus.SAFE, 10.0f)
+        val ctx = createScanContext(fingerprint, existing).apply {
+            followingScore = 10.0f
+        }
+
+        whenever(priorityHelper.resolveBetterType(any(), any())).thenReturn(DeviceType.UNKNOWN)
+        whenever(scanThrottler.shouldUpdateDevice(any())).thenReturn(false)
+        whenever(scanThrottler.shouldWriteSample(eq("MAC"), eq(false), any())).thenReturn(false)
+
+        val outcome = persister.persist(
+            ctx,
+            mock { whenever(it.resolveType(any())).thenReturn(DeviceType.UNKNOWN) },
+        )
+
+        assertEquals(false, outcome.deviceUpdated)
+        assertEquals(true, outcome.deviceUpdateThrottled)
+        assertEquals(SignalSamplePersistenceOutcome.THROTTLED, outcome.signalSampleOutcome)
+        verify(signalSampleDao, never()).insert(any())
+    }
+
+    @Test
+    fun `throttled device update evaluates and writes signal sample only once`() = runTest {
+        val fingerprint = "FINGERPRINT_1"
+        val existing = createDeviceEntity(fingerprint, TrackingStatus.SAFE, 10.0f)
+        val ctx = createScanContext(fingerprint, existing).apply {
+            followingScore = 10.0f
+        }
+
+        whenever(priorityHelper.resolveBetterType(any(), any())).thenReturn(DeviceType.UNKNOWN)
+        whenever(scanThrottler.shouldUpdateDevice(any())).thenReturn(false)
+        whenever(scanThrottler.shouldWriteSample(eq("MAC"), eq(false), any())).thenReturn(true)
+
+        val outcome = persister.persist(
+            ctx,
+            mock { whenever(it.resolveType(any())).thenReturn(DeviceType.UNKNOWN) },
+        )
+
+        assertEquals(false, outcome.deviceUpdated)
+        assertEquals(true, outcome.deviceUpdateThrottled)
+        assertEquals(SignalSamplePersistenceOutcome.WRITTEN, outcome.signalSampleOutcome)
+        verify(scanThrottler, org.mockito.kotlin.times(1)).shouldWriteSample(eq("MAC"), eq(false), any())
+        verify(signalSampleDao, org.mockito.kotlin.times(1)).insert(any())
+    }
+
+    @Test
+    fun `persist reports signal sample insert failure without throwing`() = runTest {
+        val fingerprint = "FINGERPRINT_1"
+        val existing = createDeviceEntity(fingerprint, TrackingStatus.SAFE, 10.0f)
+        val ctx = createScanContext(fingerprint, existing)
+
+        whenever(priorityHelper.resolveBetterType(any(), any())).thenReturn(DeviceType.UNKNOWN)
+        whenever(scanThrottler.shouldUpdateDevice(any())).thenReturn(true)
+        whenever(scanThrottler.shouldWriteSample(eq("MAC"), eq(false), any())).thenReturn(true)
+        whenever(signalSampleDao.insert(any())).thenThrow(IllegalStateException("disk full"))
+
+        val outcome = persister.persist(
+            ctx,
+            mock { whenever(it.resolveType(any())).thenReturn(DeviceType.UNKNOWN) },
+        )
+
+        assertEquals(true, outcome.deviceUpdated)
+        assertEquals(false, outcome.deviceUpdateThrottled)
+        assertEquals(SignalSamplePersistenceOutcome.FAILED, outcome.signalSampleOutcome)
     }
 
     @Test

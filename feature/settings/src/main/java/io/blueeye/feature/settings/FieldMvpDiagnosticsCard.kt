@@ -45,11 +45,41 @@ fun FieldMvpDiagnosticsCard(
             )
             DiagnosticRow("Runtime profile", scanner.runtimeProfile.name)
             DiagnosticRow("Scanner", scanner.state.label())
+            val ingest = scanner.ingest
+            DiagnosticRow("Ingest window", ingest.windowStartedAt.formatTime())
             DiagnosticRow("BLE last seen", scanner.lastBleResultAt.formatTime())
             DiagnosticRow("Classic last seen", scanner.lastClassicResultAt.formatTime())
-            DiagnosticRow("BLE/min", scanner.bleResultsPerMinute.toString())
+            DiagnosticRow("Raw BLE/min", ingest.rawBleCallbacksPerMinute.toString())
+            DiagnosticRow("Queued/min", ingest.enqueueAcceptedPerMinute.toString())
+            DiagnosticRow("Coalesced/min", ingest.coalescedPerMinute.toString())
+            DiagnosticRow("Processed/min", ingest.processedPerMinute.toString())
+            DiagnosticRow("Persisted/min", ingest.persistedDeviceUpdatesPerMinute.toString())
+            DiagnosticRow("Signal samples/min", ingest.signalSamplesWrittenPerMinute.toString())
+            DiagnosticRow(
+                "Raw / queued / coalesced total",
+                "${ingest.rawBleCallbacksTotal} / ${ingest.enqueueAcceptedTotal} / ${ingest.coalescedTotal}",
+            )
+            DiagnosticRow(
+                "Processed / persisted / samples total",
+                "${ingest.processingSucceededTotal} / ${ingest.persistedDeviceUpdatesTotal} / " +
+                    ingest.signalSamplesWrittenTotal,
+            )
+            DiagnosticRow("Queue depth", ingest.queueDepth.toString())
+            DiagnosticRow("Queue high-water", ingest.queueHighWaterMark.toString())
+            DiagnosticRow("Queue rejected", ingest.enqueueRejectedTotal.toString())
+            DiagnosticRow("Queue dropped", ingest.queueDroppedTotal.toString())
+            DiagnosticRow("Processing failed", ingest.processingFailedTotal.toString())
+            DiagnosticRow("Provisional discard", ingest.provisionalDiscardedTotal.toString())
+            DiagnosticRow("Sample write failed", ingest.signalSampleWriteFailuresTotal.toString())
+            DiagnosticRow(
+                "Queue wait avg/max",
+                "${ingest.averageQueueWaitMs()}/${ingest.maxQueueWaitMs} ms",
+            )
+            DiagnosticRow(
+                "Processing avg/max",
+                "${ingest.averageProcessingDurationMs()}/${ingest.maxProcessingDurationMs} ms",
+            )
             DiagnosticRow("Classic/min", scanner.classicResultsPerMinute.toString())
-            DiagnosticRow("Dropped queue events", scanner.droppedQueueEvents.toString())
             DiagnosticRow("Last scan error", scanner.lastScanError ?: "None")
             DiagnosticRow("Lifecycle", scanner.lastLifecycleTransition?.name ?: "None")
             DiagnosticRow("Lifecycle at", scanner.lastLifecycleTransitionAt.formatTime())
@@ -96,6 +126,14 @@ private fun DiagnosticRow(
             fontWeight = FontWeight.SemiBold,
         )
     }
+}
+
+private fun io.blueeye.core.domain.scanner.ScannerIngestDiagnostics.averageQueueWaitMs(): Long =
+    if (processingStartedTotal == 0L) 0L else totalQueueWaitMs / processingStartedTotal
+
+private fun io.blueeye.core.domain.scanner.ScannerIngestDiagnostics.averageProcessingDurationMs(): Long {
+    val completed = processingSucceededTotal + processingFailedTotal
+    return if (completed == 0L) 0L else totalProcessingDurationMs / completed
 }
 
 private fun ScannerRuntimeState.label(): String =
