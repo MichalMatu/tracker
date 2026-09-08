@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-ingest-finalize-v2",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-08T07:21:35.848973+00:00",
+  "command_timeout": 2400,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test \"$(git rev-parse HEAD)\" = \"23b7f21dc31fb504dd89798ad3447f7615e9d1d4\"; test -n \"$(git status --porcelain)\"; git diff --check; python3 - <<'PY'\nimport subprocess,sys\nexpected={\n'core/data/src/main/java/io/blueeye/core/data/repository/DeviceRepositoryImpl.kt',\n'core/data/src/main/java/io/blueeye/core/data/repository/handler/ble/BleScanHandler.kt',\n'core/data/src/main/java/io/blueeye/core/data/repository/handler/ble/DevicePersister.kt',\n'core/data/src/main/java/io/blueeye/core/data/scanner/ScannerRuntimeDiagnosticsStore.kt',\n'core/data/src/main/java/io/blueeye/core/scanner/manager/BleScanner.kt',\n'core/data/src/main/java/io/blueeye/core/scanner/manager/LatestPerKeyScanBuffer.kt',\n'core/data/src/test/kotlin/io/blueeye/core/data/repository/handler/ble/DevicePersisterDebounceTest.kt',\n'core/data/src/test/kotlin/io/blueeye/core/data/scanner/ScannerRuntimeIngestDiagnosticsTest.kt',\n'core/data/src/test/kotlin/io/blueeye/core/scanner/manager/LatestPerKeyScanBufferTest.kt',\n'core/domain/src/main/java/io/blueeye/core/domain/scanner/ScannerRuntimeDiagnostics.kt',\n'docs/PHASE3_FIELD_COLLECTION.md',\n'docs/PHASE3_PREIMPLEMENTATION_AUDIT.md',\n'feature/settings/src/main/java/io/blueeye/feature/settings/FieldMvpDiagnosticsCard.kt',\n'feature/settings/src/main/java/io/blueeye/feature/settings/FieldMvpExportAppend.kt',\n'feature/settings/src/test/java/io/blueeye/feature/settings/FieldMvpExportAppendTest.kt'}\nout=subprocess.check_output(['git','status','--porcelain'],text=True)\nactual={line[3:] for line in out.splitlines() if line.strip()}\nif actual!=expected:\n print('Unexpected workspace paths', sorted(actual^expected)); sys.exit(1)\nprint('workspace-path-set: OK', len(actual))\nPY\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; java -version; ./gradlew --version | sed -n '/JVM:/p'",
+      "exit_code": 1,
+      "output": "",
+      "elapsed_seconds": 0.381,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": null,
+      "output_policy": "stream",
+      "captured_output_chars": 0,
+      "output_truncated": false,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 5,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 5,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 0.381
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.11
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.074
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-08T07:21:38.162718+00:00",
+  "task_digest": "2cae37ca14760769b512598af10c3c182f85351d36df15de15af77296345afe8",
+  "idle_timeout": 600,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "attempt_id": "b46e4cc41db1cb896ce5354c",
+  "daemon_version": "4.18.17"
+}
