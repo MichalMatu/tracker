@@ -17,7 +17,7 @@
 
 ### NEXT ACTION
 
-- [ ] Phase 3 — make ingest loss observable and bounded. Start with `docs/PHASE3_HANDOFF.md`; keep scope limited to queue/ingest metrics, bounded processing and synthetic burst evidence.
+- [ ] Phase 3 field validation/closure — software ingest boundedness, observability and structural hardening are complete. Run `docs/PHASE3_FIELD_COLLECTION.md`, preserve Session Export JSON, collect Room/WAL/SHM, reconcile the counters and close Phase 3 before starting Phase 4.
 
 When the next task is completed, update this line to the next unfinished item and add an entry to the Work Log at the bottom of this file.
 
@@ -309,24 +309,30 @@ Physical lifecycle evidence: Samsung SM-S906B, Android 16 / SDK 36. Clean R3 acc
 
 Purpose: no observation may disappear without a counter explaining why.
 
+Status: **SOFTWARE IMPLEMENTATION + STRUCTURAL HARDENING COMPLETE; FIELD VALIDATION PENDING.** See `PHASE3_FIELD_COLLECTION.md` and `PHASE3_CODE_QUALITY_REVIEW.md`.
+
 Checklist:
 
-- [ ] Wire queue drop counter into `ScannerRuntimeDiagnosticsStore`.
-- [ ] Add raw BLE callbacks/minute.
-- [ ] Add accepted/coalesced events/minute.
-- [ ] Add persisted device updates/minute.
-- [ ] Add signal samples written/minute.
-- [ ] Add queue depth/high-water mark if feasible.
-- [ ] Add processing latency metric.
-- [ ] Replace `DROP_OLDEST` as an invisible correctness strategy.
-- [ ] Introduce per-device coalescing/debounce where repeated advertisements carry no new useful state.
-- [ ] Keep latest observation timestamps even when heavy enrichment is throttled.
-- [ ] Keep persistence work off the Bluetooth callback path.
-- [ ] Add synthetic burst test exceeding expected city-density traffic.
+- [x] Wire queue-loss accounting into scanner runtime diagnostics; the live latest-per-key design has no silent eviction and exposes rejected/dropped totals explicitly.
+- [x] Add raw BLE callbacks/minute.
+- [x] Add accepted/coalesced events/minute.
+- [x] Add persisted device updates/minute.
+- [x] Add signal samples written/minute.
+- [x] Add queue depth/high-water mark.
+- [x] Add queue-wait and processing-latency metrics.
+- [x] Replace `DROP_OLDEST` as an invisible correctness strategy.
+- [x] Introduce bounded latest-per-device coalescing for repeated pending advertisements.
+- [x] Keep the newest callback observation timestamp when queued work is coalesced or delayed.
+- [x] Keep persistence work off the Bluetooth callback path.
+- [x] Add synthetic burst evidence above expected dense-city traffic (10,000 observations across 100 devices, plus explicit unique-device capacity rejection coverage).
+- [x] Separate hardware lifecycle, ingest processing, diagnostics reduction and signal-sample persistence so the Phase 3 path no longer depends on new God objects.
+- [ ] Complete a varied-density real-device walk and preserve the process-lifetime Session Export JSON.
+- [ ] Collect Room database plus WAL/SHM and exact installed build evidence.
+- [ ] Reconcile field counters, confirm `queueDroppedTotal == 0`, inspect queue pressure/latency and verify DB/sample continuity.
 
 Design preference: do not process every advertisement as an independent expensive business event. Preserve raw counters and newest useful state, then perform heavier classification/persistence at a bounded rate.
 
-Exit criterion: stress test can state exactly how many events were received, coalesced, processed, persisted or intentionally discarded.
+Exit criterion: synthetic and real-device evidence can state exactly how many events were received, coalesced, processed, persisted or intentionally discarded, with no unexplained loss. Software criterion is met; physical evidence is still open.
 
 ---
 
@@ -651,6 +657,15 @@ Do not claim a runtime bug fixed only because unit tests/build are green when th
 ## 9. Work Log
 
 Append newest entries at the top of this section.
+
+### 2026-09-08 — Phase 3 software complete; structural hardening before field validation
+
+- Phase 3 ingest implementation landed at `52e386fef1010553648ced4e690267179fce0830`; canonical Quality #55 and rolling Tester Release passed for that implementation baseline.
+- Bounded latest-per-device coalescing replaces silent `DROP_OLDEST`; diagnostics now distinguish raw callbacks, accepted/rejected/coalesced work, processing outcomes, persistence/sample outcomes, queue pressure and latency.
+- A focused code-quality pass decomposes the critical path into hardware lifecycle (`BleScanner`), ingest (`ScanIngestPipeline`), metrics reduction (`ScannerIngestDiagnosticsReducer`) and signal-sample persistence (`SignalSamplePersister`) while preserving Phase 2 lifecycle and Phase 3 export semantics.
+- `docs/PHASE3_CODE_QUALITY_REVIEW.md` records architecture boundary checks, God-object decisions, deferred debt and the exact golden gate.
+- Prepublication JDK 21 sandbox evidence for the hardening diff: `git diff --check` PASS, `:core:data:detekt` PASS, `:core:data:testDebugUnitTest` PASS, full `qualityCheck` PASS and `:app:assembleDebug` PASS. Canonical exact-SHA GitHub CI remains the publication authority; the immutable checkpoint tag may be created only after those gates pass.
+- Phase 3 is **not closed** by software gates alone. Next action remains the engineering field collection and Room/export reconciliation in `docs/PHASE3_FIELD_COLLECTION.md`.
 
 ### 2026-09-06 — Phase 1 BLE Stable Core
 
