@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "20260908-v41816-selfupdate-probe-v1",
   "task_digest": "29ab8797d01f3e328168d86567b13365f9103206ef2129b692b4ba50fe36d2aa",
-  "idle_timeout": 60,
-  "task_timeout": 300,
-  "memory_limit_mb": 256,
-  "started_at": "2026-09-08T05:33:23.136203+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-08T05:33:26.416390+00:00",
   "attempt_id": "cc31576407b1c0e4b5e9cfa9",
   "daemon_version": "4.18.16",
   "daemon_pid": 5593,
-  "updated_at": "2026-09-08T05:33:23.136388+00:00",
+  "updated_at": "2026-09-08T05:33:26.741977+00:00",
   "pid": 5593
 }
