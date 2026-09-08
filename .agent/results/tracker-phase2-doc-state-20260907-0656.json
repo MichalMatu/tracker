@@ -1,9 +1,0 @@
-{
-  "id": "tracker-phase2-doc-state-20260907-0656",
-  "status": "failed",
-  "failure_reason": "invalid_task_file",
-  "started_at": null,
-  "finished_at": "2026-09-07T04:57:38.524380+00:00",
-  "daemon_version": "4.18.13",
-  "error": "ValueError: commands items must be non-empty strings"
-}
