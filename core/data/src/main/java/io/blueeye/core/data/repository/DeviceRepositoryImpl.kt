@@ -6,6 +6,7 @@ import io.blueeye.core.data.repository.handler.ble.BleScanHandler
 import io.blueeye.core.data.repository.handler.ble.SignalSamplePersistenceOutcome
 import io.blueeye.core.data.repository.handler.classic.ClassicScanHandler
 import io.blueeye.core.data.repository.handler.paired.ProbeResultHandler
+import io.blueeye.core.data.scanner.ScannerIngestEvent
 import io.blueeye.core.data.scanner.ScannerRuntimeDiagnosticsStore
 import io.blueeye.core.data.utils.asResult
 import io.blueeye.core.domain.repository.DeviceRepository
@@ -153,20 +154,22 @@ constructor(
             )
 
         if (outcome.provisionalDiscarded) {
-            ScannerRuntimeDiagnosticsStore.recordProvisionalDiscarded()
+            ScannerRuntimeDiagnosticsStore.recordIngest(ScannerIngestEvent.ProvisionalDiscarded)
         }
         outcome.persistenceOutcome?.let { persistence ->
-            ScannerRuntimeDiagnosticsStore.recordDevicePersistenceOutcome(
-                deviceUpdated = persistence.deviceUpdated,
-                deviceUpdateThrottled = persistence.deviceUpdateThrottled,
+            ScannerRuntimeDiagnosticsStore.recordIngest(
+                ScannerIngestEvent.DevicePersistence(
+                    deviceUpdated = persistence.deviceUpdated,
+                    deviceUpdateThrottled = persistence.deviceUpdateThrottled,
+                )
             )
             when (persistence.signalSampleOutcome) {
                 SignalSamplePersistenceOutcome.WRITTEN ->
-                    ScannerRuntimeDiagnosticsStore.recordSignalSampleWritten()
+                    ScannerRuntimeDiagnosticsStore.recordIngest(ScannerIngestEvent.SignalSample.WRITTEN)
                 SignalSamplePersistenceOutcome.THROTTLED ->
-                    ScannerRuntimeDiagnosticsStore.recordSignalSampleThrottled()
+                    ScannerRuntimeDiagnosticsStore.recordIngest(ScannerIngestEvent.SignalSample.THROTTLED)
                 SignalSamplePersistenceOutcome.FAILED ->
-                    ScannerRuntimeDiagnosticsStore.recordSignalSampleWriteFailed()
+                    ScannerRuntimeDiagnosticsStore.recordIngest(ScannerIngestEvent.SignalSample.FAILED)
             }
         }
     }

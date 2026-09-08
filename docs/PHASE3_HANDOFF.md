@@ -1,6 +1,8 @@
 # Phase 3 New-Chat Handoff — Ingest Observability
 
-Status: **READY TO START PHASE 3 IN A NEW CHAT**
+> **Historical kickoff note (2026-09-08):** Phase 3 software implementation has now landed. The old pipeline facts below describe the preimplementation state and must not be treated as current runtime truth. For current state use `STABILITY_RECOVERY_GUIDE.md`, `PHASE3_FIELD_COLLECTION.md` and `PHASE3_CODE_QUALITY_REVIEW.md`. Phase 3 remains open only for field validation/reconciliation.
+
+Status: **HISTORICAL KICKOFF — SOFTWARE IMPLEMENTED; FIELD VALIDATION PENDING**
 Repository: `MichalMatu/tracker` (`tracker`)
 Phase 2 implementation commit: `84b31d08bac81b6f46e44d11ccfe06071438b66a`
 Phase 2 closure-audit source baseline: `53c56fa54e92a713e555979f2d1778dc44dfaf98`

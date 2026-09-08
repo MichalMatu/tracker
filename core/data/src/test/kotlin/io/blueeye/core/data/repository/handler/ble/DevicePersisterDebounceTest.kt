@@ -30,14 +30,18 @@ class DevicePersisterDebounceTest {
     private val scanThrottler: ScanThrottler = mock()
     private val locationProvider: LocationProvider = mock()
     private val priorityHelper: DeviceTypePriorityHelper = mock()
+    private val signalSamplePersister = SignalSamplePersister(
+        signalSampleDao = signalSampleDao,
+        scanThrottler = scanThrottler,
+        locationProvider = locationProvider,
+    )
 
     private val persister = DevicePersister(
-        deviceDao,
-        signalSampleDao,
-        followMeObservationRecorder,
-        scanThrottler,
-        locationProvider,
-        priorityHelper
+        deviceDao = deviceDao,
+        followMeObservationRecorder = followMeObservationRecorder,
+        scanThrottler = scanThrottler,
+        priorityHelper = priorityHelper,
+        signalSamplePersister = signalSamplePersister,
     )
 
     @Test

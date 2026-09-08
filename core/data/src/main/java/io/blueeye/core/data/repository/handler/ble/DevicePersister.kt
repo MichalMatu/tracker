@@ -4,23 +4,14 @@ import android.util.Log
 import io.blueeye.core.data.classifier.AppleIdentityConflictGuard
 import io.blueeye.core.data.classifier.chipset.ChipsetIdentifier
 import io.blueeye.core.data.db.dao.DeviceDao
-import io.blueeye.core.data.db.dao.SignalSampleDao
 import io.blueeye.core.data.db.entity.DeviceEntity
-import io.blueeye.core.data.db.entity.SignalSampleEntity
 import io.blueeye.core.data.repository.handler.common.DeviceTypePriorityHelper
 import io.blueeye.core.data.util.NameUtils
-import io.blueeye.core.location.LocationProvider
 import io.blueeye.core.scanner.throttle.ScanThrottler
 import io.blueeye.core.scanner.throttle.ThrottleParams
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
-
-internal enum class SignalSamplePersistenceOutcome {
-    WRITTEN,
-    THROTTLED,
-    FAILED,
-}
 
 internal data class BlePersistenceOutcome(
     val deviceUpdated: Boolean,
@@ -32,17 +23,21 @@ private data class DevicePersistenceStageOutcome(
     val shouldRecordFollowMeObservation: Boolean,
     val deviceUpdated: Boolean,
     val deviceUpdateThrottled: Boolean,
-    val earlySignalSampleOutcome: SignalSamplePersistenceOutcome? = null,
 )
 
+/**
+ * Persists canonical device identity/scan state and Follow-Me tracking mutations.
+ *
+ * Signal-sample throttling and snapshot construction are delegated to [SignalSamplePersister];
+ * scanner lifecycle and ingest accounting live outside this class.
+ */
 @Singleton
 class DevicePersister @Inject constructor(
     private val deviceDao: DeviceDao,
-    private val signalSampleDao: SignalSampleDao,
     private val followMeObservationRecorder: FollowMeObservationRecorder,
     private val scanThrottler: ScanThrottler,
-    private val locationProvider: LocationProvider,
     private val priorityHelper: DeviceTypePriorityHelper,
+    private val signalSamplePersister: SignalSamplePersister,
 ) {
 
     internal suspend fun persist(
@@ -67,8 +62,7 @@ class DevicePersister @Inject constructor(
             followMeObservationRecorder.record(ctx)
         }
 
-        val signalSampleOutcome =
-            stageOutcome.earlySignalSampleOutcome ?: recordSignalSample(ctx, classifier)
+        val signalSampleOutcome = signalSamplePersister.persist(ctx, classifier)
         return BlePersistenceOutcome(
             deviceUpdated = stageOutcome.deviceUpdated,
             deviceUpdateThrottled = stageOutcome.deviceUpdateThrottled,
@@ -106,17 +100,10 @@ class DevicePersister @Inject constructor(
         val trackingChanged = updateTrackingIfChanged(ctx, existing)
 
         if (!scanThrottler.shouldUpdateDevice(params)) {
-            val earlySignalSampleOutcome =
-                if (scanThrottler.shouldWriteSample(ctx.mac, isPriorityDevice = isTactical)) {
-                    recordSignalSampleDirect(ctx, classifier)
-                } else {
-                    SignalSamplePersistenceOutcome.THROTTLED
-                }
             return DevicePersistenceStageOutcome(
                 shouldRecordFollowMeObservation = trackingChanged,
                 deviceUpdated = trackingChanged,
                 deviceUpdateThrottled = true,
-                earlySignalSampleOutcome = earlySignalSampleOutcome,
             )
         }
 
@@ -331,64 +318,6 @@ class DevicePersister @Inject constructor(
         return shouldUpdateTracking
     }
 
-    private suspend fun recordSignalSample(
-        ctx: ScanDataContext,
-        classifier: ScanResultClassifier,
-    ): SignalSamplePersistenceOutcome {
-        val isTactical = ctx.isTactical
-        return if (scanThrottler.shouldWriteSample(ctx.mac, isPriorityDevice = isTactical)) {
-            recordSignalSampleDirect(ctx, classifier)
-        } else {
-            SignalSamplePersistenceOutcome.THROTTLED
-        }
-    }
-
-    private suspend fun recordSignalSampleDirect(
-        ctx: ScanDataContext,
-        classifier: ScanResultClassifier,
-    ): SignalSamplePersistenceOutcome {
-        val location = locationProvider.getFreshCoordinates()
-        val sample = SignalSampleEntity(
-            deviceFingerprint = ctx.fingerprint,
-            observedMac = ctx.mac,
-            technology = ctx.technology,
-            deviceName = ctx.sanitizedName ?: ctx.name,
-            deviceType = classifier.resolveType(ctx).name,
-            vendorName = ctx.probeManufacturer ?: ctx.vendorName,
-            rssi = ctx.validRssi,
-            timestamp = ctx.timestamp,
-            latitude = location?.first,
-            longitude = location?.second,
-            locationAccuracy = location?.third,
-            manufacturerId = ctx.manufacturerId,
-            manufacturerDataHex = ctx.manufacturerData.toHexStringOrNull(),
-            manufacturerDataByIdHex = ctx.manufacturerRecords().toManufacturerHexEntries(),
-            serviceUuids = ctx.serviceUuids.toCsvOrNull(),
-            serviceDataByUuidHex = ctx.serviceDataRecords().toServiceDataHexEntries(),
-            appearance = ctx.appearance,
-            txPower = ctx.txPower,
-            isConnectable = ctx.isConnectable,
-            primaryPhy = ctx.primaryPhy,
-            secondaryPhy = ctx.secondaryPhy,
-            advertisingIntervalMs = ctx.advertisingInterval,
-            beaconType = ctx.beaconType,
-            rawDataHex = ctx.rawDataHex,
-            sensorData = SensorDataFormatter.format(ctx.sensorData),
-            trackingStatus = ctx.trackingStatus.name,
-            followingScore = ctx.followingScore,
-            isTactical = ctx.isTactical,
-            tacticalCategory = ctx.tacticalCategory,
-            probeError = ctx.probeError,
-        )
-        return try {
-            signalSampleDao.insert(sample)
-            SignalSamplePersistenceOutcome.WRITTEN
-        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-            Log.w(TAG, "Sample insert failed: ${e.message}")
-            SignalSamplePersistenceOutcome.FAILED
-        }
-    }
-
     private suspend fun mergeSecondaryRecordIfPresent(
         ctx: ScanDataContext,
         contextLabel: String,
@@ -430,31 +359,3 @@ private fun DeviceEntity.hasDifferentFollowMeComponents(ctx: ScanDataContext): B
         followMeEncounterScore != ctx.followMeEncounterScore ||
         followMeUserMoved != ctx.followMeUserMoved ||
         followMeBaselineDevice != ctx.followMeBaselineDevice
-
-private fun ByteArray?.toHexStringOrNull(): String? =
-    this?.takeIf { it.isNotEmpty() }?.joinToString("") { byte -> "%02X".format(byte) }
-
-private fun Map<Int, ByteArray>.toManufacturerHexEntries(): String? =
-    entries
-        .sortedBy { it.key }
-        .mapNotNull { (key, value) ->
-            value.toHexStringOrNull()?.let { hex -> "0x%04X=%s".format(key, hex) }
-        }
-        .joinToString(";")
-        .ifBlank { null }
-
-private fun Map<String, ByteArray>.toServiceDataHexEntries(): String? =
-    entries
-        .sortedBy { it.key }
-        .mapNotNull { (key, value) ->
-            value.toHexStringOrNull()?.let { hex -> "$key=$hex" }
-        }
-        .joinToString(";")
-        .ifBlank { null }
-
-private fun List<String>.toCsvOrNull(): String? =
-    map { it.trim() }
-        .filter { it.isNotBlank() }
-        .distinct()
-        .joinToString(",")
-        .ifBlank { null }

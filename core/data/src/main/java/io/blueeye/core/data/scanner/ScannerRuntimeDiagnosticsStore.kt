@@ -9,19 +9,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.ArrayDeque
 
-@Suppress("TooManyFunctions")
+/**
+ * Process-lifetime scanner diagnostics facade.
+ *
+ * Runtime/lifecycle state is owned here. Detailed ingest accounting is reduced by
+ * [ScannerIngestDiagnosticsReducer], which keeps queue/processing/persistence semantics separate
+ * from lifecycle publication and avoids one oversized metrics object.
+ */
 object ScannerRuntimeDiagnosticsStore {
     private const val WINDOW_MS = 60_000L
 
     private val lock = Any()
     private val bleEvents = ArrayDeque<Long>()
     private val classicEvents = ArrayDeque<Long>()
-    private val rawBleEvents = ArrayDeque<Long>()
-    private val enqueueAcceptedEvents = ArrayDeque<Long>()
-    private val coalescedEvents = ArrayDeque<Long>()
-    private val processedEvents = ArrayDeque<Long>()
-    private val persistedDeviceEvents = ArrayDeque<Long>()
-    private val signalSampleEvents = ArrayDeque<Long>()
+    private val ingestReducer = ScannerIngestDiagnosticsReducer()
     private val initializedAt = now()
     private val _diagnostics =
         MutableStateFlow(
@@ -41,7 +42,7 @@ object ScannerRuntimeDiagnosticsStore {
                 previous.copy(
                     state = state,
                     startedAt = state.startedAt(previous.startedAt, timestamp),
-                    ingest = previous.ingest.withRollingRates(timestamp),
+                    ingest = ingestReducer.refresh(previous.ingest, timestamp),
                     lastScanError = if (state is ScannerRuntimeState.Error) state.message else previous.lastScanError,
                     updatedAt = timestamp,
                 )
@@ -54,7 +55,7 @@ object ScannerRuntimeDiagnosticsStore {
             val previous = _diagnostics.value
             _diagnostics.value =
                 previous.copy(
-                    ingest = previous.ingest.withRollingRates(timestamp),
+                    ingest = ingestReducer.refresh(previous.ingest, timestamp),
                     lastLifecycleTransition = transition,
                     lastLifecycleTransitionAt = timestamp,
                     lifecycleTransitionCount = previous.lifecycleTransitionCount + 1,
@@ -70,29 +71,8 @@ object ScannerRuntimeDiagnosticsStore {
             _diagnostics.value =
                 previous.copy(
                     state = ScannerRuntimeState.Error(message),
-                    ingest = previous.ingest.withRollingRates(timestamp),
+                    ingest = ingestReducer.refresh(previous.ingest, timestamp),
                     lastScanError = message,
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordRawBleCallback(mac: String?) {
-        synchronized(lock) {
-            val timestamp = now()
-            rawBleEvents.addLast(timestamp)
-            val previous = _diagnostics.value
-            val ingest =
-                previous.ingest
-                    .copy(rawBleCallbacksTotal = previous.ingest.rawBleCallbacksTotal + 1)
-                    .withRollingRates(timestamp)
-            _diagnostics.value =
-                previous.copy(
-                    state = ScannerRuntimeState.Running,
-                    startedAt = previous.startedAt ?: timestamp,
-                    lastBleResultAt = timestamp,
-                    lastBleMac = mac,
-                    ingest = ingest,
                     updatedAt = timestamp,
                 )
         }
@@ -103,14 +83,13 @@ object ScannerRuntimeDiagnosticsStore {
         synchronized(lock) {
             val timestamp = now()
             bleEvents.addLast(timestamp)
-            prune(bleEvents, timestamp)
-            prune(classicEvents, timestamp)
+            refreshLegacyRates(timestamp)
             val previous = _diagnostics.value
             _diagnostics.value =
                 previous.copy(
                     bleResultsPerMinute = bleEvents.size,
                     classicResultsPerMinute = classicEvents.size,
-                    ingest = previous.ingest.withRollingRates(timestamp),
+                    ingest = ingestReducer.refresh(previous.ingest, timestamp),
                     updatedAt = timestamp,
                 )
         }
@@ -120,8 +99,7 @@ object ScannerRuntimeDiagnosticsStore {
         synchronized(lock) {
             val timestamp = now()
             classicEvents.addLast(timestamp)
-            prune(bleEvents, timestamp)
-            prune(classicEvents, timestamp)
+            refreshLegacyRates(timestamp)
             val previous = _diagnostics.value
             _diagnostics.value =
                 previous.copy(
@@ -131,229 +109,26 @@ object ScannerRuntimeDiagnosticsStore {
                     lastClassicMac = mac,
                     bleResultsPerMinute = bleEvents.size,
                     classicResultsPerMinute = classicEvents.size,
-                    ingest = previous.ingest.withRollingRates(timestamp),
+                    ingest = ingestReducer.refresh(previous.ingest, timestamp),
                     updatedAt = timestamp,
                 )
         }
     }
 
-    fun recordQueueAccepted(
-        queueDepth: Int,
-        queueHighWaterMark: Int,
-    ) {
-        synchronized(lock) {
-            val timestamp = now()
-            enqueueAcceptedEvents.addLast(timestamp)
-            val previous = _diagnostics.value
-            val ingest = previous.ingest
-            _diagnostics.value =
-                previous.copy(
-                    ingest =
-                        ingest.copy(
-                            enqueueAcceptedTotal = ingest.enqueueAcceptedTotal + 1,
-                            queueDepth = queueDepth.coerceAtLeast(0),
-                            queueHighWaterMark = maxOf(ingest.queueHighWaterMark, queueHighWaterMark),
-                        ).withRollingRates(timestamp),
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordQueueRejected() {
+    internal fun recordIngest(event: ScannerIngestEvent) {
         synchronized(lock) {
             val timestamp = now()
             val previous = _diagnostics.value
+            val rawBle = event as? ScannerIngestEvent.RawBleCallback
+            val dropped = event as? ScannerIngestEvent.QueueDropped
             _diagnostics.value =
                 previous.copy(
-                    ingest =
-                        previous.ingest.copy(
-                            enqueueRejectedTotal = previous.ingest.enqueueRejectedTotal + 1,
-                        ).withRollingRates(timestamp),
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordDroppedQueueEvents(
-        totalDropped: Long,
-        queueDepth: Int? = null,
-    ) {
-        synchronized(lock) {
-            val timestamp = now()
-            val previous = _diagnostics.value
-            _diagnostics.value =
-                previous.copy(
-                    droppedQueueEvents = totalDropped,
-                    ingest =
-                        previous.ingest.copy(
-                            queueDroppedTotal = totalDropped,
-                            queueDepth = queueDepth?.coerceAtLeast(0) ?: previous.ingest.queueDepth,
-                        ).withRollingRates(timestamp),
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordCoalescedEvent() {
-        synchronized(lock) {
-            val timestamp = now()
-            coalescedEvents.addLast(timestamp)
-            val previous = _diagnostics.value
-            _diagnostics.value =
-                previous.copy(
-                    ingest =
-                        previous.ingest.copy(
-                            coalescedTotal = previous.ingest.coalescedTotal + 1,
-                        ).withRollingRates(timestamp),
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordProcessingStarted(
-        queueDepth: Int,
-        queueWaitMs: Long,
-    ) {
-        synchronized(lock) {
-            val timestamp = now()
-            val previous = _diagnostics.value
-            val ingest = previous.ingest
-            val safeQueueWaitMs = queueWaitMs.coerceAtLeast(0L)
-            _diagnostics.value =
-                previous.copy(
-                    ingest =
-                        ingest.copy(
-                            processingStartedTotal = ingest.processingStartedTotal + 1,
-                            queueDepth = queueDepth.coerceAtLeast(0),
-                            lastQueueWaitMs = safeQueueWaitMs,
-                            totalQueueWaitMs = ingest.totalQueueWaitMs + safeQueueWaitMs,
-                            maxQueueWaitMs = maxOf(ingest.maxQueueWaitMs, safeQueueWaitMs),
-                        ).withRollingRates(timestamp),
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordProcessingSucceeded(processingDurationMs: Long) {
-        synchronized(lock) {
-            val timestamp = now()
-            processedEvents.addLast(timestamp)
-            val previous = _diagnostics.value
-            val ingest = previous.ingest
-            val safeDurationMs = processingDurationMs.coerceAtLeast(0L)
-            _diagnostics.value =
-                previous.copy(
-                    ingest =
-                        ingest.copy(
-                            processingSucceededTotal = ingest.processingSucceededTotal + 1,
-                            lastProcessingDurationMs = safeDurationMs,
-                            totalProcessingDurationMs = ingest.totalProcessingDurationMs + safeDurationMs,
-                            maxProcessingDurationMs = maxOf(ingest.maxProcessingDurationMs, safeDurationMs),
-                        ).withRollingRates(timestamp),
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordProcessingFailed(processingDurationMs: Long) {
-        synchronized(lock) {
-            val timestamp = now()
-            val previous = _diagnostics.value
-            val ingest = previous.ingest
-            val safeDurationMs = processingDurationMs.coerceAtLeast(0L)
-            _diagnostics.value =
-                previous.copy(
-                    ingest =
-                        ingest.copy(
-                            processingFailedTotal = ingest.processingFailedTotal + 1,
-                            lastProcessingDurationMs = safeDurationMs,
-                            totalProcessingDurationMs = ingest.totalProcessingDurationMs + safeDurationMs,
-                            maxProcessingDurationMs = maxOf(ingest.maxProcessingDurationMs, safeDurationMs),
-                        ).withRollingRates(timestamp),
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordProvisionalDiscarded() {
-        synchronized(lock) {
-            val timestamp = now()
-            val previous = _diagnostics.value
-            _diagnostics.value =
-                previous.copy(
-                    ingest =
-                        previous.ingest.copy(
-                            provisionalDiscardedTotal = previous.ingest.provisionalDiscardedTotal + 1,
-                        ).withRollingRates(timestamp),
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordDevicePersistenceOutcome(
-        deviceUpdated: Boolean,
-        deviceUpdateThrottled: Boolean,
-    ) {
-        synchronized(lock) {
-            val timestamp = now()
-            if (deviceUpdated) persistedDeviceEvents.addLast(timestamp)
-            val previous = _diagnostics.value
-            val ingest = previous.ingest
-            _diagnostics.value =
-                previous.copy(
-                    ingest =
-                        ingest.copy(
-                            persistedDeviceUpdatesTotal =
-                                ingest.persistedDeviceUpdatesTotal + if (deviceUpdated) 1 else 0,
-                            deviceUpdateThrottledTotal =
-                                ingest.deviceUpdateThrottledTotal + if (deviceUpdateThrottled) 1 else 0,
-                        ).withRollingRates(timestamp),
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordSignalSampleWritten() {
-        synchronized(lock) {
-            val timestamp = now()
-            signalSampleEvents.addLast(timestamp)
-            val previous = _diagnostics.value
-            _diagnostics.value =
-                previous.copy(
-                    ingest =
-                        previous.ingest.copy(
-                            signalSamplesWrittenTotal = previous.ingest.signalSamplesWrittenTotal + 1,
-                        ).withRollingRates(timestamp),
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordSignalSampleThrottled() {
-        synchronized(lock) {
-            val timestamp = now()
-            val previous = _diagnostics.value
-            _diagnostics.value =
-                previous.copy(
-                    ingest =
-                        previous.ingest.copy(
-                            signalSamplesThrottledTotal = previous.ingest.signalSamplesThrottledTotal + 1,
-                        ).withRollingRates(timestamp),
-                    updatedAt = timestamp,
-                )
-        }
-    }
-
-    fun recordSignalSampleWriteFailed() {
-        synchronized(lock) {
-            val timestamp = now()
-            val previous = _diagnostics.value
-            _diagnostics.value =
-                previous.copy(
-                    ingest =
-                        previous.ingest.copy(
-                            signalSampleWriteFailuresTotal = previous.ingest.signalSampleWriteFailuresTotal + 1,
-                        ).withRollingRates(timestamp),
+                    state = if (rawBle != null) ScannerRuntimeState.Running else previous.state,
+                    startedAt = if (rawBle != null) previous.startedAt ?: timestamp else previous.startedAt,
+                    lastBleResultAt = if (rawBle != null) timestamp else previous.lastBleResultAt,
+                    lastBleMac = if (rawBle != null) rawBle.mac else previous.lastBleMac,
+                    droppedQueueEvents = dropped?.totalDropped ?: previous.droppedQueueEvents,
+                    ingest = ingestReducer.reduce(previous.ingest, event, timestamp),
                     updatedAt = timestamp,
                 )
         }
@@ -371,21 +146,9 @@ object ScannerRuntimeDiagnosticsStore {
             -> previousStartedAt ?: timestamp
         }
 
-    private fun ScannerIngestDiagnostics.withRollingRates(timestamp: Long): ScannerIngestDiagnostics {
-        prune(rawBleEvents, timestamp)
-        prune(enqueueAcceptedEvents, timestamp)
-        prune(coalescedEvents, timestamp)
-        prune(processedEvents, timestamp)
-        prune(persistedDeviceEvents, timestamp)
-        prune(signalSampleEvents, timestamp)
-        return copy(
-            rawBleCallbacksPerMinute = rawBleEvents.size,
-            enqueueAcceptedPerMinute = enqueueAcceptedEvents.size,
-            coalescedPerMinute = coalescedEvents.size,
-            processedPerMinute = processedEvents.size,
-            persistedDeviceUpdatesPerMinute = persistedDeviceEvents.size,
-            signalSamplesWrittenPerMinute = signalSampleEvents.size,
-        )
+    private fun refreshLegacyRates(timestamp: Long) {
+        prune(bleEvents, timestamp)
+        prune(classicEvents, timestamp)
     }
 
     private fun prune(

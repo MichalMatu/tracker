@@ -1,6 +1,6 @@
 # Current Architecture
 
-> **Stabilization note (2026-09-07):** Phase 2 scanner/service lifecycle is accepted by software and physical-device gates. Recovery work must follow `STABILITY_RECOVERY_GUIDE.md`; Phase 3 ingest observability is next. The BLE-only Stable Core still takes precedence over older recommendations that keep Classic or active probing in the default path.
+> **Stabilization note (2026-09-08):** Phase 2 scanner/service lifecycle is accepted. Phase 3 software boundedness/observability and critical-path structural hardening are implemented; real-device field reconciliation is still required before Phase 4. Recovery work must follow `STABILITY_RECOVERY_GUIDE.md`. The BLE-only Stable Core still takes precedence over older recommendations that keep Classic or active probing in the default path.
 
 Status after tooling review: the project is modern Android in framework choices, but not yet clean in dependency direction.
 
@@ -31,6 +31,9 @@ Pipeline-specific issues are tracked in [PIPELINE_AUDIT.md](PIPELINE_AUDIT.md).
 - `feature:watchlist` no longer depends on `core:data`; public-safety-style signals go through `PublicSafetySignalMonitor`.
 - `feature:details` and `feature:settings` now depend on domain-facing repository contracts instead of `core:data`.
 - Phase 2 established one scanner lifecycle owner: direct `BleScanner` start/focused/passive/stop calls are confined to `ScannerService`, while feature modules use domain-facing scanner contracts.
+- Phase 3 separates `BleScanner` hardware lifecycle from `ScanIngestPipeline` queue/processing work; bounded latest-per-key buffering is independently testable.
+- Ingest metric semantics are isolated in `ScannerIngestDiagnosticsReducer`; `ScannerRuntimeDiagnosticsStore` is the synchronized publication facade rather than the counter God object.
+- Canonical device/tracking persistence remains in `DevicePersister`, while time-series RSSI/sample writes are isolated in `SignalSamplePersister`.
 - Evidence is a domain contract carried into Radar, Details, watchlist, export, and alert-history UI, including passive name/model/appearance/Class-of-Device/service/manufacturer context.
 - Navigation Compose uses serializable route types.
 - Basic Gradle quality gate exists.
@@ -47,11 +50,11 @@ Phase 2 resolved runtime ownership: direct `BleScanner` lifecycle calls are conf
 
 ### P1: `core:data` Is Too Broad
 
-`core:data` currently owns scanning, repositories, database, classification, tracking sessions, alerts, and foreground service control. This is workable for a prototype, but it is too large for long-term change safety.
+`core:data` still owns scanning, repositories, database, classification, tracking sessions, alerts, and foreground service control. This remains too broad for long-term change safety. The Phase 3 critical ingest path is now decomposed internally, which reduces immediate runtime coupling without pretending the entire module boundary is solved.
 
 ### P1/P2: Oversized Responsibilities Are Recorded Debt
 
-The Phase 2 closure re-audit identified several large files, led by `DeviceEvidenceFactory` (733 LOC / 27 functions), `DeviceCorrelationStrategy` (581 / 21), `DatabaseExporter` (572 / 22), `SettingsViewModel` (543 / 29) and multiple 450+ LOC Compose screens. `RfcommConnectionManager` also retains `GlobalScope`, and a Bose RFCOMM handler contains `Thread.sleep`. These are explicit debt, not hidden findings. See `PHASE2_CLOSURE_AUDIT.md` for the complete closure snapshot. Do not mix unrelated decomposition into Phase 3.
+The closure/hardening audits identify several large historical files, led by `DeviceEvidenceFactory`, `DeviceCorrelationStrategy`, `DatabaseExporter`, `SettingsViewModel`, `ScannerService` and multiple large Compose screens. `RfcommConnectionManager` also retains `GlobalScope`, and a Bose RFCOMM handler contains `Thread.sleep`. These are explicit debt, not hidden findings. The Phase 3 runtime hotspots were decomposed where doing so was behavior-preserving; unrelated areas remain deferred. See `PHASE2_CLOSURE_AUDIT.md` and `PHASE3_CODE_QUALITY_REVIEW.md`.
 
 ### P2: Tooling Debt Is Baseline-Gated
 

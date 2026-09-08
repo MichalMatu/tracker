@@ -1,11 +1,11 @@
 # Phase 3 Engineering Field Collection
 
-Status: **WAIT FOR GREEN EXACT-SHA BUILD**
+Status: **SOFTWARE READY; FIELD VALIDATION PENDING — USE ONLY THE EXACT-SHA GREEN TESTER BUILD**
 Scope: validate Phase 3 BLE ingest accounting and bounded latest-per-device coalescing on a real walk. This is engineering evidence for stability recovery; it does not unpause the general Field MVP checklist or advance identity/alert phases.
 
 ## Before the walk
 
-- Install the rolling tester APK only after the exact Phase 3 source SHA has green GitHub Quality, Secret Scan and Tester Release evidence.
+- Install the rolling tester APK only after the exact final Phase 3 hardening SHA has green GitHub Quality, Secret Scan and Tester Release evidence. Do not use an older Phase 3 APK once a newer hardening commit has replaced `latest-tester`.
 - Start scanning explicitly.
 - Open Settings diagnostics and confirm `Raw BLE/min` is non-zero in a place with nearby Bluetooth devices.
 - `Queue dropped` should remain `0`. A non-zero `Queue rejected` is allowed only under true unique-device capacity exhaustion and must be investigated.

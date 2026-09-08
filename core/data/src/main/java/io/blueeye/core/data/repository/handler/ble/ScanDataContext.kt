@@ -14,7 +14,8 @@ import io.blueeye.core.scanner.model.BleScanResultData
  * 1. MacAddressResolver - resolves vendor, MAC type, and carryover
  * 2. DeviceEnricher - decodes sensors, vendors, tactical data
  * 3. ScanResultClassifier - determines device type and beacon
- * 4. DevicePersister - saves to database
+ * 4. DevicePersister - persists canonical device/tracking state
+ * 5. SignalSamplePersister - persists throttled time-series signal snapshots
  */
 data class ScanDataContext(
     // ========== INPUT (immutable from scan) ==========
