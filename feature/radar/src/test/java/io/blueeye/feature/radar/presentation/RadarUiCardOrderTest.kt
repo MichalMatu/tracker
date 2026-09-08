@@ -9,30 +9,48 @@ import org.junit.Test
 
 class RadarUiCardOrderTest {
     @Test
-    fun `strong nearby devices sort before newer weak devices`() {
-        val sorted =
+    fun `live rssi changes do not reorder existing cards`() {
+        val initial =
             listOf(
-                item(fingerprint = "weak-new", displayName = "A weak", rssi = -93, firstSeenAt = NOW + 2_000),
-                item(fingerprint = "strong-old", displayName = "B strong", rssi = -52, firstSeenAt = NOW),
+                item(fingerprint = "older", displayName = "Older", rssi = -45, firstSeenAt = NOW),
+                item(fingerprint = "newer", displayName = "Newer", rssi = -95, firstSeenAt = NOW + 2_000),
             ).sortedWith(RadarUiCardOrder.comparator)
 
-        assertEquals(listOf("strong-old", "weak-new"), sorted.map { it.fingerprint })
+        val afterRssiSwap =
+            listOf(
+                item(fingerprint = "older", displayName = "Older", rssi = -99, firstSeenAt = NOW),
+                item(fingerprint = "newer", displayName = "Newer", rssi = -35, firstSeenAt = NOW + 2_000),
+            ).sortedWith(RadarUiCardOrder.comparator)
+
+        assertEquals(initial.map { it.fingerprint }, afterRssiSwap.map { it.fingerprint })
     }
 
     @Test
-    fun `same signal bucket uses rssi before recency`() {
-        val sorted =
+    fun `last seen updates do not reorder existing cards`() {
+        val initial =
             listOf(
-                item(
-                    fingerprint = "medium-weaker-new",
-                    displayName = "A medium",
-                    rssi = -78,
-                    firstSeenAt = NOW + 2_000,
-                ),
-                item(fingerprint = "medium-stronger-old", displayName = "B medium", rssi = -65, firstSeenAt = NOW),
+                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW).withLastSeen(NOW + 10_000),
+                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000).withLastSeen(NOW),
             ).sortedWith(RadarUiCardOrder.comparator)
 
-        assertEquals(listOf("medium-stronger-old", "medium-weaker-new"), sorted.map { it.fingerprint })
+        val afterLastSeenSwap =
+            listOf(
+                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW).withLastSeen(NOW),
+                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000).withLastSeen(NOW + 20_000),
+            ).sortedWith(RadarUiCardOrder.comparator)
+
+        assertEquals(initial.map { it.fingerprint }, afterLastSeenSwap.map { it.fingerprint })
+    }
+
+    @Test
+    fun `newer discovery appears before older discovery regardless of signal`() {
+        val sorted =
+            listOf(
+                item(fingerprint = "older-strong", displayName = "Older", rssi = -35, firstSeenAt = NOW),
+                item(fingerprint = "newer-weak", displayName = "Newer", rssi = -95, firstSeenAt = NOW + 2_000),
+            ).sortedWith(RadarUiCardOrder.comparator)
+
+        assertEquals(listOf("newer-weak", "older-strong"), sorted.map { it.fingerprint })
     }
 
     @Test
@@ -81,6 +99,15 @@ class RadarUiCardOrderTest {
             isNew = priority == RadarItemPriority.NEW,
             activeProbeMac = null,
         )
+
+    private fun RadarUiItem.withLastSeen(lastSeenAt: Long): RadarUiItem {
+        return copy(
+            device =
+                device.copy(
+                    lastSeenAt = lastSeenAt,
+                ),
+        )
+    }
 
     private enum class RadarItemPriority {
         ORDINARY,
