@@ -1,0 +1,15 @@
+{
+  "id": "tracker-ui-emulator-probe-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 300,
+  "idle_timeout": 300,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; EXPECTED='d7c792ff0a591011fa64c86e2f37bb85a111687f'; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; printf 'adb='; command -v adb || true; printf 'emulator='; command -v emulator || true; if command -v adb >/dev/null; then adb version; adb devices -l; fi; if command -v emulator >/dev/null; then emulator -version | head -3; printf 'avds:\n'; emulator -list-avds; fi; printf 'sdk_root=%s\n' \"${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}\"; find \"${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/nonexistent}}\" -maxdepth 3 -type d -name 'system-images' -o -name 'platform-tools' 2>/dev/null | head -20 || true"
+  ]
+}
