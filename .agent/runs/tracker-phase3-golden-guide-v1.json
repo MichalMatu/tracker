@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-golden-guide-v1",
+  "task_digest": "02d5778c4443014268eb42e17504fb2e6c42279a8875500d745b2d7456c56a23",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-08T08:47:31.451555+00:00",
+  "attempt_id": "e6c6fc800545b044b7779d1c",
+  "daemon_version": "4.18.18",
+  "daemon_pid": 50369,
+  "updated_at": "2026-09-08T08:47:31.451693+00:00",
+  "pid": 50369
+}
