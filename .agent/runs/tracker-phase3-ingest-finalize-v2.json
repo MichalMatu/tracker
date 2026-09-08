@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "tracker-phase3-ingest-finalize-v2",
   "task_digest": "2cae37ca14760769b512598af10c3c182f85351d36df15de15af77296345afe8",
-  "idle_timeout": 600,
-  "task_timeout": 7200,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-08T07:21:35.848902+00:00",
+  "status": "failed",
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-08T07:21:38.162718+00:00",
   "attempt_id": "b46e4cc41db1cb896ce5354c",
   "daemon_version": "4.18.17",
   "daemon_pid": 79256,
-  "updated_at": "2026-09-08T07:21:35.849041+00:00",
+  "updated_at": "2026-09-08T07:21:38.472514+00:00",
   "pid": 79256
 }
