@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-golden-checkpoint-tag-v1",
+  "task_digest": "d6e1adae86780c837a45d241b9caa952db57050ab348ad0e6893f94d0059ae52",
+  "idle_timeout": 300,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-08T11:24:30.159421+00:00",
+  "attempt_id": "11c17ca4c3172fd0e2085049",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 91264,
+  "updated_at": "2026-09-08T11:24:30.159474+00:00",
+  "pid": 91264
+}
