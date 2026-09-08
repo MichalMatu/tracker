@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-ingest-finalize-v4",
+  "task_digest": "a232c31fb64cad99bf126a769523aed2cf11e68b7c3eaf76de1504bea124428f",
+  "idle_timeout": 600,
+  "task_timeout": 12000,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-08T07:31:21.965926+00:00",
+  "attempt_id": "000204b63b6478ca7f0d7b38",
+  "daemon_version": "4.18.17",
+  "daemon_pid": 85786,
+  "updated_at": "2026-09-08T07:31:21.966067+00:00",
+  "pid": 85786
+}
