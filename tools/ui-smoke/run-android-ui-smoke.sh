@@ -9,9 +9,48 @@ rm -f "$OUT"/*.png "$OUT"/*.xml "$OUT"/*.log 2>/dev/null || true
 
 log() { printf '[ui-smoke] %s\n' "$*"; }
 
-dump_ui() {
+raw_dump_ui() {
   adb shell uiautomator dump /sdcard/blueeye-ui.xml >/dev/null
   adb exec-out cat /sdcard/blueeye-ui.xml > "$XML"
+}
+
+capture_failure() {
+  raw_dump_ui || true
+  cp "$XML" "$OUT/failure.xml" 2>/dev/null || true
+  adb exec-out screencap -p > "$OUT/failure.png" 2>/dev/null || true
+  adb logcat -d > "$OUT/failure-logcat.log" 2>/dev/null || true
+}
+
+dismiss_foreign_system_dialog() {
+  raw_dump_ui
+  if grep -Fq "isn't responding" "$XML" || grep -Fq "keeps stopping" "$XML"; then
+    if grep -Eiq 'BlueEye|io\.blueeye' "$XML"; then
+      log "BlueEye system error dialog detected"
+      capture_failure
+      return 1
+    fi
+
+    local action=''
+    local dialog_coords="$OUT/system-dialog.coords"
+    if python3 "$ROOT/tools/ui-smoke/ui_node.py" "$XML" text "Close app" > "$dialog_coords" 2>/dev/null; then
+      action='Close app'
+    elif python3 "$ROOT/tools/ui-smoke/ui_node.py" "$XML" text "Wait" > "$dialog_coords" 2>/dev/null; then
+      action='Wait'
+    fi
+
+    if [[ -n "$action" ]]; then
+      local x y
+      read -r x y < "$dialog_coords"
+      log "dismiss foreign system dialog via '$action' at $x,$y"
+      adb shell input tap "$x" "$y"
+      sleep 1
+    fi
+  fi
+}
+
+dump_ui() {
+  dismiss_foreign_system_dialog || return 1
+  raw_dump_ui
 }
 
 coords() {
@@ -36,10 +75,7 @@ wait_target() {
     sleep 1
   done
   log "missing target: $attribute=$value"
-  dump_ui || true
-  cp "$XML" "$OUT/failure.xml" || true
-  adb exec-out screencap -p > "$OUT/failure.png" 2>/dev/null || true
-  adb logcat -d > "$OUT/failure-logcat.log" 2>/dev/null || true
+  capture_failure
   return 1
 }
 
