@@ -38,6 +38,8 @@ wait_target() {
   log "missing target: $attribute=$value"
   dump_ui || true
   cp "$XML" "$OUT/failure.xml" || true
+  adb exec-out screencap -p > "$OUT/failure.png" 2>/dev/null || true
+  adb logcat -d > "$OUT/failure-logcat.log" 2>/dev/null || true
   return 1
 }
 
@@ -135,7 +137,7 @@ done
 
 adb logcat -c
 adb shell am start -W -n io.blueeye/.MainActivity | tee "$OUT/launch.log"
-wait_target text "UI Smoke Watch"
+wait_target text "Walk bag tag"
 assert_alive
 shot 01-radar-seeded
 

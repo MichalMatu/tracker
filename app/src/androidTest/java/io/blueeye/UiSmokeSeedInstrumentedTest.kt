@@ -37,56 +37,59 @@ class UiSmokeSeedInstrumentedTest {
             }
         }
 
-    private fun smokeDevices(): List<DeviceEntity> =
-        listOf(
-            baseDevice(1, "UI Smoke Watch").copy(
+    private fun smokeDevices(): List<DeviceEntity> {
+        val now = System.currentTimeMillis()
+        return listOf(
+            baseDevice(1, "UI Smoke Watch", now).copy(
                 isInWatchlist = true,
                 userAlias = "Walk bag tag",
                 deviceType = DeviceType.TRACKER,
                 lastRssi = -54,
             ),
-            baseDevice(2, "UI Smoke Watch Two").copy(
+            baseDevice(2, "UI Smoke Watch Two", now).copy(
                 isInWatchlist = true,
                 deviceType = DeviceType.BEACON,
                 lastRssi = -67,
             ),
-            baseDevice(3, "UI Smoke Suspicious").copy(
+            baseDevice(3, "UI Smoke Suspicious", now).copy(
                 trackingStatus = TrackingStatus.SUSPICIOUS,
                 followingScore = 78f,
                 deviceType = DeviceType.TRACKER,
                 lastRssi = -72,
             ),
-            baseDevice(4, "UI Smoke Phone").copy(
+            baseDevice(4, "UI Smoke Phone", now).copy(
                 deviceType = DeviceType.PHONE,
                 vendorName = "Smoke Mobile",
                 lastRssi = -42,
             ),
-            baseDevice(5, "UI Smoke Headphones").copy(
+            baseDevice(5, "UI Smoke Headphones", now).copy(
                 deviceType = DeviceType.HEADPHONES,
                 vendorName = "Smoke Audio",
                 lastRssi = -61,
             ),
-            baseDevice(6, "UI Smoke Sensor").copy(
+            baseDevice(6, "UI Smoke Sensor", now).copy(
                 deviceType = DeviceType.SENSOR,
                 sensorData = "Temp: 21.5C, Battery: 91%",
                 lastRssi = -83,
             ),
-            baseDevice(7, "UI Smoke Nearby").copy(
+            baseDevice(7, "UI Smoke Nearby", now).copy(
                 deviceType = DeviceType.BEACON,
                 vendorName = "Smoke Labs",
                 lastRssi = -88,
             ),
-            baseDevice(8, "UI Smoke Unknown").copy(
+            baseDevice(8, "UI Smoke Unknown", now).copy(
                 deviceType = DeviceType.UNKNOWN,
                 lastRssi = -96,
             ),
         )
+    }
 
     private fun baseDevice(
         index: Int,
         name: String,
+        now: Long,
     ): DeviceEntity {
-        val observedAt = NOW - index * MINUTE_MS
+        val observedAt = now - index * MINUTE_MS
         return DeviceEntity(
             fingerprint = "ui-smoke-$index",
             lastMacAddress = "02:00:00:00:00:${index.toString().padStart(2, '0')}",
@@ -103,7 +106,6 @@ class UiSmokeSeedInstrumentedTest {
     }
 
     private companion object {
-        private const val NOW = 1_789_000_000_000L
         private const val MINUTE_MS = 60_000L
         private const val HOUR_MS = 3_600_000L
     }
