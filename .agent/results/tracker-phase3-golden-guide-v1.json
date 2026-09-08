@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-golden-guide-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-08T08:47:31.451628+00:00",
+  "command_timeout": 600,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test \"$(git rev-parse HEAD)\" = \"f88ce7a18e25751f5460174dbf970035d4695df6\"; test -z \"$(git status --porcelain)\"; git fetch origin agent-control; git show origin/agent-control:.agent/payloads/phase3-golden-guide.patch > /tmp/phase3-golden-guide.patch; git apply --check /tmp/phase3-golden-guide.patch; git apply /tmp/phase3-golden-guide.patch; test \"$(git hash-object docs/STABILITY_RECOVERY_GUIDE.md)\" = \"347a0963da07a5f2dd3837a36445c65bb71317fc\"; git diff --check; test \"$(git diff --name-only)\" = \"docs/STABILITY_RECOVERY_GUIDE.md\"; git add docs/STABILITY_RECOVERY_GUIDE.md; git diff --cached --check; git commit -m 'Update Phase 3 recovery status'; git push origin HEAD:main; git rev-parse HEAD",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            agent-control -> FETCH_HEAD\n   617f55d..a82fecd  agent-control -> origin/agent-control\n[agent-work d7c792f] Update Phase 3 recovery status\n 1 file changed, 29 insertions(+), 14 deletions(-)\nTo https://github.com/MichalMatu/tracker.git\n   f88ce7a..d7c792f  HEAD -> main\nd7c792ff0a591011fa64c86e2f37bb85a111687f\n",
+      "elapsed_seconds": 3.507,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 18.03,
+      "output_policy": "stream",
+      "captured_output_chars": 374,
+      "output_truncated": false,
+      "current_rss_mb": 18.03,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 3.507
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.107
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.078
+  },
+  "finished_at": "2026-09-08T08:47:37.279623+00:00",
+  "task_digest": "02d5778c4443014268eb42e17504fb2e6c42279a8875500d745b2d7456c56a23",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 1024,
+  "attempt_id": "e6c6fc800545b044b7779d1c",
+  "daemon_version": "4.18.18"
+}
