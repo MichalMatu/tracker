@@ -132,6 +132,8 @@ Before local execution, read `.agent/binding.json` and `.agent/status/daemon.jso
 
 Queue local tasks as `.agent/tasks/<unique-id>.json`; inspect `.agent/runs/<id>.json` and the terminal `.agent/results/<id>.json`. Never edit the daemon's local control clone. Interrupted tasks are not replayed; a changed payload or intentional retry needs a new id. Every executable task in this repository uses `resources: []`, including ADB/install/logcat and physical-device work; detect and verify the intended device inside the task. Do not declare named resources or `machine` from this repository. The RSS bound is independent from resource classification. Preserve Gradle/build caches and checkpoint dirty workspaces before cleanup. Do not restart or self-update the shared supervisor from a repository task.
 
+When a Local Agent task is active and healthy, do not queue a duplicate or poll it every 30 seconds. With Chat Bridge, use no sooner than about two minutes for an early liveness re-check and normally 5-10 minutes for multi-minute Gradle/build/test work unless exact evidence supports a nearer completion. If exact current run/status evidence proves that the active task cannot achieve its intended outcome, publish repository-scoped `cancel_task` for that exact task id, wait for cancellation/terminal result evidence, and only then queue replacement work. Explicit `NEXT=30s` remains available for deliberate operator/emergency use.
+
 The onboarding probe verifies local execution and result publication; it is not evidence of an Android build or device test.
 
 ### Direct GitHub work and local execution
