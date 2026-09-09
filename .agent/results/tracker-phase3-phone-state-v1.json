@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-phone-state-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-09T02:21:50.220527+00:00",
+  "command_timeout": 180,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; EXPECTED='eb10cdd70039e82d09cc03231b52ad851fe42546'; PKG='io.blueeye'; git fetch --no-tags origin main >/dev/null; test \"$(git rev-parse origin/main)\" = \"${EXPECTED}\"; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test -n \"${SERIAL}\"; echo '--- granted runtime permissions ---'; adb -s \"${SERIAL}\" shell dumpsys package \"${PKG}\" | grep -E 'android.permission.(BLUETOOTH_SCAN|BLUETOOTH_CONNECT|ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|POST_NOTIFICATIONS).*granted=' || true; echo '--- bluetooth state ---'; adb -s \"${SERIAL}\" shell settings get global bluetooth_on; adb -s \"${SERIAL}\" shell dumpsys bluetooth_manager | grep -E -m 12 'enabled:|state:|mEnable|name:' || true; echo '--- current UI text/semantics ---'; TMP=$(mktemp -d); trap 'rm -rf \"${TMP}\"' EXIT; adb -s \"${SERIAL}\" shell uiautomator dump /sdcard/blueeye-window.xml >/dev/null; adb -s \"${SERIAL}\" pull /sdcard/blueeye-window.xml \"${TMP}/window.xml\" >/dev/null; python3 - \"${TMP}/window.xml\" <<'PY'\nimport sys, xml.etree.ElementTree as ET\nroot=ET.parse(sys.argv[1]).getroot()\nseen=[]\nfor n in root.iter('node'):\n    t=(n.attrib.get('text') or '').strip(); d=(n.attrib.get('content-desc') or '').strip()\n    for kind,val in [('text',t),('desc',d)]:\n        if val and (kind,val) not in seen:\n            seen.append((kind,val))\nfor kind,val in seen[:160]: print(f'{kind}: {val}')\nPY\necho '--- app services/process ---'; adb -s \"${SERIAL}\" shell pidof \"${PKG}\" || true; adb -s \"${SERIAL}\" shell dumpsys activity services \"${PKG}\" | grep -E -m 80 'ServiceRecord|foreground|io.blueeye|bluetooth|scan' || true; echo 'PHONE_STATE_CAPTURE=PASS'",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\n* daemon not running; starting now at tcp:5037\n* daemon started successfully\n--- granted runtime permissions ---\n        android.permission.POST_NOTIFICATIONS: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n        android.permission.ACCESS_FINE_LOCATION: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|524288]\n        android.permission.BLUETOOTH_CONNECT: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n        android.permission.ACCESS_COARSE_LOCATION: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n        android.permission.BLUETOOTH_SCAN: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n--- bluetooth state ---\n1\n  enabled: true\n  state: ON\n  name: Device\n  time since enabled: 25:42:50.993\n  mEnable:true\n  mEnableExternal:true\n      09-09 01:17:12.640 state: 1, pos: 0, id: -1\n      09-09 01:17:12.689 state: 1, pos: 0, id: -1\n      09-09 01:36:16.692 state: 1, pos: 0, id: -1\n      09-09 04:12:59.761 state: 1, pos: 0, id: -1\n      09-09 04:12:59.842 state: 1, pos: 0, id: -1\n      09-08 09:00:53.917 state: 3, pos: 3005, id: 0\n--- current UI text/semantics ---\n/sdcard/blueeye-window.xml: 1 file pulled, 0 skipped. 10.5 MB/s (36462 bytes in 0.003s)\ntext: All 10\ntext: Watchlist 0\ntext: Suspicious 1\ntext: Public Safety Signals 0\ntext: Nearby\ntext: Identified devices without attention evidence.\ntext: No attention\ntext: 9\ntext: TP357S (7620)\ntext: -60\ntext: Seen now • RSSI -60 dBm\ntext: BLE\ntext: STATIC-R\ntext: PENDING\ntext: 24.7°C\ntext: Low confidence\ntext: Source: Name - BLE ad\ntext: Device advertised a Bluetooth name.\ntext: Value: TP357S (7620)\ntext: Name BLE ad\ntext: Payload BLE ad\ndesc: Details\ndesc: Calibrate\ndesc: Watch device\ntext: ATC_4F24CD\ntext: -72\ntext: Seen 2s • RSSI -72 dBm\ntext: PUBLIC\ntext: Value: ATC_4F24CD\ntext: Service BLE ad\ntext: LE-Bose QC Ultra Headphones\ntext: -50\ntext: HEADPHONES\ntext: Seen now • RSSI -50 dBm\ntext: Medium confidence\ntext: Source: Service - BLE ad\ntext: Bluetooth service UUIDs observed via BLE advertisement are consistent with Bose Device (Service). Use this as classification context, not as a risk signal.\ndesc: Menu\ntext: 1 needs review / 10 seen\ntext: Review tracker-like evidence - 1 suspicious / 9 nearby\ndesc: Scan\ndesc: Baseline\ndesc: Start active GATT collection\ndesc: Filter\ndesc: Clear\n--- app services/process ---\n32105\n  * ServiceRecord{cb16ad9 u0 io.blueeye/.service.ScannerService c:io.blueeye}\n    intent={act=ACTION_START cmp=io.blueeye/.service.ScannerService}\n    packageName=io.blueeye\n    processName=io.blueeye\n    baseDir=/data/app/~~ojMggce65f9Pirv9RBxVAg==/io.blueeye-CcI7E7Qne1-6LOZpS4r3cg==/base.apk\n    dataDir=/data/user/0/io.blueeye\n    app=ProcessRecord{13fa357 32105:io.blueeye/u0a647}\n    recentCallingPackage=io.blueeye\n    infoAllowStartForeground=[callingPackage: io.blueeye; callingUid: 10647; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { act=ACTION_START xflg=0x4 cmp=io.blueeye/.service.ScannerService }; code:PROC_STATE_TOP; tempAllowListReason:<null>; allowWiu:12; targetSdkVersion:33; callerTargetSdkVersion:33; startForegroundCount:0; bindFromPackage:null: isBindService:false]\n    isForeground=true foregroundId=101 types=0x00000010 foregroundNoti=Notification(channel=scanner_channel shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|NO_CLEAR|FOREGROUND_SERVICE color=0x00000000 actions=1 vis=PRIVATE semFlags=0x0 semPriority=0 semMissedCount=0)\nPHONE_STATE_CAPTURE=PASS\n",
+      "elapsed_seconds": 7.819,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 13.48,
+      "output_policy": "stream",
+      "captured_output_chars": 3708,
+      "output_truncated": false,
+      "current_rss_mb": 9.67,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 7.819
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.112
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.071
+  },
+  "finished_at": "2026-09-09T02:21:59.630359+00:00",
+  "task_digest": "8998ce8bd0b23e8457f05fffe791f3291357db45fbbfed05c9b51baf6e5446d0",
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "memory_limit_mb": 512,
+  "attempt_id": "b31472cd0cc12bc5a5d94806",
+  "daemon_version": "4.18.19"
+}
