@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-inspect-backup-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 512,
+  "command_timeout": 180,
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; B='/tmp/BlueEye-Tracker-pre-update-data.tar'; test -f \"$B\"; H=$(shasum -a 256 \"$B\" | awk '{print $1}'); echo backup_sha256=$H; test \"$H\" = '2dadcc5a56f23adaa99e23655bc101f9261a5f0fa659f01d04c1aa4f05b42582'; echo TAR_LIST; tar tf \"$B\" | head -n 80; D=$(mktemp -d); trap 'rm -rf \"$D\"' EXIT; tar xf \"$B\" -C \"$D\"; DB=$(find \"$D\" -name tracker_database -type f | head -n1); test -n \"$DB\"; echo DB=$DB; sqlite3 \"$DB\" 'PRAGMA integrity_check; select count(*) as devices from devices; select count(*) as signal_samples from signal_samples; select count(*) as follow_me_observations from follow_me_observations;'; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test -n \"$SERIAL\"; echo RUN_AS_PWD; adb -s \"$SERIAL\" shell run-as io.blueeye pwd; echo CURRENT_DATA; adb -s \"$SERIAL\" shell run-as io.blueeye find . -maxdepth 2 -type f -o -type d | head -n 100"
+  ]
+}
