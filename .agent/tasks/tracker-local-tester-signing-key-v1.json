@@ -1,0 +1,15 @@
+{
+  "id": "tracker-local-tester-signing-key-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 256,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; DIR=\"$HOME/.local/share/blueeye-tracker/signing\"; KS=\"$DIR/tester.p12\"; PW=\"$DIR/tester.password\"; ALIAS=blueeye-tester; mkdir -p \"$DIR\"; chmod 700 \"$DIR\"; if [ ! -s \"$KS\" ] || [ ! -s \"$PW\" ]; then PASS=$(openssl rand -hex 24); printf '%s' \"$PASS\" > \"$PW\"; chmod 600 \"$PW\"; keytool -genkeypair -keystore \"$KS\" -storetype PKCS12 -storepass \"$PASS\" -keypass \"$PASS\" -alias \"$ALIAS\" -keyalg RSA -keysize 4096 -validity 36500 -dname 'CN=BlueEye Tracker Tester, OU=Stabilization, O=BlueEye, C=PL' >/dev/null 2>&1; chmod 600 \"$KS\"; echo created=1; else PASS=$(cat \"$PW\"); echo created=0; fi; CERT_SHA=$(keytool -list -v -keystore \"$KS\" -storepass \"$PASS\" -alias \"$ALIAS\" | awk -F': ' '/SHA256:/{print $2; exit}' | tr -d ':' | tr 'A-F' 'a-f'); echo tester_cert_sha256=$CERT_SHA; stat -f 'keystore_mode=%Sp keystore_size=%z' \"$KS\"; stat -f 'password_mode=%Sp password_size=%z' \"$PW\""
+  ]
+}
