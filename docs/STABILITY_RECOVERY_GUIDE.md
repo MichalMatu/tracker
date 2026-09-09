@@ -17,7 +17,7 @@
 
 ### NEXT ACTION
 
-- [ ] Phase 3 field validation/closure — software ingest boundedness, observability and structural hardening are complete. Run `docs/PHASE3_FIELD_COLLECTION.md`, preserve Session Export JSON, collect Room/WAL/SHM, reconcile the counters and close Phase 3 before starting Phase 4.
+- [ ] Install the immutable pre-field tester `v1.0.0-phase3-pre-field.1` from README, launch it on the phone and connect USB/ADB. Capture exact installed-build identity plus a non-destructive BlueEye logcat/runtime baseline, then run `docs/PHASE3_FIELD_COLLECTION.md`, preserve Session Export JSON and Room/WAL/SHM, reconcile the counters and close Phase 3 before starting Phase 4.
 
 When the next task is completed, update this line to the next unfinished item and add an entry to the Work Log at the bottom of this file.
 
@@ -309,7 +309,7 @@ Physical lifecycle evidence: Samsung SM-S906B, Android 16 / SDK 36. Clean R3 acc
 
 Purpose: no observation may disappear without a counter explaining why.
 
-Status: **SOFTWARE IMPLEMENTATION + STRUCTURAL HARDENING COMPLETE; FIELD VALIDATION PENDING.** See `PHASE3_FIELD_COLLECTION.md` and `PHASE3_CODE_QUALITY_REVIEW.md`.
+Status: **SOFTWARE IMPLEMENTATION + STRUCTURAL HARDENING + EMULATOR UI E2E COMPLETE; PHYSICAL FIELD VALIDATION PENDING.** See `PHASE3_PRE_FIELD_GOLDEN.md`, `PHASE3_FIELD_COLLECTION.md` and `PHASE3_CODE_QUALITY_REVIEW.md`.
 
 Checklist:
 
@@ -326,6 +326,8 @@ Checklist:
 - [x] Keep persistence work off the Bluetooth callback path.
 - [x] Add synthetic burst evidence above expected dense-city traffic (10,000 observations across 100 devices, plus explicit unique-device capacity rejection coverage).
 - [x] Separate hardware lifecycle, ingest processing, diagnostics reduction and signal-sample persistence so the Phase 3 path no longer depends on new God objects.
+- [x] Stabilize live Radar card order so volatile RSSI/`lastSeenAt` updates cannot continuously move existing cards under the user.
+- [x] Add Android emulator UI smoke and pass the full Radar/Details/Watchlist/Settings click-through, including real Watchlist tracking/remove actions and app FATAL/ANR checks.
 - [ ] Complete a varied-density real-device walk and preserve the process-lifetime Session Export JSON.
 - [ ] Collect Room database plus WAL/SHM and exact installed build evidence.
 - [ ] Reconcile field counters, confirm `queueDroppedTotal == 0`, inspect queue pressure/latency and verify DB/sample continuity.
@@ -655,6 +657,15 @@ Do not claim a runtime bug fixed only because unit tests/build are green when th
 ---
 
 ## 9. Work Log
+
+### 2026-09-09 — Pre-field Radar/UI stabilization and emulator E2E
+
+- Fixed live Radar list jitter by removing volatile RSSI and `lastSeenAt` from card ordering while preserving meaningful priority changes.
+- Added stable-order regression coverage and Android emulator UI smoke with deterministic Room seed, UIAutomator click-through, screenshots/UI XML and logcat failure detection.
+- Hardened state-dependent navigation and made Watchlist coverage use real `WatchlistEntity` rows with mandatory tracking/remove actions.
+- Production-code E2E checkpoint `61659c3d516c3e1c0713d9c1d1ce50ba1d6c0893` passed Quality #66, Secret Scan #96, Tester Release #23 and Android UI Smoke #7 with 21 screenshots and no BlueEye FATAL/ANR.
+- Next install target is immutable `v1.0.0-phase3-pre-field.1`. Phase 3 remains open until physical Session Export + Room/WAL/SHM evidence is reconciled.
+
 
 Append newest entries at the top of this section.
 

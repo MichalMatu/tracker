@@ -1,6 +1,6 @@
 # Phase 3 New-Chat Handoff — Ingest Observability
 
-> **Historical kickoff note (2026-09-08):** Phase 3 software implementation has now landed. The old pipeline facts below describe the preimplementation state and must not be treated as current runtime truth. For current state use `STABILITY_RECOVERY_GUIDE.md`, `PHASE3_FIELD_COLLECTION.md` and `PHASE3_CODE_QUALITY_REVIEW.md`. Phase 3 remains open only for field validation/reconciliation.
+> **Historical kickoff note (2026-09-08):** Phase 3 software implementation has now landed. The old pipeline facts below describe the preimplementation state and must not be treated as current runtime truth. For current state use `STABILITY_RECOVERY_GUIDE.md`, `PHASE3_PRE_FIELD_GOLDEN.md`, `PHASE3_FIELD_COLLECTION.md` and `PHASE3_CODE_QUALITY_REVIEW.md`. Phase 3 remains open only for field validation/reconciliation.
 
 Status: **HISTORICAL KICKOFF — SOFTWARE IMPLEMENTED; FIELD VALIDATION PENDING**
 Repository: `MichalMatu/tracker` (`tracker`)
@@ -14,12 +14,13 @@ The closure documentation commit containing this file is intentionally not hard-
 
 1. `AGENTS.md`
 2. `docs/STABILITY_RECOVERY_GUIDE.md` and its `NEXT ACTION`
-3. `docs/PHASE2_CLOSURE_AUDIT.md`
-4. this file
-5. `docs/SANDBOX_EXECUTION_FLOW.md`
-6. `docs/QUALITY_GATE.md`
-7. `docs/ARCHITECTURE_CURRENT.md`
-8. `docs/PIPELINE_AUDIT.md` for historical pipeline context
+3. `docs/PHASE3_PRE_FIELD_GOLDEN.md`
+4. `docs/PHASE2_CLOSURE_AUDIT.md`
+5. this file
+6. `docs/SANDBOX_EXECUTION_FLOW.md`
+7. `docs/QUALITY_GATE.md`
+8. `docs/ARCHITECTURE_CURRENT.md`
+9. `docs/PIPELINE_AUDIT.md` for historical pipeline context
 
 Do not reconstruct Phase 1/2 from memory; use repository documents and exact current SHA.
 

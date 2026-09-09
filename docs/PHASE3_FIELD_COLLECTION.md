@@ -3,9 +3,15 @@
 Status: **SOFTWARE READY; FIELD VALIDATION PENDING — USE ONLY THE EXACT-SHA GREEN TESTER BUILD**
 Scope: validate Phase 3 BLE ingest accounting and bounded latest-per-device coalescing on a real walk. This is engineering evidence for stability recovery; it does not unpause the general Field MVP checklist or advance identity/alert phases.
 
+## Approved pre-field build
+
+Use the immutable tester release `v1.0.0-phase3-pre-field.1` linked from README. Verify its `.sha256` before installation when practical. Once evidence collection begins, do not replace it with `latest-tester` or another build.
+
+Before the walk, connect the launched app to the Mac with USB debugging authorized. Local Agent/ADB should capture a non-destructive baseline for package `io.blueeye`: device identity, package/install information, installed APK identity where practical, and an app-focused logcat/runtime snapshot. Do not force-stop the app merely to collect this baseline because Phase 3 ingest totals are process-lifetime diagnostics.
+
 ## Before the walk
 
-- Install the rolling tester APK only after the exact final Phase 3 hardening SHA has green GitHub Quality, Secret Scan and Tester Release evidence. Do not use an older Phase 3 APK once a newer hardening commit has replaced `latest-tester`.
+- Install only the immutable `v1.0.0-phase3-pre-field.1` tester APK for this Phase 3 collection. The versioned release must have green Quality/build publication evidence; do not switch builds during the same field session.
 - Start scanning explicitly.
 - Open Settings diagnostics and confirm `Raw BLE/min` is non-zero in a place with nearby Bluetooth devices.
 - `Queue dropped` should remain `0`. A non-zero `Queue rejected` is allowed only under true unique-device capacity exhaustion and must be investigated.
@@ -40,6 +46,7 @@ Use Local Agent/ADB against the exact installed debug build to collect, without 
 - the Room database for `io.blueeye`,
 - matching `-wal` and `-shm` files when present,
 - exact installed APK/source SHA,
+- package/install metadata and baseline/final BlueEye logcat snapshots,
 - a short logcat/runtime snapshot if an ingest error or rejection was observed.
 
 ## Analysis gate

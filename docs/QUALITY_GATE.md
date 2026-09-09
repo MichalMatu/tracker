@@ -45,6 +45,7 @@ gitleaks git --config .gitleaks.toml --redact --verbose
 | assembleDebug | Works as build verification target | Not part of `qualityCheck` to keep feedback shorter | Run after `qualityCheck` before installing |
 | gitleaks | Configured in GitHub Actions | Local binary may not be installed on every machine | Run locally before history rewrite or release |
 | adb/device smoke test | Optional | Requires unlocked connected phone | Run after debug APK build |
+| Android emulator UI smoke | Configured in GitHub Actions | Runtime UI coverage is slower than unit/static gates | Require it for pre-field golden candidates; use physical ADB afterward for BLE hardware evidence |
 
 ## Current Baselines
 
@@ -79,3 +80,16 @@ git diff --check
 ```
 
 In the ChatGPT sandbox, use the restored offline Android/Gradle pack and `tools/sandbox/run-sandbox-gradle.sh`. Focused module gates may use 3 workers; broad `qualityCheck` and `:app:assembleDebug` use the bounded 2-worker sandbox profile and should be run sequentially.
+## Pre-field Golden Release Gate
+
+Before a Phase 3 field build is handed to the phone:
+
+1. exact `main` SHA passes **Quality** and **Secret Scan**,
+2. Android UI Smoke passes on production code and is explicitly rerun on the final documentation SHA,
+3. rolling `latest-tester` is refreshed from the exact final SHA,
+4. immutable `v1.0.0-phase3-pre-field.1` is created on that SHA,
+5. versioned Tester Release reruns `qualityCheck` and `:app:assembleDebug`,
+6. immutable APK and `.sha256` are present in GitHub Releases,
+7. final checkpoint tag is created only after those publication gates succeed.
+
+The emulator gate complements rather than replaces physical ADB/BLE validation in `PHASE3_FIELD_COLLECTION.md`.

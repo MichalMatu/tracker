@@ -11,6 +11,7 @@
 <p align="center">
   <a href="https://github.com/MichalMatu/tracker/actions/workflows/quality.yml"><img alt="Quality" src="https://img.shields.io/github/actions/workflow/status/MichalMatu/tracker/quality.yml?branch=main&label=quality"></a>
   <a href="https://github.com/MichalMatu/tracker/actions/workflows/gitleaks.yml"><img alt="Secret Scan" src="https://img.shields.io/github/actions/workflow/status/MichalMatu/tracker/gitleaks.yml?branch=main&label=secret-scan"></a>
+  <a href="https://github.com/MichalMatu/tracker/actions/workflows/android-ui-smoke.yml"><img alt="Android UI Smoke" src="https://img.shields.io/github/actions/workflow/status/MichalMatu/tracker/android-ui-smoke.yml?branch=main&label=ui-smoke"></a>
   <a href="https://github.com/MichalMatu/tracker/releases/tag/latest-tester"><img alt="Latest Tester APK" src="https://img.shields.io/badge/tester_APK-latest-2ea44f"></a>
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android-3DDC84">
   <img alt="Language" src="https://img.shields.io/badge/language-Kotlin-7F52FF">
@@ -39,6 +40,8 @@ This project is currently in a **stability recovery phase**. The code works, but
 - **Current branch policy:** work directly on `main`
 - **Current recovery phase:** **Phase 3 — ingest pressure, queueing and drop visibility**
 - **Last completed milestone:** **Phase 2 — deterministic scanner/service lifecycle (software + physical acceptance PASS)**
+- **Pre-field software gate:** **Phase 3 hardening + full Android emulator UI E2E PASS; physical field evidence pending**
+- **Immutable field candidate:** `v1.0.0-phase3-pre-field.1`
 - **Build/runtime standard:** **JDK 21** runtime/toolchain, **JVM 17** bytecode target
 
 Core execution docs:
@@ -46,11 +49,23 @@ Core execution docs:
 - [Stability Recovery Guide](docs/STABILITY_RECOVERY_GUIDE.md)
 - [Phase 2 Closure Re-Audit](docs/PHASE2_CLOSURE_AUDIT.md)
 - [Phase 3 New-Chat Handoff](docs/PHASE3_HANDOFF.md)
+- [Phase 3 Pre-Field Golden Candidate](docs/PHASE3_PRE_FIELD_GOLDEN.md)
 - [Stable Core Preimplementation Audit](docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md)
 - [Sandbox Execution Flow](docs/SANDBOX_EXECUTION_FLOW.md)
 - [Quality Gate](docs/QUALITY_GATE.md)
 
 ## Install BlueEye Tracker
+
+### Phase 3 pre-field golden — use this for the next phone test
+
+For the next physical/ADB validation, use the immutable build `v1.0.0-phase3-pre-field.1`. Do not switch to a newer rolling tester during the same field session.
+
+- [**Download the exact pre-field APK**](https://github.com/MichalMatu/tracker/releases/download/v1.0.0-phase3-pre-field.1/BlueEye-Tracker-v1.0.0-phase3-pre-field.1-debug.apk)
+- [SHA-256 checksum](https://github.com/MichalMatu/tracker/releases/download/v1.0.0-phase3-pre-field.1/BlueEye-Tracker-v1.0.0-phase3-pre-field.1-debug.apk.sha256)
+- [Immutable release notes](https://github.com/MichalMatu/tracker/releases/tag/v1.0.0-phase3-pre-field.1)
+- [Pre-field golden manifest](docs/PHASE3_PRE_FIELD_GOLDEN.md)
+
+The immutable release is a **debug-signed engineering build** intended for the Phase 3 phone/ADB validation. The release tag identifies the exact source used to build it.
 
 ### Tester build — persistent download
 
@@ -181,6 +196,7 @@ Short version:
 - [Stability Recovery Guide](docs/STABILITY_RECOVERY_GUIDE.md)
 - [Phase 2 Closure Re-Audit](docs/PHASE2_CLOSURE_AUDIT.md)
 - [Phase 3 New-Chat Handoff](docs/PHASE3_HANDOFF.md)
+- [Phase 3 Pre-Field Golden Candidate](docs/PHASE3_PRE_FIELD_GOLDEN.md)
 - [Stable Core Preimplementation Audit](docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md)
 - [Sandbox Execution Flow](docs/SANDBOX_EXECUTION_FLOW.md)
 - [Quality Gate](docs/QUALITY_GATE.md)

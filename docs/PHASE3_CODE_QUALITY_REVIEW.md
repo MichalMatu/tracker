@@ -98,6 +98,8 @@ Before this hardening is considered the checkpoint source:
 5. `:app:assembleDebug` passes.
 6. the exact committed SHA passes canonical GitHub Quality and Secret Scan.
 7. rolling Tester Release is built from the same exact SHA.
-8. an immutable non-release checkpoint tag records that exact green SHA.
+8. Android UI Smoke passes an emulator click-through for the pre-field production code and is explicitly rerun on the final documentation SHA before tagging.
+9. immutable versioned tester release `v1.0.0-phase3-pre-field.1` reruns `qualityCheck` + `:app:assembleDebug` and publishes APK + checksum.
+10. immutable checkpoint tag `checkpoint-phase3-pre-field-golden-2026-09-09` records that exact green SHA after the release succeeds.
 
 These software gates do **not** close Phase 3. The field walk and reconciliation described in `PHASE3_FIELD_COLLECTION.md` remain mandatory before Phase 4.
