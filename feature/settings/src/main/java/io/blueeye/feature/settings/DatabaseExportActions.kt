@@ -26,8 +26,9 @@ internal fun prepareDatabaseExport(
     }
 }
 
-internal fun isClipboardPayloadSafe(json: String): Boolean =
-    json.toByteArray(Charsets.UTF_8).size <= CLIPBOARD_SAFE_MAX_BYTES
+internal fun isClipboardPayloadSafe(json: String): Boolean {
+    return json.toByteArray(Charsets.UTF_8).size <= CLIPBOARD_SAFE_MAX_BYTES
+}
 
 internal fun copyExportToClipboard(
     context: Context,
