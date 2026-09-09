@@ -1,0 +1,60 @@
+{
+  "id": "tracker-local-tester-signing-key-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-09T04:25:37.943859+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; DIR=\"$HOME/.local/share/blueeye-tracker/signing\"; KS=\"$DIR/tester.p12\"; PW=\"$DIR/tester.password\"; ALIAS=blueeye-tester; mkdir -p \"$DIR\"; chmod 700 \"$DIR\"; if [ ! -s \"$KS\" ] || [ ! -s \"$PW\" ]; then PASS=$(openssl rand -hex 24); printf '%s' \"$PASS\" > \"$PW\"; chmod 600 \"$PW\"; keytool -genkeypair -keystore \"$KS\" -storetype PKCS12 -storepass \"$PASS\" -keypass \"$PASS\" -alias \"$ALIAS\" -keyalg RSA -keysize 4096 -validity 36500 -dname 'CN=BlueEye Tracker Tester, OU=Stabilization, O=BlueEye, C=PL' >/dev/null 2>&1; chmod 600 \"$KS\"; echo created=1; else PASS=$(cat \"$PW\"); echo created=0; fi; CERT_SHA=$(keytool -list -v -keystore \"$KS\" -storepass \"$PASS\" -alias \"$ALIAS\" | awk -F': ' '/SHA256:/{print $2; exit}' | tr -d ':' | tr 'A-F' 'a-f'); echo tester_cert_sha256=$CERT_SHA; stat -f 'keystore_mode=%Sp keystore_size=%z' \"$KS\"; stat -f 'password_mode=%Sp password_size=%z' \"$PW\"",
+      "exit_code": 0,
+      "output": "created=1\ntester_cert_sha256=fff1ada9aa9e2709b4e4bda8333404feae854372df319b77f1f45d7869a61cb6\nkeystore_mode=-rw------- keystore_size=4392\npassword_mode=-rw------- password_size=48\n",
+      "elapsed_seconds": 1.778,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 256,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 1.92,
+      "output_policy": "stream",
+      "captured_output_chars": 180,
+      "output_truncated": false,
+      "current_rss_mb": 1.92,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.778
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.111
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.081
+  },
+  "finished_at": "2026-09-09T04:25:41.284935+00:00",
+  "task_digest": "5bee1a2f109c6a5137c0802d690c449c10d5fe5e2c1302078bc79a5503c29d51",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 256,
+  "attempt_id": "3c38cd15ba8e29dbf8f8b810",
+  "daemon_version": "4.18.19"
+}
