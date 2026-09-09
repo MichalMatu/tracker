@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-smoke-calibrate-before-focused-refresh-v4",
+  "task_digest": "83dab97edae03b7c61a2e106fff61666dce54b630fe311855ecc87558f9f840b",
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-09T00:09:09.952849+00:00",
+  "attempt_id": "0e4a07085a2de2e62b316019",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 37418,
+  "updated_at": "2026-09-09T00:09:09.952997+00:00",
+  "pid": 37418
+}
