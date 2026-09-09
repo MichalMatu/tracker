@@ -1,0 +1,60 @@
+{
+  "id": "tracker-ui-smoke-calibrate-before-focused-refresh-v4",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-09T00:09:09.952939+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; EXPECTED='037a8932b37f92c428b58b8abd7ec6a05be30a46'; FILE='tools/ui-smoke/run-android-ui-smoke.sh'; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; git fetch --no-tags origin main; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; python3 -c 'from pathlib import Path; p=Path(\"tools/ui-smoke/run-android-ui-smoke.sh\"); s=p.read_text(); old=\"tap_desc \\\"Calibrate\\\"\\nwait_target text \\\"Suspicious\\\"\\nshot 05-radar-calibration-menu\\ntap_text \\\"Suspicious\\\"\\n\\n\"; new=\"tap_desc \\\"Calibrate\\\"\\nwait_target text \\\"Suspicious\\\"\\nshot 05-radar-calibration-menu\\nback\\n\\n\"; marker=\"# Open first visible Details action.\\n\"; assert s.count(old)==1; assert s.count(marker)==1; s=s.replace(old,\"\"); s=s.replace(marker,new+marker,1); p.write_text(s)'; bash -n \"$FILE\"; git diff --check; test \"$(git diff --name-only | wc -l | tr -d ' ')\" = '1'; test \"$(git diff --name-only)\" = \"$FILE\"; python3 -c 'from pathlib import Path; s=Path(\"tools/ui-smoke/run-android-ui-smoke.sh\").read_text(); assert s.index(\"tap_desc \\\"Calibrate\\\"\") < s.index(\"# Open first visible Details action.\"); assert \"tap_text \\\"Suspicious\\\"\" not in s'; git add \"$FILE\"; git commit -m 'Test calibration before focused refresh in UI smoke'; git push origin HEAD:main; printf 'ui_smoke_calibration_order_sha=%s\\n' \"$(git rev-parse HEAD)\"",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\n[agent-work 2b833d4] Test calibration before focused refresh in UI smoke\n 1 file changed, 5 insertions(+), 5 deletions(-)\nTo https://github.com/MichalMatu/tracker.git\n   037a893..2b833d4  HEAD -> main\nui_smoke_calibration_order_sha=2b833d4dd69483d65c9ae26d8c2afd67f9d3f915\n",
+      "elapsed_seconds": 2.603,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 23.27,
+      "output_policy": "stream",
+      "captured_output_chars": 362,
+      "output_truncated": false,
+      "current_rss_mb": 23.27,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 2.603
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.113
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.077
+  },
+  "finished_at": "2026-09-09T00:09:14.225597+00:00",
+  "task_digest": "83dab97edae03b7c61a2e106fff61666dce54b630fe311855ecc87558f9f840b",
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 1024,
+  "attempt_id": "0e4a07085a2de2e62b316019",
+  "daemon_version": "4.18.19"
+}
