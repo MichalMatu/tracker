@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-phone-diagnostics-ui-v1",
+  "task_digest": "497d218425f9c3040cb2c103ccee814177598fa1fbcc0ce90ee12299f1ec3b14",
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "memory_limit_mb": 512,
+  "started_at": "2026-09-09T02:24:06.141806+00:00",
+  "attempt_id": "6735527125167d404a49672f",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 71348,
+  "updated_at": "2026-09-09T02:24:06.141969+00:00",
+  "pid": 71348
+}
