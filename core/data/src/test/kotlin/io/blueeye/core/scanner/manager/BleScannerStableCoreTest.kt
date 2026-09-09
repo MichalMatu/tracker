@@ -5,6 +5,9 @@ import io.blueeye.core.domain.repository.DeviceRepository
 import io.blueeye.core.scanner.extractor.ScanResultExtractor
 import io.blueeye.core.scanner.source.BleScanSource
 import io.blueeye.core.scanner.source.ClassicScanSource
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
@@ -14,6 +17,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -40,6 +44,37 @@ class BleScannerStableCoreTest {
         verify(bleScanSource).start(anyOrNull(), any(), any())
         verify(classicScanSource, never()).start(any())
         assertSame(ScannerState.Scanning, scanner.state.value)
+    }
+
+    @Test
+    fun `passive maintenance refreshes BLE source without restarting Classic`() = runTest {
+        val bleScanSource: BleScanSource = mock()
+        val classicScanSource: ClassicScanSource = mock()
+        whenever(bleScanSource.isScanning()).thenReturn(false)
+        whenever(bleScanSource.start(anyOrNull(), any(), any())).thenReturn(true)
+
+        val scanner =
+            BleScanner(
+                context = mock<Context>(),
+                repository = mock<DeviceRepository>(),
+                adapter = null,
+                bleScanSource = bleScanSource,
+                classicScanSource = classicScanSource,
+                scanResultExtractor = mock<ScanResultExtractor>(),
+            )
+
+        scanner.performPassiveBleScan()
+        val maintenanceJob = launch { scanner.maintainPassiveScan(refreshIntervalMs = 1L) }
+
+        advanceTimeBy(ScannerConstants.SCAN_TRANSITION_DELAY_MS + 1L)
+        runCurrent()
+        maintenanceJob.cancel()
+
+        verify(bleScanSource).stop()
+        verify(bleScanSource, times(2)).start(anyOrNull(), any(), any())
+        verify(classicScanSource, never()).start(any())
+        assertSame(ScannerState.Scanning, scanner.state.value)
+        assertTrue(ScannerConstants.PASSIVE_SCAN_REFRESH_INTERVAL_MS < 300_000L)
     }
 
     @Test
