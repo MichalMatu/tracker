@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-physical-large-export-regression-v1",
+  "task_digest": "b498ca4d7a70513e2f764b41450072592d35bc9869ac2ebac52719db7e0bb8f5",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-09T03:31:12.777303+00:00",
+  "attempt_id": "1bb6a36cb195ca321b2c1c11",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 38683,
+  "updated_at": "2026-09-09T03:31:12.777405+00:00",
+  "pid": 38683
+}
