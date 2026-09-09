@@ -189,6 +189,11 @@ wait_target text "Start active GATT collection?"
 shot 04-radar-active-gatt-dialog
 tap_text "Cancel"
 
+tap_desc "Calibrate"
+wait_target text "Suspicious"
+shot 05-radar-calibration-menu
+back
+
 # Open first visible Details action.
 tap_desc "Details"
 wait_target content-desc "Edit"
@@ -212,11 +217,6 @@ tap_desc "Refresh focused scan"
 sleep 1
 back
 wait_target content-desc "Menu"
-
-tap_desc "Calibrate"
-wait_target text "Suspicious"
-shot 05-radar-calibration-menu
-tap_text "Suspicious"
 
 # Add one non-watchlist card, then exercise Watchlist.
 if coords content-desc "Watch device" >/dev/null 2>&1; then
