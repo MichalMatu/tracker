@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-pre-signature-migration-backup-v1",
+  "task_digest": "dd76cda3e166bb36ea55449251fe0373094ef11ddcb1a2424fd84e67d00ce35d",
+  "idle_timeout": 120,
+  "task_timeout": 420,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-09T03:17:04.045570+00:00",
+  "attempt_id": "b91dc066ee24cf2f7ff5f3f4",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 24491,
+  "updated_at": "2026-09-09T03:17:04.045627+00:00",
+  "pid": 24491
+}
