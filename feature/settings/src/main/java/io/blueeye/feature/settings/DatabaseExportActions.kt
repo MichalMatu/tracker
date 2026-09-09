@@ -9,7 +9,7 @@ import androidx.core.content.FileProvider
 import java.io.File
 import java.io.IOException
 
-private const val CLIPBOARD_SAFE_MAX_BYTES = 512 * 1024
+private const val ClipboardSafeMaxBytes = 512 * 1024
 
 internal fun prepareDatabaseExport(
     context: Context,
@@ -27,7 +27,7 @@ internal fun prepareDatabaseExport(
 }
 
 internal fun isClipboardPayloadSafe(json: String): Boolean {
-    return json.toByteArray(Charsets.UTF_8).size <= CLIPBOARD_SAFE_MAX_BYTES
+    return json.toByteArray(Charsets.UTF_8).size <= ClipboardSafeMaxBytes
 }
 
 internal fun copyExportToClipboard(
