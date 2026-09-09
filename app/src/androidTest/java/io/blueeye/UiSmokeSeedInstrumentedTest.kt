@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import io.blueeye.core.data.db.TrackerDatabase
 import io.blueeye.core.data.db.entity.DeviceEntity
+import io.blueeye.core.data.db.entity.WatchlistEntity
 import io.blueeye.core.model.DeviceType
 import io.blueeye.core.model.MacAddressType
 import io.blueeye.core.model.TrackingStatus
@@ -31,7 +32,14 @@ class UiSmokeSeedInstrumentedTest {
             try {
                 val devices = smokeDevices()
                 database.deviceDao().upsertAll(devices)
+                devices.take(2).forEach { device ->
+                    database.watchlistDao().insert(
+                        WatchlistEntity(deviceFingerprint = device.fingerprint),
+                    )
+                }
                 assertEquals(devices.size, database.deviceDao().getAllDevices().size)
+                assertEquals(true, database.watchlistDao().isOnWatchlist(devices[0].fingerprint))
+                assertEquals(true, database.watchlistDao().isOnWatchlist(devices[1].fingerprint))
             } finally {
                 database.close()
             }

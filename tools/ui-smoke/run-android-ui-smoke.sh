@@ -225,13 +225,13 @@ fi
 tap_desc "Menu"
 tap_text "Watchlist"
 wait_target text "Watchlist"
+wait_target text "Walk bag tag"
+wait_target text "UI Smoke Watch Two"
+wait_target content-desc "Remove from Watchlist"
 shot 09-watchlist
-if coords text "Signal Hints" >/dev/null 2>&1; then
-  tap_switch_for_text "Signal Hints"
-fi
-if coords content-desc "Remove from Watchlist" >/dev/null 2>&1; then
-  tap_desc "Remove from Watchlist"
-fi
+tap_switch_for_text "Walk bag tag"
+tap_desc "Remove from Watchlist"
+wait_target content-desc "Remove from Watchlist"
 shot 10-watchlist-after-controls
 
 # Settings main and subsections.
