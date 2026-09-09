@@ -1,0 +1,61 @@
+{
+  "id": "tracker-phase3-pre-field-golden-docs-v2",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-09T01:44:12.772427+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; EXPECTED='61659c3d516c3e1c0713d9c1d1ce50ba1d6c0893'; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; git fetch --no-tags origin main; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; git diff --name-only | sort > /tmp/golden-doc-paths; printf '%s\\n' README.md docs/PHASE3_CODE_QUALITY_REVIEW.md docs/PHASE3_FIELD_COLLECTION.md docs/PHASE3_HANDOFF.md docs/PHASE3_PRE_FIELD_GOLDEN.md docs/QUALITY_GATE.md docs/STABILITY_RECOVERY_GUIDE.md | sort > /tmp/golden-doc-expected; diff -u /tmp/golden-doc-expected /tmp/golden-doc-paths; python3 - <<'PY'\nfrom pathlib import Path\np=Path('docs/QUALITY_GATE.md')\np.write_text(p.read_text().rstrip()+\"\\n\")\nPY\ngit diff --check; git diff --name-only | sort > /tmp/golden-doc-paths-after; diff -u /tmp/golden-doc-expected /tmp/golden-doc-paths-after; grep -F 'v1.0.0-phase3-pre-field.1' README.md docs/PHASE3_PRE_FIELD_GOLDEN.md docs/PHASE3_FIELD_COLLECTION.md >/dev/null; git add README.md docs/PHASE3_CODE_QUALITY_REVIEW.md docs/PHASE3_FIELD_COLLECTION.md docs/PHASE3_HANDOFF.md docs/PHASE3_PRE_FIELD_GOLDEN.md docs/QUALITY_GATE.md docs/STABILITY_RECOVERY_GUIDE.md; git commit -m 'Freeze Phase 3 pre-field golden handoff'; git push origin HEAD:main; printf 'golden_docs_sha=%s\\n' \"$(git rev-parse HEAD)\"; test -z \"$(git status --porcelain)\"",
+      "exit_code": 1,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\n--- /tmp/golden-doc-expected\t2026-09-09 03:44:14\n+++ /tmp/golden-doc-paths\t2026-09-09 03:44:14\n@@ -1,7 +0,0 @@\n-README.md\n-docs/PHASE3_CODE_QUALITY_REVIEW.md\n-docs/PHASE3_FIELD_COLLECTION.md\n-docs/PHASE3_HANDOFF.md\n-docs/PHASE3_PRE_FIELD_GOLDEN.md\n-docs/QUALITY_GATE.md\n-docs/STABILITY_RECOVERY_GUIDE.md\n",
+      "elapsed_seconds": 0.836,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.98,
+      "output_policy": "stream",
+      "captured_output_chars": 393,
+      "output_truncated": false,
+      "current_rss_mb": 2.98,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 0.836
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.088
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.07
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-09T01:44:15.189606+00:00",
+  "task_digest": "9e093aefed8fbb60f8fd8e03930f7a8b3fa733d4e311962507a6fcda534a84fb",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 2048,
+  "attempt_id": "9b5095655a963acf7a14f9df",
+  "daemon_version": "4.18.19"
+}
