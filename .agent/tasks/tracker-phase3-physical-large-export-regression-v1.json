@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-physical-large-export-regression-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test -n \"$SERIAL\"; test -n \"$(adb -s \"$SERIAL\" shell pidof io.blueeye)\"; adb -s \"$SERIAL\" logcat -c; echo COPY_TAP; adb -s \"$SERIAL\" shell input tap 306 2155; sleep 5; echo PID_AFTER_COPY; adb -s \"$SERIAL\" shell pidof io.blueeye; echo SHARE_TAP; adb -s \"$SERIAL\" shell input tap 773 2155; sleep 5; echo SHARE_UI; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/tracker-share.xml >/dev/null; adb -s \"$SERIAL\" pull /sdcard/tracker-share.xml /tmp/tracker-share.xml >/dev/null; python3 - <<'PY'\nimport xml.etree.ElementTree as ET\nr=ET.parse('/tmp/tracker-share.xml').getroot()\nfor n in r.iter('node'):\n t=n.attrib.get('text',''); d=n.attrib.get('content-desc','')\n if t or d: print(f'text={t!r} desc={d!r}')\nPY\necho EXPORT_FILE; adb -s \"$SERIAL\" shell run-as io.blueeye ls -l cache/session_exports/blueeye-session-export.json; adb -s \"$SERIAL\" exec-out run-as io.blueeye cat cache/session_exports/blueeye-session-export.json > /tmp/blueeye-session-export-db8c3ce.json; python3 - <<'PY'\nimport json,hashlib,pathlib\np=pathlib.Path('/tmp/blueeye-session-export-db8c3ce.json')\nb=p.read_bytes(); d=json.loads(b)\nprint('export_bytes='+str(len(b)))\nprint('export_sha256='+hashlib.sha256(b).hexdigest())\nprint('deviceCount='+str(d.get('deviceCount')))\nprint('sampleCount='+str(d.get('sampleCount')))\nassert len(b)>512*1024, len(b)\nassert d.get('deviceCount')==12, d.get('deviceCount')\nassert d.get('sampleCount')==1782, d.get('sampleCount')\nPY\necho PID_AFTER_SHARE; adb -s \"$SERIAL\" shell pidof io.blueeye; echo CRASH_SCAN; if adb -s \"$SERIAL\" logcat -d -v brief | grep -E 'TransactionTooLargeException|FATAL EXCEPTION|Process: io.blueeye|DeadObjectException'; then echo CRASH_SIGNATURE_FOUND; exit 1; else echo NO_CRASH_SIGNATURES; fi; adb -s \"$SERIAL\" shell input keyevent KEYCODE_BACK || true; sleep 1; echo DB_POST; SNAP=$(mktemp); D=$(mktemp -d); trap 'rm -f \"$SNAP\"; rm -rf \"$D\"' EXIT; adb -s \"$SERIAL\" exec-out run-as io.blueeye tar cf - databases > \"$SNAP\"; tar xf \"$SNAP\" -C \"$D\"; sqlite3 \"$D/databases/tracker_database\" 'PRAGMA integrity_check; select count(*) from devices; select count(*) from signal_samples; select count(*) from follow_me_observations;'; echo PHYSICAL_LARGE_EXPORT_REGRESSION_PASS"
+  ]
+}
