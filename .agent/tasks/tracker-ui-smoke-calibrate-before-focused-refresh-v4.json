@@ -1,0 +1,15 @@
+{
+  "id": "tracker-ui-smoke-calibrate-before-focused-refresh-v4",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 300,
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "commands": [
+    "set -euo pipefail; EXPECTED='037a8932b37f92c428b58b8abd7ec6a05be30a46'; FILE='tools/ui-smoke/run-android-ui-smoke.sh'; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; git fetch --no-tags origin main; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; python3 -c 'from pathlib import Path; p=Path(\"tools/ui-smoke/run-android-ui-smoke.sh\"); s=p.read_text(); old=\"tap_desc \\\"Calibrate\\\"\\nwait_target text \\\"Suspicious\\\"\\nshot 05-radar-calibration-menu\\ntap_text \\\"Suspicious\\\"\\n\\n\"; new=\"tap_desc \\\"Calibrate\\\"\\nwait_target text \\\"Suspicious\\\"\\nshot 05-radar-calibration-menu\\nback\\n\\n\"; marker=\"# Open first visible Details action.\\n\"; assert s.count(old)==1; assert s.count(marker)==1; s=s.replace(old,\"\"); s=s.replace(marker,new+marker,1); p.write_text(s)'; bash -n \"$FILE\"; git diff --check; test \"$(git diff --name-only | wc -l | tr -d ' ')\" = '1'; test \"$(git diff --name-only)\" = \"$FILE\"; python3 -c 'from pathlib import Path; s=Path(\"tools/ui-smoke/run-android-ui-smoke.sh\").read_text(); assert s.index(\"tap_desc \\\"Calibrate\\\"\") < s.index(\"# Open first visible Details action.\"); assert \"tap_text \\\"Suspicious\\\"\" not in s'; git add \"$FILE\"; git commit -m 'Test calibration before focused refresh in UI smoke'; git push origin HEAD:main; printf 'ui_smoke_calibration_order_sha=%s\\n' \"$(git rev-parse HEAD)\""
+  ]
+}
