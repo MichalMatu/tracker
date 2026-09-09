@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-room-refresh-e2e-v1",
+  "task_digest": "4a9a36f9082946442c5963917f43365ee68802476f514592f2d90692c659cceb",
+  "idle_timeout": 600,
+  "task_timeout": 1200,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-09T04:12:51.173697+00:00",
+  "attempt_id": "50687793792e1fb7b3ea9ec4",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 78579,
+  "updated_at": "2026-09-09T04:12:51.173830+00:00",
+  "pid": 78579
+}
