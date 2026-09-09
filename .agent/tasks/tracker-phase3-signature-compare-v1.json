@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-signature-compare-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 512,
+  "command_timeout": 180,
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); OLD=$(mktemp /tmp/blueeye-old.XXXXXX.apk); trap 'rm -f \"$OLD\"' EXIT; P=$(adb -s \"$SERIAL\" shell pm path io.blueeye | tr -d '\\r' | sed -n 's/^package://p' | head -n1); adb -s \"$SERIAL\" pull \"$P\" \"$OLD\" >/dev/null; APKSIGNER=$(find \"$HOME/Library/Android/sdk/build-tools\" -name apksigner -type f | sort -V | tail -1); test -x \"$APKSIGNER\"; echo OLD_CERT; \"$APKSIGNER\" verify --print-certs \"$OLD\" | grep -E 'Signer #1 certificate SHA-256 digest'; echo NEW_CERT; \"$APKSIGNER\" verify --print-certs /tmp/BlueEye-Tracker-db8c3ce.apk | grep -E 'Signer #1 certificate SHA-256 digest'"
+  ]
+}
