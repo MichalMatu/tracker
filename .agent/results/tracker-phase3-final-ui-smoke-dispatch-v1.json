@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-final-ui-smoke-dispatch-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-09T01:47:53.751475+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; EXPECTED='eb10cdd70039e82d09cc03231b52ad851fe42546'; git fetch --no-tags origin main; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; gh workflow run android-ui-smoke.yml --ref main; sleep 3; gh run list --workflow android-ui-smoke.yml --branch main --event workflow_dispatch --limit 5 --json databaseId,headSha,status,conclusion,createdAt --jq '.[] | select(.headSha == \"'\"$EXPECTED\"'\") | [.databaseId,.headSha,.status,.conclusion,.createdAt] | @tsv' | head -n 1",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\nhttps://github.com/MichalMatu/tracker/actions/runs/34300633412\n34300633412\teb10cdd70039e82d09cc03231b52ad851fe42546\tqueued\t\t2026-09-09T01:47:57Z\n",
+      "elapsed_seconds": 6.51,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 48.98,
+      "output_policy": "stream",
+      "captured_output_chars": 234,
+      "output_truncated": false,
+      "current_rss_mb": 48.98,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 6.51
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.087
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.071
+  },
+  "finished_at": "2026-09-09T01:48:01.810163+00:00",
+  "task_digest": "5fecb1c76fb98228eb2f9a7075396e82a34b2a38b658a999b2ec6e78654e89c5",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 512,
+  "attempt_id": "c12dbc903fae58e29cc903a6",
+  "daemon_version": "4.18.19"
+}
