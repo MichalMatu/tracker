@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-signature-compare-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-09T03:15:46.246532+00:00",
+  "command_timeout": 180,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); OLD=$(mktemp /tmp/blueeye-old.XXXXXX.apk); trap 'rm -f \"$OLD\"' EXIT; P=$(adb -s \"$SERIAL\" shell pm path io.blueeye | tr -d '\\r' | sed -n 's/^package://p' | head -n1); adb -s \"$SERIAL\" pull \"$P\" \"$OLD\" >/dev/null; APKSIGNER=$(find \"$HOME/Library/Android/sdk/build-tools\" -name apksigner -type f | sort -V | tail -1); test -x \"$APKSIGNER\"; echo OLD_CERT; \"$APKSIGNER\" verify --print-certs \"$OLD\" | grep -E 'Signer #1 certificate SHA-256 digest'; echo NEW_CERT; \"$APKSIGNER\" verify --print-certs /tmp/BlueEye-Tracker-db8c3ce.apk | grep -E 'Signer #1 certificate SHA-256 digest'",
+      "exit_code": 0,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\n/data/app/~~ojMggce65f9Pirv9RBxVAg==/io.blueeye-CcI7E7Qne1-6LOZpS4r3cg==/base.apk: 1 file pulled, 0 skipped. 34.7 MB/s (13178492 bytes in 0.362s)\nOLD_CERT\nSigner #1 certificate SHA-256 digest: 8a836c9b00840a67c713c2e427a6ecdf7e58dd1c208aefe1efa5fc0e0b442f59\nNEW_CERT\nSigner #1 certificate SHA-256 digest: 2f108ae6f73ffd56c87b432cef2ee03164bc50211db681a74a47683abb4b8521\n",
+      "elapsed_seconds": 4.766,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 13.45,
+      "output_policy": "stream",
+      "captured_output_chars": 447,
+      "output_truncated": false,
+      "current_rss_mb": 5.25,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 4.766
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.117
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.065
+  },
+  "finished_at": "2026-09-09T03:15:52.515872+00:00",
+  "task_digest": "9e6fdb0918c144c62a64351217f2fec00779a7186b5329a36e75d8d9fa1e0f54",
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "memory_limit_mb": 512,
+  "attempt_id": "91d033c8dc3075cb18a82f7a",
+  "daemon_version": "4.18.19"
+}
