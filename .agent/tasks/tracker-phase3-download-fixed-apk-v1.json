@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-download-fixed-apk-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 512,
+  "command_timeout": 180,
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; OUT='/tmp/BlueEye-Tracker-db8c3ce.apk'; rm -f \"$OUT\"; gh release download latest-tester --repo MichalMatu/tracker --pattern BlueEye-Tracker-latest-tester-debug.apk --output \"$OUT\"; HASH=$(shasum -a 256 \"$OUT\" | awk '{print $1}'); echo apk=$OUT; echo sha256=$HASH; test \"$HASH\" = '4d4a58789fb94d5e984d2135c2942018f4d8ae0cfb06d6f49692a0a454941ace'"
+  ]
+}
