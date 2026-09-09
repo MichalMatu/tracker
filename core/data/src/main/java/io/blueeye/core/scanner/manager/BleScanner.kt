@@ -12,6 +12,7 @@ import io.blueeye.core.permission.PermissionManager
 import io.blueeye.core.scanner.extractor.ScanResultExtractor
 import io.blueeye.core.scanner.source.BleScanSource
 import io.blueeye.core.scanner.source.ClassicScanSource
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -101,7 +102,11 @@ constructor(
             else -> {
                 _state.value = ScannerState.Starting
                 scanJob?.cancel()
-                scanJob = scope.launch { performPassiveBleScan() }
+                scanJob =
+                    scope.launch {
+                        performPassiveBleScan()
+                        maintainPassiveScan()
+                    }
             }
         }
     }
@@ -116,18 +121,7 @@ constructor(
             }
 
             Log.i(TAG, "Starting passive BLE scan...")
-            val bleStarted =
-                bleScanSource.start(
-                    macFilter = null,
-                    onResult = ingestPipeline::onBleResult,
-                    onError = { errorCode ->
-                        val message = describeBleScanError(errorCode)
-                        Log.e(TAG, message)
-                        _state.value = ScannerState.Error(message)
-                    },
-                )
-
-            if (!bleStarted) {
+            if (!startPassiveBleSource()) {
                 _state.value = ScannerState.Error("BLE scanner unavailable")
                 return
             }
@@ -141,11 +135,63 @@ constructor(
                 )
             }
             _state.value = ScannerState.Scanning
+        } catch (error: CancellationException) {
+            throw error
         } catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
             Log.e(TAG, "Error starting passive BLE scan", error)
             _state.value = ScannerState.Error(error.message ?: "Unknown error")
         }
     }
+
+    /**
+     * Keeps the platform BLE registration fresh without changing the scanner/service lifecycle.
+     *
+     * Some Android Bluetooth stacks silently retire an otherwise healthy long-running scan while
+     * the app callback remains registered locally. Refreshing only the low-level BLE source keeps
+     * the accepted Phase 2 lifecycle and Follow-Me session intact.
+     */
+    internal suspend fun maintainPassiveScan(
+        refreshIntervalMs: Long = ScannerConstants.PASSIVE_SCAN_REFRESH_INTERVAL_MS,
+    ) {
+        while (_state.value is ScannerState.Scanning) {
+            delay(refreshIntervalMs)
+            if (_state.value !is ScannerState.Scanning) return
+            refreshPassiveBleScan()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private suspend fun refreshPassiveBleScan() {
+        try {
+            Log.i(TAG, "Refreshing passive BLE scan registration...")
+            bleScanSource.stop()
+            delay(ScannerConstants.SCAN_TRANSITION_DELAY_MS)
+            if (_state.value !is ScannerState.Scanning) return
+
+            if (!startPassiveBleSource()) {
+                _state.value = ScannerState.Error("BLE scanner unavailable during refresh")
+                return
+            }
+            Log.i(TAG, "Passive BLE scan registration refreshed")
+        } catch (error: CancellationException) {
+            throw error
+        } catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
+            Log.e(TAG, "Error refreshing passive BLE scan", error)
+            _state.value = ScannerState.Error(error.message ?: "Unknown error")
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun startPassiveBleSource(): Boolean =
+        bleScanSource.start(
+            macFilter = null,
+            onResult = ingestPipeline::onBleResult,
+            onError = { errorCode ->
+                val message = describeBleScanError(errorCode)
+                Log.e(TAG, message)
+                _state.value = ScannerState.Error(message)
+            },
+        )
 
     @SuppressLint("MissingPermission")
     fun startFocusedScan(macAddress: String) {
@@ -189,7 +235,7 @@ constructor(
 
                     _state.value = ScannerState.Focused(macAddress)
                 } catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
-                    Log.e(TAG, "Error starting focused scan", error)
+                    Log.e(TAG, "Error starting focused BLE scan", error)
                     _state.value = ScannerState.Error(error.message ?: "Unknown error")
                 }
             }
