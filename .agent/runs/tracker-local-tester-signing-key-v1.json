@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "tracker-local-tester-signing-key-v1",
   "task_digest": "5bee1a2f109c6a5137c0802d690c449c10d5fe5e2c1302078bc79a5503c29d51",
-  "idle_timeout": 120,
-  "task_timeout": 600,
-  "memory_limit_mb": 256,
-  "started_at": "2026-09-09T04:25:37.943827+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-09T04:25:41.284935+00:00",
   "attempt_id": "3c38cd15ba8e29dbf8f8b810",
   "daemon_version": "4.18.19",
   "daemon_pid": 97513,
-  "updated_at": "2026-09-09T04:25:37.943891+00:00",
+  "updated_at": "2026-09-09T04:25:41.535118+00:00",
   "pid": 97513
 }
