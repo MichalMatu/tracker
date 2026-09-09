@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-signature-migration-install-v1",
+  "task_digest": "badd7f69cfbdfda2105e9ad71ca40d0a8e35789e049ea6a774c79f140950b2d5",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-09T03:18:21.959150+00:00",
+  "attempt_id": "7162f3b485c25327af18e1fa",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 25823,
+  "updated_at": "2026-09-09T03:18:21.959208+00:00",
+  "pid": 25823
+}
