@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-current-ui-dump-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 512,
+  "command_timeout": 120,
+  "idle_timeout": 60,
+  "task_timeout": 240,
+  "commands": [
+    "set -euo pipefail; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test -n \"$SERIAL\"; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/tracker-ui.xml >/dev/null; adb -s \"$SERIAL\" pull /sdcard/tracker-ui.xml /tmp/tracker-ui.xml >/dev/null; python3 - <<'PY'\nimport xml.etree.ElementTree as ET\nr=ET.parse('/tmp/tracker-ui.xml').getroot()\nfor n in r.iter('node'):\n    t=n.attrib.get('text',''); d=n.attrib.get('content-desc',''); c=n.attrib.get('clickable',''); b=n.attrib.get('bounds','')\n    if t or d or c=='true': print(f'text={t!r} desc={d!r} clickable={c} bounds={b}')\nPY"
+  ]
+}
