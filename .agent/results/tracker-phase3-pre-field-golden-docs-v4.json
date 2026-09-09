@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-pre-field-golden-docs-v4",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-09T01:46:49.201681+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; EXPECTED='61659c3d516c3e1c0713d9c1d1ce50ba1d6c0893'; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; git fetch --no-tags origin main agent-control; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; python3 - <<'PY'\nimport json, subprocess\nraw=subprocess.check_output(['git','show','origin/agent-control:.agent/tasks/tracker-phase3-pre-field-golden-docs-v1.json'], text=True)\ncmd=json.loads(raw)['commands'][0]\nresult=subprocess.run(['bash','-lc',cmd])\nif result.returncode != 2:\n    raise SystemExit(f'expected recorded v1 to stop at diff-check rc=2, got {result.returncode}')\nPY\npython3 - <<'PY'\nfrom pathlib import Path\np=Path('docs/QUALITY_GATE.md')\np.write_text(p.read_text().rstrip()+\"\\n\")\nPY\ngit diff --check; git status --porcelain | sed -E 's/^.. //' | sort > /tmp/golden-doc-paths; printf '%s\\n' README.md docs/PHASE3_CODE_QUALITY_REVIEW.md docs/PHASE3_FIELD_COLLECTION.md docs/PHASE3_HANDOFF.md docs/PHASE3_PRE_FIELD_GOLDEN.md docs/QUALITY_GATE.md docs/STABILITY_RECOVERY_GUIDE.md | sort > /tmp/golden-doc-expected; diff -u /tmp/golden-doc-expected /tmp/golden-doc-paths; grep -F 'v1.0.0-phase3-pre-field.1' README.md docs/PHASE3_PRE_FIELD_GOLDEN.md docs/PHASE3_FIELD_COLLECTION.md >/dev/null; git add README.md docs/PHASE3_CODE_QUALITY_REVIEW.md docs/PHASE3_FIELD_COLLECTION.md docs/PHASE3_HANDOFF.md docs/PHASE3_PRE_FIELD_GOLDEN.md docs/QUALITY_GATE.md docs/STABILITY_RECOVERY_GUIDE.md; git diff --cached --check; test \"$(git diff --cached --name-only | wc -l | tr -d ' ')\" = '7'; git commit -m 'Freeze Phase 3 pre-field golden handoff'; git push origin HEAD:main; printf 'golden_docs_sha=%s\\n' \"$(git rev-parse HEAD)\"; test -z \"$(git status --porcelain)\"",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main          -> FETCH_HEAD\n * branch            agent-control -> FETCH_HEAD\n   8cf80e8..620d784  agent-control -> origin/agent-control\nFrom https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\ndocs/QUALITY_GATE.md:96: new blank line at EOF.\n[agent-work eb10cdd] Freeze Phase 3 pre-field golden handoff\n 7 files changed, 102 insertions(+), 11 deletions(-)\n create mode 100644 docs/PHASE3_PRE_FIELD_GOLDEN.md\nTo https://github.com/MichalMatu/tracker.git\n   61659c3..eb10cdd  HEAD -> main\ngolden_docs_sha=eb10cdd70039e82d09cc03231b52ad851fe42546\n",
+      "elapsed_seconds": 4.178,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 17.89,
+      "output_policy": "stream",
+      "captured_output_chars": 639,
+      "output_truncated": false,
+      "current_rss_mb": 17.89,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 4.178
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.15
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.12
+  },
+  "finished_at": "2026-09-09T01:46:55.591029+00:00",
+  "task_digest": "91e8fda7b330ba44e6b9253ba5bcc86061872deb1d6db848e7eafe22546c8aa5",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 2048,
+  "attempt_id": "5758c1524f40dcc136e93f07",
+  "daemon_version": "4.18.19"
+}
