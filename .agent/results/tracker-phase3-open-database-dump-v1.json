@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-open-database-dump-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-09T03:27:35.531266+00:00",
+  "command_timeout": 120,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); adb -s \"$SERIAL\" shell input tap 540 947; sleep 1; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/tracker-dbsettings.xml >/dev/null; adb -s \"$SERIAL\" pull /sdcard/tracker-dbsettings.xml /tmp/tracker-dbsettings.xml >/dev/null; python3 - <<'PY'\nimport xml.etree.ElementTree as ET\nr=ET.parse('/tmp/tracker-dbsettings.xml').getroot()\nfor n in r.iter('node'):\n t=n.attrib.get('text',''); d=n.attrib.get('content-desc',''); c=n.attrib.get('clickable',''); b=n.attrib.get('bounds','')\n if t or d or c=='true': print(f'text={t!r} desc={d!r} clickable={c} bounds={b}')\nPY",
+      "exit_code": 0,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\n/sdcard/tracker-dbsettings.xml: 1 file pulled, 0 skipped. 2.7 MB/s (17398 bytes in 0.006s)\ntext='Last updated: Never' desc='' clickable=false bounds=[84,326][415,379]\ntext='Session Calibration' desc='' clickable=false bounds=[84,505][460,568]\ntext='Unknown' desc='' clickable=false bounds=[84,589][270,638]\ntext='No session started' desc='' clickable=false bounds=[84,659][364,701]\ntext='No verdict yet. Export still includes devices, samples, and evidence for later review.' desc='' clickable=false bounds=[84,722][996,806]\ntext='Collected: no active session yet' desc='' clickable=false bounds=[84,827][557,869]\ntext='Needs more session context' desc='' clickable=false bounds=[84,890][509,932]\ntext='Missing: session label, session devices, RSSI samples / Useful: session notes, review signals' desc='' clickable=false bounds=[84,953][996,1037]\ntext='Before export: choose a session verdict; collect at least one device; keep scanning until RSSI samples are saved' desc='' clickable=false bounds=[84,1058][996,1142]\ntext='' desc='' clickable=true bounds=[84,1163][996,1394]\ntext='Session notes' desc='' clickable=false bounds=[126,1226][406,1289]\ntext='' desc='' clickable=true bounds=[84,1416][529,1542]\ntext='Unknown' desc='' clickable=false bounds=[230,1452][383,1505]\ntext='' desc='' clickable=true bounds=[550,1416][996,1542]\ntext='True positive' desc='' clickable=false bounds=[667,1452][879,1505]\ntext='' desc='' clickable=true bounds=[84,1563][529,1689]\ntext='Suspicious' desc='' clickable=false bounds=[216,1599][397,1652]\ntext='' desc='' clickable=true bounds=[550,1563][996,1689]\ntext='False positive' desc='' clickable=false bounds=[661,1599][886,1652]\ntext='' desc='' clickable=true bounds=[84,1710][996,1836]\ntext='Known safe' desc='' clickable=false bounds=[444,1746][636,1799]\ntext='' desc='' clickable=true bounds=[84,1857][996,1983]\ntext='Start new session' desc='' clickable=false bounds=[394,1893][687,1946]\ntext='Company IDs' desc='' clickable=false bounds=[84,2113][340,2176]\ntext='1,136 entries' desc='' clickable=false bounds=[84,2176][298,2229]\ntext='' desc='' clickable=true bounds=[871,2109][997,2235]\ntext='' desc='Update' clickable=false bounds=[902,2140][965,2203]\ntext='' desc='' clickable=true bounds=[12,96][138,222]\ntext='' desc='Back' clickable=false bounds=[43,127][106,190]\ntext='Database & Updates' desc='' clickable=false bounds=[281,121][799,195]\n",
+      "elapsed_seconds": 6.976,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 9.72,
+      "output_policy": "stream",
+      "captured_output_chars": 2467,
+      "output_truncated": false,
+      "current_rss_mb": 9.42,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 6.976
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.116
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.077
+  },
+  "finished_at": "2026-09-09T03:27:44.314952+00:00",
+  "task_digest": "e9de99372e23409bbb090e0f38983a1cad889df31922ac09d8680dafed874e44",
+  "idle_timeout": 60,
+  "task_timeout": 240,
+  "memory_limit_mb": 512,
+  "attempt_id": "87cc94281e47a5368e77f912",
+  "daemon_version": "4.18.19"
+}
