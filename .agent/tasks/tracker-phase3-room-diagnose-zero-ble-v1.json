@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-room-diagnose-zero-ble-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 512,
+  "command_timeout": 180,
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; OUT=/tmp/tracker-phase3-room-e2e-v2; test -s $OUT/baseline.json; test -s $OUT/final.json; echo '--- EXPORT STATES ---'; python3 -c 'import json; import pathlib; p=pathlib.Path(\"/tmp/tracker-phase3-room-e2e-v2\");\nfor n in (\"baseline\",\"final\"):\n d=json.load(open(p/(n+\".json\"))); s=d[\"fieldMvpDiagnostics\"][\"scanner\"]; i=s[\"ingest\"]; print(n, {k:s.get(k) for k in (\"runtimeProfile\",\"state\",\"startedAt\",\"lastBleSeenAt\",\"bleResultsPerMinute\",\"lastError\",\"lastLifecycleTransition\",\"lastLifecycleTransitionAt\",\"lifecycleTransitionCount\")}); print(n+\"_ingest\", {k:i.get(k) for k in (\"windowStartedAt\",\"rawBleCallbacksTotal\",\"rawBleCallbacksPerMinute\",\"enqueueAcceptedTotal\",\"coalescedTotal\",\"processingStartedTotal\",\"queueDepth\",\"queueHighWaterMark\",\"lastQueueWaitMs\",\"maxQueueWaitMs\",\"lastProcessingDurationMs\",\"maxProcessingDurationMs\")})'; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test -n \"$SERIAL\"; echo '--- CURRENT PROCESS/SERVICE ---'; adb -s \"$SERIAL\" shell pidof io.blueeye || true; adb -s \"$SERIAL\" shell dumpsys activity services io.blueeye | grep -E -m 120 'ScannerService|ServiceRecord|foreground|startRequested|isForeground' || true; echo '--- BLUETOOTH ---'; adb -s \"$SERIAL\" shell settings get global bluetooth_on; adb -s \"$SERIAL\" shell dumpsys bluetooth_manager | grep -Ei -m 200 'io.blueeye|scan|scanner|registered|callback' || true; echo '--- SAVED LOGCAT SCANNER LINES ---'; grep -Ei 'BleScanner|BleScan|BluetoothLeScanner|ScannerService|startScan|stopScan|onScanFailed|Scan failed|scan failed|SecurityException|DeadObject|Bluetooth.*off|Bluetooth.*on' $OUT/logcat.txt | tail -n 250 || true; echo ZERO_BLE_DIAG_PASS"
+  ]
+}
