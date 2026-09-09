@@ -1,0 +1,61 @@
+{
+  "id": "tracker-phase3-pre-field-checkpoint-v1",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-09T02:12:00.123228+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; EXPECTED='eb10cdd70039e82d09cc03231b52ad851fe42546'; VERSION='v1.0.0-phase3-pre-field.1'; CHECKPOINT='checkpoint-phase3-pre-field-golden-2026-09-09'; APK_NAME=\"BlueEye-Tracker-${VERSION}-debug.apk\"; SHA_NAME=\"${APK_NAME}.sha256\"; git fetch --no-tags origin main; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; RELEASE_TARGET=$(gh api \"repos/${GITHUB_REPOSITORY}/releases/tags/${VERSION}\" --jq '.target_commitish'); test \"${RELEASE_TARGET}\" = \"${EXPECTED}\"; TMP=$(mktemp -d); trap 'rm -rf \"${TMP}\"' EXIT; gh release download \"${VERSION}\" --repo \"${GITHUB_REPOSITORY}\" --dir \"${TMP}\" --pattern \"${APK_NAME}\" --pattern \"${SHA_NAME}\"; test -f \"${TMP}/${APK_NAME}\"; test -f \"${TMP}/${SHA_NAME}\"; EXPECTED_HASH=$(awk 'NR==1 {print $1}' \"${TMP}/${SHA_NAME}\"); test \"$(printf '%s' \"${EXPECTED_HASH}\" | wc -c | tr -d ' ')\" = '64'; ACTUAL_HASH=$(shasum -a 256 \"${TMP}/${APK_NAME}\" | awk '{print $1}'); test \"${ACTUAL_HASH}\" = \"${EXPECTED_HASH}\"; API_DIGEST=$(gh api \"repos/${GITHUB_REPOSITORY}/releases/tags/${VERSION}\" --jq '.assets[] | select(.name == \"'\"${APK_NAME}\"'\") | .digest'); test \"${API_DIGEST}\" = \"sha256:${ACTUAL_HASH}\"; test -z \"$(git ls-remote --tags origin \"refs/tags/${CHECKPOINT}\" \"refs/tags/${CHECKPOINT}^{}\")\"; if git show-ref --verify --quiet \"refs/tags/${CHECKPOINT}\"; then echo \"local checkpoint tag unexpectedly exists: ${CHECKPOINT}\" >&2; exit 3; fi; git tag -a \"${CHECKPOINT}\" \"${EXPECTED}\" -m 'Phase 3 pre-field golden checkpoint'; OBJ=$(git rev-parse \"${CHECKPOINT}\"); PEELED=$(git rev-parse \"${CHECKPOINT}^{}\"); TYPE=$(git cat-file -t \"${CHECKPOINT}\"); test \"${PEELED}\" = \"${EXPECTED}\"; test \"${TYPE}\" = 'tag'; git push origin \"refs/tags/${CHECKPOINT}\"; REMOTE=$(git ls-remote --tags origin \"refs/tags/${CHECKPOINT}^{}\" | awk '{print $1}'); test \"${REMOTE}\" = \"${EXPECTED}\"; printf 'version=%s\\napk=%s\\napk_sha256=%s\\ncheckpoint=%s\\ncheckpoint_object=%s\\ncheckpoint_peeled=%s\\ncheckpoint_type=%s\\n' \"${VERSION}\" \"${APK_NAME}\" \"${ACTUAL_HASH}\" \"${CHECKPOINT}\" \"${OBJ}\" \"${PEELED}\" \"${TYPE}\"; test -z \"$(git status --porcelain)\"",
+      "exit_code": 1,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\n/bin/sh: GITHUB_REPOSITORY: unbound variable\n",
+      "elapsed_seconds": 0.872,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 1.88,
+      "output_policy": "stream",
+      "captured_output_chars": 134,
+      "output_truncated": false,
+      "current_rss_mb": 1.88,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 0.872
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.097
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.074
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-09T02:12:02.548120+00:00",
+  "task_digest": "c554fd414ef16e1ca58dd448079106fa6f528572480d252bde3c300b2a90de9c",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 512,
+  "attempt_id": "4b6ab2d152ef0131c04e7f29",
+  "daemon_version": "4.18.19"
+}
