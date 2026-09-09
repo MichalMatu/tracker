@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-phone-final-capture-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-09T02:26:39.792564+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; EXPECTED='eb10cdd70039e82d09cc03231b52ad851fe42546'; PKG='io.blueeye'; git fetch --no-tags origin main >/dev/null; test \"$(git rev-parse origin/main)\" = \"${EXPECTED}\"; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test -n \"${SERIAL}\"; TMP=$(mktemp -d); trap 'rm -rf \"${TMP}\"' EXIT; XML=\"${TMP}/window.xml\"; dump(){ adb -s \"${SERIAL}\" shell uiautomator dump /sdcard/blueeye-final.xml >/dev/null; adb -s \"${SERIAL}\" exec-out cat /sdcard/blueeye-final.xml > \"${XML}\"; }; coords(){ dump; python3 tools/ui-smoke/ui_node.py \"${XML}\" \"$1\" \"$2\"; }; tap(){ C=$(coords \"$1\" \"$2\"); test -n \"${C}\"; set -- ${C}; adb -s \"${SERIAL}\" shell input tap \"$1\" \"$2\"; sleep 0.8; }; scroll_until(){ for i in 1 2 3 4 5 6 7 8; do if coords text \"$1\" >/dev/null 2>&1; then return 0; fi; adb -s \"${SERIAL}\" shell input swipe 540 1750 540 550 350; sleep 0.6; done; return 1; }; rows(){ dump; python3 - \"${XML}\" <<'PY'\nimport re,sys,xml.etree.ElementTree as ET\nr=re.compile(r'\\[(\\d+),(\\d+)\\]\\[(\\d+),(\\d+)\\]')\na=[]\nfor n in ET.parse(sys.argv[1]).getroot().iter('node'):\n t=(n.attrib.get('text') or '').strip(); m=r.fullmatch(n.attrib.get('bounds',''))\n if t and m:\n  x1,y1,x2,y2=map(int,m.groups()); a.append(((y1+y2)//2,(x1+x2)//2,t))\nfor y,x,t in sorted(a): print(f'{y:4d} {x:4d} {t}')\nPY\n}; echo '--- return to Radar and stop scanning normally ---'; adb -s \"${SERIAL}\" shell input keyevent BACK; sleep 0.8; tap content-desc Menu; tap text Radar; echo 'radar_before_stop:'; rows | grep -E 'Paused|seen|needs review|suspicious|nearby|All [0-9]+' || true; tap content-desc Scan; sleep 2; echo 'radar_after_stop:'; rows | grep -E 'Paused|seen|needs review|suspicious|nearby|All [0-9]+' || true; echo '--- frozen diagnostics ---'; tap content-desc Menu; tap text Settings; tap text 'Alerts & Collection'; scroll_until 'Queue dropped'; rows | grep -E 'Runtime profile|STABLE_CORE|Scanner|Running|Idle|Ingest window|BLE last seen|Raw BLE/min|Queued/min|Coalesced/min|Processed/min|Persisted/min|Signal samples/min|Raw / queued / coalesced total|Processed / persisted / samples total|Queue depth|Queue high-water|Queue rejected|Queue dropped|Processing failed|Provisional discard|Sample write failed|Queue wait avg/max|Processing avg/max|Last scan error|Lifecycle|RUNNING|STOP' || true; echo '--- session export Copy ---'; adb -s \"${SERIAL}\" shell input keyevent BACK; sleep 0.7; tap text 'Database & Updates'; scroll_until 'Copy'; tap text Copy; sleep 3; echo 'clipboard_services:'; adb -s \"${SERIAL}\" shell cmd -l | grep -i clipboard || true; echo 'clipboard_cmd_shell:'; adb -s \"${SERIAL}\" shell cmd clipboard get 2>&1 | head -c 500 || true; echo; echo 'clipboard_cmd_run_as:'; adb -s \"${SERIAL}\" shell run-as \"${PKG}\" cmd clipboard get 2>&1 | head -c 500 || true; echo; echo 'clipboard_dumpsys:'; adb -s \"${SERIAL}\" shell dumpsys clipboard 2>&1 | head -c 1200 || true; echo; echo '--- Room/WAL/SHM live stopped-scan snapshot ---'; adb -s \"${SERIAL}\" shell run-as \"${PKG}\" sh -c 'ls -al databases'; adb -s \"${SERIAL}\" exec-out run-as \"${PKG}\" sh -c 'cd /data/user/0/io.blueeye && tar cf - databases' > \"${TMP}/databases.tar\"; mkdir -p \"${TMP}/dbcopy\"; tar xf \"${TMP}/databases.tar\" -C \"${TMP}/dbcopy\"; DB=\"${TMP}/dbcopy/databases/tracker_database\"; test -f \"${DB}\"; echo 'snapshot_files:'; ls -al \"${TMP}/dbcopy/databases\"; echo 'snapshot_sha256:'; for f in \"${TMP}/dbcopy/databases\"/*; do if command -v shasum >/dev/null; then shasum -a 256 \"$f\"; else sha256sum \"$f\"; fi; done; echo 'sqlite_integrity:'; sqlite3 \"${DB}\" 'PRAGMA integrity_check;'; echo 'sqlite_user_version:'; sqlite3 \"${DB}\" 'PRAGMA user_version;'; echo 'table_counts:'; for T in $(sqlite3 \"${DB}\" \"select name from sqlite_master where type='table' and name not like 'sqlite_%' and name not like 'room_%' order by name;\"); do printf '%s=' \"$T\"; sqlite3 \"${DB}\" \"select count(*) from \\\"$T\\\";\"; done; echo '--- final logcat ---'; PID=$(adb -s \"${SERIAL}\" shell pidof \"${PKG}\" | tr -d '\\r' || true); echo \"pid=${PID:-not_running}\"; if [ -n \"${PID}\" ]; then adb -s \"${SERIAL}\" logcat --pid=\"${PID}\" -d -v threadtime > \"${TMP}/app.log\" || true; echo \"app_log_lines=$(wc -l < \"${TMP}/app.log\" | tr -d ' ')\"; echo \"error_like_count=$(grep -Eic 'FATAL|ANR|Exception|SecurityException|DeadObject|OutOfMemory|SQLite.*(error|exception)|Room.*(error|exception)' \"${TMP}/app.log\" || true)\"; grep -Ei 'FATAL|ANR|Exception|SecurityException|DeadObject|OutOfMemory|SQLite.*(error|exception)|Room.*(error|exception)' \"${TMP}/app.log\" | tail -n 80 || true; fi; echo 'global_crash_markers:'; adb -s \"${SERIAL}\" logcat -d -v threadtime | grep -E 'FATAL EXCEPTION|ANR in io.blueeye|Process: io.blueeye|am_crash|am_anr' | tail -n 80 || true; echo 'PHONE_FINAL_CAPTURE=PASS'",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\n* daemon not running; starting now at tcp:5037\n* daemon started successfully\n--- return to Radar and stop scanning normally ---\nradar_before_stop:\n 140  288 11 seen / none need review\n 182  288 No attention signals - 11 nearby\n 304  139 All 11\nradar_after_stop:\n 140  288 11 seen / none need review\n 182  288 No attention signals - 11 nearby\n 304  139 All 11\n--- frozen diagnostics ---\n 289  201 Persisted/min\n 341  250 Signal samples/min\n 415  342 Raw / queued / coalesced total\n 489  397 Processed / persisted / samples total\n 616  189 Queue depth\n 690  229 Queue high-water\n 764  208 Queue rejected\n 838  209 Queue dropped\n 912  228 Processing failed\n 986  243 Provisional discard\n1060  243 Sample write failed\n1134  254 Queue wait avg/max\n1208  254 Processing avg/max\n1356  209 Last scan error\n1430  158 Lifecycle\n1504  179 Lifecycle at\n1578  251 Lifecycle transitions\n--- session export Copy ---\nclipboard_services:\n  clipboard\n  semclipboard\nclipboard_cmd_shell:\nNo shell command implementation.\n\nclipboard_cmd_run_as:\n\nclipboard_dumpsys:\n\n--- Room/WAL/SHM live stopped-scan snapshot ---\ncache\ndatabases\nfiles\nshared_prefs\nsnapshot_files:\ntotal 2392\ndrwxr-x--x@ 5 michal  staff     160 Sep  9 04:18 .\ndrwxr-xr-x@ 3 michal  staff      96 Sep  9 04:27 ..\n-rw-r-----@ 1 michal  staff  749568 Sep  9 04:26 tracker_database\n-rw-------@ 1 michal  staff   32768 Sep  9 04:26 tracker_database-shm\n-rw-r-----@ 1 michal  staff  440872 Sep  9 04:26 tracker_database-wal\nsnapshot_sha256:\ne5cfb9ce9e874dcd7220549354924678502c7567910cb8d6210a951a490eaa51  /var/folders/y2/pbpz4k894kb10_gl3v69kbgm0000gn/T/tmp.k63nImGK7D/dbcopy/databases/tracker_database\n352b69ca74224a0e2dd5f596ed616eb640c098c0a996aab629d38c293f8eae66  /var/folders/y2/pbpz4k894kb10_gl3v69kbgm0000gn/T/tmp.k63nImGK7D/dbcopy/databases/tracker_database-shm\n8c9c22e5767f0d5d315ac04c6f7d69caaeb8e4954a938a1e9790f7fde0284596  /var/folders/y2/pbpz4k894kb10_gl3v69kbgm0000gn/T/tmp.k63nImGK7D/dbcopy/databases/tracker_database-wal\nsqlite_integrity:\nok\nsqlite_user_version:\n22\ntable_counts:\nalert_evidence_events=0\nandroid_metadata=1\ndevices=12\nfollow_me_observations=116\nsignal_samples=1782\nwatchlist=0\n--- final logcat ---\npid=not_running\nglobal_crash_markers:\n09-09 04:27:35.797 32105 32105 E AndroidRuntime: FATAL EXCEPTION: main\n09-09 04:27:35.797 32105 32105 E AndroidRuntime: Process: io.blueeye, PID: 32105\nPHONE_FINAL_CAPTURE=PASS\n",
+      "elapsed_seconds": 63.249,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 13.25,
+      "output_policy": "stream",
+      "captured_output_chars": 2479,
+      "output_truncated": false,
+      "current_rss_mb": 13.25,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 63.249
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.125
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.074
+  },
+  "finished_at": "2026-09-09T02:27:44.670432+00:00",
+  "task_digest": "ca464c91eae7228a69219f54ba4f660b2ca0885b0801539bcf39bc09a2c7ff8f",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "attempt_id": "ad62c363218e426dbca7091e",
+  "daemon_version": "4.18.19"
+}
