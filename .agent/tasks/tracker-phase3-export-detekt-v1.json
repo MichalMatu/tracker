@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-export-detekt-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 2048,
+  "command_timeout": 600,
+  "idle_timeout": 180,
+  "task_timeout": 900,
+  "commands": [
+    "set -euo pipefail; EXPECTED='ae2b3d4bdd3fbb14c6ede7e4de6eee460ff9e1f2'; git fetch --no-tags origin main >/dev/null; test \"$(git rev-parse origin/main)\" = \"${EXPECTED}\"; test \"$(git rev-parse HEAD)\" = \"${EXPECTED}\"; ./gradlew --parallel --max-workers=2 :feature:settings:detekt --console=plain --no-daemon"
+  ]
+}
