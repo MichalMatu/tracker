@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-pre-field-checkpoint-v2",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-09T02:12:35.824997+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; REPO='MichalMatu/tracker'; EXPECTED='eb10cdd70039e82d09cc03231b52ad851fe42546'; VERSION='v1.0.0-phase3-pre-field.1'; CHECKPOINT='checkpoint-phase3-pre-field-golden-2026-09-09'; APK_NAME=\"BlueEye-Tracker-${VERSION}-debug.apk\"; SHA_NAME=\"${APK_NAME}.sha256\"; git fetch --no-tags origin main; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; RELEASE_TARGET=$(gh api \"repos/${REPO}/releases/tags/${VERSION}\" --jq '.target_commitish'); test \"${RELEASE_TARGET}\" = \"${EXPECTED}\"; TMP=$(mktemp -d); trap 'rm -rf \"${TMP}\"' EXIT; gh release download \"${VERSION}\" --repo \"${REPO}\" --dir \"${TMP}\" --pattern \"${APK_NAME}\" --pattern \"${SHA_NAME}\"; test -f \"${TMP}/${APK_NAME}\"; test -f \"${TMP}/${SHA_NAME}\"; EXPECTED_HASH=$(awk 'NR==1 {print $1}' \"${TMP}/${SHA_NAME}\"); test \"$(printf '%s' \"${EXPECTED_HASH}\" | wc -c | tr -d ' ')\" = '64'; ACTUAL_HASH=$(shasum -a 256 \"${TMP}/${APK_NAME}\" | awk '{print $1}'); test \"${ACTUAL_HASH}\" = \"${EXPECTED_HASH}\"; API_DIGEST=$(gh api \"repos/${REPO}/releases/tags/${VERSION}\" --jq '.assets[] | select(.name == \"'\"${APK_NAME}\"'\") | .digest'); test \"${API_DIGEST}\" = \"sha256:${ACTUAL_HASH}\"; test -z \"$(git ls-remote --tags origin \"refs/tags/${CHECKPOINT}\" \"refs/tags/${CHECKPOINT}^{}\")\"; if git show-ref --verify --quiet \"refs/tags/${CHECKPOINT}\"; then echo \"local checkpoint tag unexpectedly exists: ${CHECKPOINT}\" >&2; exit 3; fi; git tag -a \"${CHECKPOINT}\" \"${EXPECTED}\" -m 'Phase 3 pre-field golden checkpoint'; OBJ=$(git rev-parse \"${CHECKPOINT}\"); PEELED=$(git rev-parse \"${CHECKPOINT}^{}\"); TYPE=$(git cat-file -t \"${CHECKPOINT}\"); test \"${PEELED}\" = \"${EXPECTED}\"; test \"${TYPE}\" = 'tag'; git push origin \"refs/tags/${CHECKPOINT}\"; REMOTE=$(git ls-remote --tags origin \"refs/tags/${CHECKPOINT}^{}\" | awk '{print $1}'); test \"${REMOTE}\" = \"${EXPECTED}\"; printf 'version=%s\\napk=%s\\napk_sha256=%s\\ncheckpoint=%s\\ncheckpoint_object=%s\\ncheckpoint_peeled=%s\\ncheckpoint_type=%s\\n' \"${VERSION}\" \"${APK_NAME}\" \"${ACTUAL_HASH}\" \"${CHECKPOINT}\" \"${OBJ}\" \"${PEELED}\" \"${TYPE}\"; test -z \"$(git status --porcelain)\"",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\nTo https://github.com/MichalMatu/tracker.git\n * [new tag]         checkpoint-phase3-pre-field-golden-2026-09-09 -> checkpoint-phase3-pre-field-golden-2026-09-09\nversion=v1.0.0-phase3-pre-field.1\napk=BlueEye-Tracker-v1.0.0-phase3-pre-field.1-debug.apk\napk_sha256=acd11814ebbd3a2d5a3a8cdc1c51e1338d98d7e447ebc1421603f230697f116c\ncheckpoint=checkpoint-phase3-pre-field-golden-2026-09-09\ncheckpoint_object=d7edf1a543ab1e22a1ed86be045009c1f2a4ae82\ncheckpoint_peeled=eb10cdd70039e82d09cc03231b52ad851fe42546\ncheckpoint_type=tag\n",
+      "elapsed_seconds": 6.977,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 49.73,
+      "output_policy": "stream",
+      "captured_output_chars": 611,
+      "output_truncated": false,
+      "current_rss_mb": 23.06,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 6.977
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.091
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.079
+  },
+  "finished_at": "2026-09-09T02:12:44.366971+00:00",
+  "task_digest": "f2cc293c512eb2445ff1009ad6ce55fd0b7493bc5f3fd257cca645d580b831cc",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 512,
+  "attempt_id": "249665bd394dd554527e5fb7",
+  "daemon_version": "4.18.19"
+}
