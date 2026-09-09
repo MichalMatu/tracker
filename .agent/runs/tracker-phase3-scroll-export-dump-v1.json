@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-scroll-export-dump-v1",
+  "task_digest": "18236c360af9263c97a1db7ac3dfd12ba002387eb4083f860038af934d1c6f70",
+  "idle_timeout": 60,
+  "task_timeout": 240,
+  "memory_limit_mb": 512,
+  "started_at": "2026-09-09T03:28:55.668209+00:00",
+  "attempt_id": "db792667fc765d95c022e6f0",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 36583,
+  "updated_at": "2026-09-09T03:28:55.668264+00:00",
+  "pid": 36583
+}
