@@ -1,0 +1,61 @@
+{
+  "id": "tracker-phase3-room-e2e-v2",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-09T03:57:30.879546+00:00",
+  "command_timeout": 420,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch origin agent-control >/dev/null; git show origin/agent-control:.agent/payloads/tracker-phase3-room-e2e-v2.sh > /tmp/tracker-phase3-room-e2e-v2.sh; chmod +x /tmp/tracker-phase3-room-e2e-v2.sh; /tmp/tracker-phase3-room-e2e-v2.sh",
+      "exit_code": 1,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            agent-control -> FETCH_HEAD\n   620d784..8181061  agent-control -> origin/agent-control\nFrom https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\nsource_head=db8c3ce7d95897b0c7e487750f4b7cb8e30641b3\n* daemon not running; starting now at tcp:5037\n* daemon started successfully\nserial=RFCT70L7E8J\nList of devices attached\nRFCT70L7E8J            device usb:1-1.1 product:g0sxeea model:SM_S906B device:g0s transport_id:1\n\nSM-S906B\n16\n36\n    versionCode=1 minSdk=26 targetSdk=33\n    versionName=1.0\n    lastUpdateTime=2026-09-09 05:18:27\n      android.permission.POST_NOTIFICATIONS\n      android.permission.ACCESS_FINE_LOCATION\n      android.permission.BLUETOOTH_CONNECT\n      android.permission.ACCESS_COARSE_LOCATION\n      android.permission.BLUETOOTH_SCAN\n      firstInstallTime=2026-09-09 05:18:27\n        android.permission.POST_NOTIFICATIONS: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n        android.permission.ACCESS_FINE_LOCATION: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|524288]\n        android.permission.BLUETOOTH_CONNECT: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n        android.permission.ACCESS_COARSE_LOCATION: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n        android.permission.BLUETOOTH_SCAN: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n      firstInstallTime=2026-09-09 05:18:27\n/data/app/~~EadcIChfhBPbuic-dOcM8A==/io.blueeye-EF0x653P1E_SvUuIDozr6Q==/base.apk: 1 file pulled, 0 skipped. 40.2 MB/s (13179140 bytes in 0.312s)\ninstalled_apk_sha256=4d4a58789fb94d5e984d2135c2942018f4d8ae0cfb06d6f49692a0a454941ace\nbluetooth_on=1\nscanner_running=1\npid=15639\n--- BASELINE ---\n--- baseline_db counts ---\nok\n27\n5417\n166\nbaseline_rawBleCallbacksTotal=21463\nbaseline_enqueueAcceptedTotal=21456\nbaseline_enqueueRejectedTotal=0\nbaseline_queueDroppedTotal=0\nbaseline_coalescedTotal=7\nbaseline_processingStartedTotal=21456\nbaseline_processingSucceededTotal=21456\nbaseline_processingFailedTotal=0\nbaseline_persistedDeviceUpdatesTotal=7484\nbaseline_signalSamplesWrittenTotal=3635\nbaseline_queueDepth=0\nbaseline_queueHighWaterMark=8\nSOAK_START=2026-09-09T03:58:15Z\nsoak_checkpoint_1_pid=15639\nsoak_checkpoint_2_pid=15639\nsoak_checkpoint_3_pid=15639\nsoak_checkpoint_4_pid=15639\nSOAK_END=2026-09-09T04:01:16Z\nscanner_service_still_present_after_stop=0\n--- FINAL ---\n--- final_db counts ---\nok\n27\n5417\n166\n--- DELTAS ---\nrawBleCallbacksTotal=0\nenqueueAcceptedTotal=0\nenqueueRejectedTotal=0\nqueueDroppedTotal=0\ncoalescedTotal=0\nprocessingStartedTotal=0\nprocessingSucceededTotal=0\nprocessingFailedTotal=0\nprovisionalDiscardedTotal=0\npersistedDeviceUpdatesTotal=0\ndeviceUpdateThrottledTotal=0\nsignalSamplesWrittenTotal=0\nsignalSamplesThrottledTotal=0\nsignalSampleWriteFailuresTotal=0\ntotalQueueWaitMs=0\ntotalProcessingDurationMs=0\nfinal_queueDepth=0\nfinal_queueHighWaterMark=8\nfinal_maxQueueWaitMs=208\nfinal_maxProcessingDurationMs=156\nraw_accounting_rhs=0\nTraceback (most recent call last):\n  File \"<stdin>\", line 11, in <module>\nAssertionError\n",
+      "elapsed_seconds": 263.032,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 15.23,
+      "output_policy": "stream",
+      "captured_output_chars": 3257,
+      "output_truncated": false,
+      "current_rss_mb": 10.12,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 263.032
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.135
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.091
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-09T04:01:55.561953+00:00",
+  "task_digest": "93e1aeed8b00d1eb9b847375aabe1e896ce80efa4a4c18f540abe8c364480187",
+  "idle_timeout": 360,
+  "task_timeout": 900,
+  "memory_limit_mb": 1024,
+  "attempt_id": "5d232ef826322cd3b9544dd6",
+  "daemon_version": "4.18.19"
+}
