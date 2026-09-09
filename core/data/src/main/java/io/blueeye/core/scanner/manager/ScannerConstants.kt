@@ -10,6 +10,13 @@ object ScannerConstants {
     /** Delay after stopping scan before starting a new one (Bluetooth stack stabilization) */
     const val SCAN_TRANSITION_DELAY_MS = 500L
 
+    /**
+     * Refresh passive BLE registration before Android/OEM scan timeouts can silently retire it.
+     * Samsung Android 16 field evidence showed a 300,000 ms platform timeout while the app still
+     * believed the scanner was running, so keep a full minute of margin.
+     */
+    const val PASSIVE_SCAN_REFRESH_INTERVAL_MS = 240_000L
+
     // === Throttling ===
 
     /** Minimum interval between database updates for the same device (ms) */
