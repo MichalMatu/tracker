@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-pre-field-version-tag-v1",
+  "task_digest": "0591d833129881640e10ef8abe3add5a04f7ca3a92c036d0f3ed997dfcde83d8",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 512,
+  "started_at": "2026-09-09T02:05:54.374126+00:00",
+  "attempt_id": "e453c16feb72decc5e1c0868",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 52473,
+  "updated_at": "2026-09-09T02:05:54.374266+00:00",
+  "pid": 52473
+}
