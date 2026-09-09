@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-phone-state-v1",
+  "task_digest": "8998ce8bd0b23e8457f05fffe791f3291357db45fbbfed05c9b51baf6e5446d0",
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "memory_limit_mb": 512,
+  "started_at": "2026-09-09T02:21:50.220494+00:00",
+  "attempt_id": "b31472cd0cc12bc5a5d94806",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 68970,
+  "updated_at": "2026-09-09T02:21:50.220555+00:00",
+  "pid": 68970
+}
