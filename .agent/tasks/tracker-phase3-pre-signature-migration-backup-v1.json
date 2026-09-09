@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-pre-signature-migration-backup-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 240,
+  "idle_timeout": 120,
+  "task_timeout": 420,
+  "commands": [
+    "set -euo pipefail; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test -n \"$SERIAL\"; PKG=io.blueeye; OLD='/tmp/BlueEye-Tracker-pre-update-old.apk'; DATA='/tmp/BlueEye-Tracker-pre-update-data.tar'; rm -f \"$OLD\" \"$DATA\"; P=$(adb -s \"$SERIAL\" shell pm path \"$PKG\" | tr -d '\\r' | sed -n 's/^package://p' | head -n1); adb -s \"$SERIAL\" pull \"$P\" \"$OLD\" >/dev/null; adb -s \"$SERIAL\" exec-out run-as \"$PKG\" sh -c 'cd /data/user/0/io.blueeye && tar cf - databases files shared_prefs' > \"$DATA\"; echo old_apk_sha=$(shasum -a 256 \"$OLD\" | awk '{print $1}'); echo data_tar_sha=$(shasum -a 256 \"$DATA\" | awk '{print $1}'); test \"$(shasum -a 256 \"$OLD\" | awk '{print $1}')\" = 'acd11814ebbd3a2d5a3a8cdc1c51e1338d98d7e447ebc1421603f230697f116c'; tar tf \"$DATA\" | head -n 80; T=$(mktemp -d); trap 'rm -rf \"$T\"' EXIT; tar xf \"$DATA\" -C \"$T\"; sqlite3 \"$T/databases/tracker_database\" 'PRAGMA integrity_check; select count(*) from devices; select count(*) from signal_samples; select count(*) from follow_me_observations;'; echo PRIVATE_BACKUP_PASS"
+  ]
+}
