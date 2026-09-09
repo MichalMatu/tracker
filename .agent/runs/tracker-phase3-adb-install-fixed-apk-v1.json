@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-adb-install-fixed-apk-v1",
+  "task_digest": "4fd575e081120e3be3e8bd5fd93fb1326ee2fcab0e6987decf3c731ea6b8ef4f",
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "memory_limit_mb": 512,
+  "started_at": "2026-09-09T03:14:22.956331+00:00",
+  "attempt_id": "a4f8eaefd97782435f78680e",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 21854,
+  "updated_at": "2026-09-09T03:14:22.956494+00:00",
+  "pid": 21854
+}
