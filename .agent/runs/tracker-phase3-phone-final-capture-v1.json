@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-phone-final-capture-v1",
+  "task_digest": "ca464c91eae7228a69219f54ba4f660b2ca0885b0801539bcf39bc09a2c7ff8f",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-09T02:26:39.792526+00:00",
+  "attempt_id": "ad62c363218e426dbca7091e",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 74017,
+  "updated_at": "2026-09-09T02:26:39.792599+00:00",
+  "pid": 74017
+}
