@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-ui-stability-device-v1",
+  "task_digest": "c0016cb62dc6c6ba9f90437dfbf434952905e569515804bd7dbb7a19bc482695",
+  "idle_timeout": 600,
+  "task_timeout": 1500,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-10T02:42:21.387307+00:00",
+  "attempt_id": "b7e8795c3c1e671c1eda1487",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 56745,
+  "updated_at": "2026-09-10T02:42:21.387444+00:00",
+  "pid": 56745
+}
