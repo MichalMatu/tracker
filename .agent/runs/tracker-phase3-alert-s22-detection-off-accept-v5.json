@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-alert-s22-detection-off-accept-v5",
+  "task_digest": "8d8eb9fdb3a036ddc0a450c2d89f7518b75cd2e55d86fb8ca568678bbdd47d9d",
+  "idle_timeout": 150,
+  "task_timeout": 420,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-10T16:02:57.534747+00:00",
+  "attempt_id": "e2d611beadc9f41b9d85cec9",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 69294,
+  "updated_at": "2026-09-10T16:02:57.534894+00:00",
+  "pid": 69294
+}
