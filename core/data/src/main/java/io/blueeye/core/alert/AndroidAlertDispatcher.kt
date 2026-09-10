@@ -202,7 +202,12 @@ class AndroidAlertDispatcher
 
             val identity = ActiveAlertIdentity(request.category, request.key)
             sideEffects.postNotification(identity, notification)
-            val vibrationTriggered = sideEffects.startVibration(identity, request.vibrationPattern, policy.vibrationEnabled)
+            val vibrationTriggered =
+                sideEffects.startVibration(
+                    identity = identity,
+                    pattern = request.vibrationPattern,
+                    enabled = policy.vibrationEnabled,
+                )
             val soundPlayed = sideEffects.startSound(identity, policy.soundEnabled)
 
             return AlertDeliveryResult(
@@ -329,26 +334,30 @@ private class ActiveAlertSideEffects(
         identity: ActiveAlertIdentity,
         enabled: Boolean,
     ): Boolean {
-        if (!enabled) return false
         val ringtone =
-            listOfNotNull(
-                android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI,
-                android.provider.Settings.System.DEFAULT_NOTIFICATION_URI,
-                android.provider.Settings.System.DEFAULT_RINGTONE_URI,
-            ).firstOrNull()
-                ?.let { uri -> RingtoneManager.getRingtone(context, uri) }
-                ?: return false
+            if (enabled) {
+                listOfNotNull(
+                    android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI,
+                    android.provider.Settings.System.DEFAULT_NOTIFICATION_URI,
+                    android.provider.Settings.System.DEFAULT_RINGTONE_URI,
+                ).firstOrNull()
+                    ?.let { uri -> RingtoneManager.getRingtone(context, uri) }
+            } else {
+                null
+            }
 
-        ringtone.audioAttributes =
-            AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_ALARM)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build()
-        stopSound()
-        activeRingtone = ringtone
-        activeSoundIdentity = identity
-        ringtone.play()
-        return true
+        if (ringtone != null) {
+            ringtone.audioAttributes =
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            stopSound()
+            activeRingtone = ringtone
+            activeSoundIdentity = identity
+            ringtone.play()
+        }
+        return ringtone != null
     }
 
     fun applyPolicy(policy: TrackerAlertSettings) {
