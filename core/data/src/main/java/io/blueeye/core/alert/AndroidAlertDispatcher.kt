@@ -45,7 +45,7 @@ class AndroidAlertDispatcher
     constructor(
         @ApplicationContext private val context: Context,
         private val settingsPreferencesRepository: SettingsPreferencesRepository,
-        private val vibrationHandler: TacticalVibrationHandler,
+        vibrationHandler: TacticalVibrationHandler,
     ) : AlertDispatcher {
         private val notificationManager: NotificationManager =
             context.getSystemService(NotificationManager::class.java)
@@ -53,13 +53,12 @@ class AndroidAlertDispatcher
         private val lastDeliveryByKey = ConcurrentHashMap<String, Long>()
         private val sideEffectLock = Any()
         private val policyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-        private val activeNotificationIdentities = mutableSetOf<ActiveAlertIdentity>()
-
-        @Volatile
-        private var latestPolicy: TrackerAlertSettings? = null
-        private var activeRingtone: Ringtone? = null
-        private var activeSoundIdentity: ActiveAlertIdentity? = null
-        private var activeVibrationIdentity: ActiveAlertIdentity? = null
+        private val sideEffects =
+            ActiveAlertSideEffects(
+                context = context,
+                notificationManager = notificationManagerCompat,
+                vibrationHandler = vibrationHandler,
+            )
 
         private val _diagnostics = MutableStateFlow(buildDiagnostics(AlertDeliveryResult()))
         override val diagnostics: StateFlow<AlertDeliveryDiagnostics> = _diagnostics.asStateFlow()
@@ -68,8 +67,7 @@ class AndroidAlertDispatcher
             policyScope.launch {
                 settingsPreferencesRepository.trackerAlerts.collect { policy ->
                     synchronized(sideEffectLock) {
-                        latestPolicy = policy
-                        reconcileActiveEffectsWithPolicy(policy)
+                        sideEffects.applyPolicy(policy)
                     }
                 }
             }
@@ -78,13 +76,12 @@ class AndroidAlertDispatcher
         override suspend fun dispatch(request: AlertRequest): Result<AlertDeliveryResult> =
             runCatching {
                 ensureChannels()
-                val persistedPolicy = settingsPreferencesRepository.trackerAlerts.first()
+                val policy = settingsPreferencesRepository.trackerAlerts.first()
                 val timestamp = System.currentTimeMillis()
                 val cooldownKey = "${request.category}:${request.key}"
 
                 val result =
                     synchronized(sideEffectLock) {
-                        val policy = latestPolicy ?: persistedPolicy
                         val alertPostPolicy =
                             AlertPostPolicy(
                                 channelId = if (policy.headsUpEnabled) HEADS_UP_CHANNEL_ID else TRAY_CHANNEL_ID,
@@ -120,12 +117,7 @@ class AndroidAlertDispatcher
                                         message = "Alert blocked: Android notification channel is disabled.",
                                         timestamp = timestamp,
                                     )
-                                else ->
-                                    postAlert(
-                                        request = request,
-                                        policy = alertPostPolicy,
-                                        timestamp = timestamp,
-                                    )
+                                else -> postAlert(request, alertPostPolicy, timestamp)
                             }
 
                         if (delivery.status == AlertDeliveryStatus.POSTED) {
@@ -137,15 +129,16 @@ class AndroidAlertDispatcher
                 _diagnostics.value = buildDiagnostics(result)
                 result
             }.onFailure { error ->
-                val result =
-                    AlertDeliveryResult(
-                        category = request.category,
-                        key = request.key,
-                        status = AlertDeliveryStatus.FAILED,
-                        message = "Alert dispatch failed: ${error.message ?: error.javaClass.simpleName}",
-                        timestamp = System.currentTimeMillis(),
+                _diagnostics.value =
+                    buildDiagnostics(
+                        AlertDeliveryResult(
+                            category = request.category,
+                            key = request.key,
+                            status = AlertDeliveryStatus.FAILED,
+                            message = "Alert dispatch failed: ${error.message ?: error.javaClass.simpleName}",
+                            timestamp = System.currentTimeMillis(),
+                        ),
                     )
-                _diagnostics.value = buildDiagnostics(result)
             }
 
         override fun acknowledge(
@@ -154,36 +147,14 @@ class AndroidAlertDispatcher
         ): Result<Unit> =
             runCatching {
                 synchronized(sideEffectLock) {
-                    val identity = ActiveAlertIdentity(category, key)
-                    notificationManagerCompat.cancel(category.name, key.hashCode())
-                    activeNotificationIdentities.remove(identity)
-                    if (activeSoundIdentity == identity) {
-                        stopSoundLocked()
-                    }
-                    if (activeVibrationIdentity == identity) {
-                        cancelVibrationLocked()
-                    }
+                    sideEffects.acknowledge(ActiveAlertIdentity(category, key))
                 }
             }
 
         override fun cancelAll(): Result<Unit> =
             runCatching {
                 synchronized(sideEffectLock) {
-                    cancelAllLocked()
-                }
-            }
-
-        override fun stopSound(): Result<Unit> =
-            runCatching {
-                synchronized(sideEffectLock) {
-                    stopSoundLocked()
-                }
-            }
-
-        override fun cancelVibration(): Result<Unit> =
-            runCatching {
-                synchronized(sideEffectLock) {
-                    cancelVibrationLocked()
+                    sideEffects.cancelAll()
                 }
             }
 
@@ -230,24 +201,9 @@ class AndroidAlertDispatcher
                     .build()
 
             val identity = ActiveAlertIdentity(request.category, request.key)
-            @Suppress("MissingPermission")
-            notificationManagerCompat.notify(request.category.name, request.key.hashCode(), notification)
-            activeNotificationIdentities.add(identity)
-
-            val vibrationTriggered =
-                if (policy.vibrationEnabled && request.vibrationPattern != AlertVibrationPattern.NONE) {
-                    triggerVibration(request.vibrationPattern)
-                    activeVibrationIdentity = identity
-                    true
-                } else {
-                    false
-                }
-            val soundPlayed =
-                if (policy.soundEnabled) {
-                    playAlertSound(identity)
-                } else {
-                    false
-                }
+            sideEffects.postNotification(identity, notification)
+            val vibrationTriggered = sideEffects.startVibration(identity, request.vibrationPattern, policy.vibrationEnabled)
+            val soundPlayed = sideEffects.startSound(identity, policy.soundEnabled)
 
             return AlertDeliveryResult(
                 category = request.category,
@@ -259,69 +215,6 @@ class AndroidAlertDispatcher
                 message = "Alert posted by unified dispatcher.",
                 timestamp = timestamp,
             )
-        }
-
-        private fun triggerVibration(pattern: AlertVibrationPattern) {
-            when (pattern) {
-                AlertVibrationPattern.NONE -> Unit
-                AlertVibrationPattern.MEDIUM -> vibrationHandler.vibrate(ConfidenceLevel.MEDIUM)
-                AlertVibrationPattern.HIGH -> vibrationHandler.vibrate(ConfidenceLevel.HIGH)
-                AlertVibrationPattern.CRITICAL -> vibrationHandler.vibrate(ConfidenceLevel.CRITICAL)
-                AlertVibrationPattern.WATCHLIST_RETURN -> vibrationHandler.vibrateForFavorite()
-            }
-        }
-
-        private fun playAlertSound(identity: ActiveAlertIdentity): Boolean {
-            val ringtone =
-                listOfNotNull(
-                    android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI,
-                    android.provider.Settings.System.DEFAULT_NOTIFICATION_URI,
-                    android.provider.Settings.System.DEFAULT_RINGTONE_URI,
-                ).firstOrNull()
-                    ?.let { uri -> RingtoneManager.getRingtone(context, uri) }
-                    ?: return false
-
-            ringtone.audioAttributes =
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
-
-            stopSoundLocked()
-            activeRingtone = ringtone
-            activeSoundIdentity = identity
-            ringtone.play()
-            return true
-        }
-
-        private fun reconcileActiveEffectsWithPolicy(policy: TrackerAlertSettings) {
-            alertCancellationActions(policy).forEach { action ->
-                when (action) {
-                    AlertCancellationAction.ALL -> cancelAllLocked()
-                    AlertCancellationAction.SOUND -> stopSoundLocked()
-                    AlertCancellationAction.VIBRATION -> cancelVibrationLocked()
-                }
-            }
-        }
-
-        private fun cancelAllLocked() {
-            activeNotificationIdentities.forEach { identity ->
-                notificationManagerCompat.cancel(identity.category.name, identity.key.hashCode())
-            }
-            activeNotificationIdentities.clear()
-            stopSoundLocked()
-            cancelVibrationLocked()
-        }
-
-        private fun stopSoundLocked() {
-            activeRingtone?.stop()
-            activeRingtone = null
-            activeSoundIdentity = null
-        }
-
-        private fun cancelVibrationLocked() {
-            vibrationHandler.cancel()
-            activeVibrationIdentity = null
         }
 
         private fun ensureChannels() {
@@ -395,6 +288,106 @@ class AndroidAlertDispatcher
             private const val TRAY_CHANNEL_ID = "field_mvp_alerts_tray_v1"
         }
     }
+
+private class ActiveAlertSideEffects(
+    private val context: Context,
+    private val notificationManager: NotificationManagerCompat,
+    private val vibrationHandler: TacticalVibrationHandler,
+) {
+    private val notificationIdentities = mutableSetOf<ActiveAlertIdentity>()
+    private var activeRingtone: Ringtone? = null
+    private var activeSoundIdentity: ActiveAlertIdentity? = null
+    private var activeVibrationIdentity: ActiveAlertIdentity? = null
+
+    @Suppress("MissingPermission")
+    fun postNotification(
+        identity: ActiveAlertIdentity,
+        notification: android.app.Notification,
+    ) {
+        notificationManager.notify(identity.category.name, identity.key.hashCode(), notification)
+        notificationIdentities.add(identity)
+    }
+
+    fun startVibration(
+        identity: ActiveAlertIdentity,
+        pattern: AlertVibrationPattern,
+        enabled: Boolean,
+    ): Boolean {
+        if (!enabled || pattern == AlertVibrationPattern.NONE) return false
+        when (pattern) {
+            AlertVibrationPattern.NONE -> Unit
+            AlertVibrationPattern.MEDIUM -> vibrationHandler.vibrate(ConfidenceLevel.MEDIUM)
+            AlertVibrationPattern.HIGH -> vibrationHandler.vibrate(ConfidenceLevel.HIGH)
+            AlertVibrationPattern.CRITICAL -> vibrationHandler.vibrate(ConfidenceLevel.CRITICAL)
+            AlertVibrationPattern.WATCHLIST_RETURN -> vibrationHandler.vibrateForFavorite()
+        }
+        activeVibrationIdentity = identity
+        return true
+    }
+
+    fun startSound(
+        identity: ActiveAlertIdentity,
+        enabled: Boolean,
+    ): Boolean {
+        if (!enabled) return false
+        val ringtone =
+            listOfNotNull(
+                android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI,
+                android.provider.Settings.System.DEFAULT_NOTIFICATION_URI,
+                android.provider.Settings.System.DEFAULT_RINGTONE_URI,
+            ).firstOrNull()
+                ?.let { uri -> RingtoneManager.getRingtone(context, uri) }
+                ?: return false
+
+        ringtone.audioAttributes =
+            AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+        stopSound()
+        activeRingtone = ringtone
+        activeSoundIdentity = identity
+        ringtone.play()
+        return true
+    }
+
+    fun applyPolicy(policy: TrackerAlertSettings) {
+        alertCancellationActions(policy).forEach { action ->
+            when (action) {
+                AlertCancellationAction.ALL -> cancelAll()
+                AlertCancellationAction.SOUND -> stopSound()
+                AlertCancellationAction.VIBRATION -> cancelVibration()
+            }
+        }
+    }
+
+    fun acknowledge(identity: ActiveAlertIdentity) {
+        notificationManager.cancel(identity.category.name, identity.key.hashCode())
+        notificationIdentities.remove(identity)
+        if (activeSoundIdentity == identity) stopSound()
+        if (activeVibrationIdentity == identity) cancelVibration()
+    }
+
+    fun cancelAll() {
+        notificationIdentities.forEach { identity ->
+            notificationManager.cancel(identity.category.name, identity.key.hashCode())
+        }
+        notificationIdentities.clear()
+        stopSound()
+        cancelVibration()
+    }
+
+    private fun stopSound() {
+        activeRingtone?.stop()
+        activeRingtone = null
+        activeSoundIdentity = null
+    }
+
+    private fun cancelVibration() {
+        vibrationHandler.cancel()
+        activeVibrationIdentity = null
+    }
+}
 
 internal enum class AlertCancellationAction {
     ALL,
