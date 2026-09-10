@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.18.20",
-  "state": "idle",
-  "pid": 41673,
-  "updated_at": "2026-09-10T15:36:27.970740+00:00",
+  "state": "running",
+  "pid": 54030,
+  "updated_at": "2026-09-10T15:48:15.556464+00:00",
   "self_revision": "0bb99d790dbed19a528b4cb8ac238432134b5660",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": null,
+  "current_task_id": "tracker-phase3-alert-s22-dispatch-diagnostic-v1",
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "tracker",
@@ -23,8 +23,8 @@
   "default_branch": "main",
   "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 41673,
-  "supervisor_pid": 32134,
-  "last_task_id": "tracker-phase3-alert-s22-detection-off-accept-v3",
+  "worker_pid": 54030,
+  "supervisor_pid": 53937,
+  "active_resources": [],
   "execution_variant": "parallel"
 }
