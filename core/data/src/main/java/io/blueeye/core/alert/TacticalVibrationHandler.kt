@@ -97,6 +97,14 @@ class TacticalVibrationHandler @Inject constructor(
         }
     }
 
+    fun cancel() {
+        try {
+            getVibrator()?.cancel()
+        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+            Log.e(TAG, "Failed to cancel vibration: ${e.message}")
+        }
+    }
+
     private fun getVibrator(): Vibrator? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
         manager?.defaultVibrator
