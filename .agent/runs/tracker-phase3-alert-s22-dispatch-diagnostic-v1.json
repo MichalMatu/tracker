@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-alert-s22-dispatch-diagnostic-v1",
+  "task_digest": "cf5540436cfe4cb5201e7f762def745922a3a183cb5bdc391f44013e2522ba09",
+  "idle_timeout": 120,
+  "task_timeout": 360,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-10T15:48:19.152036+00:00",
+  "attempt_id": "fb09c3ea4db055d56a7d433c",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 54030,
+  "updated_at": "2026-09-10T15:48:19.152178+00:00",
+  "pid": 54030
+}
