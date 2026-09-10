@@ -1,5 +1,6 @@
 package io.blueeye.core.scanner.throttle
 
+import io.blueeye.core.model.TrackingStatus
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -105,11 +106,63 @@ class ScanThrottlerTest {
     }
 
     @Test
-    fun `shouldWriteSample throttle separately`() {
-        val mac = "AA:BB:CC:11:22:33"
-
-        assertTrue(throttler.shouldWriteSample(mac, now = 1000L))
-        assertFalse(throttler.shouldWriteSample(mac, now = 1500L)) // 2000ms limit
-        assertTrue(throttler.shouldWriteSample(mac, now = 3100L))
+    fun `stable signal sample uses ten second heartbeat per fingerprint`() {
+        assertTrue(throttler.shouldWriteSample(sample(now = 1_000L)))
+        assertFalse(throttler.shouldWriteSample(sample(now = 9_000L)))
+        assertTrue(throttler.shouldWriteSample(sample(now = 11_000L)))
     }
+
+    @Test
+    fun `rotated mac writes immediately for same fingerprint`() {
+        assertTrue(throttler.shouldWriteSample(sample(now = 1_000L)))
+        assertTrue(
+            throttler.shouldWriteSample(
+                sample(observedMac = "AA:BB:CC:44:55:66", now = 1_100L)
+            )
+        )
+    }
+
+    @Test
+    fun `significant rssi change writes immediately`() {
+        assertTrue(throttler.shouldWriteSample(sample(rssi = -70, now = 1_000L)))
+        assertFalse(throttler.shouldWriteSample(sample(rssi = -65, now = 1_100L)))
+        assertTrue(throttler.shouldWriteSample(sample(rssi = -60, now = 1_200L)))
+    }
+
+    @Test
+    fun `tracking status change writes immediately`() {
+        assertTrue(throttler.shouldWriteSample(sample(now = 1_000L)))
+        assertTrue(
+            throttler.shouldWriteSample(
+                sample(trackingStatus = TrackingStatus.SUSPICIOUS, now = 1_100L)
+            )
+        )
+    }
+
+    @Test
+    fun `priority signal samples keep one hundred millisecond cadence`() {
+        assertTrue(throttler.shouldWriteSample(sample(isPriorityDevice = true, now = 1_000L)))
+        assertFalse(
+            throttler.shouldWriteSample(
+                sample(rssi = -30, isPriorityDevice = true, now = 1_050L)
+            )
+        )
+        assertTrue(throttler.shouldWriteSample(sample(isPriorityDevice = true, now = 1_100L)))
+    }
+
+    private fun sample(
+        observedMac: String = "AA:BB:CC:11:22:33",
+        rssi: Int = -70,
+        trackingStatus: TrackingStatus = TrackingStatus.SAFE,
+        isPriorityDevice: Boolean = false,
+        now: Long,
+    ): SignalSampleThrottleParams =
+        SignalSampleThrottleParams(
+            identityKey = "CANONICAL_FINGERPRINT",
+            observedMac = observedMac,
+            currentRssi = rssi,
+            trackingStatus = trackingStatus,
+            isPriorityDevice = isPriorityDevice,
+            now = now,
+        )
 }

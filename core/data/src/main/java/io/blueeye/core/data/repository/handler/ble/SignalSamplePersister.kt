@@ -5,6 +5,7 @@ import io.blueeye.core.data.db.dao.SignalSampleDao
 import io.blueeye.core.data.db.entity.SignalSampleEntity
 import io.blueeye.core.location.LocationProvider
 import io.blueeye.core.scanner.throttle.ScanThrottler
+import io.blueeye.core.scanner.throttle.SignalSampleThrottleParams
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,7 +32,18 @@ class SignalSamplePersister @Inject constructor(
         ctx: ScanDataContext,
         classifier: ScanResultClassifier,
     ): SignalSamplePersistenceOutcome {
-        if (!scanThrottler.shouldWriteSample(ctx.mac, isPriorityDevice = ctx.isTactical)) {
+        if (
+            !scanThrottler.shouldWriteSample(
+                SignalSampleThrottleParams(
+                    identityKey = ctx.fingerprint,
+                    observedMac = ctx.mac,
+                    currentRssi = ctx.validRssi,
+                    trackingStatus = ctx.trackingStatus,
+                    isPriorityDevice = ctx.isTactical,
+                    now = ctx.timestamp,
+                )
+            )
+        ) {
             return SignalSamplePersistenceOutcome.THROTTLED
         }
 

@@ -25,6 +25,6 @@ object ScannerConstants {
     /** High-frequency update interval for tactical/priority devices (ms) */
     const val TACTICAL_UPDATE_THROTTLE_MS = 100L
 
-    /** Minimum interval between signal sample recordings (ms) */
-    const val SIGNAL_SAMPLE_THROTTLE_MS = 2000L
+    /** Stable-device heartbeat interval for persisted signal history (ms). */
+    const val SIGNAL_SAMPLE_THROTTLE_MS = 10_000L
 }

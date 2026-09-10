@@ -72,7 +72,6 @@ internal fun String.withFieldMvpDiagnostics(uiState: SettingsUiState): String {
     return substring(0, insertionPoint).trimEnd() + payload + substring(insertionPoint)
 }
 
-
 internal fun Writer.writeWithFieldMvpDiagnostics(
     json: String,
     uiState: SettingsUiState,

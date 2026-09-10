@@ -8,8 +8,14 @@ import io.blueeye.core.model.AlertEvidenceEvent
 import io.blueeye.core.model.AlertEvidenceEventType
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.SignalSample
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,20 +27,42 @@ class SessionStatsProvider
         private val signalSampleRepository: SignalSampleRepository,
         private val settingsPreferencesRepository: SettingsPreferencesRepository,
     ) {
+        @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
         val stats: Flow<SessionStats> =
-            combine(
-                settingsPreferencesRepository.session,
-                deviceRepository.getAllDevices(),
-                signalSampleRepository.getAllSignalSamplesFlow(),
-                deviceRepository.getRecentAlertEvidenceEvents(),
-            ) { session, devicesResult, samplesResult, alertEventsResult ->
-                SessionStatsCalculator.calculate(
-                    startedAt = session.startedAt,
-                    devices = devicesResult.getOrDefault(emptyList()),
-                    samples = samplesResult.getOrDefault(emptyList()),
-                    alertEvidenceEvents = alertEventsResult.getOrDefault(emptyList()),
-                )
-            }
+            settingsPreferencesRepository.session
+                .flatMapLatest { session ->
+                    if (session.startedAt <= 0L) {
+                        flowOf(SessionStats())
+                    } else {
+                        flow {
+                            while (true) {
+                                emit(loadSnapshot(session.startedAt))
+                                delay(SESSION_STATS_REFRESH_INTERVAL_MS)
+                            }
+                        }
+                    }
+                }
+                .flowOn(Dispatchers.Default)
+
+        private suspend fun loadSnapshot(startedAt: Long): SessionStats {
+            val devices = deviceRepository.getAllDevicesSync().getOrDefault(emptyList())
+            val samples = signalSampleRepository.getAllSignalSamples().getOrDefault(emptyList())
+            val alertEvents =
+                deviceRepository.getRecentAlertEvidenceEvents()
+                    .first()
+                    .getOrDefault(emptyList())
+
+            return SessionStatsCalculator.calculate(
+                startedAt = startedAt,
+                devices = devices,
+                samples = samples,
+                alertEvidenceEvents = alertEvents,
+            )
+        }
+
+        private companion object {
+            const val SESSION_STATS_REFRESH_INTERVAL_MS = 5_000L
+        }
     }
 
 data class SessionStats(

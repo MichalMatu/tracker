@@ -7,8 +7,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
 import org.junit.Assert.assertEquals
-import java.io.StringWriter
 import org.junit.Test
+import java.io.StringWriter
 
 class FieldMvpExportAppendTest {
     @Test
@@ -65,13 +65,14 @@ class FieldMvpExportAppendTest {
     @Test
     fun `streamed diagnostics keep base export valid`() {
         val uiState = SettingsUiState(scannerDiagnostics = ScannerRuntimeDiagnostics())
-        val base = """
+        val base =
+            """
             {
               "schemaVersion": 19,
               "sampleCount": 2,
               "signalSamples": [{"rssi":-60},{"rssi":-61}]
             }
-        """.trimIndent()
+            """.trimIndent()
         val writer = StringWriter()
 
         writer.writeWithFieldMvpDiagnostics(base, uiState)
@@ -81,5 +82,4 @@ class FieldMvpExportAppendTest {
         assertEquals(2L, root.getValue("sampleCount").jsonPrimitive.long)
         root.getValue("fieldMvpDiagnostics").jsonObject
     }
-
 }

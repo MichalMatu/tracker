@@ -9,6 +9,7 @@ import io.blueeye.core.location.LocationProvider
 import io.blueeye.core.model.DeviceType
 import io.blueeye.core.model.TrackingStatus
 import io.blueeye.core.scanner.throttle.ScanThrottler
+import io.blueeye.core.scanner.throttle.SignalSampleThrottleParams
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -250,7 +251,7 @@ class DevicePersisterDebounceTest {
         whenever(locationProvider.getFreshCoordinates()).thenReturn(Triple(51.0879, 17.0395, 6.5f))
         whenever(priorityHelper.resolveBetterType(any(), any())).thenReturn(DeviceType.TRACKER)
         whenever(scanThrottler.shouldUpdateDevice(any())).thenReturn(true)
-        whenever(scanThrottler.shouldWriteSample(eq("MAC"), eq(false), any())).thenReturn(true)
+        whenever(scanThrottler.shouldWriteSample(any<SignalSampleThrottleParams>())).thenReturn(true)
 
         val outcome = persister.persist(
             ctx,
@@ -302,7 +303,7 @@ class DevicePersisterDebounceTest {
 
         whenever(priorityHelper.resolveBetterType(any(), any())).thenReturn(DeviceType.UNKNOWN)
         whenever(scanThrottler.shouldUpdateDevice(any())).thenReturn(false)
-        whenever(scanThrottler.shouldWriteSample(eq("MAC"), eq(false), any())).thenReturn(false)
+        whenever(scanThrottler.shouldWriteSample(any<SignalSampleThrottleParams>())).thenReturn(false)
 
         val outcome = persister.persist(
             ctx,
@@ -325,7 +326,7 @@ class DevicePersisterDebounceTest {
 
         whenever(priorityHelper.resolveBetterType(any(), any())).thenReturn(DeviceType.UNKNOWN)
         whenever(scanThrottler.shouldUpdateDevice(any())).thenReturn(false)
-        whenever(scanThrottler.shouldWriteSample(eq("MAC"), eq(false), any())).thenReturn(true)
+        whenever(scanThrottler.shouldWriteSample(any<SignalSampleThrottleParams>())).thenReturn(true)
 
         val outcome = persister.persist(
             ctx,
@@ -335,7 +336,7 @@ class DevicePersisterDebounceTest {
         assertEquals(false, outcome.deviceUpdated)
         assertEquals(true, outcome.deviceUpdateThrottled)
         assertEquals(SignalSamplePersistenceOutcome.WRITTEN, outcome.signalSampleOutcome)
-        verify(scanThrottler, org.mockito.kotlin.times(1)).shouldWriteSample(eq("MAC"), eq(false), any())
+        verify(scanThrottler, org.mockito.kotlin.times(1)).shouldWriteSample(any<SignalSampleThrottleParams>())
         verify(signalSampleDao, org.mockito.kotlin.times(1)).insert(any())
     }
 
@@ -347,7 +348,7 @@ class DevicePersisterDebounceTest {
 
         whenever(priorityHelper.resolveBetterType(any(), any())).thenReturn(DeviceType.UNKNOWN)
         whenever(scanThrottler.shouldUpdateDevice(any())).thenReturn(true)
-        whenever(scanThrottler.shouldWriteSample(eq("MAC"), eq(false), any())).thenReturn(true)
+        whenever(scanThrottler.shouldWriteSample(any<SignalSampleThrottleParams>())).thenReturn(true)
         whenever(signalSampleDao.insert(any())).thenThrow(IllegalStateException("disk full"))
 
         val outcome = persister.persist(
