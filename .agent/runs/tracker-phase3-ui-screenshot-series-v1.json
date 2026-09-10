@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-ui-screenshot-series-v1",
+  "task_digest": "03beab8478863912e38e76b7b1f7aa9b00954d919f40bb092933f9062ac11973",
+  "idle_timeout": 600,
+  "task_timeout": 1500,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-10T02:47:04.951158+00:00",
+  "attempt_id": "844629949f27a40af6ee1b24",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 63136,
+  "updated_at": "2026-09-10T02:47:04.951210+00:00",
+  "pid": 63136
+}
