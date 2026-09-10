@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-room-user-profile-audit-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 256,
+  "command_timeout": 180,
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; git fetch --no-tags origin main >/dev/null; echo source_head=$(git rev-parse origin/main); SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test -n \"$SERIAL\"; echo serial=$SERIAL; echo '--- current user ---'; adb -s \"$SERIAL\" shell am get-current-user || true; echo '--- users ---'; adb -s \"$SERIAL\" shell pm list users || adb -s \"$SERIAL\" shell cmd user list || true; echo '--- package dump io.blueeye ---'; adb -s \"$SERIAL\" shell dumpsys package io.blueeye 2>&1 | sed -n '1,240p' || true; echo '--- package paths by likely users ---'; for u in 0 10 11 12 95 96 97 98 99 150 151; do printf 'user_%s=' \"$u\"; adb -s \"$SERIAL\" shell pm path --user \"$u\" io.blueeye 2>&1 | tr '\\n' ' '; echo; done; echo '--- package enabled state by likely users ---'; for u in 0 10 11 12 95 96 97 98 99 150 151; do printf 'user_%s=' \"$u\"; adb -s \"$SERIAL\" shell cmd package list packages --user \"$u\" io.blueeye 2>&1 | tr '\\n' ' '; echo; done"
+  ]
+}
