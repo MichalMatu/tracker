@@ -51,11 +51,11 @@ internal data class AlertAcknowledgeTarget(
 internal fun alertAcknowledgeTarget(
     categoryName: String?,
     key: String?,
-): AlertAcknowledgeTarget? {
-    val category =
-        categoryName
-            ?.let { value -> runCatching { AlertCategory.valueOf(value) }.getOrNull() }
-            ?: return null
-    val normalizedKey = key?.takeIf(String::isNotBlank) ?: return null
-    return AlertAcknowledgeTarget(category, normalizedKey)
-}
+): AlertAcknowledgeTarget? =
+    categoryName
+        ?.let { value -> runCatching { AlertCategory.valueOf(value) }.getOrNull() }
+        ?.let { category ->
+            key
+                ?.takeIf(String::isNotBlank)
+                ?.let { normalizedKey -> AlertAcknowledgeTarget(category, normalizedKey) }
+        }
