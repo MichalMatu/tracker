@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-alert-s22-ui-state-probe-v1",
+  "task_digest": "fa1316378aba65d7bb712d14a6fd90f3dfae465916be8d88e611c73bca615b6e",
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-10T15:18:39.832561+00:00",
+  "attempt_id": "e9f6618ff9de29cfca887f42",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 28885,
+  "updated_at": "2026-09-10T15:18:39.832714+00:00",
+  "pid": 28885
+}
