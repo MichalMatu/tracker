@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-prewalk-install-v2",
+  "task_digest": "51ca82c5323336195e60b1ba5cb45218ae22a694b777f87164c6cfaa9eee6654",
+  "idle_timeout": 900,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-10T08:49:20.639361+00:00",
+  "attempt_id": "fa5b8ab047fe50dd971df3d3",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 80857,
+  "updated_at": "2026-09-10T08:49:20.639451+00:00",
+  "pid": 80857
+}
