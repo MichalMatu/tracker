@@ -1,0 +1,61 @@
+{
+  "id": "tracker-phase3-prewalk-install-v1",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-10T08:35:55.026334+00:00",
+  "command_timeout": 3600,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch origin agent-control >/dev/null; git show origin/agent-control:.agent/payloads/tracker-phase3-prewalk-install-v1.sh > /tmp/tracker-phase3-prewalk-install-v1.sh; chmod +x /tmp/tracker-phase3-prewalk-install-v1.sh; /tmp/tracker-phase3-prewalk-install-v1.sh",
+      "exit_code": 124,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            agent-control -> FETCH_HEAD\n   b40b7dd..62be37d  agent-control -> origin/agent-control\n--- java ---\nopenjdk version \"21.0.2\" 2024-01-16 LTS\nOpenJDK Runtime Environment Temurin-21.0.2+13 (build 21.0.2+13-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.2+13 (build 21.0.2+13-LTS, mixed mode)\nFrom https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\nsource_head=4e3751598f9df679cd7e8e55482e17fb35fdc622\nci_run_34455536091={\"conclusion\":\"success\",\"headSha\":\"4e3751598f9df679cd7e8e55482e17fb35fdc622\",\"name\":\"Secret Scan\",\"status\":\"completed\"}\nci_run_34455536134={\"conclusion\":\"success\",\"headSha\":\"4e3751598f9df679cd7e8e55482e17fb35fdc622\",\"name\":\"Sandbox Pack\",\"status\":\"completed\"}\nci_run_34455536171={\"conclusion\":\"success\",\"headSha\":\"4e3751598f9df679cd7e8e55482e17fb35fdc622\",\"name\":\"Quality\",\"status\":\"completed\"}\n",
+      "elapsed_seconds": 607.367,
+      "timed_out": false,
+      "idle_timed_out": true,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 52.17,
+      "output_policy": "stream",
+      "captured_output_chars": 905,
+      "output_truncated": false,
+      "current_rss_mb": 44.42,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 607.367
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.102
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.069
+  },
+  "failure_reason": "command_idle_timeout",
+  "finished_at": "2026-09-10T08:46:04.106291+00:00",
+  "task_digest": "da46daafe0290c52c6e467e9e7ae8f00d223b922473acbbc0a3befbe854ca2b1",
+  "idle_timeout": 600,
+  "task_timeout": 5400,
+  "memory_limit_mb": 4096,
+  "attempt_id": "7a98ce4673425a084a86afd3",
+  "daemon_version": "4.18.19"
+}
