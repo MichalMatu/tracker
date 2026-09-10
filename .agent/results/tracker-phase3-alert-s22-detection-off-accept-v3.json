@@ -1,0 +1,61 @@
+{
+  "id": "tracker-phase3-alert-s22-detection-off-accept-v3",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-10T15:35:41.348754+00:00",
+  "command_timeout": 240,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; EXPECTED='a15877bdb338a54d1bc30885b876c9e8f1459494'; SERIAL='RFCT70L7E8J'; PKG='io.blueeye'; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {n++} END {print n+0}')\" -eq 1; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1)\" = \"$SERIAL\"; model=$(adb -s \"$SERIAL\" shell getprop ro.product.model | tr -d '\\r'); echo device_model=$model; case \"$model\" in SM-S906*) ;; *) exit 3;; esac; dump(){ adb -s \"$SERIAL\" shell uiautomator dump /sdcard/tracker-alert-v3.xml >/dev/null; adb -s \"$SERIAL\" exec-out cat /sdcard/tracker-alert-v3.xml > /tmp/tracker-alert-v3.xml; }; tap_node(){ attr=$1; value=$2; dump; coords=$(python3 tools/ui-smoke/ui_node.py /tmp/tracker-alert-v3.xml \"$attr\" \"$value\"); adb -s \"$SERIAL\" shell input tap $coords; sleep 1; }; master_state(){ xmllint --xpath 'string((//node[@checkable=\"true\" and @enabled=\"true\"])[1]/@checked)' /tmp/tracker-alert-v3.xml 2>/dev/null; }; adb -s \"$SERIAL\" shell am force-stop \"$PKG\" >/dev/null 2>&1 || true; adb -s \"$SERIAL\" shell am start -W -n \"$PKG/.MainActivity\" >/dev/null; sleep 2; tap_node content-desc Menu; tap_node text Settings; tap_node text 'Alerts & Collection'; dump; before_master=$(master_state); echo detection_before=$before_master; test \"$before_master\" = false; master=$(python3 tools/ui-smoke/ui_node.py /tmp/tracker-alert-v3.xml text 'Tracker Detection' --nearest-checkable); adb -s \"$SERIAL\" shell input tap $master; sleep 1; dump; enabled_master=$(master_state); echo detection_after_enable=$enabled_master; test \"$enabled_master\" = true; test_coords=''; for i in 1 2 3; do dump; if test_coords=$(python3 tools/ui-smoke/ui_node.py /tmp/tracker-alert-v3.xml text 'Test alert' 2>/dev/null); then break; fi; adb -s \"$SERIAL\" shell input swipe 500 1750 500 650 350; sleep 1; done; test -n \"$test_coords\"; adb -s \"$SERIAL\" shell input tap $test_coords; sleep 1; notif_before=$(adb -s \"$SERIAL\" shell dumpsys notification --noredact | grep -c 'BlueEye test alert' || true); echo test_notification_before_disable=$notif_before; test \"$notif_before\" -ge 1; uid=$(adb -s \"$SERIAL\" shell dumpsys package \"$PKG\" | awk -F= '/userId=/{gsub(/\\r/,\"\",$2); print $2; exit}'); echo package_uid=$uid; echo '--- audio-before ---'; adb -s \"$SERIAL\" shell dumpsys audio | grep -i -E \"io.blueeye|uid[ :=]+$uid|USAGE_ALARM|state[:=]started\" | head -n 60 || true; master=''; for i in 1 2 3; do dump; if master=$(python3 tools/ui-smoke/ui_node.py /tmp/tracker-alert-v3.xml text 'Tracker Detection' --nearest-checkable 2>/dev/null); then break; fi; adb -s \"$SERIAL\" shell input swipe 500 650 500 1800 350; sleep 1; done; test -n \"$master\"; adb -s \"$SERIAL\" shell input tap $master; sleep 1; notif_after=$(adb -s \"$SERIAL\" shell dumpsys notification --noredact | grep -c 'BlueEye test alert' || true); echo test_notification_after_disable=$notif_after; test \"$notif_after\" -eq 0; dump; final_master=$(master_state); echo detection_final=$final_master; test \"$final_master\" = false; echo '--- audio-after ---'; adb -s \"$SERIAL\" shell dumpsys audio | grep -i -E \"io.blueeye|uid[ :=]+$uid|USAGE_ALARM|state[:=]started\" | head -n 60 || true; echo PHASE3_ALERT_S22_DETECTION_OFF_ACCEPTANCE_PASS",
+      "exit_code": 1,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\ndevice_model=SM-S906B\ndetection_before=false\ndetection_after_enable=true\ntest_notification_before_disable=0\n",
+      "elapsed_seconds": 30.646,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 12.5,
+      "output_policy": "stream",
+      "captured_output_chars": 185,
+      "output_truncated": false,
+      "current_rss_mb": 8.25,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 30.646
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.094
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.067
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-10T15:36:13.543019+00:00",
+  "task_digest": "6c64e47ed37423385ed1a6098899dee1df03ec9c24688d9922d1cf907a644d64",
+  "idle_timeout": 120,
+  "task_timeout": 360,
+  "memory_limit_mb": 1024,
+  "attempt_id": "f62d00ed1eb7e4b1170fe677",
+  "daemon_version": "4.18.20"
+}
