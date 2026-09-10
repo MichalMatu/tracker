@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.18.19",
   "state": "idle",
-  "pid": 81514,
-  "updated_at": "2026-09-10T03:05:56.113057+00:00",
+  "pid": 88444,
+  "updated_at": "2026-09-10T03:07:31.523559+00:00",
   "self_revision": "8e04f75287630cb1db363f1b53c3c0b770e10dcc",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 81514,
-  "supervisor_pid": 76196,
-  "last_task_id": "tracker-phase3-current-accounting-finalize-v1",
+  "worker_pid": 88444,
+  "supervisor_pid": 88324,
   "execution_variant": "parallel"
 }
