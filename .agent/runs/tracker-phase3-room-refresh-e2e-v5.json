@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-10T01:45:09.444934+00:00",
+  "task_id": "tracker-phase3-room-refresh-e2e-v5",
+  "daemon_version": "4.18.19",
+  "pid": 98918
+}
