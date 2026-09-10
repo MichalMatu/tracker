@@ -1,7 +1,9 @@
 package io.blueeye.core.alert
 
+import io.blueeye.core.domain.alert.AlertCategory
 import io.blueeye.core.domain.repository.TrackerAlertSettings
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class AlertCancellationPolicyTest {
@@ -58,6 +60,30 @@ class AlertCancellationPolicyTest {
         val sampledPolicy = settings(sound = false)
 
         assertEquals(sampledPolicy, effectiveAlertPolicy(sampledPolicy, null))
+    }
+
+    @Test
+    fun `acknowledge target preserves exact alert identity`() {
+        assertEquals(
+            AlertAcknowledgeTarget(AlertCategory.TEST, "settings-test-alert"),
+            alertAcknowledgeTarget(AlertCategory.TEST.name, "settings-test-alert"),
+        )
+    }
+
+    @Test
+    fun `acknowledge target rejects malformed identity`() {
+        assertNull(alertAcknowledgeTarget("NOT_A_CATEGORY", "settings-test-alert"))
+        assertNull(alertAcknowledgeTarget(AlertCategory.TEST.name, ""))
+        assertNull(alertAcknowledgeTarget(null, "settings-test-alert"))
+    }
+
+    @Test
+    fun `alert action request code includes category and key`() {
+        val testCode = alertActionRequestCode(AlertCategory.TEST, "shared-key")
+        val followMeCode = alertActionRequestCode(AlertCategory.FOLLOW_ME, "shared-key")
+
+        assertEquals(testCode, alertActionRequestCode(AlertCategory.TEST, "shared-key"))
+        check(testCode != followMeCode)
     }
 
     private fun settings(
