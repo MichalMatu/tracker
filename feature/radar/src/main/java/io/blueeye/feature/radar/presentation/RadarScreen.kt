@@ -171,12 +171,22 @@ fun RadarScreen(
             }
             when (val state = uiState) {
                 is RadarUiState.Loading -> {
-                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center,
+                    ) {
                         CircularProgressIndicator()
                     }
                 }
                 is RadarUiState.Error -> {
-                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center,
+                    ) {
                         Text(state.message, color = MaterialTheme.colorScheme.error)
                     }
                 }
