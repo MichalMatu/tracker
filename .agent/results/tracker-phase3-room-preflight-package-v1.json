@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-room-preflight-package-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-10T01:30:49.232836+00:00",
+  "command_timeout": 120,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch --no-tags origin main >/dev/null; echo source_head=$(git rev-parse origin/main); SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test -n \"$SERIAL\"; echo serial=$SERIAL; echo '--- pm path ---'; adb -s \"$SERIAL\" shell pm path io.blueeye || true; echo '--- packages matching blueeye ---'; adb -s \"$SERIAL\" shell pm list packages | grep -i blueeye || true; echo '--- pid ---'; adb -s \"$SERIAL\" shell pidof io.blueeye || true; echo '--- service ---'; if adb -s \"$SERIAL\" shell dumpsys activity services io.blueeye | grep -q ScannerService; then echo scanner_service=present; else echo scanner_service=absent; fi",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\nsource_head=c1577ff92a0deb6bf14c29d0320d53f3aee87632\n* daemon not running; starting now at tcp:5037\n* daemon started successfully\nserial=RFCT70L7E8J\n--- pm path ---\n--- packages matching blueeye ---\nError: java.lang.SecurityException: Shell does not have permission to access user 151\n com.android.server.am.ActivityManagerService.handleIncomingUser:8 android.app.ActivityManager.handleIncomingUser:5755 com.android.server.pm.PackageManagerShellCommand.translateUserId:24 \npackage:io.blueeye.core.data.test\n--- pid ---\n--- service ---\nscanner_service=absent\n",
+      "elapsed_seconds": 4.711,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 256,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 13.45,
+      "output_policy": "stream",
+      "captured_output_chars": 647,
+      "output_truncated": false,
+      "current_rss_mb": 13.45,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 4.711
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.099
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.069
+  },
+  "finished_at": "2026-09-10T01:30:55.502046+00:00",
+  "task_digest": "0524fafe1c252c0e3724b4e436cf72a01463d6cbcc4eb8aa6ef7dab93858f562",
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "memory_limit_mb": 256,
+  "attempt_id": "951f0254e603bf51c17346d6",
+  "daemon_version": "4.18.19"
+}
