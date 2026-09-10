@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-current-export-late-check-v1",
+  "task_digest": "eb5ff504ebde272d97bd149c8fca374b0169613c746f306c15108f9228b9d87b",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 512,
+  "started_at": "2026-09-10T03:09:07.541257+00:00",
+  "attempt_id": "796b198f36b6de8acd082d1a",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 89535,
+  "updated_at": "2026-09-10T03:09:07.541406+00:00",
+  "pid": 89535
+}
