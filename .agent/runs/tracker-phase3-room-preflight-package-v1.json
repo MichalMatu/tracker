@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-room-preflight-package-v1",
+  "task_digest": "0524fafe1c252c0e3724b4e436cf72a01463d6cbcc4eb8aa6ef7dab93858f562",
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "memory_limit_mb": 256,
+  "started_at": "2026-09-10T01:30:49.232755+00:00",
+  "attempt_id": "951f0254e603bf51c17346d6",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 86438,
+  "updated_at": "2026-09-10T01:30:49.232909+00:00",
+  "pid": 86438
+}
