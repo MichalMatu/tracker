@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 2,
-  "command": "set -euo pipefail; EXPECTED='a15877bdb338a54d1bc30885b876c9e8f1459494'; SERIAL='RFCT70L7E8J'; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {n++} END {print n+0}')\" -eq 1; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1)\" = \"$SERIAL\"; model=$(adb -s \"$SERIAL\" shell getprop ro.product.model | tr -d '\\r'); echo device_model=$model; case \"$model\" in SM-S906*) ;; *) exit 3;; esac",
-  "pid": 61977,
+  "command": "set -u; SERIAL='RFCT70L7E8J'; PKG='io.blueeye'; XML='/tmp/tracker-nav-trace.xml'; dump(){ adb -s \"$SERIAL\" shell uiautomator dump /sdcard/tracker-nav-trace.xml >/dev/null; adb -s \"$SERIAL\" exec-out cat /sdcard/tracker-nav-trace.xml > \"$XML\"; }; show(){ echo ---$1---; dump; sed 's/></>\\n</g' \"$XML\" | grep -oE 'text=\"[^\"]+\"|content-desc=\"[^\"]+\"' | head -n 50; }; coords(){ python3 tools/ui-smoke/ui_node.py \"$XML\" \"$1\" \"$2\" 2>/dev/null; }; adb -s \"$SERIAL\" shell am force-stop \"$PKG\" >/dev/null 2>&1 || true; adb -s \"$SERIAL\" shell am start -W -n \"$PKG/.MainActivity\" >/dev/null; sleep 3; show START; dump; c=$(coords content-desc Menu || true); echo menu_coords=\"$c\"; test -n \"$c\" || exit 21; adb -s \"$SERIAL\" shell input tap $c; sleep 1; show AFTER_MENU; dump; c=$(coords text Settings || true); echo settings_coords=\"$c\"; test -n \"$c\" || exit 22; adb -s \"$SERIAL\" shell input tap $c; sleep 1; show AFTER_SETTINGS; dump; c=$(coords text 'Alerts & Collection' || true); echo alerts_coords=\"$c\"; test -n \"$c\" || exit 23; adb -s \"$SERIAL\" shell input tap $c; sleep 1; show ALERTS; dump; c=$(python3 tools/ui-smoke/ui_node.py \"$XML\" text 'Tracker Detection' --nearest-checkable 2>/dev/null || true); echo master_coords=\"$c\"; test -n \"$c\" || exit 24; echo PHASE3_ALERT_NAVIGATION_TRACE_PASS",
+  "pid": 62058,
   "timeout": 180,
   "idle_timeout": 120,
   "memory_limit_mb": 1024,
-  "started_at": "2026-09-10T15:57:27.635893+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-10T15:57:31.113130+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 2,
   "stage_phase": "commands",
   "task_id": "tracker-phase3-alert-s22-navigation-trace-v1",
@@ -18,5 +18,5 @@
   "task_digest": "68376efb8a5e127f14c75fbf243af0a3a162bb8f6a943542eda8fb952f2cf96f",
   "daemon_version": "4.18.20",
   "daemon_pid": 61827,
-  "updated_at": "2026-09-10T15:57:27.636353+00:00"
+  "updated_at": "2026-09-10T15:57:31.129915+00:00"
 }
