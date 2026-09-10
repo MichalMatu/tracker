@@ -32,6 +32,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
@@ -92,43 +93,46 @@ class AndroidAlertDispatcher
                             )
                         val lastDelivery = lastDeliveryByKey[cooldownKey] ?: 0L
 
-                        when {
-                            !policy.detectionEnabled ->
-                                request.blocked(
-                                    status = AlertDeliveryStatus.BLOCKED_BY_POLICY,
-                                    message = "Alert blocked: alert delivery is disabled in Settings.",
-                                    timestamp = timestamp,
-                                )
-                            request.cooldownMs > 0L && timestamp - lastDelivery < request.cooldownMs ->
-                                request.blocked(
-                                    status = AlertDeliveryStatus.COOLED_DOWN,
-                                    message = "Alert cooled down to avoid repeated notifications.",
-                                    timestamp = timestamp,
-                                )
-                            !canPostNotifications() ->
-                                request.blocked(
-                                    status = AlertDeliveryStatus.BLOCKED_BY_PERMISSION,
-                                    message = "Alert blocked: POST_NOTIFICATIONS is not granted.",
-                                    timestamp = timestamp,
-                                )
-                            isChannelBlocked(alertPostPolicy.channelId) ->
-                                request.blocked(
-                                    status = AlertDeliveryStatus.BLOCKED_BY_CHANNEL,
-                                    message = "Alert blocked: Android notification channel is disabled.",
-                                    timestamp = timestamp,
-                                )
-                            else ->
-                                postAlert(
-                                    request = request,
-                                    policy = alertPostPolicy,
-                                    timestamp = timestamp,
-                                )
+                        val delivery =
+                            when {
+                                !policy.detectionEnabled ->
+                                    request.blocked(
+                                        status = AlertDeliveryStatus.BLOCKED_BY_POLICY,
+                                        message = "Alert blocked: alert delivery is disabled in Settings.",
+                                        timestamp = timestamp,
+                                    )
+                                request.cooldownMs > 0L && timestamp - lastDelivery < request.cooldownMs ->
+                                    request.blocked(
+                                        status = AlertDeliveryStatus.COOLED_DOWN,
+                                        message = "Alert cooled down to avoid repeated notifications.",
+                                        timestamp = timestamp,
+                                    )
+                                !canPostNotifications() ->
+                                    request.blocked(
+                                        status = AlertDeliveryStatus.BLOCKED_BY_PERMISSION,
+                                        message = "Alert blocked: POST_NOTIFICATIONS is not granted.",
+                                        timestamp = timestamp,
+                                    )
+                                isChannelBlocked(alertPostPolicy.channelId) ->
+                                    request.blocked(
+                                        status = AlertDeliveryStatus.BLOCKED_BY_CHANNEL,
+                                        message = "Alert blocked: Android notification channel is disabled.",
+                                        timestamp = timestamp,
+                                    )
+                                else ->
+                                    postAlert(
+                                        request = request,
+                                        policy = alertPostPolicy,
+                                        timestamp = timestamp,
+                                    )
+                            }
+
+                        if (delivery.status == AlertDeliveryStatus.POSTED) {
+                            lastDeliveryByKey[cooldownKey] = timestamp
                         }
+                        delivery
                     }
 
-                if (result.status == AlertDeliveryStatus.POSTED) {
-                    lastDeliveryByKey[cooldownKey] = timestamp
-                }
                 _diagnostics.value = buildDiagnostics(result)
                 result
             }.onFailure { error ->
@@ -288,15 +292,12 @@ class AndroidAlertDispatcher
         }
 
         private fun reconcileActiveEffectsWithPolicy(policy: TrackerAlertSettings) {
-            if (!policy.detectionEnabled) {
-                cancelAllLocked()
-                return
-            }
-            if (!policy.soundEnabled) {
-                stopSoundLocked()
-            }
-            if (!policy.vibrationEnabled) {
-                cancelVibrationLocked()
+            alertCancellationActions(policy).forEach { action ->
+                when (action) {
+                    AlertCancellationAction.ALL -> cancelAllLocked()
+                    AlertCancellationAction.SOUND -> stopSoundLocked()
+                    AlertCancellationAction.VIBRATION -> cancelVibrationLocked()
+                }
             }
         }
 
@@ -387,6 +388,22 @@ class AndroidAlertDispatcher
             private const val HEADS_UP_CHANNEL_ID = "field_mvp_alerts_heads_up_v1"
             private const val TRAY_CHANNEL_ID = "field_mvp_alerts_tray_v1"
         }
+    }
+
+internal enum class AlertCancellationAction {
+    ALL,
+    SOUND,
+    VIBRATION,
+}
+
+internal fun alertCancellationActions(policy: TrackerAlertSettings): Set<AlertCancellationAction> =
+    when {
+        !policy.detectionEnabled -> setOf(AlertCancellationAction.ALL)
+        else ->
+            buildSet {
+                if (!policy.soundEnabled) add(AlertCancellationAction.SOUND)
+                if (!policy.vibrationEnabled) add(AlertCancellationAction.VIBRATION)
+            }
     }
 
 private fun AlertRequest.blocked(
