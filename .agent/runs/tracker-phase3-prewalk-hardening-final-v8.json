@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-prewalk-hardening-final-v8",
+  "task_digest": "bd8e01ea4c3309d8776cba8a260989f6690215bedef062947ff9e7698d187c41",
+  "idle_timeout": 600,
+  "task_timeout": 5400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-10T08:13:59.766931+00:00",
+  "attempt_id": "6424b2c01589a3138feec535",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 46413,
+  "updated_at": "2026-09-10T08:13:59.767072+00:00",
+  "pid": 46413
+}
