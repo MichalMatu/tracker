@@ -53,6 +53,7 @@ class AndroidAlertDispatcher
         private val lastDeliveryByKey = ConcurrentHashMap<String, Long>()
         private val sideEffectLock = Any()
         private val policyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        private var latestAppliedPolicy: TrackerAlertSettings? = null
         private val sideEffects =
             ActiveAlertSideEffects(
                 context = context,
@@ -67,6 +68,7 @@ class AndroidAlertDispatcher
             policyScope.launch {
                 settingsPreferencesRepository.trackerAlerts.collect { policy ->
                     synchronized(sideEffectLock) {
+                        latestAppliedPolicy = policy
                         sideEffects.applyPolicy(policy)
                     }
                 }
@@ -76,12 +78,13 @@ class AndroidAlertDispatcher
         override suspend fun dispatch(request: AlertRequest): Result<AlertDeliveryResult> =
             runCatching {
                 ensureChannels()
-                val policy = settingsPreferencesRepository.trackerAlerts.first()
+                val sampledPolicy = settingsPreferencesRepository.trackerAlerts.first()
                 val timestamp = System.currentTimeMillis()
                 val cooldownKey = "${request.category}:${request.key}"
 
                 val result =
                     synchronized(sideEffectLock) {
+                        val policy = effectiveAlertPolicy(sampledPolicy, latestAppliedPolicy)
                         val alertPostPolicy =
                             AlertPostPolicy(
                                 channelId = if (policy.headsUpEnabled) HEADS_UP_CHANNEL_ID else TRAY_CHANNEL_ID,
@@ -413,6 +416,11 @@ internal fun alertCancellationActions(policy: TrackerAlertSettings): Set<AlertCa
                 if (!policy.vibrationEnabled) add(AlertCancellationAction.VIBRATION)
             }
     }
+
+internal fun effectiveAlertPolicy(
+    sampledPolicy: TrackerAlertSettings,
+    latestAppliedPolicy: TrackerAlertSettings?,
+): TrackerAlertSettings = latestAppliedPolicy ?: sampledPolicy
 
 private fun AlertRequest.blocked(
     status: AlertDeliveryStatus,
