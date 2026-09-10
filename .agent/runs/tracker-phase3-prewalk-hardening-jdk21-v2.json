@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-prewalk-hardening-jdk21-v2",
+  "task_digest": "56852baf450e930dae8aea0c021650e0d9a380a4e5cc08fa6b32c19fc718753c",
+  "idle_timeout": 900,
+  "task_timeout": 5400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-10T07:32:14.507407+00:00",
+  "attempt_id": "30f89d531151e96caf4bc30c",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 5280,
+  "updated_at": "2026-09-10T07:32:14.507508+00:00",
+  "pid": 5280
+}
