@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.18.20",
   "state": "idle",
-  "pid": 43069,
-  "updated_at": "2026-09-10T14:10:40.685973+00:00",
+  "pid": 44357,
+  "updated_at": "2026-09-10T14:11:37.400501+00:00",
   "self_revision": "0bb99d790dbed19a528b4cb8ac238432134b5660",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 43069,
-  "supervisor_pid": 40740,
-  "last_task_id": "tracker-phase3-alert-s22-signature-inspect-v1",
+  "worker_pid": 44357,
+  "supervisor_pid": 44265,
   "execution_variant": "parallel"
 }
