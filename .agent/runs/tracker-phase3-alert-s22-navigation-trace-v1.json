@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-alert-s22-navigation-trace-v1",
+  "task_digest": "68376efb8a5e127f14c75fbf243af0a3a162bb8f6a943542eda8fb952f2cf96f",
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-10T15:57:26.197166+00:00",
+  "attempt_id": "c231707a819cfa74ffb0005c",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 61827,
+  "updated_at": "2026-09-10T15:57:26.197439+00:00",
+  "pid": 61827
+}
