@@ -436,12 +436,14 @@ internal fun effectiveAlertPolicy(
     latestAppliedPolicy: TrackerAlertSettings?,
 ): TrackerAlertSettings = latestAppliedPolicy ?: sampledPolicy
 
-private const val ALERT_ACTION_HASH_MULTIPLIER = 31
+private object AlertActionRequestCode {
+    const val HASH_MULTIPLIER = 31
+}
 
 internal fun alertActionRequestCode(
     category: AlertCategory,
     key: String,
-): Int = ALERT_ACTION_HASH_MULTIPLIER * category.name.hashCode() + key.hashCode()
+): Int = AlertActionRequestCode.HASH_MULTIPLIER * category.name.hashCode() + key.hashCode()
 
 private fun AlertRequest.blocked(
     status: AlertDeliveryStatus,
