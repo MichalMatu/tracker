@@ -53,6 +53,7 @@ class AndroidAlertDispatcher
         private val lastDeliveryByKey = ConcurrentHashMap<String, Long>()
         private val sideEffectLock = Any()
         private val policyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        private val activeNotificationIdentities = mutableSetOf<ActiveAlertIdentity>()
 
         @Volatile
         private var latestPolicy: TrackerAlertSettings? = null
@@ -155,6 +156,7 @@ class AndroidAlertDispatcher
                 synchronized(sideEffectLock) {
                     val identity = ActiveAlertIdentity(category, key)
                     notificationManagerCompat.cancel(category.name, key.hashCode())
+                    activeNotificationIdentities.remove(identity)
                     if (activeSoundIdentity == identity) {
                         stopSoundLocked()
                     }
@@ -227,10 +229,11 @@ class AndroidAlertDispatcher
                     .setAutoCancel(true)
                     .build()
 
+            val identity = ActiveAlertIdentity(request.category, request.key)
             @Suppress("MissingPermission")
             notificationManagerCompat.notify(request.category.name, request.key.hashCode(), notification)
+            activeNotificationIdentities.add(identity)
 
-            val identity = ActiveAlertIdentity(request.category, request.key)
             val vibrationTriggered =
                 if (policy.vibrationEnabled && request.vibrationPattern != AlertVibrationPattern.NONE) {
                     triggerVibration(request.vibrationPattern)
@@ -302,7 +305,10 @@ class AndroidAlertDispatcher
         }
 
         private fun cancelAllLocked() {
-            notificationManagerCompat.cancelAll()
+            activeNotificationIdentities.forEach { identity ->
+                notificationManagerCompat.cancel(identity.category.name, identity.key.hashCode())
+            }
+            activeNotificationIdentities.clear()
             stopSoundLocked()
             cancelVibrationLocked()
         }
