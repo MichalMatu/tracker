@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-alert-s22-stop-alarm-accept-v1",
+  "task_digest": "f9f4ed0865d348133164f6413c499ee40445bae158b0e590de422e32fa8e4307",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-10T17:37:22.403471+00:00",
+  "attempt_id": "bd097ed1a76e60c5c865a133",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 60861,
+  "updated_at": "2026-09-10T17:37:22.403621+00:00",
+  "pid": 60861
+}
