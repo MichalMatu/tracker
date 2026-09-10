@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-share-crash-buffer-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 512,
+  "command_timeout": 180,
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; git fetch --no-tags origin main >/dev/null; echo source_head=$(git rev-parse origin/main); SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test \"$SERIAL\" = RFCT70L7E8J; echo serial=$SERIAL; echo '--- crash-buffer ---'; adb -s \"$SERIAL\" logcat -b crash -d -v threadtime -t 800 2>/dev/null | tail -n 500 || true; echo '--- exit-info-top ---'; adb -s \"$SERIAL\" shell dumpsys activity exit-info io.blueeye 2>/dev/null | head -n 90 || true; echo PHASE3_SHARE_CRASH_BUFFER_CAPTURE_DONE"
+  ]
+}
