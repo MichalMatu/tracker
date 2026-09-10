@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-alert-stop-detekt-diagnostic-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 2048,
+  "command_timeout": 600,
+  "idle_timeout": 180,
+  "task_timeout": 900,
+  "commands": [
+    "set -u; EXPECTED='dff3cfb8e95723c40fad20f66186de157f49d9b6'; actual=$(git rev-parse HEAD); echo expected_sha=$EXPECTED; echo actual_sha=$actual; test \"$actual\" = \"$EXPECTED\" || exit 10; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; LOG=/tmp/tracker-stop-detekt-v1.log; rm -f \"$LOG\"; set +e; ./gradlew :core:data:detekt --console=plain --stacktrace >\"$LOG\" 2>&1; rc=$?; set -e; echo detekt_exit_code=$rc; cat \"$LOG\"; echo '--- detekt reports ---'; find core/data/build/reports/detekt -type f -maxdepth 2 -print 2>/dev/null || true; for f in core/data/build/reports/detekt/detekt.txt core/data/build/reports/detekt/detekt.xml core/data/build/reports/detekt/detekt.md; do if [ -f \"$f\" ]; then echo ---$f---; cat \"$f\"; fi; done; test \"$rc\" -ne 0; echo PHASE3_ALERT_STOP_DETEKT_DIAGNOSTIC_CAPTURED"
+  ]
+}
