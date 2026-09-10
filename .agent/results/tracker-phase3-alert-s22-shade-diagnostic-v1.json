@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-alert-s22-shade-diagnostic-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-10T17:58:41.757610+00:00",
+  "command_timeout": 600,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -u; EXPECTED='8ef2da7e44f72137e840c710acdae80a539c226e'; SERIAL='RFCT70L7E8J'; PKG='io.blueeye'; XML='/tmp/tracker-shade-diagnostic-v1.xml'; actual=$(git rev-parse HEAD); echo expected_sha=$EXPECTED; echo actual_sha=$actual; test \"$actual\" = \"$EXPECTED\" || exit 10; count=$(adb devices | awk 'NR>1 && $2==\"device\" {n++} END {print n+0}'); echo adb_device_count=$count; test \"$count\" -eq 1 || exit 11; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1)\" = \"$SERIAL\" || exit 12; model=$(adb -s \"$SERIAL\" shell getprop ro.product.model | tr -d '\\r'); echo device_model=$model; case \"$model\" in SM-S906*) ;; *) exit 13;; esac; dump(){ adb -s \"$SERIAL\" shell uiautomator dump /sdcard/tracker-shade-diagnostic-v1.xml >/dev/null 2>&1 && adb -s \"$SERIAL\" exec-out cat /sdcard/tracker-shade-diagnostic-v1.xml > \"$XML\"; }; coords(){ python3 tools/ui-smoke/ui_node.py \"$XML\" \"$1\" \"$2\" 2>/dev/null; }; adb -s \"$SERIAL\" shell am force-stop \"$PKG\" >/dev/null 2>&1 || true; adb -s \"$SERIAL\" shell am start -W -n \"$PKG/.MainActivity\" >/dev/null 2>&1 || exit 20; sleep 3; dump || exit 21; c=$(coords content-desc Menu || true); test -n \"$c\" || exit 22; adb -s \"$SERIAL\" shell input tap $c; sleep 1; dump; c=$(coords text Settings || true); test -n \"$c\" || exit 23; adb -s \"$SERIAL\" shell input tap $c; sleep 1; dump; c=$(coords text 'Alerts & Collection' || true); test -n \"$c\" || exit 24; adb -s \"$SERIAL\" shell input tap $c; sleep 2; i=1; tc=''; while [ $i -le 8 ]; do dump || true; tc=$(coords text 'Test alert' || true); [ -n \"$tc\" ] && break; adb -s \"$SERIAL\" shell input swipe 540 1750 540 700 300 >/dev/null 2>&1 || true; sleep 0.5; i=$((i+1)); done; echo test_alert_coords=$tc; test -n \"$tc\" || exit 31; adb -s \"$SERIAL\" shell input tap $tc; sleep 1; dump || true; echo '--- app alert status ---'; grep -oE 'text=\"(POSTED|BLOCKED_BY_POLICY|FAILED|No alert dispatched yet|Test alert)[^\"]*\"' \"$XML\" | tail -n 20 || true; echo '--- active TEST records before shade ---'; adb -s \"$SERIAL\" shell dumpsys notification --noredact | awk '/Notification List:/{p=1} /mArchive=Archive/{p=0} p' | grep -E 'pkg=io\\.blueeye.*tag=TEST|tag=TEST.*pkg=io\\.blueeye' || true; adb -s \"$SERIAL\" shell input swipe 540 40 540 1800 650 >/dev/null 2>&1 || true; sleep 2; dump || true; echo '--- packages after physical shade swipe ---'; grep -o 'package=\"[^\"]*\"' \"$XML\" | sort -u | head -n 20 || true; echo '--- stop action after physical shade swipe ---'; grep -oE 'text=\"[^\"]*Stop alarm[^\"]*\"|content-desc=\"[^\"]*Stop alarm[^\"]*\"' \"$XML\" || true; echo PHASE3_ALERT_S22_SHADE_DIAGNOSTIC_CAPTURED",
+      "exit_code": 0,
+      "output": "expected_sha=8ef2da7e44f72137e840c710acdae80a539c226e\nactual_sha=8ef2da7e44f72137e840c710acdae80a539c226e\n* daemon not running; starting now at tcp:5037\n* daemon started successfully\nadb_device_count=1\ndevice_model=SM-S906B\ntest_alert_coords=540 2183\n--- app alert status ---\ntext=\"POSTED\"\ntext=\"Test alert\"\n--- active TEST records before shade ---\n    NotificationRecord(0x0ad298a6: pkg=io.blueeye user=UserHandle{0} id=1497462859 tag=TEST importance=4 key=0|io.blueeye|1497462859|TEST|10628: Notification(channel=field_mvp_alerts_heads_up_v1 shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=AUTO_CANCEL color=0x00000000 category=alarm actions=1 vis=PUBLIC semFlags=0x2008 semPriority=0 semMissedCount=0))\n--- packages after physical shade swipe ---\npackage=\"com.android.systemui\"\n--- stop action after physical shade swipe ---\nPHASE3_ALERT_S22_SHADE_DIAGNOSTIC_CAPTURED\n",
+      "elapsed_seconds": 33.309,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 12.44,
+      "output_policy": "stream",
+      "captured_output_chars": 895,
+      "output_truncated": false,
+      "current_rss_mb": 9.66,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 33.309
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.111
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.072
+  },
+  "finished_at": "2026-09-10T17:59:16.742533+00:00",
+  "task_digest": "9c0fcf51e1e0e977661db9234194fd6595af2da267d027c4fc56e8687ead8aa3",
+  "idle_timeout": 180,
+  "task_timeout": 900,
+  "memory_limit_mb": 2048,
+  "attempt_id": "a054b59644ffbb2141e217c4",
+  "daemon_version": "4.18.20"
+}
