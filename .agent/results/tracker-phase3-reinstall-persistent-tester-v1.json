@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-reinstall-persistent-tester-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-10T01:37:41.665436+00:00",
+  "command_timeout": 600,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch origin agent-control >/dev/null; git show origin/agent-control:.agent/payloads/tracker-phase3-reinstall-persistent-tester-v1.sh > /tmp/tracker-phase3-reinstall-persistent-tester-v1.sh; chmod +x /tmp/tracker-phase3-reinstall-persistent-tester-v1.sh; /tmp/tracker-phase3-reinstall-persistent-tester-v1.sh",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            agent-control -> FETCH_HEAD\n   c8f5c01..2bb9848  agent-control -> origin/agent-control\nFrom https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\nsource_head=c1577ff92a0deb6bf14c29d0320d53f3aee87632\nquality_run={\"conclusion\":\"success\",\"headSha\":\"c1577ff92a0deb6bf14c29d0320d53f3aee87632\",\"status\":\"completed\"}\nci_apk_sha256=2b7fecf31f4a2031a63db5f70c4139976983f2107d9bd46b8b843ca9834ba45f\napksigner=/Users/michal/Library/Android/sdk/build-tools/36.0.0/apksigner\nsigned_cert_sha256=fff1ada9aa9e2709b4e4bda8333404feae854372df319b77f1f45d7869a61cb6\nsigned_apk_sha256=a84f2ed3b6260b9f1baec5c8955a7a316f070de7208260a5788d46d43edbe2a1\n* daemon not running; starting now at tcp:5037\n* daemon started successfully\nserial=RFCT70L7E8J\nList of devices attached\nRFCT70L7E8J            device usb:1-1.1 product:g0sxeea model:SM_S906B device:g0s transport_id:1\n\ncurrent_android_user=0\npackage_before_install=absent\nServing...\nAll files should be loaded. Notifying the device.\nPerforming Incremental Install\nSuccess\nInstall command complete in 5147 ms\ninstalled_path=/data/app/~~IWajNFE-TzLxWizCKY-yXw==/io.blueeye-okY0bgskJLdndzV27zG9fA==/base.apk\n/data/app/~~IWajNFE-TzLxWizCKY-yXw==/io.blueeye-okY0bgskJLdndzV27zG9fA==/base.apk: 1 file pulled, 0 skipped. 41.4 MB/s (13205504 bytes in 0.304s)\ninstalled_apk_sha256=a84f2ed3b6260b9f1baec5c8955a7a316f070de7208260a5788d46d43edbe2a1\ninstalled_cert_sha256=fff1ada9aa9e2709b4e4bda8333404feae854372df319b77f1f45d7869a61cb6\npid_after_launch=8324\nPHASE3_PERSISTENT_TESTER_REINSTALL_PASS\n",
+      "elapsed_seconds": 22.381,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 50.03,
+      "output_policy": "stream",
+      "captured_output_chars": 1609,
+      "output_truncated": false,
+      "current_rss_mb": 3.92,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 22.381
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.098
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.085
+  },
+  "finished_at": "2026-09-10T01:38:05.655921+00:00",
+  "task_digest": "0df07304d8fe0b5f22b1a9d44541551edf08664689fac8574b1f37a022dd8bbb",
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 1024,
+  "attempt_id": "828ec1cfb6bbb2f1cd94a5a0",
+  "daemon_version": "4.18.19"
+}
