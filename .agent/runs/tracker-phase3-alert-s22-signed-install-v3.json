@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-alert-s22-signed-install-v3",
+  "task_digest": "6c03ba530dfe4a6faa61bc69f74bbbab0bcdad1bdfb1bfce07bf33937fe8ebd4",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-10T15:11:37.201114+00:00",
+  "attempt_id": "376a8f8639b6704d4ca8dc3f",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 20977,
+  "updated_at": "2026-09-10T15:11:37.201165+00:00",
+  "pid": 20977
+}
