@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-export-oom-device-install-v1",
+  "task_digest": "976c27cdb9f73089f280c5c488f0d59f2576a3134c725f930bfddfd17dae4145",
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-10T04:40:09.464446+00:00",
+  "attempt_id": "a78474115c6a1c83730e4984",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 74093,
+  "updated_at": "2026-09-10T04:40:09.464581+00:00",
+  "pid": 74093
+}
