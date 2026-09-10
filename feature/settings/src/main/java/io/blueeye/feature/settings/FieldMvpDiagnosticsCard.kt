@@ -15,9 +15,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.blueeye.core.domain.alert.AlertChannelDiagnostics
 import io.blueeye.core.domain.scanner.ScannerRuntimeState
+import io.blueeye.core.ui.stableLiveHeight
 import io.blueeye.core.ui.theme.Dimens
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,7 +34,7 @@ fun FieldMvpDiagnosticsCard(
     val scanner = uiState.scannerDiagnostics
     val alerts = uiState.alertDeliveryDiagnostics
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().stableLiveHeight(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(
@@ -95,6 +98,9 @@ fun FieldMvpDiagnosticsCard(
                 text = alerts.lastResult.message,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                minLines = 2,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
             Button(
                 onClick = onTestAlert,
@@ -113,17 +119,24 @@ private fun DiagnosticRow(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

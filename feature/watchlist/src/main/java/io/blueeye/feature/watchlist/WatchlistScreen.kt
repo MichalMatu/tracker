@@ -44,6 +44,7 @@ import io.blueeye.core.model.DetectionEvidence
 import io.blueeye.core.model.EvidenceSource
 import io.blueeye.core.model.PublicSafetySignal
 import io.blueeye.core.ui.R
+import io.blueeye.core.ui.stableLiveHeight
 import io.blueeye.core.ui.theme.BlueEyeTheme
 import io.blueeye.core.ui.theme.Dimens
 import io.blueeye.core.ui.theme.extendedColors
@@ -150,7 +151,10 @@ fun PublicSafetySignalCard(
     val signalItems = WatchlistSignalUiFormatter.map(detections, now)
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .stableLiveHeight(),
         colors =
             CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
@@ -248,17 +252,22 @@ private fun PublicSafetySignalHintRow(item: WatchlistSignalUiInfo) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
         Text(
             text = item.confidenceText,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.extendedColors.warning,
             fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
         Text(
             text = item.detailText,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            minLines = 2,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
@@ -266,6 +275,8 @@ private fun PublicSafetySignalHintRow(item: WatchlistSignalUiInfo) {
             text = item.signalText,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -286,6 +297,7 @@ fun WatchlistDeviceItemRow(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .stableLiveHeight()
                 .clickable { onClick(device.fingerprint) },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = Dimens.CardElevation)
@@ -354,6 +366,8 @@ private fun WatchlistDeviceHeader(info: WatchlistDeviceUiInfo) {
             style = MaterialTheme.typography.labelMedium,
             color = statusColor,
             fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -377,11 +391,13 @@ private fun WatchlistDeviceMetadata(info: WatchlistDeviceUiInfo) {
             text = info.lastSeenText,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
         )
         Text(
             text = info.rssiText,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
         )
     }
 }
@@ -410,11 +426,14 @@ private fun WatchlistAlertStatus(
                 style = MaterialTheme.typography.labelMedium,
                 color = alertColor,
                 fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
             )
             Text(
                 text = "${info.alertTypeText} • ${info.priorityText}",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
         info.returnEvidence?.let { evidence ->

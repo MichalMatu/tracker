@@ -16,10 +16,12 @@ import io.blueeye.core.domain.repository.WatchlistRepository
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.GattService
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -29,6 +31,7 @@ import kotlinx.serialization.json.put
 import javax.inject.Inject
 
 @Suppress("LongParameterList", "TooGenericExceptionCaught", "TooManyFunctions", "MagicNumber")
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class DetailsViewModel
     @Inject
@@ -52,14 +55,17 @@ class DetailsViewModel
 
         val signalSamples =
             repository.getSignalSamples(fingerprint)
+                .sample(UI_REFRESH_INTERVAL_MS)
                 .map { result -> result.getOrDefault(emptyList()) }
 
         val followMeHistory =
             repository.getFollowMeHistory(fingerprint)
+                .sample(UI_REFRESH_INTERVAL_MS)
                 .map { result -> result.getOrDefault(emptyList()) }
 
         val alertEvidenceEvents =
             repository.getAlertEvidenceEvents(fingerprint)
+                .sample(UI_REFRESH_INTERVAL_MS)
                 .map { result -> result.getOrDefault(emptyList()) }
 
         val sensorData =
@@ -88,24 +94,25 @@ class DetailsViewModel
 
         private fun loadDevice() {
             viewModelScope.launch {
-                // OPTIMIZATION: Try to fetch immediately to show data while waiting for flow
+                // Fetch once immediately so throttling never delays the first rendered device.
                 val initial = repository.getDeviceByFingerprint(fingerprint).getOrNull()
 
                 if (initial != null) {
                     _device.value = initial
                 }
 
-                // Then subscribe to updates
-                repository.getDeviceFlow(fingerprint).collect { result ->
-                    val updated = result.getOrNull()
+                // Persistence remains full-rate; only visible Details snapshots are rate-limited.
+                repository.getDeviceFlow(fingerprint)
+                    .sample(UI_REFRESH_INTERVAL_MS)
+                    .collect { result ->
+                        val updated = result.getOrNull()
 
-                    if (updated != null) {
-                        _device.value = updated
-                    } else if (_device.value == null) {
-                        // Only if we still have nothing, maybe handle error/empty state
-                        // For now, keep loading or previous state
+                        if (updated != null) {
+                            _device.value = updated
+                        } else if (_device.value == null) {
+                            // Keep loading or the previous known state until a device is available.
+                        }
                     }
-                }
             }
         }
 
@@ -265,5 +272,9 @@ class DetailsViewModel
                     onResult(null)
                 }
             }
+        }
+
+        private companion object {
+            const val UI_REFRESH_INTERVAL_MS = 750L
         }
     }

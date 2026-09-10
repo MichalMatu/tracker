@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import io.blueeye.core.model.AlertEvidenceEvent
 import io.blueeye.core.model.DetectionConfidence
+import io.blueeye.core.ui.stableLiveHeight
 import io.blueeye.core.ui.theme.BlueEyeTheme
 import io.blueeye.core.ui.theme.Dimens
 import io.blueeye.core.ui.theme.extendedColors
@@ -30,7 +31,7 @@ fun DetailsAlertHistoryCard(
     val historyInfo = remember(events) { DetailsAlertHistoryFormatter.format(events) }
     if (historyInfo == null) return
 
-    Card(modifier = modifier.fillMaxWidth()) {
+    Card(modifier = modifier.fillMaxWidth().stableLiveHeight()) {
         Column(
             modifier = Modifier.padding(Dimens.PaddingMedium),
             verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
@@ -78,6 +79,7 @@ private fun DetailsAlertHistoryMetric(
             color = valueColor,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.weight(AlertHistoryLayout.VALUE_WEIGHT),
+            minLines = AlertHistoryLayout.VALUE_TEXT_MAX_LINES,
             maxLines = AlertHistoryLayout.VALUE_TEXT_MAX_LINES,
             overflow = TextOverflow.Ellipsis,
         )
@@ -97,6 +99,7 @@ private fun DetailsAlertHistoryRow(event: AlertEvidenceEvent) {
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(AlertHistoryLayout.LABEL_WEIGHT),
+                minLines = AlertHistoryLayout.VALUE_TEXT_MAX_LINES,
                 maxLines = AlertHistoryLayout.VALUE_TEXT_MAX_LINES,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -108,6 +111,7 @@ private fun DetailsAlertHistoryRow(event: AlertEvidenceEvent) {
                 color = event.evidence.confidence.resolveColor(),
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(AlertHistoryLayout.VALUE_WEIGHT),
+                minLines = AlertHistoryLayout.VALUE_TEXT_MAX_LINES,
                 maxLines = AlertHistoryLayout.VALUE_TEXT_MAX_LINES,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -116,6 +120,7 @@ private fun DetailsAlertHistoryRow(event: AlertEvidenceEvent) {
             text = event.evidence.reasonText,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            minLines = AlertHistoryLayout.REASON_TEXT_MAX_LINES,
             maxLines = AlertHistoryLayout.REASON_TEXT_MAX_LINES,
             overflow = TextOverflow.Ellipsis,
         )

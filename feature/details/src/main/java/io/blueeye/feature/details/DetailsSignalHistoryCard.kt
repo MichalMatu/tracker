@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import io.blueeye.core.model.SignalSample
+import io.blueeye.core.ui.stableLiveHeight
 import io.blueeye.core.ui.theme.BlueEyeTheme
 import io.blueeye.core.ui.theme.Dimens
 import io.blueeye.core.ui.theme.extendedColors
@@ -38,7 +39,7 @@ fun DetailsSignalHistoryCard(
     val historyInfo = remember(sortedSamples) { DetailsSignalHistoryFormatter.format(sortedSamples) }
     if (historyInfo == null) return
 
-    Card(modifier = modifier.fillMaxWidth()) {
+    Card(modifier = modifier.fillMaxWidth().stableLiveHeight()) {
         Column(
             modifier = Modifier.padding(Dimens.PaddingMedium),
             verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
@@ -52,6 +53,7 @@ fun DetailsSignalHistoryCard(
                 text = historyInfo.windowText,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                minLines = SignalHistoryLayout.WINDOW_TEXT_MAX_LINES,
                 maxLines = SignalHistoryLayout.WINDOW_TEXT_MAX_LINES,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -98,6 +100,7 @@ private fun SignalHistoryMetric(
             color = valueColor,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.weight(SignalHistoryLayout.VALUE_WEIGHT),
+            minLines = SignalHistoryLayout.VALUE_TEXT_MAX_LINES,
             maxLines = SignalHistoryLayout.VALUE_TEXT_MAX_LINES,
             overflow = TextOverflow.Ellipsis,
         )

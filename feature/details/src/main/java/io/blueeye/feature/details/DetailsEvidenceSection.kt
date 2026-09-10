@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import io.blueeye.core.model.DetectionConfidence
 import io.blueeye.core.model.DetectionEvidence
 import io.blueeye.core.model.EvidenceSource
+import io.blueeye.core.ui.stableLiveHeight
 import io.blueeye.core.ui.theme.BlueEyeTheme
 import io.blueeye.core.ui.theme.Dimens
 import io.blueeye.core.ui.theme.extendedColors
@@ -33,7 +34,7 @@ fun DetailsEvidenceSection(
     val evidenceItems = remember(evidence) { DetailsEvidenceUiFormatter.format(evidence) }
     val emptyState = remember { DetailsEvidenceUiFormatter.emptyState() }
 
-    Card(modifier = modifier.fillMaxWidth()) {
+    Card(modifier = modifier.fillMaxWidth().stableLiveHeight()) {
         Column(modifier = Modifier.padding(Dimens.PaddingMedium)) {
             Text(
                 text = "Evidence",
@@ -72,6 +73,9 @@ fun DetailsEvidenceEmptyStateContent(emptyState: DetailsEvidenceEmptyState) {
             text = emptyState.detail,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            minLines = EvidenceLayout.REASON_TEXT_LINES,
+            maxLines = EvidenceLayout.REASON_TEXT_LINES,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -89,11 +93,15 @@ fun DetailsEvidenceItem(item: DetailsEvidenceUiItem) {
                     text = item.sourceText,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = item.modeText,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             DetailsEvidenceConfidencePill(item)
@@ -103,6 +111,9 @@ fun DetailsEvidenceItem(item: DetailsEvidenceUiItem) {
             text = item.reasonText,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
+            minLines = EvidenceLayout.REASON_TEXT_LINES,
+            maxLines = EvidenceLayout.REASON_TEXT_LINES,
+            overflow = TextOverflow.Ellipsis,
         )
 
         DetailsEvidenceValueRow(label = "Observed", value = item.observedAtText)
@@ -147,7 +158,8 @@ fun DetailsEvidenceValueRow(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(EvidenceLayout.VALUE_WEIGHT),
-            maxLines = EvidenceLayout.TECHNICAL_VALUE_MAX_LINES,
+            minLines = EvidenceLayout.TECHNICAL_VALUE_LINES,
+            maxLines = EvidenceLayout.TECHNICAL_VALUE_LINES,
             overflow = TextOverflow.Ellipsis,
         )
     }
@@ -165,7 +177,8 @@ private fun DetectionConfidence.resolveEvidenceColor(): Color =
 private object EvidenceLayout {
     const val LABEL_WEIGHT = 0.32f
     const val VALUE_WEIGHT = 0.68f
-    const val TECHNICAL_VALUE_MAX_LINES = 4
+    const val REASON_TEXT_LINES = 2
+    const val TECHNICAL_VALUE_LINES = 2
 }
 
 @androidx.compose.ui.tooling.preview.Preview(showBackground = true)

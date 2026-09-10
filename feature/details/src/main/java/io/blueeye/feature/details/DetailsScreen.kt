@@ -54,6 +54,7 @@ import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceConnectionState
 import io.blueeye.core.model.SensorData
 import io.blueeye.core.ui.R
+import io.blueeye.core.ui.stableLiveHeight
 import io.blueeye.core.ui.theme.BlueEyeTheme
 import io.blueeye.core.ui.theme.Dimens
 
@@ -99,8 +100,19 @@ fun DetailsScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text(text = device?.getDisplayName() ?: "Unknown Device", style = MaterialTheme.typography.titleMedium)
-                        Text(text = fingerprint, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            text = device?.getDisplayName() ?: "Unknown Device",
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = fingerprint,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     }
                 },
                 navigationIcon = {
@@ -245,7 +257,7 @@ fun DetailsScreen(
 fun HeaderCard(device: Device) {
     val summary = remember(device) { DetailsDecisionSummaryFormatter.format(device) }
 
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(modifier = Modifier.fillMaxWidth().stableLiveHeight()) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -270,7 +282,12 @@ fun HeaderCard(device: Device) {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(text = "${device.rssi} dBm", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    text = "${device.rssi} dBm",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                )
                 DetailsDecisionSummaryText(summary)
             }
         }
@@ -283,7 +300,10 @@ fun ConnectionCard(
     onConnect: () -> Unit,
     onDisconnect: () -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+    Card(
+        modifier = Modifier.fillMaxWidth().stableLiveHeight(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
@@ -312,7 +332,14 @@ fun ConnectionCard(
             }
 
             if (connectionState is DeviceConnectionState.Error) {
-                Text(text = connectionState.message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = Dimens.PaddingSmall))
+                Text(
+                    text = connectionState.message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = Dimens.PaddingSmall),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
     }
@@ -323,14 +350,20 @@ fun InfoSection(
     title: String,
     items: List<Pair<String, String>>
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(modifier = Modifier.fillMaxWidth().stableLiveHeight()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             HorizontalDivider(modifier = Modifier.padding(vertical = Dimens.PaddingSmall))
             items.forEach { (label, value) ->
                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = Dimens.PaddingExtraSmall), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        text = value,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
         }
@@ -339,7 +372,10 @@ fun InfoSection(
 
 @Composable
 fun SensorDataCard(data: SensorData) {
-    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+    Card(
+        modifier = Modifier.fillMaxWidth().stableLiveHeight(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+    ) {
         Column(modifier = Modifier.padding(Dimens.PaddingMedium)) {
             Text("Sensor Data", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSecondaryContainer)
             Spacer(Modifier.height(8.dp))

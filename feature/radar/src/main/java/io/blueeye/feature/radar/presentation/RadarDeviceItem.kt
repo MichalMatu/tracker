@@ -4,11 +4,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceCalibrationLabel
+import io.blueeye.core.ui.stableLiveHeight
 import io.blueeye.core.ui.theme.Dimens
 import io.blueeye.core.ui.theme.extendedColors
 
@@ -60,6 +61,7 @@ fun RadarDeviceItem(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = Dimens.PaddingMedium, vertical = Dimens.PaddingExtraSmall)
+                .stableLiveHeight()
                 .clickable { onClick(item.device) },
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
         elevation = CardDefaults.cardElevation(defaultElevation = Dimens.CardElevation)
@@ -103,20 +105,20 @@ fun RadarDeviceItem(
                         )
                     }
 
-                    if (item.vendorAndType.isNotBlank()) {
-                        Text(
-                            text = item.vendorAndType,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.outline,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
+                    Text(
+                        text = item.vendorAndType.ifBlank { " " },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline,
+                        minLines = 1,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
 
                     Text(
                         text = "Seen ${item.signalInfo.timeSinceSeen} • RSSI ${item.signalInfo.rssiText}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        minLines = 1,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -164,13 +166,15 @@ private fun DeviceIcon(item: RadarUiItem) {
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun BadgeRow(item: RadarUiItem) {
-    FlowRow(
-        modifier = Modifier.padding(top = Dimens.PaddingExtraSmall),
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(top = Dimens.PaddingExtraSmall)
+                .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(Dimens.PaddingExtraSmall),
-        verticalArrangement = Arrangement.spacedBy(Dimens.PaddingExtraSmall),
     ) {
         Badge(text = item.badges.techBadge, color = item.badges.techColor.resolve())
         Badge(text = item.badges.privacyBadge, color = MaterialTheme.colorScheme.outline)
@@ -245,7 +249,6 @@ private fun RadarDeviceActions(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RadarEvidenceSummary(
     evidenceInfo: RadarEvidenceInfo,
@@ -258,6 +261,7 @@ fun RadarEvidenceSummary(
             text = evidenceInfo.primarySourceText,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.outline,
+            minLines = 1,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = Dimens.PaddingExtraSmall),
@@ -267,26 +271,29 @@ fun RadarEvidenceSummary(
             text = evidenceInfo.primaryReasonText,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            minLines = 3,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = Dimens.PaddingExtraSmall),
         )
 
-        evidenceInfo.primaryValueText?.let { valueText ->
-            Text(
-                text = valueText,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = Dimens.PaddingExtraSmall),
-            )
-        }
-
-        FlowRow(
+        Text(
+            text = evidenceInfo.primaryValueText.orEmpty(),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            minLines = 2,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = Dimens.PaddingExtraSmall),
+        )
+
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = Dimens.PaddingExtraSmall)
+                    .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(Dimens.PaddingExtraSmall),
-            verticalArrangement = Arrangement.spacedBy(Dimens.PaddingExtraSmall),
         ) {
             evidenceInfo.chips.forEach { chip ->
                 EvidenceChip(chip)

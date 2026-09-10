@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import io.blueeye.core.model.FollowMeHistorySample
 import io.blueeye.core.model.TrackingStatus
+import io.blueeye.core.ui.stableLiveHeight
 import io.blueeye.core.ui.theme.BlueEyeTheme
 import io.blueeye.core.ui.theme.Dimens
 import io.blueeye.core.ui.theme.extendedColors
@@ -30,7 +31,7 @@ fun DetailsFollowMeHistoryCard(
     val historyInfo = remember(samples) { DetailsFollowMeHistoryFormatter.format(samples) }
     if (historyInfo == null) return
 
-    Card(modifier = modifier.fillMaxWidth()) {
+    Card(modifier = modifier.fillMaxWidth().stableLiveHeight()) {
         Column(
             modifier = Modifier.padding(Dimens.PaddingMedium),
             verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
@@ -44,6 +45,7 @@ fun DetailsFollowMeHistoryCard(
                 text = historyInfo.windowText,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                minLines = FollowMeHistoryLayout.WINDOW_TEXT_MAX_LINES,
                 maxLines = FollowMeHistoryLayout.WINDOW_TEXT_MAX_LINES,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -90,6 +92,7 @@ private fun FollowMeHistoryMetric(
             color = valueColor,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.weight(FollowMeHistoryLayout.VALUE_WEIGHT),
+            minLines = FollowMeHistoryLayout.VALUE_TEXT_MAX_LINES,
             maxLines = FollowMeHistoryLayout.VALUE_TEXT_MAX_LINES,
             overflow = TextOverflow.Ellipsis,
         )
@@ -108,6 +111,7 @@ private fun FollowMeHistoryRow(sample: FollowMeHistorySample) {
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(FollowMeHistoryLayout.LABEL_WEIGHT),
+            minLines = FollowMeHistoryLayout.VALUE_TEXT_MAX_LINES,
             maxLines = FollowMeHistoryLayout.VALUE_TEXT_MAX_LINES,
             overflow = TextOverflow.Ellipsis,
         )
@@ -116,6 +120,7 @@ private fun FollowMeHistoryRow(sample: FollowMeHistorySample) {
             style = MaterialTheme.typography.bodySmall,
             color = sample.trackingStatus.resolveColor(),
             modifier = Modifier.weight(FollowMeHistoryLayout.VALUE_WEIGHT),
+            minLines = FollowMeHistoryLayout.VALUE_TEXT_MAX_LINES,
             maxLines = FollowMeHistoryLayout.VALUE_TEXT_MAX_LINES,
             overflow = TextOverflow.Ellipsis,
         )

@@ -14,11 +14,13 @@ import io.blueeye.core.domain.usecase.GetScannedDevicesUseCase
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.DeviceType
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -68,8 +70,12 @@ class RadarViewModel
         // Zbiór fingerprintów, które były widoczne w momencie włączenia trybu Baseline
         private val baselineDevices = MutableStateFlow<Set<String>?>(null)
 
-        // Raw device stream (used for vendor extraction)
-        private val rawDevicesFlow = getScannedDevicesUseCase(sinceSecondsAgo = 180)
+        // Persistence remains full-rate. Only presentation snapshots are rate-limited so a dense
+        // BLE room does not force Compose to rebuild the visible card tree dozens of times/second.
+        @OptIn(FlowPreview::class)
+        private val rawDevicesFlow =
+            getScannedDevicesUseCase(sinceSecondsAgo = 180)
+                .sample(UI_REFRESH_INTERVAL_MS)
 
         private val activeProbeFlow = deviceRepository.getActiveProbe()
 
@@ -88,10 +94,7 @@ class RadarViewModel
 
                 devicesResult.fold(
                     onSuccess = { devices ->
-                        // Update available vendors for filter dialog (using full list or throttled
-                        // is fine here)
-                        // Note: Using throttled list to update vendors avoids recalculating on
-                        // every raw emission
+                        // Update available vendors for filter dialog from the UI-rate snapshot.
                         if (devices.isNotEmpty()) {
                             updateAvailableVendors(devices)
                         }
@@ -240,6 +243,10 @@ class RadarViewModel
                     deviceRepository.setCalibrationLabel(device.fingerprint, label)
                 }
             }
+        }
+
+        private companion object {
+            const val UI_REFRESH_INTERVAL_MS = 750L
         }
     }
 
