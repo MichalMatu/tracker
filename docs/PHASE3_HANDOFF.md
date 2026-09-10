@@ -1,14 +1,20 @@
 # Phase 3 New-Chat Handoff — Ingest Observability
 
-> **Historical kickoff note (2026-09-08):** Phase 3 software implementation has now landed. The old pipeline facts below describe the preimplementation state and must not be treated as current runtime truth. For current state use `STABILITY_RECOVERY_GUIDE.md`, `PHASE3_PRE_FIELD_GOLDEN.md`, `PHASE3_FIELD_COLLECTION.md` and `PHASE3_CODE_QUALITY_REVIEW.md`. Phase 3 remains open only for field validation/reconciliation.
+> **Historical kickoff note (2026-09-08):** Phase 3 software implementation has now landed. The old pipeline facts below describe the preimplementation state and must not be treated as current runtime truth. For current state use `STABILITY_RECOVERY_GUIDE.md`, `PHASE3_TARGETED_PHYSICAL_ACCEPTANCE.md`, `PHASE3_PRE_FIELD_GOLDEN.md`, `PHASE3_FIELD_COLLECTION.md` and `PHASE3_CODE_QUALITY_REVIEW.md`. Phase 3 remains open only for field validation/reconciliation.
 
-Status: **HISTORICAL KICKOFF — SOFTWARE IMPLEMENTED; FIELD VALIDATION PENDING**
+Status: **HISTORICAL KICKOFF — TARGETED PHYSICAL ACCEPTANCE PASS; VARIED-DENSITY WALK PENDING**
 Repository: `MichalMatu/tracker` (`tracker`)
 Phase 2 implementation commit: `84b31d08bac81b6f46e44d11ccfe06071438b66a`
 Phase 2 closure-audit source baseline: `53c56fa54e92a713e555979f2d1778dc44dfaf98`
 Local Agent binding: `be481b25-9d97-4205-b93f-95f5c5827441`
 
 The closure documentation commit containing this file is intentionally not hard-coded as its own HEAD. At the start of the next chat, fetch current `main` and treat that exact SHA as source of truth before doing any work.
+
+## Current acceptance checkpoint — 2026-09-10
+
+Application source `745fdf30271459a20e380763ea69b8ed2e601839` has exact-SHA green CI and targeted Samsung S22+ physical acceptance for the previously open large-export OOM, Settings performance under active Radar load, and short process-lifetime ingest accounting. The accounting reconciles `443 = 417 accepted + 26 coalesced + 0 rejected`, with zero queue drops and zero processing/sample write failures. Earlier >430-second passive-BLE watchdog survival with two 240-second refreshes remains accepted.
+
+The only remaining Phase 3 field gate is one varied-density walk with preserved Session Export JSON plus Room/WAL/SHM continuity evidence. Do not start Phase 4 yet.
 
 ## Read first
 

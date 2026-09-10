@@ -1,10 +1,10 @@
 # Phase 3 Pre-Field Golden Candidate
 
-Status: **SOFTWARE + EMULATOR E2E READY; PHYSICAL FIELD EVIDENCE PENDING**
+Status: **SOFTWARE + EMULATOR E2E + TARGETED PHYSICAL ACCEPTANCE PASS; VARIED-DENSITY FIELD WALK PENDING**
 
-This freezes the engineering handoff immediately before the Phase 3 phone/ADB validation. It does **not** close Phase 3 and does not authorize Phase 4.
+This document began as the pre-field freeze. It now also points to the targeted physical acceptance recorded at source `745fdf30271459a20e380763ea69b8ed2e601839`. It still does **not** close Phase 3 or authorize Phase 4; one varied-density real-device walk remains.
 
-## Immutable install target
+## Historical immutable pre-field target
 
 - Versioned tester tag/release: `v1.0.0-phase3-pre-field.1`
 - Final checkpoint tag, created only after all publication gates pass: `checkpoint-phase3-pre-field-golden-2026-09-09`
@@ -12,7 +12,9 @@ This freezes the engineering handoff immediately before the Phase 3 phone/ADB va
 - Signing: Android debug signing; not Play Store/production signing.
 - Download entry point: **Install BlueEye Tracker** in `README.md`.
 
-The versioned release is the install authority for this field run. Once collection starts, do not replace it with `latest-tester`, even if `main` moves.
+The `.1` release is the historical pre-field authority and is now superseded for the final Phase 3 walk by the physically accepted application source `745fdf30271459a20e380763ea69b8ed2e601839`. Do **not** use `.1` for the remaining walk because later stability fixes include the passive-scan watchdog, large-export OOM fix, Settings load reduction and fingerprint-based sample throttling.
+
+Targeted S22+ acceptance for `745fdf30271459a20e380763ea69b8ed2e601839` is recorded in `PHASE3_TARGETED_PHYSICAL_ACCEPTANCE.md`: exact ingest accounting has zero unexplained loss, Settings stays responsive while Radar runs, and a 21,704-sample Share export completes without OOM.
 
 ## Production-code E2E checkpoint
 
@@ -35,6 +37,6 @@ The final documentation commit changes documentation only. Its tagged SHA must s
 
 ## Next physical step
 
-After publication: download the immutable APK from README, install and launch it, grant required Bluetooth/location/notification permissions, connect USB with ADB authorization, then collect a non-destructive baseline (`adb devices -l`, package/install identity for `io.blueeye`, installed APK identity where practical, and BlueEye-focused logcat/runtime evidence). Do not clear app data or force-stop after beginning evidence collection. Then run `docs/PHASE3_FIELD_COLLECTION.md`.
+Run one varied-density real-device walk using an APK built from accepted application source `745fdf30271459a20e380763ea69b8ed2e601839` with the established tester signing certificate. Preserve Session Export JSON before process death and collect Room plus WAL/SHM afterward. Reconcile continuity across the walk.
 
-Before Phase 4, preserve Session Export JSON plus Room/WAL/SHM and reconcile Phase 3 ingest counters, including `queueDroppedTotal == 0`.
+Do not repeat the already accepted >430-second passive-BLE watchdog soak, Settings performance regression, or large Share/OOM regression unless the relevant implementation changes. After the walk passes, close Phase 3 and only then hand off to Phase 4.

@@ -17,7 +17,7 @@
 
 ### NEXT ACTION
 
-- [ ] Install the immutable pre-field tester `v1.0.0-phase3-pre-field.1` from README, launch it on the phone and connect USB/ADB. Capture exact installed-build identity plus a non-destructive BlueEye logcat/runtime baseline, then run `docs/PHASE3_FIELD_COLLECTION.md`, preserve Session Export JSON and Room/WAL/SHM, reconcile the counters and close Phase 3 before starting Phase 4.
+- [ ] Complete one varied-density real-device walk using the physically accepted app build from source commit `745fdf30271459a20e380763ea69b8ed2e601839`. Preserve Session Export JSON plus Room/WAL/SHM and reconcile continuity across the walk. Targeted ingest accounting, Settings performance, large Share/OOM and >430 s passive-BLE watchdog evidence are already accepted; do not repeat them unless relevant code changes.
 
 When the next task is completed, update this line to the next unfinished item and add an entry to the Work Log at the bottom of this file.
 
@@ -309,7 +309,7 @@ Physical lifecycle evidence: Samsung SM-S906B, Android 16 / SDK 36. Clean R3 acc
 
 Purpose: no observation may disappear without a counter explaining why.
 
-Status: **SOFTWARE IMPLEMENTATION + STRUCTURAL HARDENING + EMULATOR UI E2E COMPLETE; PHYSICAL FIELD VALIDATION PENDING.** See `PHASE3_PRE_FIELD_GOLDEN.md`, `PHASE3_FIELD_COLLECTION.md` and `PHASE3_CODE_QUALITY_REVIEW.md`.
+Status: **SOFTWARE + EMULATOR E2E + TARGETED PHYSICAL ACCEPTANCE COMPLETE; VARIED-DENSITY FIELD WALK PENDING.** See `PHASE3_TARGETED_PHYSICAL_ACCEPTANCE.md`, `PHASE3_PRE_FIELD_GOLDEN.md`, `PHASE3_FIELD_COLLECTION.md` and `PHASE3_CODE_QUALITY_REVIEW.md`.
 
 Checklist:
 
@@ -331,6 +331,8 @@ Checklist:
 - [ ] Complete a varied-density real-device walk and preserve the process-lifetime Session Export JSON.
 - [ ] Collect Room database plus WAL/SHM and exact installed build evidence.
 - [ ] Reconcile field counters, confirm `queueDroppedTotal == 0`, inspect queue pressure/latency and verify DB/sample continuity.
+
+Targeted physical acceptance on 2026-09-10 at source `745fdf30271459a20e380763ea69b8ed2e601839` reconciled `443` raw BLE callbacks as `417` accepted + `26` coalesced + `0` rejected, with `queueDroppedTotal=0`, `417/417/0` processing started/succeeded/failed, device persistence `119 + 298 throttled = 417`, and signal sampling `107 + 310 throttled + 0 failed = 417`. The same build physically passed the large Share/OOM regression and kept Settings responsive while Radar was running. See `PHASE3_TARGETED_PHYSICAL_ACCEPTANCE.md`. The earlier >430 s two-refresh passive-BLE watchdog evidence remains accepted and should not be repeated unless scanner lifecycle/watchdog code changes.
 
 Design preference: do not process every advertisement as an independent expensive business event. Preserve raw counters and newest useful state, then perform heavier classification/persistence at a bounded rate.
 
@@ -766,3 +768,10 @@ After that point the feature freeze can be lifted and normal product development
 - Final Local Agent JDK 21 gate on the same exact SHA: `qualityCheck` PASS, `:app:assembleDebug` PASS, `git diff --check` PASS, clean worktree PASS.
 - Known architectural debt is captured in `docs/PHASE2_CLOSURE_AUDIT.md`; it must not be mixed into Phase 3 unless directly required by queue/ingest observability.
 - Next action: Phase 3 via `docs/PHASE3_HANDOFF.md`.
+
+### 2026-09-10 — Phase 3 targeted physical acceptance
+
+- Source `745fdf30271459a20e380763ea69b8ed2e601839` installed on Samsung SM-S906B with `adb install -r`; Room counts and integrity were unchanged across install.
+- Manual physical pass: `Database & Updates` remained responsive with Radar running; large Share completed and produced the process-lifetime export instead of OOM.
+- Export accounting reconciled exactly with zero queue drops/rejections/failures; sample writes were materially reduced by intentional throttling.
+- Remaining Phase 3 item: one varied-density walk with Session Export JSON plus Room/WAL/SHM continuity evidence. Phase 4 remains blocked.

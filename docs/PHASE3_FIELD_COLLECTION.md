@@ -1,21 +1,32 @@
 # Phase 3 Engineering Field Collection
 
-Status: **SOFTWARE READY; FIELD VALIDATION PENDING — USE ONLY THE EXACT-SHA GREEN TESTER BUILD**
+Status: **TARGETED PHYSICAL ACCEPTANCE PASS; VARIED-DENSITY WALK PENDING — USE THE EXACT ACCEPTED APPLICATION SOURCE**
 Scope: validate Phase 3 BLE ingest accounting and bounded latest-per-device coalescing on a real walk. This is engineering evidence for stability recovery; it does not unpause the general Field MVP checklist or advance identity/alert phases.
 
 ## Approved pre-field build
 
-Use the immutable tester release `v1.0.0-phase3-pre-field.1` linked from README. Verify its `.sha256` before installation when practical. Once evidence collection begins, do not replace it with `latest-tester` or another build.
+The historical `.1` pre-field release is superseded for the remaining walk. Use an APK built from accepted application source `745fdf30271459a20e380763ea69b8ed2e601839` and signed with the established tester certificate `fff1ada9aa9e2709b4e4bda8333404feae854372df319b77f1f45d7869a61cb6`. Once collection begins, do not switch builds during the same field session.
 
 Before the walk, connect the launched app to the Mac with USB debugging authorized. Local Agent/ADB should capture a non-destructive baseline for package `io.blueeye`: device identity, package/install information, installed APK identity where practical, and an app-focused logcat/runtime snapshot. Do not force-stop the app merely to collect this baseline because Phase 3 ingest totals are process-lifetime diagnostics.
 
 ## Before the walk
 
-- Install only the immutable `v1.0.0-phase3-pre-field.1` tester APK for this Phase 3 collection. The versioned release must have green Quality/build publication evidence; do not switch builds during the same field session.
+- Use only an APK built from accepted application source `745fdf30271459a20e380763ea69b8ed2e601839` for the remaining Phase 3 collection; do not switch builds during the same field session.
 - Start scanning explicitly.
 - Open Settings diagnostics and confirm `Raw BLE/min` is non-zero in a place with nearby Bluetooth devices.
 - `Queue dropped` should remain `0`. A non-zero `Queue rejected` is allowed only under true unique-device capacity exhaustion and must be investigated.
 - Do not clear app data before or during the collection.
+
+## Already accepted; do not repeat
+
+The following physical evidence is already sufficient unless related implementation changes:
+
+- >430-second passive BLE survival on Samsung Android 16 with the same PID/service and two watchdog refreshes;
+- Settings responsiveness while Radar is actively scanning;
+- large Session Share/export without the previously reproduced OOM;
+- short process-lifetime ingest reconciliation with zero queue drops/rejections/failures and explicit sample throttling.
+
+See `PHASE3_TARGETED_PHYSICAL_ACCEPTANCE.md`. The remaining purpose of the walk is varied-density continuity evidence, not repeating these regressions.
 
 ## During the walk
 
