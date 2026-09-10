@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-settings-samples-opt-publish-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-10T05:16:36.344612+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; EXPECTED=ee10fd0a080fff61f6b20322b51df7c733259511; git fetch --no-tags origin main agent-control >/dev/null; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; git checkout main >/dev/null; git merge --ff-only origin/main >/dev/null; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; git show origin/agent-control:.agent/payloads/tracker-phase3-settings-samples-opt-v1.patch > /tmp/tracker-phase3-settings-samples-opt-v1.patch; test \"$(shasum -a 256 /tmp/tracker-phase3-settings-samples-opt-v1.patch | awk '{print $1}')\" = 6995629b79d632629c0646e22c7dfb78c50e854b4f89c034396d2940efed7253; git apply --check /tmp/tracker-phase3-settings-samples-opt-v1.patch; git apply /tmp/tracker-phase3-settings-samples-opt-v1.patch; git diff --check; printf '%s\\n' app/src/test/java/io/blueeye/core/scanner/throttle/ScanThrottlerTest.kt core/data/src/main/java/io/blueeye/core/data/repository/handler/ble/SignalSamplePersister.kt core/data/src/main/java/io/blueeye/core/scanner/manager/ScannerConstants.kt core/data/src/main/java/io/blueeye/core/scanner/throttle/ScanThrottler.kt core/data/src/test/kotlin/io/blueeye/core/data/repository/handler/ble/DevicePersisterDebounceTest.kt feature/settings/src/main/java/io/blueeye/feature/settings/FieldMvpExportAppend.kt feature/settings/src/main/java/io/blueeye/feature/settings/SessionStatsProvider.kt feature/settings/src/test/java/io/blueeye/feature/settings/FieldMvpExportAppendTest.kt | sort > /tmp/expected-files; git diff --name-only | sort > /tmp/actual-files; diff -u /tmp/expected-files /tmp/actual-files; git add -- $(cat /tmp/expected-files); git commit -m 'Reduce live stats and signal history load'; git push origin main; echo committed_sha=$(git rev-parse HEAD)",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main          -> FETCH_HEAD\n * branch            agent-control -> FETCH_HEAD\n   d36c740..d46f568  agent-control -> origin/agent-control\nSwitched to branch 'main'\n[main 745fdf3] Reduce live stats and signal history load\n 8 files changed, 179 insertions(+), 48 deletions(-)\nTo https://github.com/MichalMatu/tracker.git\n   ee10fd0..745fdf3  main -> main\ncommitted_sha=745fdf30271459a20e380763ea69b8ed2e601839\n",
+      "elapsed_seconds": 2.768,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 24.42,
+      "output_policy": "stream",
+      "captured_output_chars": 470,
+      "output_truncated": false,
+      "current_rss_mb": 24.42,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 2.768
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.11
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.072
+  },
+  "finished_at": "2026-09-10T05:16:40.718761+00:00",
+  "task_digest": "2b542b12dc93d3ae2056f75e08f60bf31228886751056b36d884b6da94cdf6d0",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 512,
+  "attempt_id": "3fc10e0a6f75b698a94ce6e0",
+  "daemon_version": "4.18.19"
+}
