@@ -42,6 +42,24 @@ class AlertCancellationPolicyTest {
         assertEquals(emptySet<AlertCancellationAction>(), alertCancellationActions(settings()))
     }
 
+    @Test
+    fun `latest applied policy wins over stale sampled policy`() {
+        val sampledPolicy = settings()
+        val latestAppliedPolicy = settings(detection = false)
+
+        assertEquals(
+            latestAppliedPolicy,
+            effectiveAlertPolicy(sampledPolicy, latestAppliedPolicy),
+        )
+    }
+
+    @Test
+    fun `sampled policy is used before collector has applied a policy`() {
+        val sampledPolicy = settings(sound = false)
+
+        assertEquals(sampledPolicy, effectiveAlertPolicy(sampledPolicy, null))
+    }
+
     private fun settings(
         detection: Boolean = true,
         sound: Boolean = true,
