@@ -1,5 +1,7 @@
 package io.blueeye.feature.settings
 
+import java.io.Writer
+
 internal fun String.withFieldMvpDiagnostics(uiState: SettingsUiState): String {
     val insertionPoint = lastIndexOf('}')
     if (insertionPoint <= 0) return this
@@ -68,6 +70,30 @@ internal fun String.withFieldMvpDiagnostics(uiState: SettingsUiState): String {
           }
         """.trimIndent()
     return substring(0, insertionPoint).trimEnd() + payload + substring(insertionPoint)
+}
+
+
+internal fun Writer.writeWithFieldMvpDiagnostics(
+    json: String,
+    uiState: SettingsUiState,
+) {
+    val insertionPoint = json.lastIndexOf('}')
+    if (insertionPoint <= 0) {
+        write(json)
+        return
+    }
+
+    // Build only the small diagnostics fragment. Never create a second copy of the full export.
+    val decoratedEmptyObject = "{}".withFieldMvpDiagnostics(uiState)
+    val diagnosticsFragment = decoratedEmptyObject.substring(1, decoratedEmptyObject.length - 1)
+    var prefixEnd = insertionPoint
+    while (prefixEnd > 0 && json[prefixEnd - 1].isWhitespace()) {
+        prefixEnd -= 1
+    }
+
+    write(json, 0, prefixEnd)
+    write(diagnosticsFragment)
+    write(json, insertionPoint, json.length - insertionPoint)
 }
 
 private fun Long?.jsonValue(): String = this?.toString() ?: "null"

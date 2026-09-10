@@ -20,8 +20,29 @@ internal fun prepareDatabaseExport(
     viewModel.exportDatabase { json ->
         if (json == null) {
             Toast.makeText(context, "Export failed", Toast.LENGTH_SHORT).show()
-        } else {
+        } else if (isClipboardPayloadSafe(json)) {
             onExportReady(json.withFieldMvpDiagnostics(viewModel.uiState.value))
+        } else {
+            // Let the clipboard guard reject large exports without first duplicating the whole JSON.
+            onExportReady(json)
+        }
+    }
+}
+
+internal fun prepareDatabaseExportForShare(
+    context: Context,
+    viewModel: SettingsViewModel,
+) {
+    Toast.makeText(context, "Preparing session export...", Toast.LENGTH_SHORT).show()
+    viewModel.exportDatabase { json ->
+        if (json == null) {
+            Toast.makeText(context, "Export failed", Toast.LENGTH_SHORT).show()
+        } else {
+            shareExport(
+                context = context,
+                json = json,
+                uiState = viewModel.uiState.value,
+            )
         }
     }
 }
@@ -60,9 +81,10 @@ internal fun copyExportToClipboard(
 internal fun shareExport(
     context: Context,
     json: String,
+    uiState: SettingsUiState,
 ) {
     runCatching {
-        val exportFile = writeSessionExportFile(context, json)
+        val exportFile = writeSessionExportFile(context, json, uiState)
         val uri =
             FileProvider.getUriForFile(
                 context,
@@ -90,6 +112,7 @@ internal fun shareExport(
 private fun writeSessionExportFile(
     context: Context,
     json: String,
+    uiState: SettingsUiState,
 ): File {
     val directory = File(context.cacheDir, "session_exports")
     if (!directory.exists() && !directory.mkdirs()) {
@@ -99,7 +122,7 @@ private fun writeSessionExportFile(
     val target = File(directory, "blueeye-session-export.json")
     val temporary = File(directory, "blueeye-session-export.json.tmp")
     temporary.bufferedWriter(Charsets.UTF_8).use { writer ->
-        writer.write(json)
+        writer.writeWithFieldMvpDiagnostics(json, uiState)
     }
 
     if (target.exists() && !target.delete()) {

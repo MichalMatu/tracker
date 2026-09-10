@@ -408,9 +408,7 @@ fun DatabaseContent(
                 }
             },
             onShareExport = {
-                prepareDatabaseExport(context, viewModel) { json ->
-                    shareExport(context, json)
-                }
+                prepareDatabaseExportForShare(context, viewModel)
             },
         )
     }
