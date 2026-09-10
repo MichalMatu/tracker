@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-alert-stop-detekt-diagnostic-v1",
+  "task_digest": "b52b739c86447449489d37c1a171c57707ad90f70fff6d3236f1f9646e7827d2",
+  "idle_timeout": 180,
+  "task_timeout": 900,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-10T16:56:30.355977+00:00",
+  "attempt_id": "3ac08d42f4cf3db9f86338e7",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 23936,
+  "updated_at": "2026-09-10T16:56:30.356114+00:00",
+  "pid": 23936
+}
