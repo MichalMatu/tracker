@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-alert-s22-settings-state-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-10T15:21:13.801561+00:00",
+  "command_timeout": 180,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test \"$(git rev-parse HEAD)\" = \"a15877bdb338a54d1bc30885b876c9e8f1459494\"; SERIAL=RFCT70L7E8J; PKG=io.blueeye; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {n++} END {print n+0}')\" -eq 1; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1)\" = \"$SERIAL\"; model=$(adb -s \"$SERIAL\" shell getprop ro.product.model | tr -d '\\r'); echo device_model=$model; case \"$model\" in SM-S906*) ;; *) exit 3;; esac; dump(){ adb -s \"$SERIAL\" shell uiautomator dump /sdcard/tracker-alert-state.xml >/dev/null; adb -s \"$SERIAL\" exec-out cat /sdcard/tracker-alert-state.xml > /tmp/tracker-alert-state.xml; }; tap_node(){ attr=$1; value=$2; dump; coords=$(python3 tools/ui-smoke/ui_node.py /tmp/tracker-alert-state.xml \"$attr\" \"$value\"); adb -s \"$SERIAL\" shell input tap $coords; sleep 1; }; adb -s \"$SERIAL\" shell am force-stop \"$PKG\" >/dev/null 2>&1 || true; adb -s \"$SERIAL\" shell am start -W -n \"$PKG/.MainActivity\" >/dev/null; sleep 2; tap_node content-desc Menu; tap_node text Settings; tap_node text 'Alerts & Collection'; dump; sed 's/></>\\n</g' /tmp/tracker-alert-state.xml | grep -E 'text=\"(Tracker Detection|Vibration|Sound|Heads-Up Notification)\"|checkable=\"true\"' | head -n 40; echo PHASE3_ALERT_SETTINGS_STATE_PROBE_PASS",
+      "exit_code": 0,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\ndevice_model=SM-S906B\n<node index=\"0\" text=\"Tracker Detection\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,365][434,414]\" drawing-order=\"0\" hint=\"\" />\n<node NAF=\"true\" index=\"2\" text=\"\" resource-id=\"\" class=\"android.view.View\" package=\"io.blueeye\" content-desc=\"\" checkable=\"true\" checked=\"false\" clickable=\"true\" enabled=\"true\" focusable=\"true\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[859,347][996,473]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"5\" text=\"\" resource-id=\"\" class=\"android.view.View\" package=\"io.blueeye\" content-desc=\"\" checkable=\"true\" checked=\"false\" clickable=\"true\" enabled=\"false\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[859,564][996,690]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"6\" text=\"Vibration\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,798][264,847]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"8\" text=\"\" resource-id=\"\" class=\"android.view.View\" package=\"io.blueeye\" content-desc=\"\" checkable=\"true\" checked=\"true\" clickable=\"true\" enabled=\"false\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[859,780][996,906]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"9\" text=\"Sound\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,966][210,1015]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"11\" text=\"\" resource-id=\"\" class=\"android.view.View\" package=\"io.blueeye\" content-desc=\"\" checkable=\"true\" checked=\"true\" clickable=\"true\" enabled=\"false\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[859,948][996,1074]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"12\" text=\"Heads-Up Notification\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,1134][525,1183]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"14\" text=\"\" resource-id=\"\" class=\"android.view.View\" package=\"io.blueeye\" content-desc=\"\" checkable=\"true\" checked=\"true\" clickable=\"true\" enabled=\"false\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[859,1116][996,1242]\" drawing-order=\"0\" hint=\"\" />\nPHASE3_ALERT_SETTINGS_STATE_PROBE_PASS\n",
+      "elapsed_seconds": 19.375,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 12.38,
+      "output_policy": "stream",
+      "captured_output_chars": 3244,
+      "output_truncated": false,
+      "current_rss_mb": 9.48,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 19.375
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.099
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.07
+  },
+  "finished_at": "2026-09-10T15:21:34.777015+00:00",
+  "task_digest": "a3d4e577372d1ff0ddbe7006cd67bb0c9662f66e8e2bf9882e765ab34f47d378",
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "attempt_id": "47a9ad591ce2fc15df52c04f",
+  "daemon_version": "4.18.20"
+}
