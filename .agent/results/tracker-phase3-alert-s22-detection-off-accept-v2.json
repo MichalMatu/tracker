@@ -1,0 +1,9 @@
+{
+  "id": "tracker-phase3-alert-s22-detection-off-accept-v2",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "started_at": null,
+  "finished_at": "2026-09-10T15:28:24.712781+00:00",
+  "daemon_version": "4.18.20",
+  "error": "JSONDecodeError: Invalid control character at: line 13 column 1241 (char 1566)"
+}
