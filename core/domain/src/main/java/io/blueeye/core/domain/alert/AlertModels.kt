@@ -71,5 +71,16 @@ interface AlertDispatcher {
 
     suspend fun dispatch(request: AlertRequest): Result<AlertDeliveryResult>
 
+    fun acknowledge(
+        category: AlertCategory,
+        key: String,
+    ): Result<Unit>
+
+    fun cancelAll(): Result<Unit>
+
+    fun stopSound(): Result<Unit>
+
+    fun cancelVibration(): Result<Unit>
+
     fun refreshDiagnostics(): Result<Unit>
 }
