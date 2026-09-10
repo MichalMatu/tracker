@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-alert-s22-signature-inspect-v1",
+  "task_digest": "953d2b9d8e7123493d02ef9739b1589957ec423ac8028198cc7a01d2c855dbe8",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-10T14:10:11.947760+00:00",
+  "attempt_id": "0333b833c99c88aea0c3895b",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 43069,
+  "updated_at": "2026-09-10T14:10:11.947847+00:00",
+  "pid": 43069
+}
