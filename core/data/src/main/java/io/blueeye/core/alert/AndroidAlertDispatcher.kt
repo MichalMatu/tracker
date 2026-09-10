@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioAttributes
+import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
@@ -15,6 +16,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.blueeye.core.data.classifier.vendor.tactical.ConfidenceLevel
+import io.blueeye.core.domain.alert.AlertCategory
 import io.blueeye.core.domain.alert.AlertChannelDiagnostics
 import io.blueeye.core.domain.alert.AlertDeliveryDiagnostics
 import io.blueeye.core.domain.alert.AlertDeliveryResult
@@ -23,10 +25,15 @@ import io.blueeye.core.domain.alert.AlertDispatcher
 import io.blueeye.core.domain.alert.AlertRequest
 import io.blueeye.core.domain.alert.AlertVibrationPattern
 import io.blueeye.core.domain.repository.SettingsPreferencesRepository
+import io.blueeye.core.domain.repository.TrackerAlertSettings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,57 +50,80 @@ class AndroidAlertDispatcher
             context.getSystemService(NotificationManager::class.java)
         private val notificationManagerCompat = NotificationManagerCompat.from(context)
         private val lastDeliveryByKey = ConcurrentHashMap<String, Long>()
+        private val sideEffectLock = Any()
+        private val policyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+        @Volatile
+        private var latestPolicy: TrackerAlertSettings? = null
+        private var activeRingtone: Ringtone? = null
+        private var activeSoundIdentity: ActiveAlertIdentity? = null
+        private var activeVibrationIdentity: ActiveAlertIdentity? = null
 
         private val _diagnostics = MutableStateFlow(buildDiagnostics(AlertDeliveryResult()))
         override val diagnostics: StateFlow<AlertDeliveryDiagnostics> = _diagnostics.asStateFlow()
 
+        init {
+            policyScope.launch {
+                settingsPreferencesRepository.trackerAlerts.collect { policy ->
+                    synchronized(sideEffectLock) {
+                        latestPolicy = policy
+                        reconcileActiveEffectsWithPolicy(policy)
+                    }
+                }
+            }
+        }
+
         override suspend fun dispatch(request: AlertRequest): Result<AlertDeliveryResult> =
             runCatching {
                 ensureChannels()
-                val policy = settingsPreferencesRepository.trackerAlerts.first()
+                val persistedPolicy = settingsPreferencesRepository.trackerAlerts.first()
                 val timestamp = System.currentTimeMillis()
-                val alertPostPolicy =
-                    AlertPostPolicy(
-                        channelId = if (policy.headsUpEnabled) HEADS_UP_CHANNEL_ID else TRAY_CHANNEL_ID,
-                        headsUpEnabled = policy.headsUpEnabled,
-                        soundEnabled = policy.soundEnabled,
-                        vibrationEnabled = policy.vibrationEnabled,
-                    )
                 val cooldownKey = "${request.category}:${request.key}"
-                val lastDelivery = lastDeliveryByKey[cooldownKey] ?: 0L
 
                 val result =
-                    when {
-                        !policy.detectionEnabled ->
-                            request.blocked(
-                                status = AlertDeliveryStatus.BLOCKED_BY_POLICY,
-                                message = "Alert blocked: alert delivery is disabled in Settings.",
-                                timestamp = timestamp,
+                    synchronized(sideEffectLock) {
+                        val policy = latestPolicy ?: persistedPolicy
+                        val alertPostPolicy =
+                            AlertPostPolicy(
+                                channelId = if (policy.headsUpEnabled) HEADS_UP_CHANNEL_ID else TRAY_CHANNEL_ID,
+                                headsUpEnabled = policy.headsUpEnabled,
+                                soundEnabled = policy.soundEnabled,
+                                vibrationEnabled = policy.vibrationEnabled,
                             )
-                        request.cooldownMs > 0L && timestamp - lastDelivery < request.cooldownMs ->
-                            request.blocked(
-                                status = AlertDeliveryStatus.COOLED_DOWN,
-                                message = "Alert cooled down to avoid repeated notifications.",
-                                timestamp = timestamp,
-                            )
-                        !canPostNotifications() ->
-                            request.blocked(
-                                status = AlertDeliveryStatus.BLOCKED_BY_PERMISSION,
-                                message = "Alert blocked: POST_NOTIFICATIONS is not granted.",
-                                timestamp = timestamp,
-                            )
-                        isChannelBlocked(alertPostPolicy.channelId) ->
-                            request.blocked(
-                                status = AlertDeliveryStatus.BLOCKED_BY_CHANNEL,
-                                message = "Alert blocked: Android notification channel is disabled.",
-                                timestamp = timestamp,
-                            )
-                        else ->
-                            postAlert(
-                                request = request,
-                                policy = alertPostPolicy,
-                                timestamp = timestamp,
-                            )
+                        val lastDelivery = lastDeliveryByKey[cooldownKey] ?: 0L
+
+                        when {
+                            !policy.detectionEnabled ->
+                                request.blocked(
+                                    status = AlertDeliveryStatus.BLOCKED_BY_POLICY,
+                                    message = "Alert blocked: alert delivery is disabled in Settings.",
+                                    timestamp = timestamp,
+                                )
+                            request.cooldownMs > 0L && timestamp - lastDelivery < request.cooldownMs ->
+                                request.blocked(
+                                    status = AlertDeliveryStatus.COOLED_DOWN,
+                                    message = "Alert cooled down to avoid repeated notifications.",
+                                    timestamp = timestamp,
+                                )
+                            !canPostNotifications() ->
+                                request.blocked(
+                                    status = AlertDeliveryStatus.BLOCKED_BY_PERMISSION,
+                                    message = "Alert blocked: POST_NOTIFICATIONS is not granted.",
+                                    timestamp = timestamp,
+                                )
+                            isChannelBlocked(alertPostPolicy.channelId) ->
+                                request.blocked(
+                                    status = AlertDeliveryStatus.BLOCKED_BY_CHANNEL,
+                                    message = "Alert blocked: Android notification channel is disabled.",
+                                    timestamp = timestamp,
+                                )
+                            else ->
+                                postAlert(
+                                    request = request,
+                                    policy = alertPostPolicy,
+                                    timestamp = timestamp,
+                                )
+                        }
                     }
 
                 if (result.status == AlertDeliveryStatus.POSTED) {
@@ -111,6 +141,44 @@ class AndroidAlertDispatcher
                         timestamp = System.currentTimeMillis(),
                     )
                 _diagnostics.value = buildDiagnostics(result)
+            }
+
+        override fun acknowledge(
+            category: AlertCategory,
+            key: String,
+        ): Result<Unit> =
+            runCatching {
+                synchronized(sideEffectLock) {
+                    val identity = ActiveAlertIdentity(category, key)
+                    notificationManagerCompat.cancel(category.name, key.hashCode())
+                    if (activeSoundIdentity == identity) {
+                        stopSoundLocked()
+                    }
+                    if (activeVibrationIdentity == identity) {
+                        cancelVibrationLocked()
+                    }
+                }
+            }
+
+        override fun cancelAll(): Result<Unit> =
+            runCatching {
+                synchronized(sideEffectLock) {
+                    cancelAllLocked()
+                }
+            }
+
+        override fun stopSound(): Result<Unit> =
+            runCatching {
+                synchronized(sideEffectLock) {
+                    stopSoundLocked()
+                }
+            }
+
+        override fun cancelVibration(): Result<Unit> =
+            runCatching {
+                synchronized(sideEffectLock) {
+                    cancelVibrationLocked()
+                }
             }
 
         override fun refreshDiagnostics(): Result<Unit> =
@@ -158,14 +226,21 @@ class AndroidAlertDispatcher
             @Suppress("MissingPermission")
             notificationManagerCompat.notify(request.category.name, request.key.hashCode(), notification)
 
+            val identity = ActiveAlertIdentity(request.category, request.key)
             val vibrationTriggered =
                 if (policy.vibrationEnabled && request.vibrationPattern != AlertVibrationPattern.NONE) {
                     triggerVibration(request.vibrationPattern)
+                    activeVibrationIdentity = identity
                     true
                 } else {
                     false
                 }
-            val soundPlayed = if (policy.soundEnabled) playAlertSound() else false
+            val soundPlayed =
+                if (policy.soundEnabled) {
+                    playAlertSound(identity)
+                } else {
+                    false
+                }
 
             return AlertDeliveryResult(
                 category = request.category,
@@ -189,7 +264,7 @@ class AndroidAlertDispatcher
             }
         }
 
-        private fun playAlertSound(): Boolean {
+        private fun playAlertSound(identity: ActiveAlertIdentity): Boolean {
             val ringtone =
                 listOfNotNull(
                     android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI,
@@ -197,14 +272,49 @@ class AndroidAlertDispatcher
                     android.provider.Settings.System.DEFAULT_RINGTONE_URI,
                 ).firstOrNull()
                     ?.let { uri -> RingtoneManager.getRingtone(context, uri) }
+                    ?: return false
 
-            ringtone?.audioAttributes =
+            ringtone.audioAttributes =
                 AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_ALARM)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build()
-            ringtone?.play()
-            return ringtone != null
+
+            stopSoundLocked()
+            activeRingtone = ringtone
+            activeSoundIdentity = identity
+            ringtone.play()
+            return true
+        }
+
+        private fun reconcileActiveEffectsWithPolicy(policy: TrackerAlertSettings) {
+            if (!policy.detectionEnabled) {
+                cancelAllLocked()
+                return
+            }
+            if (!policy.soundEnabled) {
+                stopSoundLocked()
+            }
+            if (!policy.vibrationEnabled) {
+                cancelVibrationLocked()
+            }
+        }
+
+        private fun cancelAllLocked() {
+            notificationManagerCompat.cancelAll()
+            stopSoundLocked()
+            cancelVibrationLocked()
+        }
+
+        private fun stopSoundLocked() {
+            activeRingtone?.stop()
+            activeRingtone = null
+            activeSoundIdentity = null
+        }
+
+        private fun cancelVibrationLocked() {
+            vibrationHandler.cancel()
+            activeVibrationIdentity = null
         }
 
         private fun ensureChannels() {
@@ -300,4 +410,9 @@ private data class AlertPostPolicy(
     val headsUpEnabled: Boolean,
     val soundEnabled: Boolean,
     val vibrationEnabled: Boolean,
+)
+
+private data class ActiveAlertIdentity(
+    val category: AlertCategory,
+    val key: String,
 )
