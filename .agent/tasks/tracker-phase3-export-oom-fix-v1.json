@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-export-oom-fix-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 4096,
+  "command_timeout": 1800,
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "commands": [
+    "set -euo pipefail; git fetch origin agent-control >/dev/null; git show origin/agent-control:.agent/payloads/tracker-phase3-export-oom-fix-v1.sh > /tmp/tracker-phase3-export-oom-fix-v1.sh; chmod +x /tmp/tracker-phase3-export-oom-fix-v1.sh; /tmp/tracker-phase3-export-oom-fix-v1.sh"
+  ]
+}
