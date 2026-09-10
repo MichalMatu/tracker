@@ -1,0 +1,15 @@
+{
+  "id": "tracker-phase3-settings-perf-snapshot-v1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 512,
+  "command_timeout": 180,
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; git fetch --no-tags origin main >/dev/null; echo source_head=$(git rev-parse origin/main); SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test \"$SERIAL\" = RFCT70L7E8J; echo serial=$SERIAL; PID=$(adb -s \"$SERIAL\" shell pidof io.blueeye 2>/dev/null | tr -d '\\r' || true); echo pid=$PID; echo '--- top-activity ---'; adb -s \"$SERIAL\" shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' | head -n 8 || true; echo '--- scanner-service ---'; adb -s \"$SERIAL\" shell dumpsys activity services io.blueeye | grep -E 'ScannerService|ServiceRecord' | head -n 20 || true; if [ -n \"$PID\" ]; then echo '--- cpu-samples ---'; for i in 1 2 3 4 5 6 7 8; do adb -s \"$SERIAL\" shell top -b -n 1 -p \"$PID\" | tail -n 3 | head -n 1 || true; sleep 1; done; echo '--- meminfo ---'; adb -s \"$SERIAL\" shell dumpsys meminfo io.blueeye | head -n 120 || true; echo '--- gfx-summary ---'; adb -s \"$SERIAL\" shell dumpsys gfxinfo io.blueeye | head -n 120 || true; echo '--- recent-gc ---'; adb -s \"$SERIAL\" logcat -d -v brief -t 2500 | grep -E -i 'io.blueeye|GC freed|WaitForGcToComplete|Alloc concurrent copying|Background concurrent copying|OutOfMemory' | tail -n 160 || true; fi; echo PHASE3_SETTINGS_PERF_SNAPSHOT_DONE"
+  ]
+}
