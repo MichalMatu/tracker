@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-prewalk-detekt-diagnose-v4",
+  "task_digest": "f6a1e24a1e329c3b8f9ac54826807da04668c7124d7c69eb0144df746084cdb7",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-10T07:48:33.740263+00:00",
+  "attempt_id": "460fa05a98498265f44da83b",
+  "daemon_version": "4.18.19",
+  "daemon_pid": 19971,
+  "updated_at": "2026-09-10T07:48:33.740433+00:00",
+  "pid": 19971
+}
