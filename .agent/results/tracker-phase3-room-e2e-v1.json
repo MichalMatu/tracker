@@ -1,9 +1,0 @@
-{
-  "id": "tracker-phase3-room-e2e-v1",
-  "status": "failed",
-  "failure_reason": "invalid_task_file",
-  "started_at": null,
-  "finished_at": "2026-09-09T03:54:15.301880+00:00",
-  "daemon_version": "4.18.19",
-  "error": "JSONDecodeError: Invalid \\escape: line 13 column 1421 (char 1724)"
-}
