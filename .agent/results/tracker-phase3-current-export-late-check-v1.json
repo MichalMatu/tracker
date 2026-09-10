@@ -1,0 +1,61 @@
+{
+  "id": "tracker-phase3-current-export-late-check-v1",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-10T03:09:07.541336+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch --no-tags origin main >/dev/null; echo source_head=$(git rev-parse origin/main); SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -n1); test \"$SERIAL\" = RFCT70L7E8J; PID=$(adb -s \"$SERIAL\" shell pidof io.blueeye | tr -d '\\r'); echo pid_now=$PID; test \"$PID\" = 24851; FILE=cache/session_exports/blueeye-session-export.json; if adb -s \"$SERIAL\" shell run-as io.blueeye test -s \"$FILE\"; then echo export_present=1; adb -s \"$SERIAL\" shell run-as io.blueeye ls -l \"$FILE\"; adb -s \"$SERIAL\" exec-out run-as io.blueeye cat \"$FILE\" > /tmp/tracker-current-export-late.json; python3 - <<'PY'\nimport json, hashlib, os\np='/tmp/tracker-current-export-late.json'\nb=open(p,'rb').read(); d=json.loads(b)\ns=d['fieldMvpDiagnostics']['scanner']; i=s['ingest']\nprint('export_bytes='+str(len(b))); print('export_sha256='+hashlib.sha256(b).hexdigest())\nfor k in ['state','startedAt','lastBleSeenAt']: print(f'{k}={s.get(k)}')\nfor k in ['rawBleCallbacksTotal','enqueueAcceptedTotal','enqueueRejectedTotal','queueDroppedTotal','coalescedTotal','processingStartedTotal','processingSucceededTotal','processingFailedTotal','signalSamplesWrittenTotal','signalSampleWriteFailuresTotal','queueDepth','queueHighWaterMark','maxQueueWaitMs','maxProcessingDurationMs']: print(f'{k}={i.get(k)}')\nraw=i['rawBleCallbacksTotal']; accepted=i['enqueueAcceptedTotal']; rejected=i['enqueueRejectedTotal']; coalesced=i['coalescedTotal']; started=i['processingStartedTotal']; succeeded=i['processingSucceededTotal']; failed=i['processingFailedTotal']\nassert raw>0; assert raw==accepted+coalesced+rejected; assert rejected==0; assert i['queueDroppedTotal']==0; assert failed==0; assert i['signalSampleWriteFailuresTotal']==0; assert i['queueDepth']==0; assert started==succeeded+failed; assert accepted==started; assert i['signalSamplesWrittenTotal']>0\nprint('CURRENT_INGEST_ACCOUNTING_PASS')\nPY\nadb -s \"$SERIAL\" shell run-as io.blueeye cp databases/tracker_database cache/tracker-late-final.db; adb -s \"$SERIAL\" exec-out run-as io.blueeye cat cache/tracker-late-final.db > /tmp/tracker-late-final.db; sqlite3 /tmp/tracker-late-final.db 'PRAGMA integrity_check; select count(*) from devices; select count(*) from signal_samples; select count(*) from follow_me_observations;' | sed 's/^/db=/' ; python3 - <<'PY'\nimport json, sqlite3\nd=json.load(open('/tmp/tracker-current-export-late.json')); c=sqlite3.connect('/tmp/tracker-late-final.db'); dev=c.execute('select count(*) from devices').fetchone()[0]; sam=c.execute('select count(*) from signal_samples').fetchone()[0]; print('export_deviceCount='+str(d.get('deviceCount'))); print('export_sampleCount='+str(d.get('sampleCount'))); print('db_devices='+str(dev)); print('db_samples='+str(sam)); assert d.get('deviceCount')==dev; assert d.get('sampleCount')==sam; print('EXPORT_DB_RECONCILIATION_PASS')\nPY\nelse echo export_present=0; exit 4; fi",
+      "exit_code": 1,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\nsource_head=53cccf4fa39525febf54e0a57f65796efbd51812\n* daemon not running; starting now at tcp:5037\n* daemon started successfully\n",
+      "elapsed_seconds": 4.002,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 13.47,
+      "output_policy": "stream",
+      "captured_output_chars": 219,
+      "output_truncated": false,
+      "current_rss_mb": 13.47,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 4.002
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.112
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.081
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-10T03:09:13.175423+00:00",
+  "task_digest": "eb5ff504ebde272d97bd149c8fca374b0169613c746f306c15108f9228b9d87b",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 512,
+  "attempt_id": "796b198f36b6de8acd082d1a",
+  "daemon_version": "4.18.19"
+}
