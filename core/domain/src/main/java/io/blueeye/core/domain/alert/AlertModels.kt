@@ -78,9 +78,5 @@ interface AlertDispatcher {
 
     fun cancelAll(): Result<Unit>
 
-    fun stopSound(): Result<Unit>
-
-    fun cancelVibration(): Result<Unit>
-
     fun refreshDiagnostics(): Result<Unit>
 }
