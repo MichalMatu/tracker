@@ -14,6 +14,11 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application>
+        <receiver
+            android:name="io.blueeye.core.alert.AlertAcknowledgeReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
         <service
             android:name="io.blueeye.service.ScannerService"
             android:enabled="true"
