@@ -183,6 +183,13 @@ class AndroidAlertDispatcher
                             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
                         )
                     }
+            val acknowledgePendingIntent =
+                PendingIntent.getBroadcast(
+                    context,
+                    alertActionRequestCode(request.category, request.key),
+                    AlertAcknowledgeReceiver.intent(context, request.category, request.key),
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                )
 
             val notification =
                 NotificationCompat.Builder(context, policy.channelId)
@@ -200,6 +207,12 @@ class AndroidAlertDispatcher
                         },
                     )
                     .setContentIntent(pendingIntent)
+                    .setDeleteIntent(acknowledgePendingIntent)
+                    .addAction(
+                        android.R.drawable.ic_menu_close_clear_cancel,
+                        STOP_ALARM_LABEL,
+                        acknowledgePendingIntent,
+                    )
                     .setAutoCancel(true)
                     .build()
 
@@ -294,6 +307,7 @@ class AndroidAlertDispatcher
         private companion object {
             private const val HEADS_UP_CHANNEL_ID = "field_mvp_alerts_heads_up_v1"
             private const val TRAY_CHANNEL_ID = "field_mvp_alerts_tray_v1"
+            private const val STOP_ALARM_LABEL = "Stop alarm"
         }
     }
 
@@ -421,6 +435,11 @@ internal fun effectiveAlertPolicy(
     sampledPolicy: TrackerAlertSettings,
     latestAppliedPolicy: TrackerAlertSettings?,
 ): TrackerAlertSettings = latestAppliedPolicy ?: sampledPolicy
+
+internal fun alertActionRequestCode(
+    category: AlertCategory,
+    key: String,
+): Int = 31 * category.name.hashCode() + key.hashCode()
 
 private fun AlertRequest.blocked(
     status: AlertDeliveryStatus,
