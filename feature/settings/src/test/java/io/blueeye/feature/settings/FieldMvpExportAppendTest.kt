@@ -12,6 +12,17 @@ import java.io.StringWriter
 
 class FieldMvpExportAppendTest {
     @Test
+    fun `diagnostics append fragment is valid at streamed root tail`() {
+        val uiState = SettingsUiState(scannerDiagnostics = ScannerRuntimeDiagnostics())
+        val json = "{\"schemaVersion\":19${fieldMvpDiagnosticsAppendFragment(uiState)}}"
+
+        val root = Json.parseToJsonElement(json).jsonObject
+
+        assertEquals(19L, root.getValue("schemaVersion").jsonPrimitive.long)
+        root.getValue("fieldMvpDiagnostics").jsonObject
+    }
+
+    @Test
     fun `field export contains reconcilable ingest diagnostics`() {
         val ingest =
             ScannerIngestDiagnostics(

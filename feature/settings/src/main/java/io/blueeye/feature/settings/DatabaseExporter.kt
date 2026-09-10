@@ -12,7 +12,9 @@ import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.FollowMeHistorySample
 import io.blueeye.core.model.IdentityCarryoverVerdict
 import io.blueeye.core.model.SignalSample
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -22,6 +24,7 @@ import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,64 +39,79 @@ class DatabaseExporter
     ) {
         private val json = Json { prettyPrint = true }
 
-        @Suppress("TooGenericExceptionCaught", "SwallowedException")
-        suspend fun export(): String? {
-            return try {
-                val devicesResult = deviceRepository.getAllDevicesSync()
-                val devices = devicesResult.getOrDefault(emptyList())
-                val samples = signalSampleRepository.getAllSignalSamples().getOrDefault(emptyList())
-                val exportDate = System.currentTimeMillis()
-                val sessionSettings = settingsPreferencesRepository.session.first()
-                val sessionLabel = sessionSettings.calibrationLabel
-                val sessionStartedAt = sessionSettings.startedAt
-                val sessionNotes = sessionSettings.notes
-                val activeCollectionEnabled = activeCollectionRepository.autoActiveProbeEnabled.first()
-                val sessionDevices =
-                    if (sessionStartedAt > 0L) {
-                        devices.filter { it.lastSeenAt >= sessionStartedAt }
-                    } else {
-                        emptyList()
-                    }
-                val sessionSamples =
-                    if (sessionStartedAt > 0L) {
-                        samples.filter { it.timestamp >= sessionStartedAt }
-                    } else {
-                        emptyList()
-                    }
-                val sessionFollowMeObservations =
-                    loadSessionFollowMeObservations(
-                        devices = sessionDevices,
-                        sessionStartedAt = sessionStartedAt,
-                    )
-                val sessionAlertEvidenceEvents =
-                    loadSessionAlertEvidenceEvents(
-                        devices = sessionDevices,
-                        sessionStartedAt = sessionStartedAt,
-                    )
-
-                val root =
-                    DatabaseExportJsonMapper.buildExport(
-                        DatabaseExportData(
-                            devices = devices,
-                            samples = samples,
-                            session =
-                                DatabaseExportSessionData(
-                                    devices = sessionDevices,
-                                    samples = sessionSamples,
-                                    label = sessionLabel,
-                                    startedAt = sessionStartedAt,
-                                    notes = sessionNotes,
-                                    activeCollectionEnabled = activeCollectionEnabled,
-                                    followMeObservations = sessionFollowMeObservations,
-                                    alertEvidenceEvents = sessionAlertEvidenceEvents,
-                                ),
-                            exportDate = exportDate,
-                        ),
-                    )
-                json.encodeToString(root)
-            } catch (e: Exception) {
-                null
+        suspend fun export(): String? =
+            withContext(Dispatchers.Default) {
+                runCatching {
+                    json.encodeToString(DatabaseExportJsonMapper.buildExport(loadData()))
+                }.getOrNull()
             }
+
+        suspend fun exportToFile(
+            file: File,
+            trailingRootFragmentProvider: () -> String = { "" },
+        ): Boolean =
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    val data = loadData()
+                    file.bufferedWriter(Charsets.UTF_8).use { writer ->
+                        DatabaseExportStreamWriter.writeExport(
+                            data = data,
+                            writer = writer,
+                            json = json,
+                            trailingRootFragmentProvider = trailingRootFragmentProvider,
+                        )
+                    }
+                }.isSuccess
+            }
+
+        private suspend fun loadData(): DatabaseExportData {
+            val devices = deviceRepository.getAllDevicesSync().getOrDefault(emptyList())
+            val samples = signalSampleRepository.getAllSignalSamples().getOrDefault(emptyList())
+            val exportDate = System.currentTimeMillis()
+            val sessionSettings = settingsPreferencesRepository.session.first()
+            val sessionLabel = sessionSettings.calibrationLabel
+            val sessionStartedAt = sessionSettings.startedAt
+            val sessionNotes = sessionSettings.notes
+            val activeCollectionEnabled = activeCollectionRepository.autoActiveProbeEnabled.first()
+            val sessionDevices =
+                if (sessionStartedAt > 0L) {
+                    devices.filter { it.lastSeenAt >= sessionStartedAt }
+                } else {
+                    emptyList()
+                }
+            val sessionSamples =
+                if (sessionStartedAt > 0L) {
+                    samples.filter { it.timestamp >= sessionStartedAt }
+                } else {
+                    emptyList()
+                }
+            val sessionFollowMeObservations =
+                loadSessionFollowMeObservations(
+                    devices = sessionDevices,
+                    sessionStartedAt = sessionStartedAt,
+                )
+            val sessionAlertEvidenceEvents =
+                loadSessionAlertEvidenceEvents(
+                    devices = sessionDevices,
+                    sessionStartedAt = sessionStartedAt,
+                )
+
+            return DatabaseExportData(
+                devices = devices,
+                samples = samples,
+                session =
+                    DatabaseExportSessionData(
+                        devices = sessionDevices,
+                        samples = sessionSamples,
+                        label = sessionLabel,
+                        startedAt = sessionStartedAt,
+                        notes = sessionNotes,
+                        activeCollectionEnabled = activeCollectionEnabled,
+                        followMeObservations = sessionFollowMeObservations,
+                        alertEvidenceEvents = sessionAlertEvidenceEvents,
+                    ),
+                exportDate = exportDate,
+            )
         }
 
         private suspend fun loadSessionFollowMeObservations(
@@ -155,6 +173,13 @@ internal data class SessionFollowMeObservation(
 internal object DatabaseExportJsonMapper {
     fun buildExport(data: DatabaseExportData): JsonObject =
         buildJsonObject {
+            buildExportMetadata(data).forEach { (key, value) -> put(key, value) }
+            put("devices", JsonArray(data.devices.map(::mapDevice)))
+            put("signalSamples", JsonArray(data.samples.map(::mapSample)))
+        }
+
+    internal fun buildExportMetadata(data: DatabaseExportData): JsonObject =
+        buildJsonObject {
             put("schemaVersion", SCHEMA_VERSION)
             put("exportDate", data.exportDate)
             put("deviceCount", data.devices.size)
@@ -194,8 +219,6 @@ internal object DatabaseExportJsonMapper {
                     exportDate = data.exportDate,
                 ),
             )
-            put("devices", JsonArray(data.devices.map(::mapDevice)))
-            put("signalSamples", JsonArray(data.samples.map(::mapSample)))
         }
 
     private fun mapSession(
@@ -383,7 +406,7 @@ internal object DatabaseExportJsonMapper {
         }
     }
 
-    private fun mapDevice(device: Device): JsonObject =
+    internal fun mapDevice(device: Device): JsonObject =
         buildJsonObject {
             put("fingerprint", device.fingerprint)
             put("mac", device.macAddress)
@@ -446,7 +469,7 @@ internal object DatabaseExportJsonMapper {
             put("provenance", evidence.provenance.name)
         }
 
-    private fun mapSample(sample: SignalSample): JsonObject =
+    internal fun mapSample(sample: SignalSample): JsonObject =
         buildJsonObject {
             put("deviceFingerprint", sample.deviceFingerprint)
             put("observedMac", sample.observedMac)

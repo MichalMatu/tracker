@@ -72,6 +72,11 @@ internal fun String.withFieldMvpDiagnostics(uiState: SettingsUiState): String {
     return substring(0, insertionPoint).trimEnd() + payload + substring(insertionPoint)
 }
 
+internal fun fieldMvpDiagnosticsAppendFragment(uiState: SettingsUiState): String {
+    val decoratedEmptyObject = "{}".withFieldMvpDiagnostics(uiState)
+    return decoratedEmptyObject.substring(1, decoratedEmptyObject.length - 1)
+}
+
 internal fun Writer.writeWithFieldMvpDiagnostics(
     json: String,
     uiState: SettingsUiState,
@@ -83,8 +88,7 @@ internal fun Writer.writeWithFieldMvpDiagnostics(
     }
 
     // Build only the small diagnostics fragment. Never create a second copy of the full export.
-    val decoratedEmptyObject = "{}".withFieldMvpDiagnostics(uiState)
-    val diagnosticsFragment = decoratedEmptyObject.substring(1, decoratedEmptyObject.length - 1)
+    val diagnosticsFragment = fieldMvpDiagnosticsAppendFragment(uiState)
     var prefixEnd = insertionPoint
     while (prefixEnd > 0 && json[prefixEnd - 1].isWhitespace()) {
         prefixEnd -= 1

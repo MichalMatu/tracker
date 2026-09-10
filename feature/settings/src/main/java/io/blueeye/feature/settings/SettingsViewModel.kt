@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 data class SettingsUiState(
@@ -322,6 +323,19 @@ class SettingsViewModel
             viewModelScope.launch {
                 val json = databaseExporter.export()
                 onResult(json)
+            }
+        }
+
+        fun exportDatabaseToFile(
+            file: File,
+            onResult: (Boolean) -> Unit,
+        ) {
+            viewModelScope.launch {
+                val exported =
+                    databaseExporter.exportToFile(file) {
+                        fieldMvpDiagnosticsAppendFragment(uiState.value)
+                    }
+                onResult(exported)
             }
         }
 

@@ -14,6 +14,7 @@ import io.blueeye.core.model.IdentityCarryoverVerdict
 import io.blueeye.core.model.MacAddressType
 import io.blueeye.core.model.SignalSample
 import io.blueeye.core.model.TrackingStatus
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.contentOrNull
@@ -27,8 +28,52 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.StringWriter
 
 class DatabaseExportJsonMapperTest {
+    @Test
+    fun `streamed export is semantically identical to in-memory mapper`() {
+        val device =
+            device(
+                fingerprint = "stream-device",
+                lastSeenAt = SESSION_STARTED_AT + 10_000L,
+                calibrationLabel = DeviceCalibrationLabel.UNKNOWN,
+            )
+        val sample =
+            sample(
+                deviceFingerprint = device.fingerprint,
+                timestamp = SESSION_STARTED_AT + 12_000L,
+                latitude = 51.1,
+                longitude = 17.0,
+            )
+        val data =
+            DatabaseExportData(
+                devices = listOf(device),
+                samples = listOf(sample),
+                session =
+                    DatabaseExportSessionData(
+                        devices = listOf(device),
+                        samples = listOf(sample),
+                        label = DeviceCalibrationLabel.UNKNOWN,
+                        startedAt = SESSION_STARTED_AT,
+                        notes = "stream-test",
+                        activeCollectionEnabled = false,
+                        followMeObservations = emptyList(),
+                        alertEvidenceEvents = emptyList(),
+                    ),
+                exportDate = EXPORT_DATE,
+            )
+        val writer = StringWriter()
+        val json = Json { prettyPrint = true }
+
+        DatabaseExportStreamWriter.writeExport(data, writer, json)
+
+        assertEquals(
+            DatabaseExportJsonMapper.buildExport(data),
+            Json.parseToJsonElement(writer.toString()).jsonObject,
+        )
+    }
+
     @Test
     fun `export includes session summary counters`() {
         val fixture = structuredExportFixture()

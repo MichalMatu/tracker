@@ -34,15 +34,26 @@ internal fun prepareDatabaseExportForShare(
     viewModel: SettingsViewModel,
 ) {
     Toast.makeText(context, "Preparing session export...", Toast.LENGTH_SHORT).show()
-    viewModel.exportDatabase { json ->
-        if (json == null) {
+    val directory = File(context.cacheDir, "session_exports")
+    if (!directory.exists() && !directory.mkdirs()) {
+        Toast.makeText(context, "Unable to prepare session export", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    val target = File(directory, "blueeye-session-export.json")
+    val temporary = File(directory, "blueeye-session-export.json.tmp")
+    viewModel.exportDatabaseToFile(temporary) { exported ->
+        if (!exported) {
+            temporary.delete()
             Toast.makeText(context, "Export failed", Toast.LENGTH_SHORT).show()
         } else {
-            shareExport(
-                context = context,
-                json = json,
-                uiState = viewModel.uiState.value,
-            )
+            runCatching {
+                replaceSessionExportFile(temporary, target)
+                shareExportFile(context, target)
+            }.onFailure {
+                temporary.delete()
+                Toast.makeText(context, "Unable to share session export", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
@@ -78,53 +89,35 @@ internal fun copyExportToClipboard(
     }
 }
 
-internal fun shareExport(
+private fun shareExportFile(
     context: Context,
-    json: String,
-    uiState: SettingsUiState,
+    exportFile: File,
 ) {
-    runCatching {
-        val exportFile = writeSessionExportFile(context, json, uiState)
-        val uri =
-            FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                exportFile,
-            )
-        val sendIntent =
-            Intent(Intent.ACTION_SEND).apply {
-                type = "application/json"
-                putExtra(Intent.EXTRA_SUBJECT, "BlueEye session export")
-                putExtra(Intent.EXTRA_STREAM, uri)
-                clipData = ClipData.newRawUri("BlueEye Session Export JSON", uri)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-        val chooser =
-            Intent.createChooser(sendIntent, "Share BlueEye session export").apply {
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-        context.startActivity(chooser)
-    }.onFailure {
-        Toast.makeText(context, "Unable to share session export", Toast.LENGTH_SHORT).show()
-    }
+    val uri =
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            exportFile,
+        )
+    val sendIntent =
+        Intent(Intent.ACTION_SEND).apply {
+            type = "application/json"
+            putExtra(Intent.EXTRA_SUBJECT, "BlueEye session export")
+            putExtra(Intent.EXTRA_STREAM, uri)
+            clipData = ClipData.newRawUri("BlueEye Session Export JSON", uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+    val chooser =
+        Intent.createChooser(sendIntent, "Share BlueEye session export").apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+    context.startActivity(chooser)
 }
 
-private fun writeSessionExportFile(
-    context: Context,
-    json: String,
-    uiState: SettingsUiState,
-): File {
-    val directory = File(context.cacheDir, "session_exports")
-    if (!directory.exists() && !directory.mkdirs()) {
-        throw IOException("Unable to create session export directory")
-    }
-
-    val target = File(directory, "blueeye-session-export.json")
-    val temporary = File(directory, "blueeye-session-export.json.tmp")
-    temporary.bufferedWriter(Charsets.UTF_8).use { writer ->
-        writer.writeWithFieldMvpDiagnostics(json, uiState)
-    }
-
+private fun replaceSessionExportFile(
+    temporary: File,
+    target: File,
+) {
     if (target.exists() && !target.delete()) {
         temporary.delete()
         throw IOException("Unable to replace previous session export")
@@ -133,5 +126,4 @@ private fun writeSessionExportFile(
         temporary.copyTo(target, overwrite = true)
         temporary.delete()
     }
-    return target
 }
