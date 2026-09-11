@@ -1,10 +1,11 @@
 <!-- PHASE3-2026-09-11-FINAL-OVERRIDE -->
-> **2026-09-11 continuation override — read this before the historical handoff below.**
+> **2026-09-11 FINAL FIELD-REACCEPTANCE OVERRIDE — read this first.**
 >
-> Application milestone SHA: `630e184dbc328672a961e2826208fddd77a68f02` (`Stabilize retention and location latency`).
-> Phase 3 source stabilization work from the field-walk blockers is implemented through this SHA. Local final static gate `tracker-phase3-final-stabilization-static-gate-v2` is terminal PASS (`core:data:detekt` + exact `feature:settings` ktlint check). Secret Scan #137 and Sandbox Pack #62 are exact-SHA PASS. Quality #107 (`34575320891`) and Android UI Smoke #38 (`34575320942`) were still `in_progress` when this handoff was written. Do not claim Phase 3 final acceptance until those exact-SHA workflows are checked terminally and the targeted Samsung field reacceptance below is completed.
+> The installed/accepted application build is source SHA `40eac7a504d363a05cd6c235c25146e01bb36ff2` on Samsung `SM-S906B`. Production application source is unchanged from milestone `630e184dbc328672a961e2826208fddd77a68f02`; later changes through `40eac7a...` are documentation plus the bounded export-schema test correction. Exact-SHA Secret Scan, Quality, Android UI Smoke, Sandbox Pack and Tester Release are green, and targeted ADB pre-smoke (Start/Stop + screen-off/Dozing) passed.
 >
-> The authoritative compact continuation record is `docs/PHASE3_FINAL_HANDOFF_2026-09-11.md`. The older text below remains historical evidence and should not be treated as the current blocker list.
+> **Authoritative continuation document:** `docs/PHASE3_FIELD_REACCEPTANCE_HANDOFF_2026-09-11.md`. The final structural/code-quality second pass is `docs/PHASE3_FINAL_CODE_QUALITY_AUDIT_2026-09-11.md`. The historical handoff below remains evidence only.
+>
+> NEXT ACTION is the final varied-density walk and preservation/correlation of Session Export + ADB/logcat + Room/WAL/SHM + Bluetooth HCI snoop from a system bugreport. Do not change application code before that evidence is captured unless a new P0/P1 failure is reproduced.
 
 # Phase 3 New-Chat Handoff — Field Walk Findings and Targeted Stabilization
 

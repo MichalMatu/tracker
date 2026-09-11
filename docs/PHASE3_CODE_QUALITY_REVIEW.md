@@ -1,3 +1,5 @@
+> **Final second-pass audit:** see `PHASE3_FINAL_CODE_QUALITY_AUDIT_2026-09-11.md`. This earlier review remains the structural-hardening provenance.
+
 # Phase 3 Code Quality Review
 
 Status: **STRUCTURAL HARDENING COMPLETE IN SOURCE; FIELD VALIDATION STILL REQUIRED**

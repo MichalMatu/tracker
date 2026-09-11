@@ -1,3 +1,5 @@
+> **SUPERSEDED FOR CURRENT STATUS:** continue from `PHASE3_FIELD_REACCEPTANCE_HANDOFF_2026-09-11.md`. This file remains historical provenance for the stabilization package.
+
 # Phase 3 final continuation handoff — 2026-09-11
 
 ## Binding and source of truth

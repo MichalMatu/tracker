@@ -1,17 +1,17 @@
 # Phase 3 Engineering Field Collection
 
-Status: **TARGETED PHYSICAL ACCEPTANCE PASS; VARIED-DENSITY WALK PENDING — USE THE EXACT ACCEPTED APPLICATION SOURCE**
+Status: **TARGETED PHYSICAL ACCEPTANCE + EXACT-BUILD PRE-SMOKE PASS; FINAL VARIED-DENSITY WALK/CAPTURE PENDING**
 Scope: validate Phase 3 BLE ingest accounting and bounded latest-per-device coalescing on a real walk. This is engineering evidence for stability recovery; it does not unpause the general Field MVP checklist or advance identity/alert phases.
 
 ## Approved pre-field build
 
-The historical `.1` pre-field release is superseded for the remaining walk. Use an APK built from accepted application source `745fdf30271459a20e380763ea69b8ed2e601839` and signed with the established tester certificate `fff1ada9aa9e2709b4e4bda8333404feae854372df319b77f1f45d7869a61cb6`. Once collection begins, do not switch builds during the same field session.
+Use the already-installed debug APK built from exact source `40eac7a504d363a05cd6c235c25146e01bb36ff2`. APK SHA-256 is `17ebd807c526eda077e9e7f9e96e6306924890e4c201a3c5d3e50f9d76237a65`; signer certificate SHA-256 is `fb07493cf97b0a84ec410f7f72f12938b7f9d47151546e15c049c49c27807b11` (`Android Debug`). Do not reinstall or switch builds during the same field session. Documentation-only descendants of this source do not require reinstalling the phone.
 
 Before the walk, connect the launched app to the Mac with USB debugging authorized. Local Agent/ADB should capture a non-destructive baseline for package `io.blueeye`: device identity, package/install information, installed APK identity where practical, and an app-focused logcat/runtime snapshot. Do not force-stop the app merely to collect this baseline because Phase 3 ingest totals are process-lifetime diagnostics.
 
 ## Before the walk
 
-- Use only an APK built from accepted application source `745fdf30271459a20e380763ea69b8ed2e601839` for the remaining Phase 3 collection; do not switch builds during the same field session.
+- Use only an APK built from accepted application source `40eac7a504d363a05cd6c235c25146e01bb36ff2` for the remaining Phase 3 collection; do not switch builds during the same field session.
 - Start scanning explicitly.
 - Open Settings diagnostics and confirm `Raw BLE/min` is non-zero in a place with nearby Bluetooth devices.
 - `Queue dropped` should remain `0`. A non-zero `Queue rejected` is allowed only under true unique-device capacity exhaustion and must be investigated.
@@ -27,6 +27,10 @@ The following physical evidence is already sufficient unless related implementat
 - short process-lifetime ingest reconciliation with zero queue drops/rejections/failures and explicit sample throttling.
 
 See `PHASE3_TARGETED_PHYSICAL_ACCEPTANCE.md`. The remaining purpose of the walk is varied-density continuity evidence, not repeating these regressions.
+
+## Bluetooth HCI companion capture
+
+Bluetooth HCI snoop tracing is enabled and physically verified on the Samsung (`dumpsys bluetooth_manager` reports `snoop_logger_tracing`). Normal ADB cannot read the protected Samsung snoop path directly. Leave HCI snoop enabled throughout the walk. After preserving Session Export, ADB/runtime evidence and Room/WAL/SHM, generate a Samsung/Android bugreport and extract `btsnoop_hci.log` or the vendor-equivalent snoop artifact. Keep raw HCI/bugreport private; they may expose sensitive device/system information. HCI is a host/controller trace, not an over-the-air RF sniffer, and it complements rather than replaces Tracker GPS/RSSI telemetry.
 
 ## During the walk
 
@@ -59,6 +63,7 @@ Use Local Agent/ADB against the exact installed debug build to collect, without 
 - exact installed APK/source SHA,
 - package/install metadata and baseline/final BlueEye logcat snapshots,
 - a short logcat/runtime snapshot if an ingest error or rejection was observed.
+- the Bluetooth HCI snoop artifact extracted from a system bugreport, with file hash/time range when practical.
 
 ## Analysis gate
 

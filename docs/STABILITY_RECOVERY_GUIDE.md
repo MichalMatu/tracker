@@ -17,7 +17,7 @@
 
 ### NEXT ACTION
 
-- [ ] Complete the Phase 3 identity-continuity correction using the anonymized OPPO/JBL field fixtures: preserve the accepted short-window carryover behavior, do not extend destructive same-name matching beyond the current 30 s window, and add only reversible/explicit evidence for plausible long-gap continuity. Before broadening any destructive merge path, preserve user-owned `DeviceEntity` state. Phase 4 remains blocked until identity, retention, latency follow-ups and final field reacceptance are complete.
+- [ ] Complete the final varied-density Phase 3 field reacceptance using the already-installed `40eac7a504d363a05cd6c235c25146e01bb36ff2` APK. Before killing/restarting/resetting anything, preserve the complete Session Export and ADB/runtime evidence; then collect Room/WAL/SHM and the enabled Bluetooth HCI snoop through a Samsung/Android bugreport as specified in `PHASE3_FIELD_REACCEPTANCE_HANDOFF_2026-09-11.md`. Reconcile ingest/GPS/identity evidence and HCI-vs-Tracker observations. Do not refactor or retune the healthy ingest path before this evidence is analyzed.
 
 When the next task is completed, update this line to the next unfinished item and add an entry to the Work Log at the bottom of this file.
 

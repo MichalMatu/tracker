@@ -8,6 +8,8 @@ export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
 
 On macOS, resolve JDK 21 through `/usr/libexec/java_home` instead of hard-coding a Homebrew path. The Phase 2 closure gate on 2026-09-07 used Eclipse Temurin 21.0.2 successfully.
 
+Local Agent currently sees Oracle JDK 22 as the shell default while Temurin 21 is also installed. Detekt 1.23.x rejects JVM target 22, so every Local Agent Gradle/Detekt command must explicitly set `JAVA_HOME="$(/usr/libexec/java_home -v 21)"`. The final Phase 3 read-only audit reproduced the JDK-22 failure and then passed all-module Detekt on Temurin 21.0.2.
+
 ## Main Command
 
 ```bash
