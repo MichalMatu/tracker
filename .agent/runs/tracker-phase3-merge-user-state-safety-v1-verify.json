@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-merge-user-state-safety-v1-verify",
+  "task_digest": "b6073e67a298bf541e5bce97f279b397e06883188f29f29c47e5a75f45b11086",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-11T05:19:51.949431+00:00",
+  "attempt_id": "25c221e70c0a0db5cd0fff1d",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 8711,
+  "updated_at": "2026-09-11T05:19:51.949535+00:00",
+  "pid": 8711
+}
