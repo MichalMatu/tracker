@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 4,
+  "index": 5,
   "total": 6,
-  "command": "set -euo pipefail; echo '--- INDEPENDENT_COMPLEXITY_TOOL ---'; TMP=/tmp/tracker-final-audit-tools-v2; rm -rf \"$TMP\"; python3 -m venv \"$TMP\"; if \"$TMP/bin/python\" -m pip -q install --disable-pip-version-check lizard; then \"$TMP/bin/lizard\" --version; set +e; \"$TMP/bin/lizard\" -l java -C 15 -L 100 -a 7 app core feature >\"$TMP/lizard.txt\" 2>&1; RC=$?; set -e; echo LIZARD_EXIT=$RC; tail -n 220 \"$TMP/lizard.txt\"; else echo LIZARD_INSTALL_UNAVAILABLE; fi; rm -rf \"$TMP\"; echo INDEPENDENT_TOOL_STEP_DONE",
-  "pid": 30059,
+  "command": "set -euo pipefail; ./gradlew --no-daemon detekt; echo DETEKT_ALL_MODULES_PASS",
+  "pid": 30249,
   "timeout": 900,
   "idle_timeout": 300,
   "memory_limit_mb": 2048,
-  "started_at": "2026-09-11T09:28:34.601284+00:00",
-  "stage_name": "command-4",
-  "stage_index": 4,
+  "started_at": "2026-09-11T09:28:42.761726+00:00",
+  "stage_name": "command-5",
+  "stage_index": 5,
   "stage_total": 6,
   "stage_phase": "commands",
   "task_id": "tracker-final-structural-audit-v2",
@@ -18,5 +18,5 @@
   "task_digest": "8802a349dfe234b41ba67f1adc2a6e1d6927565498c7de6cb0c1dc3d736f4d1d",
   "daemon_version": "4.18.20",
   "daemon_pid": 29776,
-  "updated_at": "2026-09-11T09:28:34.676657+00:00"
+  "updated_at": "2026-09-11T09:28:42.833351+00:00"
 }
