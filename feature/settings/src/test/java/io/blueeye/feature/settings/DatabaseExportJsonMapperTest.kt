@@ -85,7 +85,7 @@ class DatabaseExportJsonMapperTest {
         val reviewReadiness = session.getValue("reviewReadiness").jsonObject
         val reviewDeviceQueue = session.getValue("reviewDeviceQueue").jsonArray.single().jsonObject
 
-        assertEquals(19, export.getValue("schemaVersion").jsonPrimitive.int)
+        assertEquals(20, export.getValue("schemaVersion").jsonPrimitive.int)
         assertEquals(EXPORT_DATE, export.getValue("exportDate").jsonPrimitive.long)
         assertEquals(2, export.getValue("deviceCount").jsonPrimitive.int)
         assertEquals(2, export.getValue("sampleCount").jsonPrimitive.int)
