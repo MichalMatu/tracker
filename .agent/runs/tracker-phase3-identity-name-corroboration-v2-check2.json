@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "tracker-phase3-identity-name-corroboration-v2-check2",
   "task_digest": "012d39a3ddb0c9367ccc23660397c9b0e936f6515ecf89dca7ed14307ff28c17",
-  "idle_timeout": 120,
-  "task_timeout": 600,
-  "memory_limit_mb": 1024,
-  "started_at": "2026-09-11T03:57:48.808819+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-11T03:57:51.841216+00:00",
   "attempt_id": "2e24ff224eac88b8f8db9eb5",
   "daemon_version": "4.18.20",
   "daemon_pid": 50258,
-  "updated_at": "2026-09-11T03:57:48.808986+00:00",
+  "updated_at": "2026-09-11T03:57:52.165483+00:00",
   "pid": 50258
 }
