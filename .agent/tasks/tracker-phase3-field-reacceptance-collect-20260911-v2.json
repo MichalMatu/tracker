@@ -1,0 +1,17 @@
+{
+  "id": "tracker-phase3-field-reacceptance-collect-20260911-v2",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1536,
+  "command_timeout": 2400,
+  "idle_timeout": 900,
+  "task_timeout": 3600,
+  "commands": [
+    "set -euo pipefail; git fetch --no-tags origin agent-control main >/dev/null; test \"$(git rev-parse origin/main)\" = 'd15f6985371ef3ffe0496d7a14454589d56978ee'; git show origin/agent-control:.agent/payloads/tracker-phase3-field-reacceptance-resume-20260911-v1.sh > /tmp/tracker-phase3-field-reacceptance-resume-v1.sh; chmod 700 /tmp/tracker-phase3-field-reacceptance-resume-v1.sh; /tmp/tracker-phase3-field-reacceptance-resume-v1.sh"
+  ]
+}
