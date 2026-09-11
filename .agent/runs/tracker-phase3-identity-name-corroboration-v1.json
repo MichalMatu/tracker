@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-identity-name-corroboration-v1",
+  "task_digest": "b69e8840984051605a00f614f82a9bb34a583de2d82904235988852504a9da77",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-11T03:32:53.985010+00:00",
+  "attempt_id": "452973e35e0a8a3be3c5685e",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 22989,
+  "updated_at": "2026-09-11T03:32:53.985119+00:00",
+  "pid": 22989
+}
