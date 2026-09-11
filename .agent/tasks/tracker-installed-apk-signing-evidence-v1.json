@@ -1,0 +1,17 @@
+{
+  "id": "tracker-installed-apk-signing-evidence-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; test \"$(git rev-parse HEAD)\" = '40eac7a504d363a05cd6c235c25146e01bb36ff2'; APK=app/build/outputs/apk/debug/app-debug.apk; test -f \"$APK\"; echo APK_SHA256=$(shasum -a 256 \"$APK\" | awk '{print $1}'); APKSIGNER=$(find \"$HOME/Library/Android/sdk/build-tools\" -type f -name apksigner 2>/dev/null | sort -V | tail -n 1); test -n \"$APKSIGNER\"; echo APKSIGNER=$APKSIGNER; \"$APKSIGNER\" verify --print-certs \"$APK\" | grep -E 'Signer #1 certificate DN|Signer #1 certificate SHA-256 digest|Signer #1 certificate SHA-1 digest'; adb shell pm path io.blueeye | grep '^package:'; adb shell dumpsys package io.blueeye | grep -E 'versionCode=|versionName=' | head -n 2; echo SIGNING_EVIDENCE_PASS"
+  ]
+}
