@@ -24,6 +24,12 @@ constructor() {
         /** Maximum time to consider for destructive carryover (30 seconds). */
         const val CARRYOVER_WINDOW_MS = 30_000L
 
+        /**
+         * Distinct addresses seen practically simultaneously are coexistence evidence, not a safe
+         * destructive rotation match. Real rotation must leave a short sequential gap first.
+         */
+        const val MIN_DESTRUCTIVE_CARRYOVER_GAP_MS = 2_000L
+
         /** Maximum age for a non-destructive long-gap identity candidate. */
         const val LONG_GAP_CANDIDATE_WINDOW_MS = 300_000L
 
@@ -71,7 +77,9 @@ constructor() {
                 continue
             }
             val timeSinceLastSeen = input.data.timestamp - target.lastSeenAt
-            if (timeSinceLastSeen <= CARRYOVER_WINDOW_MS) {
+            val isSequentialCarryoverWindow =
+                timeSinceLastSeen in MIN_DESTRUCTIVE_CARRYOVER_GAP_MS..CARRYOVER_WINDOW_MS
+            if (isSequentialCarryoverWindow) {
                 immediateMatchForTarget(input, target)?.let { return it }
                 val weightedMatch = weightedMatchForTarget(input, target)
                 if (weightedMatch != null && weightedMatch.evidence.confidence > highestScore) {
@@ -349,9 +357,10 @@ constructor() {
     }
 
     /**
-     * "Shadow Match" Heuristic for Apple Devices:
-     * If we see a "Shadow" signal (generic name) very close (Time & RSSI) to a "Main" signal (named device)
-     * and both are Apple (0x004C), we assume they are the same physical device emitting different packets.
+     * "Shadow Match" Heuristic for Apple Devices.
+     *
+     * The caller only invokes destructive matching after a minimum sequential gap. Simultaneously
+     * visible addresses are therefore coexistence evidence and never receive an Apple shortcut.
      */
     private fun matchShadow(
         data: BleScanResultData,
@@ -361,7 +370,7 @@ constructor() {
         val isAppleInfo = data.manufacturerId == 76 ||
             hasAppleManufacturerData(data.manufacturerData) ||
             hasAppleManufacturerData(data.rawData)
-        
+
         if (!isAppleInfo) return 0f
 
         val targetIsAppleInfo =
@@ -370,39 +379,26 @@ constructor() {
 
         if (!targetIsAppleInfo) return 0f
 
-        // 2. Shadow Identification
+        // 2. Shadow Identification. At least one side must be a generic Apple shadow packet.
         val dataIsShadow = isShadowName(data.name)
         val targetIsShadow = isShadowName(target.lastDeviceName)
-
-        // Rule: At least ONE of them must be a Shadow to be a Shadow Match.
-        // - Shadow -> Main (Classic flow)
-        // - Main -> Shadow (Order Independence / "Upgrade" flow)
-        // - Shadow -> Shadow (Merge concurrent generic packets)
         if (!dataIsShadow && !targetIsShadow) return 0f
 
         // 3. Signal Strength Check
         val rssiDiff = abs(data.rssi - target.lastRssi)
-        
-        // RELAXED THRESHOLDS:
-        // Strong signals (> -75): Allow diff up to 20 (was 15).
-        // Weak signals (< -75): Allow diff up to 10 (was 4).
+
+        // Strong signals (> -75): allow diff up to 20. Weak signals: keep a tighter 10 dB limit.
         val isWeak = data.rssi < -75
         val limit = if (isWeak) 10 else 20
-        
-        // CONCURRENT BOOST: If signals are simultaneous (< 1s) and strong, we assume same source (multi-service).
-        // User observed ~4-5dB diff. We allow up to 8dB for concurrent strong signals (Tightened).
-        val timeDiff = abs(data.timestamp - target.lastSeenAt)
-        if (timeDiff < 1000 && !isWeak && rssiDiff <= 8) {
-             android.util.Log.i("ShadowMatch", "Concurrent Apple Merge (${if(dataIsShadow) "S->T" else "T->S"}): ${data.mac} -> ${target.primaryMac} (dt=${timeDiff}ms, dRsum=${rssiDiff})")
-             return 1.0f
-        }
-
         if (rssiDiff > limit) {
-             return 0f
+            return 0f
         }
 
-        // 4. Match!
-        android.util.Log.i("ShadowMatch", "Shadow MATCH: ${data.mac} (${data.name}) -> ${target.primaryMac} (${target.lastDeviceName}). RSSI: ${data.rssi}/${target.lastRssi}")
+        android.util.Log.i(
+            "ShadowMatch",
+            "Sequential Apple shadow MATCH: ${data.mac} (${data.name}) -> " +
+                "${target.primaryMac} (${target.lastDeviceName}). RSSI: ${data.rssi}/${target.lastRssi}",
+        )
         return 1.0f
     }
 
@@ -415,10 +411,10 @@ constructor() {
         target: TrackedTarget
     ): Float {
         // 1. Vendor Check: Must be Microsoft (0x0006)
-        val isMsInfo = data.manufacturerId == 6 || 
-                       (data.manufacturerData != null && data.manufacturerData.size >= 2 && 
+        val isMsInfo = data.manufacturerId == 6 ||
+                       (data.manufacturerData != null && data.manufacturerData.size >= 2 &&
                         data.manufacturerData[0] == 0x06.toByte() && data.manufacturerData[1] == 0x00.toByte())
-        
+
         if (!isMsInfo) return 0f
 
         // 2. Target Check (Target should have Microsoft vendor or "Windows" name)
@@ -426,15 +422,15 @@ constructor() {
         // Search in name safely
         val targetName = target.lastDeviceName
         var targetIsWindows = targetName?.contains("Windows", ignoreCase = true) == true
-        
+
         // Also check if target's last payload has Microsoft ID if name is missing?
         // For now, rely on Name or if target is also emitting MS data (we could parse lastPayload but let's keep it simple)
-        
+
         if (!targetIsWindows) {
             // Check payload for 0x06 00
             val payload = target.lastPayload
             if (payload != null && payload.size >= 4) {
-                 // Check for 0x06 00 in typical offsets. 
+                 // Check for 0x06 00 in typical offsets.
                  // Often AD Structure: [Len][FF][06][00]...
                  // Let's brute force search 06 00 ? No, strict parsing is better but complex here.
                  // Let's assume if it has no name, we might skip it unless strictly matching payload.
@@ -445,11 +441,11 @@ constructor() {
 
         // 3. Signal Strength & Proximity
         val rssiDiff = abs(data.rssi - target.lastRssi)
-        
+
         // Similar to Apple: Allow weak signals if very close
         val isWeak = data.rssi < -75
         val isVeryClose = rssiDiff <= 3
-        
+
         if ((isWeak && !isVeryClose) || rssiDiff > 10) {
              return 0f
         }
@@ -531,13 +527,13 @@ constructor() {
     private fun isShadowName(name: String?): Boolean {
         if (name.isNullOrBlank()) return true
         val lower = name.lowercase()
-        return lower.startsWith("apple inc") || 
+        return lower.startsWith("apple inc") ||
                lower.startsWith("apple, inc") || // Handle comma
-               lower == "apple device" || 
-               lower.startsWith("find my") || 
-               lower == "continuity" || 
+               lower == "apple device" ||
+               lower.startsWith("find my") ||
+               lower == "continuity" ||
                lower == "unknown" ||
-               lower == "call handover" || 
+               lower == "call handover" ||
                lower == "nearby"
     }
 
@@ -578,13 +574,13 @@ constructor() {
 
     /**
      * Heuristic for Sequence Numbers:
-     * If payloads are identical size and have very few bit flips (Hamming Distance <= 2), 
+     * If payloads are identical size and have very few bit flips (Hamming Distance <= 2),
      * it's extremely likely to be the same device incrementing a counter.
      */
     private fun matchSequenceHeuristic(a: ByteArray?, b: ByteArray?): Float {
         if (a == null || b == null) return 0f
         if (a.size != b.size) return 0f
-        
+
         var bitDiff = 0
         for (i in a.indices) {
             val diff = a[i].toInt() xor b[i].toInt()
@@ -593,14 +589,14 @@ constructor() {
             }
             if (bitDiff > 2) return 0f // Too many changes
         }
-        
+
         // If 1 or 2 bits changed, high likelihood of sequence number
         return if (bitDiff in 1..2) 1.0f else 0f
     }
 
     private fun stripHeaders(payload: ByteArray?): ByteArray? {
         if (payload == null || payload.size < 3) return payload
-        
+
         // Scan for Manufacturer Data (0xFF)
         // Simple heuristic: If payload starts with 0xFF (after length), strip the next 2 bytes.
         // But rawData has [Len][Type][Value...]. We need to parse.
@@ -618,25 +614,25 @@ constructor() {
                 // Check Company ID (Little Endian)
                 val c1 = payload[offset + 2]
                 val c2 = payload[offset + 3]
-                
+
                 // Check for Apple (4C 00) or Microsoft (06 00)
                 val isApple = c1 == HEADER_APPLE[0] && c2 == HEADER_APPLE[1]
                 val isMs = c1 == HEADER_MICROSOFT[0] && c2 == HEADER_MICROSOFT[1]
 
                 if (isApple || isMs) {
-                    // Return payload WITHOUT this Company ID (3 bytes: Type FF + C1 + C2 replaced by... nothing? 
+                    // Return payload WITHOUT this Company ID (3 bytes: Type FF + C1 + C2 replaced by... nothing?
                     // No, we want to match the *rest* of the data.
                     // Let's return a copy with the Company ID bytes zeroed out or removed?
                     // Removal is cleaner.
-                    
-                    // Actually, we should return the Data part ONLY? 
+
+                    // Actually, we should return the Data part ONLY?
                     // No, keep other AD structures?
                     // Expert said: "Strip manufacturer headers".
                     // Let's remove the 2 bytes of Company ID.
                     // Copy everything EXCEPT [offset+2, offset+3]
-                    
-                    return payload.filterIndexed { index, _ -> 
-                        index != offset + 2 && index != offset + 3 
+
+                    return payload.filterIndexed { index, _ ->
+                        index != offset + 2 && index != offset + 3
                     }.toByteArray()
                 }
             }
@@ -662,7 +658,7 @@ constructor() {
                 matches++
             }
         }
-        
+
         // Return percentage of matches
         return matches.toFloat() / checkLen
     }
