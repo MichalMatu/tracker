@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-export-schema-test-fix-v1",
+  "task_digest": "7414be226ca26049be9e754e8c5426fdd2c093843bee34c4242b324e01c07064",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-11T07:51:05.494698+00:00",
+  "attempt_id": "3c3fb04225c29dd4acb28bbd",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 16225,
+  "updated_at": "2026-09-11T07:51:05.494786+00:00",
+  "pid": 16225
+}
