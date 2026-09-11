@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phone-presmoke-scan-toggle-v1",
+  "task_digest": "918bffe1f12bf89e85d3f9bf6499e392da9860b35e229473db2691eb91b7c3be",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-11T08:24:12.155529+00:00",
+  "attempt_id": "a8e9b830dcd8711413c6eadf",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 57978,
+  "updated_at": "2026-09-11T08:24:12.155588+00:00",
+  "pid": 57978
+}
