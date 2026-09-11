@@ -1,0 +1,17 @@
+{
+  "id": "tracker-phase3-final-logcheck-20260911-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 60,
+  "idle_timeout": 60,
+  "task_timeout": 120,
+  "commands": [
+    "set -euo pipefail; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {c++} END{print c+0}')\" = '1'; PID=$(adb shell pidof io.blueeye | tr -d '\\r'); test -n \"$PID\"; adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; LOGS=$(adb logcat -d -v brief --pid=\"$PID\"); printf '%s\n' \"$LOGS\" | grep -E 'FATAL EXCEPTION|AndroidRuntime|OutOfMemoryError|SQLiteException|SecurityException|BLE scan failed' > /tmp/tracker-phase3-final-errors.txt || true; if [ -s /tmp/tracker-phase3-final-errors.txt ]; then cat /tmp/tracker-phase3-final-errors.txt; exit 41; fi; echo PHASE3_FINAL_LOGCHECK_PASS"
+  ]
+}
