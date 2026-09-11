@@ -17,7 +17,7 @@
 
 ### NEXT ACTION
 
-- [ ] Complete one varied-density real-device walk using the physically accepted app build from source commit `745fdf30271459a20e380763ea69b8ed2e601839`. Preserve Session Export JSON plus Room/WAL/SHM and reconcile continuity across the walk. Targeted ingest accounting, Settings performance, large Share/OOM and >430 s passive-BLE watchdog evidence are already accepted; do not repeat them unless relevant code changes.
+- [ ] Complete the Phase 3 identity-continuity correction using the anonymized OPPO/JBL field fixtures: preserve the accepted short-window carryover behavior, do not extend destructive same-name matching beyond the current 30 s window, and add only reversible/explicit evidence for plausible long-gap continuity. Before broadening any destructive merge path, preserve user-owned `DeviceEntity` state. Phase 4 remains blocked until identity, retention, latency follow-ups and final field reacceptance are complete.
 
 When the next task is completed, update this line to the next unfinished item and add an entry to the Work Log at the bottom of this file.
 
@@ -659,6 +659,13 @@ Do not claim a runtime bug fixed only because unit tests/build are green when th
 ---
 
 ## 9. Work Log
+
+### 2026-09-11 — Phase 3 field-blocker stabilization
+
+- Alert cancellation/ownership is physically accepted on Samsung S22+: per-alert `Stop alarm` cancels the exact active alert while Tracker Detection remains enabled and a subsequent test alert still dispatches. Final per-alert source baseline before classifier work: `8ef2da7e44f72137e840c710acdae80a539c226e`.
+- Tactical name hardening is accepted at `36b69af2d7e274ca1e8162cab95cbe01c0efda85`: bare `X5` and `Generic X5 Headset` no longer escalate to tactical/public-safety identity, branded `INVISIO X5` remains recognized, `EADS` is word-bounded, and the Invisio family label no longer falsely claims V60 II. Focused tests/detekt and exact-SHA GitHub workflows passed.
+- Apple Nearby Info semantics are accepted at `277a89017ee884d4f50a22afaffb982a72761666`: Type 0x10 no longer promotes the low status nibble to a physical model (including the false `Apple Vision Pro` case), while full status/action fields remain available and a specific model from another Continuity TLV survives merge. Exact-SHA Quality #102, Secret Scan and Sandbox Pack passed.
+- Identity re-audit of the private field export shows the OPPO/JBL examples split across gaps longer than 30 s while in-window carryover still works. Do not solve this by lengthening destructive same-name matching. Current `mergeDevices` moves dependent history rows and deletes the duplicate device row without merging all user-owned `DeviceEntity` state, so merge-state preservation is a prerequisite before any broader destructive correlation.
 
 ### 2026-09-09 — Pre-field Radar/UI stabilization and emulator E2E
 
