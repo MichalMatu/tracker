@@ -1,0 +1,153 @@
+diff --git a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt b/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt
+--- a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt
++++ b/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt
+@@ -38,6 +38,7 @@ constructor() {
+         private const val MAX_SUMMARY_VALUE_LENGTH = 64
+         private const val EXTREME_RSSI_DIFF = 50
+         private const val RSSI_PENALTY_MULTIPLIER = 0.5f
++        private const val SAME_NAME_MIN_PAYLOAD_SCORE = 0.8f
+ 
+         // Known Vendor Headers to strip (Little Endian Manufacturer ID)
+         private val HEADER_APPLE = byteArrayOf(0x4C.toByte(), 0x00.toByte())
+@@ -104,6 +105,9 @@ constructor() {
+                     },
+                 interval = matchInterval(input.advertisingInterval, target.lastAdvertisingInterval),
+             )
++        if (scores.name >= 1.0f && !scores.hasIndependentIdentityEvidence()) return null
++
+         val normalizedScore =
+             weightedScore(
+                 input = input,
+@@ -133,6 +137,9 @@ constructor() {
+         )
+     }
+ 
++    private fun FeatureScores.hasIndependentIdentityEvidence(): Boolean =
++        uuid > 0f || finalPayload >= SAME_NAME_MIN_PAYLOAD_SCORE || interval > 0f
++
+     private fun weightedScore(
+         input: MatchInput,
+         target: TrackedTarget,
+@@ -188,7 +195,7 @@ constructor() {
+             when {
+                 matchShadow(data, target) >= 1.0f -> CarryoverMatchReason.APPLE_SHADOW
+                 matchMicrosoft(data, target) >= 1.0f -> CarryoverMatchReason.MICROSOFT_SHADOW
+-                matchSameNameHeuristic(data, target) >= 1.0f -> CarryoverMatchReason.SAME_NAME_PROXIMITY
++                matchSameNameHeuristic(input, target) >= 1.0f -> CarryoverMatchReason.SAME_NAME_PROXIMITY
+                 else -> null
+             } ?: return null
+ 
+@@ -386,9 +393,10 @@ constructor() {
+     }
+ 
+     private fun matchSameNameHeuristic(
+-        data: BleScanResultData,
+-        target: TrackedTarget
++        input: MatchInput,
++        target: TrackedTarget,
+     ): Float {
++        val data = input.data
+         // 1. Must have same non-empty name
+         if (data.name.isNullOrBlank() || target.lastDeviceName.isNullOrBlank()) {
+              // android.util.Log.v("ShadowMatch", "Same Name SKIP: Name missing. '${data.name}' vs '${target.lastDeviceName}'")
+@@ -411,6 +419,7 @@ constructor() {
+         val isSafeName = isAppleInfo || !isGenericName(data.name)
+         
+         if (!isSafeName) return 0f
++        if (!hasSameNameCorroboration(input, target)) return 0f
+ 
+         // 3. Must be strong signals and close
+         val rssiDiff = abs(data.rssi - target.lastRssi)
+@@ -428,6 +437,20 @@ constructor() {
+         return 0f
+     }
+ 
++    private fun hasSameNameCorroboration(
++        input: MatchInput,
++        target: TrackedTarget,
++    ): Boolean {
++        val payloadScore =
++            matchPayloadFuzzy(
++                stripHeaders(input.rawData),
++                stripHeaders(target.lastPayload),
++            )
++        return matchUuids(input.serviceUuids, target.lastServiceUuids) > 0f ||
++            payloadScore >= SAME_NAME_MIN_PAYLOAD_SCORE ||
++            matchInterval(input.advertisingInterval, target.lastAdvertisingInterval) > 0f
++    }
++
+     private fun isGenericName(name: String?): Boolean {
+         if (name.isNullOrBlank()) return true
+         val lower = name.lowercase()
+diff --git a/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt b/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt
+--- a/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt
++++ b/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt
+@@ -68,6 +68,43 @@ class AddressCarryoverTrackerTest {
+         assertTrue("Target ID should be valid", result2.targetId.startsWith("TGT_"))
+     }
+ 
++    @Test
++    fun `same specific name and RSSI alone should stay separate`() {
++        val first = createScanData("21:11:11:11:11:11", "JBL Tune 520BT-LE", null, null)
++        val second = createScanData("22:22:22:22:22:22", "JBL Tune 520BT-LE", null, null)
++
++        val firstResult = tracker.processScan(first, first.name)
++        val secondResult = tracker.processScan(second, second.name)
++
++        assertTrue(firstResult.isNewTarget)
++        assertTrue(secondResult.isNewTarget)
++        assertFalse(secondResult.isCarryover)
++        assertNotEquals(firstResult.targetId, secondResult.targetId)
++    }
++
++    @Test
++    fun `same specific name with service UUID corroboration may carry over`() {
++        val serviceUuids = listOf("0000fe2c-0000-1000-8000-00805f9b34fb")
++        val first =
++            createScanData("31:11:11:11:11:11", "JBL Tune 520BT-LE", null, null).copy(
++                serviceUuids = serviceUuids,
++            )
++        val second =
++            createScanData("32:22:22:22:22:22", "JBL Tune 520BT-LE", null, null).copy(
++                serviceUuids = serviceUuids,
++            )
++
++        val firstResult = tracker.processScan(first, first.name)
++        val secondResult = tracker.processScan(second, second.name)
++
++        assertTrue(firstResult.isNewTarget)
++        assertTrue(secondResult.isCarryover)
++        assertEquals(firstResult.targetId, secondResult.targetId)
++        assertEquals(
++            CarryoverMatchReason.SAME_NAME_PROXIMITY,
++            secondResult.matchEvidence?.reasonCode,
++        )
++    }
++
+     @Test
+     fun `known alias should keep reporting primary mac for persistence`() {
+         val primaryMac = "69:95:CC:A8:9C:A0"
+diff --git a/app/src/test/java/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt b/app/src/test/java/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt
+--- a/app/src/test/java/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt
++++ b/app/src/test/java/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt
+@@ -69,7 +69,7 @@ class AddressCarryoverTrackerTest {
+     }
+ 
+     @Test
+-    fun `processScan correlates device with Same Name and Similar RSSI`() {
++    fun `processScan keeps same name and similar RSSI separate without corroboration`() {
+         // 1. First Scan
+         val data1 =
+             io.blueeye.core.scanner.model.BleScanResultData(
+@@ -99,8 +99,9 @@ class AddressCarryoverTrackerTest {
+             )
+         val res2 = tracker.processScan(data2, deviceName = "MyHeadphones")
+ 
+-        assertTrue("Should be carryover due to Name+RSSI", res2.isCarryover)
+-        assertEquals(res1.targetId, res2.targetId)
++        assertFalse("Name+RSSI alone must not be carryover", res2.isCarryover)
++        assertTrue("Second same-name device should stay separate", res2.isNewTarget)
++        assertFalse("Target IDs should remain distinct", res1.targetId == res2.targetId)
+     }
+ 
+     @Test
