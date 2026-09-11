@@ -1,0 +1,22 @@
+{
+  "id": "tracker-phase3-x5-name-hardening-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 4096,
+  "command_timeout": 1800,
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "commands": [
+    "set -euo pipefail; EXPECTED='8ef2da7e44f72137e840c710acdae80a539c226e'; actual=$(git rev-parse HEAD); echo expected_sha=$EXPECTED; echo actual_sha=$actual; test \"$actual\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; git fetch origin main; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"",
+    "python3 - <<'PY'\nfrom pathlib import Path\npatterns = Path('core/data/src/main/java/io/blueeye/core/data/classifier/vendor/tactical/TacticalNamePatterns.kt')\nregistry = Path('core/data/src/main/java/io/blueeye/core/data/classifier/vendor/TacticalOuiRegistry.kt')\ntests = Path('app/src/test/java/io/blueeye/core/data/classifier/vendor/TacticalOuiRegistryTest.kt')\n\np = patterns.read_text()\nold = '        Regex(\"X5\", RegexOption.IGNORE_CASE), // X5 headset'\nnew = '        Regex(\"\\\\bINVISIO[\\\\s_-]*X5\\\\b|\\\\bX5[\\\\s_-]*INVISIO\\\\b\", RegexOption.IGNORE_CASE), // X5 headset requires brand context'\nassert p.count(old) == 1, p.count(old)\npatterns.write_text(p.replace(old, new))\n\nr = registry.read_text()\nold = '            matches(n, p.INVISIO_EXTENDED_PATTERNS) -> TacticalCategory.TACTICAL_AUDIO to \"Invisio V60 II\"'\nnew = '            matches(n, p.INVISIO_EXTENDED_PATTERNS) -> TacticalCategory.TACTICAL_AUDIO to \"Invisio professional audio\"'\nassert r.count(old) == 1, r.count(old)\nregistry.write_text(r.replace(old, new))\n\nt = tests.read_text()\nmarker = '''    @Test\n    fun `matchByName detects Invisio IAD`() {\n        val result = TacticalOuiRegistry.matchByName(\"IAD 01\")\n\n        assertNotNull(result)\n        assertEquals(TacticalCategory.TACTICAL_AUDIO, result!!.first)\n    }\n'''
+insert = marker + '''\n    @Test\n    fun `matchByName ignores ambiguous bare X5`() {\n        assertNull(TacticalOuiRegistry.matchByName(\"X5\"))\n        assertNull(TacticalOuiRegistry.matchByName(\"Generic X5 Headset\"))\n    }\n\n    @Test\n    fun `matchByName detects branded Invisio X5`() {\n        val result = TacticalOuiRegistry.matchByName(\"INVISIO X5\")\n\n        assertNotNull(result)\n        assertEquals(TacticalCategory.TACTICAL_AUDIO, result!!.first)\n        assertTrue(result.second.contains(\"Invisio\"))\n    }\n'''
+assert t.count(marker) == 1, t.count(marker)\ntests.write_text(t.replace(marker, insert))\nPY\ngit diff --check; git diff -- core/data/src/main/java/io/blueeye/core/data/classifier/vendor/tactical/TacticalNamePatterns.kt core/data/src/main/java/io/blueeye/core/data/classifier/vendor/TacticalOuiRegistry.kt app/src/test/java/io/blueeye/core/data/classifier/vendor/TacticalOuiRegistryTest.kt",
+    "export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew :app:testDebugUnitTest --tests io.blueeye.core.data.classifier.vendor.TacticalOuiRegistryTest --console=plain; ./gradlew :core:data:detekt :app:detekt --console=plain",
+    "set -euo pipefail; EXPECTED='8ef2da7e44f72137e840c710acdae80a539c226e'; git fetch origin main; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; git add core/data/src/main/java/io/blueeye/core/data/classifier/vendor/tactical/TacticalNamePatterns.kt core/data/src/main/java/io/blueeye/core/data/classifier/vendor/TacticalOuiRegistry.kt app/src/test/java/io/blueeye/core/data/classifier/vendor/TacticalOuiRegistryTest.kt; git commit -m 'Harden ambiguous Invisio X5 name matching'; NEW=$(git rev-parse HEAD); git push origin HEAD:main; echo new_sha=$NEW; echo PHASE3_X5_NAME_HARDENING_PUSH_PASS"
+  ]
+}
