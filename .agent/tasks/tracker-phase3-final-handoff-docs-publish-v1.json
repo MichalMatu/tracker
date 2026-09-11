@@ -1,0 +1,19 @@
+{
+  "id": "tracker-phase3-final-handoff-docs-publish-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 4096,
+  "command_timeout": 900,
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch origin main agent-control; test \"$(git rev-parse origin/main)\" = '630e184dbc328672a961e2826208fddd77a68f02'; git checkout main; git reset --hard '630e184dbc328672a961e2826208fddd77a68f02'",
+    "set -euo pipefail; git show origin/agent-control:.agent/scripts/tracker-phase3-final-handoff-docs-v1.py > /tmp/final-handoff.py; python3 /tmp/final-handoff.py; git diff --check; test \"$(git status --porcelain | wc -l | tr -d ' ')\" -eq 2; git status --short",
+    "set -euo pipefail; git add docs/PHASE3_HANDOFF.md docs/PHASE3_FINAL_HANDOFF_2026-09-11.md; git commit -m 'Update Phase 3 final handoff'; sha=$(git rev-parse HEAD); git push origin HEAD:main; git fetch origin main; test \"$(git rev-parse origin/main)\" = \"$sha\"; test -z \"$(git status --porcelain)\"; echo PHASE3_FINAL_HANDOFF_DOCS_PUBLISH_PASS:$sha"
+  ]
+}
