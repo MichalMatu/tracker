@@ -1,0 +1,89 @@
+{
+  "id": "tracker-phase3-merge-user-state-safety-v2-verify",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-11T05:29:49.570329+00:00",
+  "command_timeout": 1800,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test \"$(git rev-parse HEAD)\" = 'feb3246d482b10f5cef6bd0dda2fcb39d58fd05a'; test -z \"$(git status --porcelain)\"; git fetch origin main agent-control; test \"$(git rev-parse origin/main)\" = 'feb3246d482b10f5cef6bd0dda2fcb39d58fd05a'",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main          -> FETCH_HEAD\n * branch            agent-control -> FETCH_HEAD\n   85015a2..638ad66  agent-control -> origin/agent-control\n",
+      "elapsed_seconds": 1.16,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.86,
+      "output_policy": "stream",
+      "captured_output_chars": 200,
+      "output_truncated": false,
+      "current_rss_mb": 3.86,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; git show origin/agent-control:.agent/patches/tracker-phase3-merge-user-state-safety-v2.patch > /tmp/tracker-merge-safety-v2.patch; git apply --recount --check /tmp/tracker-merge-safety-v2.patch; git apply --recount /tmp/tracker-merge-safety-v2.patch; git diff --check; test \"$(git status --porcelain | wc -l | tr -d ' ')\" -eq 4; git status --short",
+      "exit_code": 128,
+      "output": "error: patch with only garbage at line 4\n",
+      "elapsed_seconds": 0.421,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.53,
+      "output_policy": "stream",
+      "captured_output_chars": 41,
+      "output_truncated": false,
+      "current_rss_mb": 2.53,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.16
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 0.421
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.119
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.073
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-11T05:29:52.886965+00:00",
+  "task_digest": "165a5feac8d177b111493bbe6b2da6741f7a017d88443c7cdfa205e791b7267d",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "attempt_id": "bd56fb0840df8df0a82557d1",
+  "daemon_version": "4.18.20"
+}
