@@ -1,0 +1,116 @@
+{
+  "id": "tracker-phase3-long-gap-identity-milestone-v1-publish1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-11T07:15:44.275742+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch origin main agent-control; test \"$(git rev-parse origin/main)\" = 'ac35d92f521edb2ac099b9d32b592166d2c575e6'; git checkout --detach 'ac35d92f521edb2ac099b9d32b592166d2c575e6'",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main          -> FETCH_HEAD\n * branch            agent-control -> FETCH_HEAD\n   4ca1b8e..ca40d40  agent-control -> origin/agent-control\nHEAD is now at ac35d92 Preserve user state across device merges\n",
+      "elapsed_seconds": 1.265,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 1.7,
+      "output_policy": "stream",
+      "captured_output_chars": 264,
+      "output_truncated": false,
+      "current_rss_mb": 1.7,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-candidate-core-v1.py > /tmp/candidate.py; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-candidate-core-v1-detekt-cleanup.py > /tmp/candidate-cleanup.py; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-identity-milestone-v1.py > /tmp/identity-milestone.py; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-identity-milestone-v1-fake-dao-fix.py > /tmp/fake-dao-fix.py; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-identity-milestone-v1-import-cleanup.py > /tmp/import-cleanup.py; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-identity-milestone-v1-settings-detekt-cleanup.py > /tmp/settings-cleanup.py; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-identity-milestone-v1-settings-detekt-cleanup2.py > /tmp/settings-cleanup2.py; python3 /tmp/candidate.py; python3 /tmp/candidate-cleanup.py; python3 /tmp/identity-milestone.py; python3 /tmp/fake-dao-fix.py; python3 /tmp/import-cleanup.py; python3 /tmp/settings-cleanup.py; python3 /tmp/settings-cleanup2.py; git diff --check; test \"$(git status --porcelain | wc -l | tr -d ' ')\" -eq 20",
+      "exit_code": 0,
+      "output": "",
+      "elapsed_seconds": 0.73,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.03,
+      "output_policy": "stream",
+      "captured_output_chars": 0,
+      "output_truncated": false,
+      "current_rss_mb": 2.03,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; git add -A; git commit -m 'Persist long-gap identity candidates'; sha=$(git rev-parse HEAD); git push origin HEAD:main; echo PHASE3_LONG_GAP_IDENTITY_MILESTONE_PUSH_SHA=$sha",
+      "exit_code": 0,
+      "output": "[detached HEAD fceced0] Persist long-gap identity candidates\n 20 files changed, 384 insertions(+), 13 deletions(-)\n create mode 100644 core/data/src/main/java/io/blueeye/core/data/db/dao/IdentityContinuityCandidateDao.kt\n create mode 100644 core/data/src/main/java/io/blueeye/core/data/db/entity/IdentityContinuityCandidateEntity.kt\n create mode 100644 core/data/src/main/java/io/blueeye/core/data/mapper/IdentityContinuityCandidateMapper.kt\n create mode 100644 core/model/src/main/kotlin/io/blueeye/core/model/IdentityContinuityCandidate.kt\nTo https://github.com/MichalMatu/tracker.git\n   ac35d92..fceced0  HEAD -> main\nPHASE3_LONG_GAP_IDENTITY_MILESTONE_PUSH_SHA=fceced07617c13d00ccd5fae59b913de208fca63\n",
+      "elapsed_seconds": 2.255,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 1.98,
+      "output_policy": "stream",
+      "captured_output_chars": 706,
+      "output_truncated": false,
+      "current_rss_mb": 1.98,
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.265
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.73
+    },
+    {
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 2.255
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.105
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.068
+  },
+  "finished_at": "2026-09-11T07:15:50.327336+00:00",
+  "task_digest": "1b7322e9554aa512e9474a279e3e93085623af53deeb436cbb08be9cb59e0fd3",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 4096,
+  "attempt_id": "d35e16f132a742bf1e6ce959",
+  "daemon_version": "4.18.20"
+}
