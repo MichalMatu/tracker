@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 3,
-  "command": "set -euo pipefail; git show origin/agent-control:.agent/scripts/tracker-phase3-retention-milestone-v1.py > /tmp/retention.py; git show origin/agent-control:.agent/scripts/tracker-phase3-latency-location-backoff-v1.py > /tmp/latency.py; git show origin/agent-control:.agent/scripts/tracker-phase3-latency-location-backoff-v1-detekt-cleanup.py > /tmp/latency-cleanup.py; git show origin/agent-control:.agent/scripts/tracker-phase3-quality-ktlint-fix-v1.py > /tmp/quality-fix.py; python3 /tmp/retention.py; python3 /tmp/latency.py; python3 /tmp/latency-cleanup.py; python3 /tmp/quality-fix.py; git diff --check",
-  "pid": 72764,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew :core:data:detekt --console=plain || true; cat core/data/build/reports/detekt/detekt.txt || true; ./gradlew :feature:settings:ktlintMainSourceSetCheck --console=plain || true; cat feature/settings/build/reports/ktlint/ktlintMainSourceSetCheck/ktlintMainSourceSetCheck.txt 2>/dev/null || true",
+  "pid": 72814,
   "timeout": 900,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-11T07:27:44.640059+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-11T07:27:45.884493+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-phase3-final-stabilization-detekt-report-v1",
@@ -18,5 +18,5 @@
   "task_digest": "318c1c685bc6e33d28dc0effb92393e30fd84014c5689ff00a31ede4496aa944",
   "daemon_version": "4.18.20",
   "daemon_pid": 72241,
-  "updated_at": "2026-09-11T07:27:44.726709+00:00"
+  "updated_at": "2026-09-11T07:27:45.960833+00:00"
 }
