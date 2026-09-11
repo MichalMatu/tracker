@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-merge-user-state-safety-v3-exactsha1",
+  "task_digest": "9d4600b11a5536cadb74ae9cb277441a98ee714abe7d6c6422ad0614f9ea7698",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-11T06:04:58.902873+00:00",
+  "attempt_id": "bebdf10eacd223ccfcc308e1",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 61786,
+  "updated_at": "2026-09-11T06:04:58.902934+00:00",
+  "pid": 61786
+}
