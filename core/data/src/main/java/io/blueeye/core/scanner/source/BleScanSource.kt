@@ -12,7 +12,7 @@ import android.os.ParcelUuid
 import android.util.Log
 import javax.inject.Inject
 
-internal enum class PassiveBleScanMode {
+enum class PassiveBleScanMode {
     BROAD,
     BACKGROUND_FILTERED,
 }
