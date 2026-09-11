@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-btsnooz-correlation-20260911-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-11T10:09:27.862268+00:00",
+  "command_timeout": 1800,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch --no-tags origin agent-control main >/dev/null; test \"$(git rev-parse origin/main)\" = 'd15f6985371ef3ffe0496d7a14454589d56978ee'; git show origin/agent-control:.agent/payloads/tracker-phase3-btsnooz-correlation-20260911-v1.sh > /tmp/tracker-phase3-btsnooz-correlation-v1.sh; chmod 700 /tmp/tracker-phase3-btsnooz-correlation-v1.sh; /tmp/tracker-phase3-btsnooz-correlation-v1.sh",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            agent-control -> FETCH_HEAD\n * branch            main          -> FETCH_HEAD\n   a827bb2..f8d081c  agent-control -> origin/agent-control\n* daemon not running; starting now at tcp:5037\n* daemon started successfully\nsnoop_logger_tracing_marker=1\nfresh_bugreport_captured=1\nbtsnooz_section_found=0 checked_text_entries=7\nfresh_bugreport_deleted=1\n",
+      "elapsed_seconds": 111.86,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 24.44,
+      "output_policy": "stream",
+      "captured_output_chars": 407,
+      "output_truncated": false,
+      "current_rss_mb": 24.44,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 111.86
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.169
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.07
+  },
+  "finished_at": "2026-09-11T10:11:21.560456+00:00",
+  "task_digest": "6af8db40f89fe7a5606a2656e79e6fcdbeadf2092c0d08fa2e782c86c769ebf4",
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "memory_limit_mb": 2048,
+  "attempt_id": "f94c91563ee0714e38580061",
+  "daemon_version": "4.18.20"
+}
