@@ -1,0 +1,14 @@
+{
+  "id": "tracker-phase3-x5-name-hardening-v3-cancel-20260911T0248Z",
+  "action": "cancel_task",
+  "status": "completed",
+  "daemon_version": "4.18.20",
+  "updated_at": "2026-09-11T03:15:36.205292+00:00",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "control_branch": "agent-control",
+  "default_branch": "main",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "task_id": "tracker-phase3-x5-name-hardening-v3",
+  "result": "already_terminal"
+}
