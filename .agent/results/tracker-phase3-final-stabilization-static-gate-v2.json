@@ -1,0 +1,132 @@
+{
+  "id": "tracker-phase3-final-stabilization-static-gate-v2",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-11T07:35:54.688999+00:00",
+  "command_timeout": 1200,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch origin main agent-control; test \"$(git rev-parse origin/main)\" = 'fceced07617c13d00ccd5fae59b913de208fca63'; git checkout --detach 'fceced07617c13d00ccd5fae59b913de208fca63'; test -z \"$(git status --porcelain)\"",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main          -> FETCH_HEAD\n * branch            agent-control -> FETCH_HEAD\n   103ac74..a43f0aa  agent-control -> origin/agent-control\nHEAD is now at fceced0 Persist long-gap identity candidates\n",
+      "elapsed_seconds": 1.577,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 1.88,
+      "output_policy": "stream",
+      "captured_output_chars": 260,
+      "output_truncated": false,
+      "current_rss_mb": 1.88,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; for s in tracker-phase3-retention-milestone-v1.py tracker-phase3-latency-location-backoff-v1.py tracker-phase3-latency-location-backoff-v1-detekt-cleanup.py tracker-phase3-quality-ktlint-fix-v1.py tracker-phase3-location-multiline-cleanup-v1.py; do git show origin/agent-control:.agent/scripts/$s > /tmp/$s; python3 /tmp/$s; done; git diff --check",
+      "exit_code": 0,
+      "output": "",
+      "elapsed_seconds": 1.154,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.03,
+      "output_policy": "stream",
+      "captured_output_chars": 0,
+      "output_truncated": false,
+      "current_rss_mb": 2.03,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew :core:data:detekt :feature:settings:ktlintMainSourceSetCheck --console=plain; echo PHASE3_FINAL_STABILIZATION_STATIC_GATE_V2_PASS",
+      "exit_code": 0,
+      "output": "Starting a Gradle Daemon (subsequent builds will be faster)\nReusing configuration cache.\n\n> Task :core:data:detekt\n\n\n258 kotlin files were analyzed.\n\n> Task :feature:settings:loadKtlintReporters UP-TO-DATE\n> Task :feature:settings:runKtlintCheckOverMainSourceSet UP-TO-DATE\n> Task :feature:settings:ktlintMainSourceSetCheck UP-TO-DATE\n\nBUILD SUCCESSFUL in 19s\n4 actionable tasks: 1 executed, 3 up-to-date\nConfiguration cache entry reused.\nPHASE3_FINAL_STABILIZATION_STATIC_GATE_V2_PASS\n",
+      "elapsed_seconds": 20.565,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 193.64,
+      "output_policy": "stream",
+      "captured_output_chars": 486,
+      "output_truncated": false,
+      "current_rss_mb": 30.09,
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.577
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.154
+    },
+    {
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 20.565
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": " M core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceActionDao.kt\n M core/data/src/main/java/io/blueeye/core/data/db/dao/IdentityContinuityCandidateDao.kt\n M core/data/src/main/java/io/blueeye/core/data/repository/DeviceHistoryDataSource.kt\n M core/data/src/main/java/io/blueeye/core/data/repository/DeviceRepositoryImpl.kt\n M core/data/src/main/java/io/blueeye/core/location/LocationProvider.kt\n M feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt\n",
+    "elapsed_seconds": 0.195
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "diff --git a/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceActionDao.kt b/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceActionDao.kt\nindex e7e9022..f3fb7dc 100644\n--- a/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceActionDao.kt\n+++ b/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceActionDao.kt\n@@ -16,7 +16,25 @@ interface DeviceActionDao {\n     @Delete\n     suspend fun delete(device: DeviceEntity)\n \n-    @Query(\"DELETE FROM devices WHERE lastSeenAt < :beforeTimestamp AND isInWatchlist = 0\")\n+    @Query(\n+        \"\"\"\n+        DELETE FROM devices\n+        WHERE lastSeenAt < :beforeTimestamp\n+            AND isInWatchlist = 0\n+            AND isSafeBeacon = 0\n+            AND (userAlias IS NULL OR TRIM(userAlias) = '')\n+            AND (userNotes IS NULL OR TRIM(userNotes) = '')\n+            AND alertSound = 0\n+            AND alertVibration = 0\n+            AND isTrackingEnabled = 1\n+            AND isIgnoredForTracking = 0\n+            AND calibrationLabel = 'UNKNOWN'\n+            AND identityCarryoverVerdict = 'UNREVIEWED'\n+            AND fingerprint NOT IN (SELECT deviceFingerprint FROM watchlist)\n+            AND fingerprint NOT IN (SELECT deviceFingerprint FROM identity_continuity_candidates)\n+            AND fingerprint NOT IN (SELECT candidateFingerprint FROM identity_continuity_candidates)\n+        \"\"\",\n+    )\n     suspend fun deleteOldDevices(beforeTimestamp: Long): Int\n \n     @Query(\"DELETE FROM devices\")\ndiff --git a/core/data/src/main/java/io/blueeye/core/data/db/dao/IdentityContinuityCandidateDao.kt b/core/data/src/main/java/io/blueeye/core/data/db/dao/IdentityContinuityCandidateDao.kt\nindex 5f19897..35193f8 100644\n--- a/core/data/src/main/java/io/blueeye/core/data/db/dao/IdentityContinuityCandidateDao.kt\n+++ b/core/data/src/main/java/io/blueeye/core/data/db/dao/IdentityContinuityCandidateDao.kt\n@@ -26,6 +26,9 @@ interface IdentityContinuityCandidateDao {\n     )\n     suspend fun setVerdict(id: Long, verdict: IdentityCarryoverVerdict)\n \n+    @Query(\"DELETE FROM identity_continuity_candidates WHERE timestamp < :beforeTimestamp\")\n+    suspend fun deleteOldCandidates(beforeTimestamp: Long): Int\n+\n     @Query(\"DELETE FROM identity_continuity_candidates\")\n     suspend fun deleteAll()\n }\ndiff --git a/core/data/src/main/java/io/blueeye/core/data/repository/DeviceHistoryDataSource.kt b/core/data/src/main/java/io/blueeye/core/data/repository/DeviceHistoryDataSource.kt\nindex f06afa0..f2bc7b0 100644\n--- a/core/data/src/main/java/io/blueeye/core/data/repository/DeviceHistoryDataSource.kt\n+++ b/core/data/src/main/java/io/blueeye/core/data/repository/DeviceHistoryDataSource.kt\n@@ -43,6 +43,14 @@ class DeviceHistoryDataSource @Inject constructor(\n     suspend fun getIdentityCandidatesSince(sinceTimestamp: Long): List<IdentityContinuityCandidate> =\n         identityContinuityCandidateDao.getSince(sinceTimestamp).toIdentityContinuityCandidateDomain()\n \n+    suspend fun deleteExpiredHistory(now: Long) {\n+        signalSampleDao.deleteOldSamples(now - SIGNAL_SAMPLE_RETENTION_MS)\n+        val evidenceBefore = now - EVIDENCE_RETENTION_MS\n+        followMeObservationDao.deleteOldObservations(evidenceBefore)\n+        alertEvidenceEventDao.deleteOldEvents(evidenceBefore)\n+        identityContinuityCandidateDao.deleteOldCandidates(evidenceBefore)\n+    }\n+\n     suspend fun deleteOrphanedHistory() {\n         signalSampleDao.deleteOrphanedSamples()\n         followMeObservationDao.deleteOrphanedObservations()\n@@ -55,4 +63,10 @@ class DeviceHistoryDataSource @Inject constructor(\n         alertEvidenceEventDao.deleteAll()\n         identityContinuityCandidateDao.deleteAll()\n     }\n+\n+    private companion object {\n+        const val DAY_MS = 24L * 60 * 60 * 1000\n+        const val SIGNAL_SAMPLE_RETENTION_MS = 7L * DAY_MS\n+        const val EVIDENCE_RETENTION_MS = 30L * DAY_MS\n+    }\n }\ndiff --git a/core/data/src/main/java/io/blueeye/core/data/repository/DeviceRepositoryImpl.kt b/core/data/src/main/java/io/blueeye/core/data/repository/DeviceRepositoryImpl.kt\nindex 1cb22c1..cd0d9b3 100644\n--- a/core/data/src/main/java/io/blueeye/core/data/repository/DeviceRepositoryImpl.kt\n+++ b/core/data/src/main/java/io/blueeye/core/data/repository/DeviceRepositoryImpl.kt\n@@ -247,8 +247,9 @@ constructor(\n     }\n \n     override suspend fun deleteOldDevices(maxAgeMs: Long): Result<Int> = runCatching {\n-        val timestamp = System.currentTimeMillis() - maxAgeMs\n-        deviceDao.deleteOldDevices(timestamp)\n+        val now = System.currentTimeMillis()\n+        deviceHistoryDataSource.deleteExpiredHistory(now)\n+        deviceDao.deleteOldDevices(now - maxAgeMs)\n     }\n \n     override fun setActiveProbe(mac: String?) {\ndiff --git a/core/data/src/main/java/io/blueeye/core/location/LocationProvider.kt b/core/data/src/main/java/io/blueeye/core/location/LocationProvider.kt\nindex 529027f..e65e1ba 100644\n--- a/core/data/src/main/java/io/blueeye/core/location/LocationProvider.kt\n+++ b/core/data/src/main/java/io/blueeye/core/location/LocationProvider.kt\n@@ -37,6 +37,7 @@ open class LocationProvider @Inject constructor(\n     private var cachedLocation: Location? = null\n \n     private val readGate = LocationReadGate(PROVIDER_READ_THROTTLE_MS)\n+    private val activeFixGate = LocationReadGate(ACTIVE_FIX_RETRY_BACKOFF_MS)\n \n     /**\n      * Get the last known location.\n@@ -101,7 +102,11 @@ open class LocationProvider @Inject constructor(\n         val location =\n             activeFixMutex.withLock {\n                 cachedLocation?.takeIf(::isActiveFixFresh)\n-                    ?: requestActiveLocation()\n+                    ?: if (activeFixGate.shouldReadProviders()) {\n+                        requestActiveLocation()\n+                    } else {\n+                        null\n+                    }\n                     ?: getLastLocation()\n             }\n \n@@ -198,6 +203,7 @@ open class LocationProvider @Inject constructor(\n     companion object {\n         private const val LAST_KNOWN_FRESHNESS_THRESHOLD_MS = 5 * 60 * 1000\n         private const val ACTIVE_FIX_REUSE_MS = 10_000L\n+        private const val ACTIVE_FIX_RETRY_BACKOFF_MS = 10_000L\n         private const val ACTIVE_FIX_TIMEOUT_MS = 2_000L\n         private const val PROVIDER_READ_THROTTLE_MS = 2_000L\n         private const val LOCATION_MIN_TIME_MS = 0L\ndiff --git a/feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt b/feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt\nindex cc19826..516a2ba 100644\n--- a/feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt\n+++ b/feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt\n@@ -517,8 +517,7 @@ internal object DatabaseExportJsonMapper {\n }\n \n internal object SessionIdentityCandidateExportMapper {\n-    fun map(candidates: List<IdentityContinuityCandidate>): JsonArray =\n-        JsonArray(candidates.map(::mapCandidate))\n+    fun map(candidates: List<IdentityContinuityCandidate>): JsonArray = JsonArray(candidates.map(::mapCandidate))\n \n     private fun mapCandidate(candidate: IdentityContinuityCandidate): JsonObject =\n         buildJsonObject {\n",
+    "elapsed_seconds": 0.043
+  },
+  "finished_at": "2026-09-11T07:36:20.756633+00:00",
+  "workspace_checkpoint": {
+    "version": 2,
+    "task_id": "tracker-phase3-final-stabilization-static-gate-v2",
+    "reason": "task-exit",
+    "created_at": "2026-09-11T07:36:21.324054+00:00",
+    "base_head": "fceced07617c13d00ccd5fae59b913de208fca63",
+    "work_branch": "",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/tracker-phase3-final-stabilization-static-gate-v2/1789112181128099000-task-exit",
+    "tracked_patch": "tracked.patch",
+    "untracked_root": "untracked",
+    "untracked_files": [],
+    "tracked_patch_bytes": 7574,
+    "untracked_bytes": 0,
+    "total_bytes": 7574,
+    "status": " M core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceActionDao.kt\n M core/data/src/main/java/io/blueeye/core/data/db/dao/IdentityContinuityCandidateDao.kt\n M core/data/src/main/java/io/blueeye/core/data/repository/DeviceHistoryDataSource.kt\n M core/data/src/main/java/io/blueeye/core/data/repository/DeviceRepositoryImpl.kt\n M core/data/src/main/java/io/blueeye/core/location/LocationProvider.kt\n M feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt\n"
+  },
+  "task_digest": "64cd452f4687d20efaed3bfdc5040aa36f5460e3413d81a93f28efb38a40bc8d",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "c62a4683f36e3b42688d0bde",
+  "daemon_version": "4.18.20"
+}
