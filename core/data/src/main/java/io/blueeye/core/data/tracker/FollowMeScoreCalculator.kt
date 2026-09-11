@@ -83,9 +83,14 @@ constructor(
         val userHasMoved: Boolean = true,
         val isBaselineDevice: Boolean = false,
         val movementTrackingAvailable: Boolean = true,
+        /**
+         * Accumulated continuous observation time while movement was recently confirmed. When
+         * present, this replaces wall-clock lastSeen-firstSeen duration for Follow-Me scoring.
+         */
+        val observedWhileMovingDurationMs: Long? = null,
     )
 
-    /** Score result with breakdown. */
+    /** Input data for score calculation. */
     data class ScoreResult(
         val totalScore: Int,
         val status: TrackingStatus,
@@ -118,8 +123,12 @@ constructor(
 
         if (canScoreFollowSignals) {
             // 1. Duration Score (0-30 points)
-            val durationMs = metrics.lastSeenAt - metrics.firstSeenAt
-            durationScore = calculateDurationScore(durationMs, metrics.encounterCount, explanations)
+            durationScore =
+                calculateDurationScore(
+                    metrics.effectiveMovingDurationMs(),
+                    metrics.encounterCount,
+                    explanations,
+                )
             totalScore += durationScore
 
             // 2. RSSI Stability Score (0-25 points)
@@ -180,7 +189,7 @@ constructor(
 
     /** Quick check if device should be monitored. */
     fun shouldMonitor(metrics: DeviceMetrics): Boolean {
-        val duration = metrics.lastSeenAt - metrics.firstSeenAt
+        val duration = metrics.effectiveMovingDurationMs()
         val isLongDuration = duration >= MIN_TRACKING_DURATION_MS &&
             metrics.encounterCount >= MIN_ENCOUNTERS_FOR_TRACKING
         val canMonitorFollowSignals =
@@ -198,6 +207,9 @@ constructor(
     /** Put through formatter */
     fun getRecommendedAction(score: Int): String = riskFormatter.getRecommendedAction(score)
 
+    private fun DeviceMetrics.effectiveMovingDurationMs(): Long =
+        observedWhileMovingDurationMs ?: (lastSeenAt - firstSeenAt).coerceAtLeast(0L)
+
     private fun calculateDurationScore(
         durationMs: Long,
         encounterCount: Int,
@@ -212,7 +224,7 @@ constructor(
             else -> SCORE_DURATION_MAX
         }
         if (score > 0) {
-            explanations.add("Seen for ${durationMs / MS_PER_MINUTE}min while moving")
+            explanations.add("Observed for ${durationMs / MS_PER_MINUTE}min while moving")
         }
         return score
     }
