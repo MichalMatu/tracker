@@ -5,6 +5,7 @@ import io.blueeye.core.data.db.dao.DeviceSearchDao
 import io.blueeye.core.data.db.dao.SignalSampleDao
 import io.blueeye.core.data.db.entity.DeviceEntity
 import io.blueeye.core.data.db.entity.SignalSampleEntity
+import io.blueeye.core.data.db.entity.WatchlistEntity
 import io.blueeye.core.data.repository.handler.classic.ClassicDevicePersister
 import io.blueeye.core.data.repository.handler.classic.ClassicScanDataContext
 import io.blueeye.core.data.repository.handler.common.DeviceTypePriorityHelper
@@ -548,6 +549,12 @@ class AppleDeduplicationScenariosTest {
         override suspend fun deleteByFingerprint(fingerprint: String) { 
              db.remove(fingerprint) 
         }
+        override suspend fun getDeviceForMerge(fingerprint: String): DeviceEntity? = db[fingerprint]
+        override suspend fun updateDeviceForMerge(device: DeviceEntity) {
+            db[device.fingerprint] = device
+        }
+        override suspend fun getWatchlistForMerge(fingerprint: String): WatchlistEntity? = null
+        override suspend fun updateWatchlistForMerge(entry: WatchlistEntity) {}
         override suspend fun mergeDevices(targetFingerprint: String, duplicateFingerprint: String) {}
         override fun getRecentDevicesFlow(sinceTimestamp: Long): Flow<List<DeviceEntity>> = flowOf(emptyList())
         override fun getWatchlistDevicesFlow(): Flow<List<DeviceEntity>> = flowOf(emptyList())

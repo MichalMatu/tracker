@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import io.blueeye.core.data.db.entity.DeviceEntity
+import io.blueeye.core.data.db.entity.WatchlistEntity
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.IdentityCarryoverVerdict
 
@@ -58,11 +60,43 @@ interface DeviceActionDao {
     @Query("DELETE FROM devices WHERE fingerprint = :fingerprint")
     suspend fun deleteByFingerprint(fingerprint: String)
 
+    @Query("SELECT * FROM devices WHERE fingerprint = :fingerprint")
+    suspend fun getDeviceForMerge(fingerprint: String): DeviceEntity?
+
+    @Update
+    suspend fun updateDeviceForMerge(device: DeviceEntity)
+
+    @Query("SELECT * FROM watchlist WHERE deviceFingerprint = :fingerprint")
+    suspend fun getWatchlistForMerge(fingerprint: String): WatchlistEntity?
+
+    @Update
+    suspend fun updateWatchlistForMerge(entry: WatchlistEntity)
+
     @Transaction
     suspend fun mergeDevices(
         targetFingerprint: String,
         duplicateFingerprint: String,
     ) {
+        val target = getDeviceForMerge(targetFingerprint)
+        val duplicate = getDeviceForMerge(duplicateFingerprint)
+        if (target != null && duplicate != null) {
+            val mergedTarget = DeviceMergePolicy.mergeUserState(target, duplicate)
+            val targetWatchlist = getWatchlistForMerge(targetFingerprint)
+            val duplicateWatchlist = getWatchlistForMerge(duplicateFingerprint)
+            val mergedWatchlist =
+                DeviceMergePolicy.mergeWatchlist(
+                    target = targetWatchlist,
+                    duplicate = duplicateWatchlist,
+                    targetFingerprint = targetFingerprint,
+                )
+
+            if (mergedTarget != target) {
+                updateDeviceForMerge(mergedTarget)
+            }
+            if (mergedWatchlist != null && mergedWatchlist != targetWatchlist) {
+                updateWatchlistForMerge(mergedWatchlist)
+            }
+        }
         moveSamples(targetFingerprint, duplicateFingerprint)
         moveFollowMeObservations(targetFingerprint, duplicateFingerprint)
         moveAlertEvidenceEvents(targetFingerprint, duplicateFingerprint)
