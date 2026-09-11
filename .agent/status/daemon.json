@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.18.20",
   "state": "idle",
-  "pid": 57978,
-  "updated_at": "2026-09-11T08:24:48.780528+00:00",
+  "pid": 59646,
+  "updated_at": "2026-09-11T08:25:48.928109+00:00",
   "self_revision": "0bb99d790dbed19a528b4cb8ac238432134b5660",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 57978,
-  "supervisor_pid": 57851,
-  "last_task_id": "tracker-phone-presmoke-scan-toggle-v1",
+  "worker_pid": 59646,
+  "supervisor_pid": 59528,
   "execution_variant": "parallel"
 }
