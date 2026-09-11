@@ -1,0 +1,17 @@
+{
+  "id": "tracker-hci-direct-pull-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -u; OUT=\"$HOME/Downloads/BlueEye-HCI\"; mkdir -p \"$OUT\"; rm -f \"$OUT/btsnoop_hci.log\"; for p in /data/misc/bluetooth/logs/btsnoop_hci.log /data/misc/bluedroid/btsnoop_hci.log /data/log/bt/btsnoop_hci.log /sdcard/btsnoop_hci.log; do echo TRY=$p; if adb pull \"$p\" \"$OUT/btsnoop_hci.log\" >/tmp/blueeye-hci-pull.txt 2>&1; then echo PULLED_FROM=$p; break; else tail -n 2 /tmp/blueeye-hci-pull.txt; fi; done; if [ -s \"$OUT/btsnoop_hci.log\" ]; then echo HCI_DIRECT_PULL_PASS; echo LOCAL_PATH=\"$OUT/btsnoop_hci.log\"; wc -c \"$OUT/btsnoop_hci.log\"; shasum -a 256 \"$OUT/btsnoop_hci.log\"; file \"$OUT/btsnoop_hci.log\"; else echo HCI_DIRECT_PULL_FAILED; exit 45; fi"
+  ]
+}
