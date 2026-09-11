@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-retention-latency-milestone-v1-verify1",
+  "task_digest": "17c56406a1ec82988c35b0edc501ca3a9f2d7ea2c3ea185ff16390bb2aa3c38d",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-11T07:20:28.883094+00:00",
+  "attempt_id": "6eef8baef0ef774c53aa7d3b",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 60629,
+  "updated_at": "2026-09-11T07:20:28.883163+00:00",
+  "pid": 60629
+}
