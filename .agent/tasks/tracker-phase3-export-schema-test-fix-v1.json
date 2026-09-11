@@ -1,0 +1,20 @@
+{
+  "id": "tracker-phase3-export-schema-test-fix-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 4096,
+  "command_timeout": 1200,
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch origin main agent-control; test \"$(git rev-parse origin/main)\" = '0ac25446b4582b856ad14d9fb608079d7d05a432'; test \"$(git rev-parse origin/main^)\" = '630e184dbc328672a961e2826208fddd77a68f02'; git checkout -B main origin/main; test -z \"$(git status --porcelain)\"",
+    "set -euo pipefail; python3 - <<'PY'\nfrom pathlib import Path\np = Path('feature/settings/src/test/java/io/blueeye/feature/settings/DatabaseExportJsonMapperTest.kt')\ns = p.read_text()\nold = 'assertEquals(19, export.getValue(\"schemaVersion\").jsonPrimitive.int)'\nnew = 'assertEquals(20, export.getValue(\"schemaVersion\").jsonPrimitive.int)'\nassert s.count(old) == 1, s.count(old)\np.write_text(s.replace(old, new, 1))\nPY\ntest \"$(git diff --name-only)\" = 'feature/settings/src/test/java/io/blueeye/feature/settings/DatabaseExportJsonMapperTest.kt'; git diff --check; git diff -- feature/settings/src/test/java/io/blueeye/feature/settings/DatabaseExportJsonMapperTest.kt",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew :feature:settings:testDebugUnitTest --tests 'io.blueeye.feature.settings.DatabaseExportJsonMapperTest.export includes session summary counters' --console=plain; ./gradlew :feature:settings:testDebugUnitTest --tests 'io.blueeye.feature.settings.DatabaseExportJsonMapperTest' --console=plain",
+    "set -euo pipefail; git diff --check; git add feature/settings/src/test/java/io/blueeye/feature/settings/DatabaseExportJsonMapperTest.kt; git commit -m 'Fix export schema version test'; git push origin main; echo PUBLISHED_SHA=$(git rev-parse HEAD); test -z \"$(git status --porcelain)\""
+  ]
+}
