@@ -263,7 +263,7 @@ object TacticalNamePatterns {
     val AIRBUS_TETRAPOL_PATTERNS = listOf(
         Regex("TH[89]", RegexOption.IGNORE_CASE), // TH8, TH9 terminals
         Regex("Tetrapol", RegexOption.IGNORE_CASE),
-        Regex("Eads", RegexOption.IGNORE_CASE), // Legacy EADS brand
+        Regex("\\bEADS\\b", RegexOption.IGNORE_CASE), // Legacy EADS brand
         Regex("THR[89]", RegexOption.IGNORE_CASE) // THR8, THR9 rugged
     )
 
@@ -288,7 +288,10 @@ object TacticalNamePatterns {
         Regex("V60\\s*II", RegexOption.IGNORE_CASE), // V60 II controller
         Regex("V60\\s*ADP", RegexOption.IGNORE_CASE), // V60 ADP II adapter
         Regex("V20", RegexOption.IGNORE_CASE), // V20 single-com
-        Regex("X5", RegexOption.IGNORE_CASE), // X5 headset
+        Regex(
+            "\\bINVISIO[\\s_-]*X5\\b|\\bX5[\\s_-]*INVISIO\\b",
+            RegexOption.IGNORE_CASE,
+        ), // X5 headset requires brand context
         Regex("M3s", RegexOption.IGNORE_CASE) // M3s in-ear
     )
 

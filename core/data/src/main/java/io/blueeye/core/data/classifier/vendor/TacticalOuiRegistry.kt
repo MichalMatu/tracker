@@ -89,7 +89,7 @@ object TacticalOuiRegistry {
             matches(n, p.AIRBUS_TETRAPOL_PATTERNS) -> TacticalCategory.TACTICAL_RADIO to "Airbus Tetrapol"
             matches(n, p.MOTOROLA_BDBOS_PATTERNS) -> TacticalCategory.TACTICAL_RADIO to "Motorola TETRA"
             matches(n, p.SECUNET_PATTERNS) -> TacticalCategory.TACTICAL_EUD to "secunet Mobile (DE)"
-            matches(n, p.INVISIO_EXTENDED_PATTERNS) -> TacticalCategory.TACTICAL_AUDIO to "Invisio V60 II"
+            matches(n, p.INVISIO_EXTENDED_PATTERNS) -> TacticalCategory.TACTICAL_AUDIO to "Invisio professional audio"
             matches(n, p.ESN_TERMINAL_PATTERNS) -> TacticalCategory.TACTICAL_EUD to "ESN Terminal (UK)"
             matches(n, p.ZEBRA_TC7X_PATTERNS) -> TacticalCategory.TACTICAL_EUD to "Zebra TC7x (EU)"
             matches(n, p.BLUEBIRD_PATTERNS) -> TacticalCategory.TACTICAL_EUD to "Bluebird PDA"

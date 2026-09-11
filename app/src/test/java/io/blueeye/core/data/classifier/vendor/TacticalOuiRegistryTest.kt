@@ -149,6 +149,29 @@ class TacticalOuiRegistryTest {
     }
 
     @Test
+    fun `matchByName ignores ambiguous X5 names`() {
+        assertNull(TacticalOuiRegistry.matchByName("X5"))
+        assertNull(TacticalOuiRegistry.matchByName("Generic X5 Headset"))
+    }
+
+    @Test
+    fun `matchByName detects branded Invisio X5`() {
+        val result = TacticalOuiRegistry.matchByName("INVISIO X5")
+
+        assertNotNull(result)
+        assertEquals(TacticalCategory.TACTICAL_AUDIO, result!!.first)
+        assertTrue(result.second.contains("Invisio"))
+    }
+
+    @Test
+    fun `matchByName keeps standalone EADS brand evidence`() {
+        val result = TacticalOuiRegistry.matchByName("EADS terminal")
+
+        assertNotNull(result)
+        assertEquals(TacticalCategory.TACTICAL_RADIO, result!!.first)
+    }
+
+    @Test
     fun `matchByName detects Yardarm sensor`() {
         val result = TacticalOuiRegistry.matchByName("YHA-12345")
 
