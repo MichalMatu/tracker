@@ -6,17 +6,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.PowerManager
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.blueeye.core.scanner.source.PassiveBleScanMode
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /** Keeps screen-state policy outside the BLE lifecycle owner. */
-@Singleton
-class PassiveBleScreenStateMonitor
-@Inject
-constructor(
-    @ApplicationContext private val context: Context,
+internal class PassiveBleScreenStateMonitor(
+    private val context: Context,
 ) {
     private var receiver: BroadcastReceiver? = null
 
@@ -51,18 +45,13 @@ constructor(
                 addAction(Intent.ACTION_SCREEN_ON)
             }
 
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.registerReceiver(screenReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-            } else {
-                @Suppress("DEPRECATION")
-                context.registerReceiver(screenReceiver, filter)
-            }
-            receiver = screenReceiver
-        } catch (error: RuntimeException) {
-            receiver = null
-            throw error
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(screenReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            @Suppress("DEPRECATION")
+            context.registerReceiver(screenReceiver, filter)
         }
+        receiver = screenReceiver
     }
 
     @Synchronized
