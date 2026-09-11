@@ -9,7 +9,7 @@ diff --git a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/Devic
  
          // Known Vendor Headers to strip (Little Endian Manufacturer ID)
          private val HEADER_APPLE = byteArrayOf(0x4C.toByte(), 0x00.toByte())
-@@ -104,6 +105,9 @@ constructor() {
+@@ -104,6 +105,8 @@ constructor() {
                      },
                  interval = matchInterval(input.advertisingInterval, target.lastAdvertisingInterval),
              )
@@ -18,7 +18,7 @@ diff --git a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/Devic
          val normalizedScore =
              weightedScore(
                  input = input,
-@@ -133,6 +137,9 @@ constructor() {
+@@ -133,6 +136,9 @@ constructor() {
          )
      }
  
@@ -28,7 +28,7 @@ diff --git a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/Devic
      private fun weightedScore(
          input: MatchInput,
          target: TrackedTarget,
-@@ -188,7 +195,7 @@ constructor() {
+@@ -188,7 +194,7 @@ constructor() {
              when {
                  matchShadow(data, target) >= 1.0f -> CarryoverMatchReason.APPLE_SHADOW
                  matchMicrosoft(data, target) >= 1.0f -> CarryoverMatchReason.MICROSOFT_SHADOW
@@ -37,7 +37,7 @@ diff --git a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/Devic
                  else -> null
              } ?: return null
  
-@@ -386,9 +393,10 @@ constructor() {
+@@ -386,9 +392,10 @@ constructor() {
      }
  
      private fun matchSameNameHeuristic(
@@ -50,7 +50,7 @@ diff --git a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/Devic
          // 1. Must have same non-empty name
          if (data.name.isNullOrBlank() || target.lastDeviceName.isNullOrBlank()) {
               // android.util.Log.v("ShadowMatch", "Same Name SKIP: Name missing. '${data.name}' vs '${target.lastDeviceName}'")
-@@ -411,6 +419,7 @@ constructor() {
+@@ -411,6 +418,7 @@ constructor() {
          val isSafeName = isAppleInfo || !isGenericName(data.name)
          
          if (!isSafeName) return 0f
@@ -58,7 +58,7 @@ diff --git a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/Devic
  
          // 3. Must be strong signals and close
          val rssiDiff = abs(data.rssi - target.lastRssi)
-@@ -428,6 +437,20 @@ constructor() {
+@@ -428,6 +436,20 @@ constructor() {
          return 0f
      }
  
@@ -82,7 +82,7 @@ diff --git a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/Devic
 diff --git a/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt b/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt
 --- a/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt
 +++ b/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt
-@@ -68,6 +68,43 @@ class AddressCarryoverTrackerTest {
+@@ -68,6 +68,44 @@ class AddressCarryoverTrackerTest {
          assertTrue("Target ID should be valid", result2.targetId.startsWith("TGT_"))
      }
  
