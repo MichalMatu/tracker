@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 3,
-  "command": "set -euo pipefail; adb shell input tap 503 159; for i in 1 2 3 4 5 6; do sleep 1; if adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; then break; fi; done; adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; adb shell dumpsys activity services io.blueeye | grep -E 'ScannerService|isForeground=true|startRequested=true'; sleep 4; adb shell uiautomator dump /sdcard/tracker-restarted.xml >/dev/null; echo '--- UI_SAMPLE ---'; adb shell cat /sdcard/tracker-restarted.xml | grep -oE 'text=\"[^\"]*\"' | grep -v 'text=\"\"' | head -n 30; echo '--- ERRORS ---'; PID=$(adb shell pidof io.blueeye | tr -d '\\r'); test -n \"$PID\"; adb logcat -d -v brief --pid=\"$PID\" | grep -E 'FATAL EXCEPTION|AndroidRuntime|SecurityException|IllegalStateException|SQLiteException|OutOfMemoryError' && exit 33 || true; echo START_RUNNING_NO_ERRORS_PASS",
-  "pid": 62453,
+  "command": "set -euo pipefail; echo '--- SCANNER_LIFECYCLE ---'; adb logcat -d -v brief -s ScannerService:V BleScanner:V '*:S' | tail -n 120; echo STOP_START_VERIFY_PASS",
+  "pid": 62626,
   "timeout": 300,
   "idle_timeout": 120,
   "memory_limit_mb": 1024,
-  "started_at": "2026-09-11T08:29:03.374432+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-11T08:29:11.540802+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-phone-presmoke-stop-start-verify-v1",
@@ -18,5 +18,5 @@
   "task_digest": "57261374213f143fa0ec17334b68fea1e209625177103f55186b30e19ec9e363",
   "daemon_version": "4.18.20",
   "daemon_pid": 62085,
-  "updated_at": "2026-09-11T08:29:03.444716+00:00"
+  "updated_at": "2026-09-11T08:29:11.574985+00:00"
 }
