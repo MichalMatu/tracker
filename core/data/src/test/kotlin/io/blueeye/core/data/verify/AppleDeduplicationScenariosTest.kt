@@ -73,10 +73,10 @@ class AppleDeduplicationScenariosTest {
         val now = System.currentTimeMillis()
 
         val firstMac = "E2:4A:BB:FD:71:2E"
-        val firstPacket = createBlePacket(firstMac, -36, now, "Find My")
+        val firstPacket = createBlePacket(firstMac, -36, now, "Michal's AirPods Pro")
 
         val rotatedMac = "6F:77:9F:57:CB:7B"
-        val rotatedPacket = createBlePacket(rotatedMac, -38, now + 3_000, "Find My")
+        val rotatedPacket = createBlePacket(rotatedMac, -38, now + 3_000, "Michal's AirPods Pro")
 
         val result1 = tracker.processScan(firstPacket, firstPacket.name)
         val result2 = tracker.processScan(rotatedPacket, rotatedPacket.name)
