@@ -72,22 +72,20 @@ constructor() {
         var highestScore = 0f
 
         for (target in targets) {
-            if (AppleIdentityConflictGuard.hasNameFamilyConflict(input.deviceName, target.lastDeviceName)) {
-                continue
-            }
-            if (isAmbiguousAppleShadowPair(input, target)) {
-                continue
-            }
-
-            val timeSinceLastSeen = input.data.timestamp - target.lastSeenAt
-            val isSequentialCarryoverWindow =
-                timeSinceLastSeen in MIN_DESTRUCTIVE_CARRYOVER_GAP_MS..CARRYOVER_WINDOW_MS
-            if (isSequentialCarryoverWindow) {
-                immediateMatchForTarget(input, target)?.let { return it }
-                val weightedMatch = weightedMatchForTarget(input, target)
-                if (weightedMatch != null && weightedMatch.evidence.confidence > highestScore) {
-                    highestScore = weightedMatch.evidence.confidence
-                    bestMatch = weightedMatch
+            val hasNameFamilyConflict =
+                AppleIdentityConflictGuard.hasNameFamilyConflict(input.deviceName, target.lastDeviceName)
+            val isEligibleTarget = !hasNameFamilyConflict && !isAmbiguousAppleShadowPair(input, target)
+            if (isEligibleTarget) {
+                val timeSinceLastSeen = input.data.timestamp - target.lastSeenAt
+                val isSequentialCarryoverWindow =
+                    timeSinceLastSeen in MIN_DESTRUCTIVE_CARRYOVER_GAP_MS..CARRYOVER_WINDOW_MS
+                if (isSequentialCarryoverWindow) {
+                    immediateMatchForTarget(input, target)?.let { return it }
+                    val weightedMatch = weightedMatchForTarget(input, target)
+                    if (weightedMatch != null && weightedMatch.evidence.confidence > highestScore) {
+                        highestScore = weightedMatch.evidence.confidence
+                        bestMatch = weightedMatch
+                    }
                 }
             }
         }
@@ -367,29 +365,28 @@ constructor() {
         target: TrackedTarget,
     ): Float {
         val data = input.data
-        if (!isAppleData(data)) return 0f
-
-        val targetIsAppleInfo =
+        val targetIsApple =
             hasAppleManufacturerData(target.lastPayload) ||
                 isAppleDeviceName(target.lastDeviceName)
-        if (!targetIsAppleInfo) return 0f
-
-        val dataIsShadow = isShadowName(input.deviceName)
-        val targetIsShadow = isShadowName(target.lastDeviceName)
-        if (dataIsShadow == targetIsShadow) return 0f
-        if (!hasIdentityCorroboration(input, target)) return 0f
-
+        val shadowsAreComplementary =
+            isShadowName(input.deviceName) != isShadowName(target.lastDeviceName)
         val rssiDiff = abs(data.rssi - target.lastRssi)
-        val isWeak = data.rssi < -75
-        val limit = if (isWeak) 10 else 20
-        if (rssiDiff > limit) return 0f
+        val rssiLimit = if (data.rssi < -75) 10 else 20
+        val isMatch =
+            isAppleData(data) &&
+                targetIsApple &&
+                shadowsAreComplementary &&
+                hasIdentityCorroboration(input, target) &&
+                rssiDiff <= rssiLimit
 
-        android.util.Log.i(
-            "ShadowMatch",
-            "Corroborated Apple shadow MATCH: ${data.mac} (${input.deviceName}) -> " +
-                "${target.primaryMac} (${target.lastDeviceName}). RSSI: ${data.rssi}/${target.lastRssi}",
-        )
-        return 1.0f
+        if (isMatch) {
+            android.util.Log.i(
+                "ShadowMatch",
+                "Corroborated Apple shadow MATCH: ${data.mac} (${input.deviceName}) -> " +
+                    "${target.primaryMac} (${target.lastDeviceName}). RSSI: ${data.rssi}/${target.lastRssi}",
+            )
+        }
+        return if (isMatch) 1.0f else 0f
     }
 
     private fun isAmbiguousAppleShadowPair(
@@ -416,7 +413,7 @@ constructor() {
         data: BleScanResultData,
         target: TrackedTarget,
     ): Float {
-        val isMsInfo =
+        val isMicrosoftData =
             data.manufacturerId == 6 ||
                 (
                     data.manufacturerData != null &&
@@ -424,28 +421,23 @@ constructor() {
                         data.manufacturerData[0] == 0x06.toByte() &&
                         data.manufacturerData[1] == 0x00.toByte()
                 )
-        if (!isMsInfo) return 0f
-
-        val targetName = target.lastDeviceName
-        val targetIsWindows = targetName?.contains("Windows", ignoreCase = true) == true
-        if (!targetIsWindows) {
-            val payload = target.lastPayload
-            if (payload != null && payload.size >= 4) {
-                return 0f
-            }
-            return 0f
-        }
-
+        val targetIsWindows = target.lastDeviceName?.contains("Windows", ignoreCase = true) == true
         val rssiDiff = abs(data.rssi - target.lastRssi)
         val isWeak = data.rssi < -75
         val isVeryClose = rssiDiff <= 3
-        if ((isWeak && !isVeryClose) || rssiDiff > 10) return 0f
+        val isMatch =
+            isMicrosoftData &&
+                targetIsWindows &&
+                (!isWeak || isVeryClose) &&
+                rssiDiff <= 10
 
-        android.util.Log.i(
-            "ShadowMatch",
-            "Microsoft MATCH: ${data.mac} -> ${target.primaryMac}. RSSI: ${data.rssi}/${target.lastRssi}",
-        )
-        return 1.0f
+        if (isMatch) {
+            android.util.Log.i(
+                "ShadowMatch",
+                "Microsoft MATCH: ${data.mac} -> ${target.primaryMac}. RSSI: ${data.rssi}/${target.lastRssi}",
+            )
+        }
+        return if (isMatch) 1.0f else 0f
     }
 
     private fun matchSameNameHeuristic(
