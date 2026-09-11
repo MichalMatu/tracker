@@ -1,6 +1,7 @@
 package io.blueeye.core.scanner.source
 
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
@@ -143,6 +144,7 @@ constructor(private val adapter: BluetoothAdapter?) {
      * The OR-list deliberately covers the broad structures Tracker consumes while remaining a
      * genuine filtered scan that Android may continue when the display is off.
      */
+    @TargetApi(Build.VERSION_CODES.TIRAMISU)
     private fun buildAdvertisingTypeFilters(): List<ScanFilter> =
         listOf(
             ScanRecord.DATA_TYPE_FLAGS,
