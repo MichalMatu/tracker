@@ -127,6 +127,5 @@ class BleScannerStableCoreTest {
             bleScanSource = bleScanSource,
             classicScanSource = classicScanSource,
             scanResultExtractor = mock<ScanResultExtractor>(),
-            screenStateMonitor = mock<PassiveBleScreenStateMonitor>(),
         )
 }
