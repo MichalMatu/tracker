@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-11T02:22:04.797636+00:00",
+  "task_id": "tracker-phase3-x5-name-hardening-v1",
+  "daemon_version": "4.18.20",
+  "pid": 55082
+}
