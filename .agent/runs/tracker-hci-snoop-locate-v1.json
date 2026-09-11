@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-hci-snoop-locate-v1",
+  "task_digest": "11a9280633bd3a98659a608218bf9a2be5b3ca38014e496419efed9b963cf3c0",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-11T09:19:17.025765+00:00",
+  "attempt_id": "eb5359a5efa0466103dd25e4",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 19344,
+  "updated_at": "2026-09-11T09:19:17.025835+00:00",
+  "pid": 19344
+}
