@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "tracker-phase3-final-logcheck-20260911-v2",
   "task_digest": "104fb3998029eb643e09ee5de8261d701eed4e45e583bd05f4954b287bd03af8",
-  "idle_timeout": 60,
-  "task_timeout": 180,
-  "memory_limit_mb": 1024,
-  "started_at": "2026-09-11T18:09:30.207387+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-11T18:09:32.649429+00:00",
   "attempt_id": "bb6d5a7f3053c777ee6075ff",
   "daemon_version": "4.18.20",
   "daemon_pid": 94838,
-  "updated_at": "2026-09-11T18:09:30.207512+00:00",
+  "updated_at": "2026-09-11T18:09:33.026871+00:00",
   "pid": 94838
 }
