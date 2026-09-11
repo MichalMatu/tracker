@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 3,
-  "command": "set -euo pipefail; test \"$(git rev-parse HEAD)\" = '40eac7a504d363a05cd6c235c25146e01bb36ff2'; adb logcat -c; adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; echo INITIAL_SCANNER_RUNNING_PASS; adb shell input tap 503 159; sleep 3; if adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; then echo 'ScannerService still present after stop' >&2; adb shell dumpsys activity services io.blueeye | grep -E 'ScannerService|isForeground|startRequested' >&2 || true; exit 31; fi; echo STOP_REMOVED_SERVICE_PASS; sleep 5; if adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; then echo 'ScannerService auto-restarted after stop' >&2; exit 32; fi; echo STOP_STAYS_STOPPED_PASS",
-  "pid": 62258,
+  "command": "set -euo pipefail; adb shell input tap 503 159; for i in 1 2 3 4 5 6; do sleep 1; if adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; then break; fi; done; adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; adb shell dumpsys activity services io.blueeye | grep -E 'ScannerService|isForeground=true|startRequested=true'; sleep 4; adb shell uiautomator dump /sdcard/tracker-restarted.xml >/dev/null; echo '--- UI_SAMPLE ---'; adb shell cat /sdcard/tracker-restarted.xml | grep -oE 'text=\"[^\"]*\"' | grep -v 'text=\"\"' | head -n 30; echo '--- ERRORS ---'; PID=$(adb shell pidof io.blueeye | tr -d '\\r'); test -n \"$PID\"; adb logcat -d -v brief --pid=\"$PID\" | grep -E 'FATAL EXCEPTION|AndroidRuntime|SecurityException|IllegalStateException|SQLiteException|OutOfMemoryError' && exit 33 || true; echo START_RUNNING_NO_ERRORS_PASS",
+  "pid": 62453,
   "timeout": 300,
   "idle_timeout": 120,
   "memory_limit_mb": 1024,
-  "started_at": "2026-09-11T08:28:51.547001+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-11T08:29:03.374432+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-phone-presmoke-stop-start-verify-v1",
@@ -18,5 +18,5 @@
   "task_digest": "57261374213f143fa0ec17334b68fea1e209625177103f55186b30e19ec9e363",
   "daemon_version": "4.18.20",
   "daemon_pid": 62085,
-  "updated_at": "2026-09-11T08:28:51.547151+00:00"
+  "updated_at": "2026-09-11T08:29:03.444716+00:00"
 }
