@@ -1,0 +1,17 @@
+{
+  "id": "tracker-phone-presmoke-unexpected-stop-inspect-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 180,
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test \"$(git rev-parse HEAD)\" = '40eac7a504d363a05cd6c235c25146e01bb36ff2'; test -n \"$(adb shell pidof io.blueeye | tr -d '\\r')\"; echo '--- SERVICE ---'; adb shell dumpsys activity services io.blueeye | grep -E 'ScannerService|isForeground|startRequested' || true; echo '--- UI ---'; adb shell uiautomator dump /sdcard/tracker-current.xml >/dev/null; adb shell cat /sdcard/tracker-current.xml | grep -oE 'text=\"[^\"]*\"|content-desc=\"[^\"]*\"' | grep -v '=\"\"' | head -n 60; echo '--- LIFECYCLE ---'; adb logcat -d -v brief -s ScannerService:V BleScanner:V '*:S' | tail -n 120; echo '--- ERRORS ---'; PID=$(adb shell pidof io.blueeye | tr -d '\\r'); adb logcat -d -v brief --pid=\"$PID\" | grep -E 'FATAL EXCEPTION|AndroidRuntime|SecurityException|IllegalStateException|SQLiteException|OutOfMemoryError|Bluetooth is off or unavailable|SCANNER_FAILED|START_FAILED' || true"
+  ]
+}
