@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-final-docs-sync-v2",
+  "task_digest": "a7528192650dd8267dc674b928e6e75d66065a164533c71186f850e477018051",
+  "idle_timeout": 120,
+  "task_timeout": 900,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-11T09:40:07.306928+00:00",
+  "attempt_id": "9a952fc02968ec500e408c91",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 43415,
+  "updated_at": "2026-09-11T09:40:07.307072+00:00",
+  "pid": 43415
+}
