@@ -1,0 +1,19 @@
+{
+  "id": "tracker-phase3-long-gap-identity-milestone-v1-settings-detekt-report2",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 4096,
+  "command_timeout": 900,
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch origin main agent-control; test \"$(git rev-parse origin/main)\" = 'ac35d92f521edb2ac099b9d32b592166d2c575e6'; git checkout --detach 'ac35d92f521edb2ac099b9d32b592166d2c575e6'",
+    "set -euo pipefail; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-candidate-core-v1.py > /tmp/candidate.py; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-candidate-core-v1-detekt-cleanup.py > /tmp/candidate-cleanup.py; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-identity-milestone-v1.py > /tmp/identity-milestone.py; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-identity-milestone-v1-fake-dao-fix.py > /tmp/fake-dao-fix.py; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-identity-milestone-v1-import-cleanup.py > /tmp/import-cleanup.py; git show origin/agent-control:.agent/scripts/tracker-phase3-long-gap-identity-milestone-v1-settings-detekt-cleanup.py > /tmp/settings-cleanup.py; python3 /tmp/candidate.py; python3 /tmp/candidate-cleanup.py; python3 /tmp/identity-milestone.py; python3 /tmp/fake-dao-fix.py; python3 /tmp/import-cleanup.py; python3 /tmp/settings-cleanup.py; git diff --check",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew :feature:settings:detekt --console=plain || true; cat feature/settings/build/reports/detekt/detekt.txt || true"
+  ]
+}
