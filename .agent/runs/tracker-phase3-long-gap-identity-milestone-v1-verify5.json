@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-long-gap-identity-milestone-v1-verify5",
+  "task_digest": "3dbd87245be1bd7ed1a32ffc196c3c453d9d6834cfe4b41e0e21747c83f3f5e7",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-11T07:13:38.909427+00:00",
+  "attempt_id": "63f70a3ae23bcc501628780e",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 49745,
+  "updated_at": "2026-09-11T07:13:38.909497+00:00",
+  "pid": 49745
+}
