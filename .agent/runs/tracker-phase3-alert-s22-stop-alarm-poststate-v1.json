@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-alert-s22-stop-alarm-poststate-v1",
+  "task_digest": "09f640d4845b2e3d43c70bf6bc4657b4eb1fcdfd1fe82ba141ca6656b56ac324",
+  "idle_timeout": 240,
+  "task_timeout": 1200,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-11T02:15:52.895637+00:00",
+  "attempt_id": "e1dbba7991ae6d92d476df79",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 50256,
+  "updated_at": "2026-09-11T02:15:52.895858+00:00",
+  "pid": 50256
+}
