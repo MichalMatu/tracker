@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-identity-name-corroboration-v2-detekt-diagnostic",
+  "task_digest": "b007f4dd53a741574d2cd6fec11bf3d227e76dd48a99b76864896585b30601be",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-11T04:01:47.863989+00:00",
+  "attempt_id": "0cb140b362fe54122037b2d0",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 60646,
+  "updated_at": "2026-09-11T04:01:47.864186+00:00",
+  "pid": 60646
+}
