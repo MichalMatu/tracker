@@ -1,0 +1,117 @@
+{
+  "id": "tracker-phone-presmoke-scan-toggle-v1",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-11T08:24:12.155561+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test \"$(git rev-parse HEAD)\" = '40eac7a504d363a05cd6c235c25146e01bb36ff2'; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {c++} END{print c+0}')\" = '1'; test -n \"$(adb shell pidof io.blueeye | tr -d '\\r')\"; adb shell uiautomator dump /sdcard/tracker-before.xml >/dev/null; adb shell cat /sdcard/tracker-before.xml | grep -q 'text=\"Paused\"'; echo BEFORE_PAUSED_PASS",
+      "exit_code": 0,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\nBEFORE_PAUSED_PASS\n",
+      "elapsed_seconds": 5.706,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 12.27,
+      "output_policy": "stream",
+      "captured_output_chars": 96,
+      "output_truncated": false,
+      "current_rss_mb": 9.62,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; adb logcat -c; adb shell input tap 503 159; sleep 5; test -n \"$(adb shell pidof io.blueeye | tr -d '\\r')\"; adb shell uiautomator dump /sdcard/tracker-running.xml >/dev/null; echo '--- RUNNING_UI ---'; adb shell cat /sdcard/tracker-running.xml | grep -oE 'text=\"[^\"]*\"|content-desc=\"[^\"]*\"' | head -n 80; echo '--- RUNNING_LOG_ERRORS ---'; PID=$(adb shell pidof io.blueeye | tr -d '\\r'); adb logcat -d -v brief --pid=\"$PID\" | grep -E 'FATAL EXCEPTION|AndroidRuntime|SecurityException|IllegalStateException|SQLiteException|OutOfMemoryError' || true",
+      "exit_code": 0,
+      "output": "--- RUNNING_UI ---\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"All 10\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"Watchlist 0\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"Suspicious 1\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"Public Safety Signals 0\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"Nearby\"\ncontent-desc=\"\"\ntext=\"Identified devices without attention evidence.\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"No attention\"\ncontent-desc=\"\"\ntext=\"8\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"ATC_4F24CD\"\ncontent-desc=\"\"\ntext=\"-58\"\ncontent-desc=\"\"\ntext=\" \"\ncontent-desc=\"\"\ntext=\"Seen now • RSSI -58 dBm\"\ncontent-desc=\"\"\ntext=\"\"\ncontent-desc=\"\"\ntext=\"BLE\"\ncontent-desc=\"\"\ntext=\"PUBLIC\"\ncontent-desc=\"\"\ntext=\"PENDING\"\ncontent-desc=\"\"\ntext=\"23.8°C\"\ncontent-desc=\"\"\ntext=\"Low confidence\"\ncontent-desc=\"\"\ntext=\"Source: Name - BLE ad\"\ncontent-desc=\"\"\ntext=\"Device advertised a Bluetooth name.\"\ncontent-desc=\"\"\ntext=\"Value: ATC_4F24CD\"\ncontent-desc=\"\"\n--- RUNNING_LOG_ERRORS ---\n",
+      "elapsed_seconds": 8.23,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 9.59,
+      "output_policy": "stream",
+      "captured_output_chars": 1269,
+      "output_truncated": false,
+      "current_rss_mb": 9.59,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; adb shell input tap 503 159; sleep 2; test -n \"$(adb shell pidof io.blueeye | tr -d '\\r')\"; adb shell uiautomator dump /sdcard/tracker-after.xml >/dev/null; adb shell cat /sdcard/tracker-after.xml | grep -q 'text=\"Paused\"'; echo AFTER_PAUSED_PASS; echo '--- FINAL_LOG_ERRORS ---'; PID=$(adb shell pidof io.blueeye | tr -d '\\r'); adb logcat -d -v brief --pid=\"$PID\" | grep -E 'FATAL EXCEPTION|AndroidRuntime|SecurityException|IllegalStateException|SQLiteException|OutOfMemoryError' || true; echo SCAN_TOGGLE_SMOKE_PASS",
+      "exit_code": 1,
+      "output": "",
+      "elapsed_seconds": 4.886,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 9.67,
+      "output_policy": "stream",
+      "captured_output_chars": 0,
+      "output_truncated": false,
+      "current_rss_mb": 9.67,
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 5.706
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 8.23
+    },
+    {
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 4.886
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.139
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.072
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-11T08:24:32.726673+00:00",
+  "task_digest": "918bffe1f12bf89e85d3f9bf6499e392da9860b35e229473db2691eb91b7c3be",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "attempt_id": "a8e9b830dcd8711413c6eadf",
+  "daemon_version": "4.18.20"
+}
