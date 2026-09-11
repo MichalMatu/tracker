@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 3,
-  "command": "set -euo pipefail; git show origin/agent-control:.agent/scripts/tracker-phase3-retention-milestone-v1.py > /tmp/retention.py; git show origin/agent-control:.agent/scripts/tracker-phase3-latency-location-backoff-v1.py > /tmp/latency.py; git show origin/agent-control:.agent/scripts/tracker-phase3-latency-location-backoff-v1-detekt-cleanup.py > /tmp/latency-cleanup.py; git show origin/agent-control:.agent/scripts/tracker-phase3-quality-ktlint-fix-v1.py > /tmp/quality-fix.py; python3 /tmp/retention.py; python3 /tmp/latency.py; python3 /tmp/latency-cleanup.py; python3 /tmp/quality-fix.py; git diff --check; test \"$(git diff --name-only | sort | tr '\n' '|')\" = 'core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceActionDao.kt|core/data/src/main/java/io/blueeye/core/data/db/dao/IdentityContinuityCandidateDao.kt|core/data/src/main/java/io/blueeye/core/data/repository/DeviceHistoryDataSource.kt|core/data/src/main/java/io/blueeye/core/data/repository/DeviceRepositoryImpl.kt|core/data/src/main/java/io/blueeye/core/location/LocationProvider.kt|feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt|'",
-  "pid": 68154,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew :core:data:detekt :feature:settings:ktlintMainSourceSetCheck --console=plain; echo PHASE3_FINAL_STABILIZATION_STATIC_GATE_PASS",
+  "pid": 68194,
   "timeout": 1200,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-11T07:25:28.705663+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-11T07:25:29.339275+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-phase3-final-stabilization-static-gate-v1",
@@ -18,5 +18,5 @@
   "task_digest": "b68f230febd16b85b673d009c473cc1c8d75c3c814d50c8e6ced1ab30f4df50b",
   "daemon_version": "4.18.20",
   "daemon_pid": 67851,
-  "updated_at": "2026-09-11T07:25:28.787911+00:00"
+  "updated_at": "2026-09-11T07:25:29.409390+00:00"
 }
