@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-final-stabilization-detekt-report-v1",
+  "task_digest": "318c1c685bc6e33d28dc0effb92393e30fd84014c5689ff00a31ede4496aa944",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-11T07:27:40.737162+00:00",
+  "attempt_id": "3ab4f4c84d2d16ee8ba3da78",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 72241,
+  "updated_at": "2026-09-11T07:27:40.737304+00:00",
+  "pid": 72241
+}
