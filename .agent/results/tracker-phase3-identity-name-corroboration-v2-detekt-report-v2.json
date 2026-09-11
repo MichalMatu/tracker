@@ -1,0 +1,104 @@
+{
+  "id": "tracker-phase3-identity-name-corroboration-v2-detekt-report-v2",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-11T04:47:19.261667+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test \"$(git rev-parse HEAD)\" = 'c34a31ead48a783d7d9c8c03141788612d6e3e89'; test -z \"$(git status --porcelain)\"; git fetch origin main agent-control; test \"$(git rev-parse origin/main)\" = 'c34a31ead48a783d7d9c8c03141788612d6e3e89'; git show origin/agent-control:.agent/patches/tracker-phase3-identity-name-corroboration-v2.patch > /tmp/tracker-identity.patch; git apply --recount --check /tmp/tracker-identity.patch; git apply --recount /tmp/tracker-identity.patch; git diff --check",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main          -> FETCH_HEAD\n * branch            agent-control -> FETCH_HEAD\n   8f8fc78..6a2743b  agent-control -> origin/agent-control\n",
+      "elapsed_seconds": 1.232,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 5.52,
+      "output_policy": "stream",
+      "captured_output_chars": 200,
+      "output_truncated": false,
+      "current_rss_mb": 5.52,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 2,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew :core:data:detekt --console=plain || true; cat core/data/build/reports/detekt/detekt.txt || true",
+      "exit_code": 0,
+      "output": "Starting a Gradle Daemon (subsequent builds will be faster)\nReusing configuration cache.\n\n> Task :core:data:detekt\n\n\n253 kotlin files were analyzed.\n\n> Task :core:data:detekt FAILED\n\nFAILURE: Build failed with an exception.\n\n* What went wrong:\nExecution failed for task ':core:data:detekt'.\n> Analysis failed with 1 weighted issues.\n\n* Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights.\n> Get more help at https://help.gradle.org.\n\nBUILD FAILED in 7s\n1 actionable task: 1 executed\nConfiguration cache entry reused.\nReturnCount - [matchSameNameHeuristic] at /Users/michal/agent-workspace/repos/tracker/work/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt:395:17 - Signature=DeviceCorrelationStrategy.kt$DeviceCorrelationStrategy$private fun matchSameNameHeuristic( input: MatchInput, target: TrackedTarget, ): Float\n",
+      "elapsed_seconds": 8.709,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 93.38,
+      "output_policy": "stream",
+      "captured_output_chars": 967,
+      "output_truncated": false,
+      "current_rss_mb": 61.75,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 2,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 2,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.232
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 2,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 8.709
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": " M app/src/test/java/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n M core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt\n M core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n",
+    "elapsed_seconds": 0.169
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "diff --git a/app/src/test/java/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt b/app/src/test/java/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\nindex 3745287..0a1c235 100644\n--- a/app/src/test/java/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n+++ b/app/src/test/java/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n@@ -67,7 +67,7 @@ class AddressCarryoverTrackerTest {\n     }\n \n     @Test\n-    fun `processScan correlates device with Same Name and Similar RSSI`() {\n+    fun `processScan keeps same name and similar RSSI separate without corroboration`() {\n         // 1. First Scan\n         val data1 =\n             io.blueeye.core.scanner.model.BleScanResultData(\n@@ -97,8 +97,9 @@ class AddressCarryoverTrackerTest {\n             )\n         val res2 = tracker.processScan(data2, deviceName = \"MyHeadphones\")\n \n-        assertTrue(\"Should be carryover due to Name+RSSI\", res2.isCarryover)\n-        assertEquals(res1.targetId, res2.targetId)\n+        assertFalse(\"Name+RSSI alone must not be carryover\", res2.isCarryover)\n+        assertTrue(\"Second same-name device should stay separate\", res2.isNewTarget)\n+        assertFalse(\"Target IDs should remain distinct\", res1.targetId == res2.targetId)\n     }\n \n     @Test\ndiff --git a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt b/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt\nindex 82f1e18..4a80381 100644\n--- a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt\n+++ b/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt\n@@ -38,6 +38,7 @@ constructor() {\n         private const val MAX_SUMMARY_VALUE_LENGTH = 64\n         private const val EXTREME_RSSI_DIFF = 50\n         private const val RSSI_PENALTY_MULTIPLIER = 0.5f\n+        private const val SAME_NAME_MIN_PAYLOAD_SCORE = 0.8f\n \n         // Known Vendor Headers to strip (Little Endian Manufacturer ID)\n         private val HEADER_APPLE = byteArrayOf(0x4C.toByte(), 0x00.toByte())\n@@ -106,6 +107,8 @@ constructor() {\n                     },\n                 interval = matchInterval(input.advertisingInterval, target.lastAdvertisingInterval),\n             )\n+        val hasIndependentIdentityEvidence = scores.hasIndependentIdentityEvidence()\n+\n         val normalizedScore =\n             weightedScore(\n                 input = input,\n@@ -113,7 +116,7 @@ constructor() {\n                 scores = scores,\n             ).withRssiPenalty(input, target, scores.name)\n \n-        if (normalizedScore <= MATCH_THRESHOLD) return null\n+        if (!hasIndependentIdentityEvidence || normalizedScore <= MATCH_THRESHOLD) return null\n \n         return CarryoverMatch(\n             targetId = target.targetId,\n@@ -134,6 +137,9 @@ constructor() {\n         )\n     }\n \n+    private fun FeatureScores.hasIndependentIdentityEvidence(): Boolean =\n+        uuid > 0f || finalPayload >= SAME_NAME_MIN_PAYLOAD_SCORE || interval > 0f\n+\n     private fun weightedScore(\n         input: MatchInput,\n         target: TrackedTarget,\n@@ -189,7 +195,7 @@ constructor() {\n             when {\n                 matchShadow(data, target) >= 1.0f -> CarryoverMatchReason.APPLE_SHADOW\n                 matchMicrosoft(data, target) >= 1.0f -> CarryoverMatchReason.MICROSOFT_SHADOW\n-                matchSameNameHeuristic(data, target) >= 1.0f -> CarryoverMatchReason.SAME_NAME_PROXIMITY\n+                matchSameNameHeuristic(input, target) >= 1.0f -> CarryoverMatchReason.SAME_NAME_PROXIMITY\n                 else -> null\n             } ?: return null\n \n@@ -387,9 +393,10 @@ constructor() {\n     }\n \n     private fun matchSameNameHeuristic(\n-        data: BleScanResultData,\n-        target: TrackedTarget\n+        input: MatchInput,\n+        target: TrackedTarget,\n     ): Float {\n+        val data = input.data\n         // 1. Must have same non-empty name\n         if (data.name.isNullOrBlank() || target.lastDeviceName.isNullOrBlank()) {\n              // android.util.Log.v(\"ShadowMatch\", \"Same Name SKIP: Name missing. '${data.name}' vs '${target.lastDeviceName}'\")\n@@ -409,7 +416,8 @@ constructor() {\n                           (data.manufacturerData != null && data.manufacturerData.size >= 2 && \n                            data.manufacturerData[0] == 0x4C.toByte() && data.manufacturerData[1] == 0x00.toByte())\n \n-        val isSafeName = isAppleInfo || !isGenericName(data.name)\n+        val isSafeName =\n+            (isAppleInfo || !isGenericName(data.name)) && hasSameNameCorroboration(input, target)\n         \n         if (!isSafeName) return 0f\n \n@@ -428,6 +436,20 @@ constructor() {\n         return 0f\n     }\n \n+    private fun hasSameNameCorroboration(\n+        input: MatchInput,\n+        target: TrackedTarget,\n+    ): Boolean {\n+        val payloadScore =\n+            matchPayloadFuzzy(\n+                stripHeaders(input.rawData),\n+                stripHeaders(target.lastPayload),\n+            )\n+        return matchUuids(input.serviceUuids, target.lastServiceUuids) > 0f ||\n+            payloadScore >= SAME_NAME_MIN_PAYLOAD_SCORE ||\n+            matchInterval(input.advertisingInterval, target.lastAdvertisingInterval) > 0f\n+    }\n+\n     private fun isGenericName(name: String?): Boolean {\n         if (name.isNullOrBlank()) return true\n         val lower = name.lowercase()\ndiff --git a/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt b/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\nindex 0f7a308..5eb87d1 100644\n--- a/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n+++ b/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n@@ -68,6 +68,44 @@ class AddressCarryoverTrackerTest {\n         assertTrue(\"Target ID should be valid\", result2.targetId.startsWith(\"TGT_\"))\n     }\n \n+    @Test\n+    fun `same specific name and RSSI alone should stay separate`() {\n+        val first = createScanData(\"21:11:11:11:11:11\", \"JBL Tune 520BT-LE\", null, null)\n+        val second = createScanData(\"22:22:22:22:22:22\", \"JBL Tune 520BT-LE\", null, null)\n+\n+        val firstResult = tracker.processScan(first, first.name)\n+        val secondResult = tracker.processScan(second, second.name)\n+\n+        assertTrue(firstResult.isNewTarget)\n+        assertTrue(secondResult.isNewTarget)\n+        assertFalse(secondResult.isCarryover)\n+        assertNotEquals(firstResult.targetId, secondResult.targetId)\n+    }\n+\n+    @Test\n+    fun `same specific name with service UUID corroboration may carry over`() {\n+        val serviceUuids = listOf(\"0000fe2c-0000-1000-8000-00805f9b34fb\")\n+        val first =\n+            createScanData(\"31:11:11:11:11:11\", \"JBL Tune 520BT-LE\", null, null).copy(\n+                serviceUuids = serviceUuids,\n+            )\n+        val second =\n+            createScanData(\"32:22:22:22:22:22\", \"JBL Tune 520BT-LE\", null, null).copy(\n+                serviceUuids = serviceUuids,\n+            )\n+\n+        val firstResult = tracker.processScan(first, first.name)\n+        val secondResult = tracker.processScan(second, second.name)\n+\n+        assertTrue(firstResult.isNewTarget)\n+        assertTrue(secondResult.isCarryover)\n+        assertEquals(firstResult.targetId, secondResult.targetId)\n+        assertEquals(\n+            CarryoverMatchReason.SAME_NAME_PROXIMITY,\n+            secondResult.matchEvidence?.reasonCode,\n+        )\n+    }\n+\n     @Test\n     fun `known alias should keep reporting primary mac for persistence`() {\n         val primaryMac = \"69:95:CC:A8:9C:A0\"\n",
+    "elapsed_seconds": 0.026
+  },
+  "finished_at": "2026-09-11T04:47:30.920022+00:00",
+  "workspace_checkpoint": {
+    "version": 2,
+    "task_id": "tracker-phase3-identity-name-corroboration-v2-detekt-report-v2",
+    "reason": "task-exit",
+    "created_at": "2026-09-11T04:47:31.392569+00:00",
+    "base_head": "c34a31ead48a783d7d9c8c03141788612d6e3e89",
+    "work_branch": "agent-work",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/tracker-phase3-identity-name-corroboration-v2-detekt-report-v2/1789102051220255000-task-exit",
+    "tracked_patch": "tracked.patch",
+    "untracked_root": "untracked",
+    "untracked_files": [],
+    "tracked_patch_bytes": 7854,
+    "untracked_bytes": 0,
+    "total_bytes": 7854,
+    "status": " M app/src/test/java/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n M core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt\n M core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n"
+  },
+  "task_digest": "fdf02709db40a5354c67632843f953ff82d4efd535f7d7b8559d37b8f6f98d39",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 4096,
+  "attempt_id": "bca05dacd3377abe0a0276a0",
+  "daemon_version": "4.18.20"
+}
