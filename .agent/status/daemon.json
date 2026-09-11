@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.18.20",
   "state": "idle",
-  "pid": 29406,
-  "updated_at": "2026-09-11T05:37:59.957914+00:00",
+  "pid": 30995,
+  "updated_at": "2026-09-11T05:39:14.194798+00:00",
   "self_revision": "0bb99d790dbed19a528b4cb8ac238432134b5660",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 29406,
-  "supervisor_pid": 26891,
-  "last_task_id": "tracker-phase3-merge-user-state-safety-v2-patchcheck2",
+  "worker_pid": 30995,
+  "supervisor_pid": 30903,
   "execution_variant": "parallel"
 }
