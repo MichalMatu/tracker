@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 3,
-  "command": "set -euo pipefail; EXPECTED=2e5223f22128059935c36bb24946cfef95eba958; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; adb shell input keyevent KEYCODE_WAKEUP; sleep 2; adb shell wm dismiss-keyguard >/dev/null 2>&1 || true; adb shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/tmp/tracker-fixed-monkey.txt 2>&1 || { cat /tmp/tracker-fixed-monkey.txt; exit 21; }; sleep 3; adb logcat -c; if ! adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; then adb shell uiautomator dump /sdcard/tracker-fixed-before.xml >/dev/null; echo '--- BEFORE_UI ---'; adb shell cat /sdcard/tracker-fixed-before.xml | grep -oE 'text=\"[^\"]*\"|content-desc=\"[^\"]*\"' | head -n 100; adb shell input tap 503 159; sleep 8; fi; PID=$(adb shell pidof io.blueeye | tr -d '\\r'); test -n \"$PID\"; adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; adb shell dumpsys activity services io.blueeye | grep -q 'isForeground=true'; snapshot_count(){ D=\"$1\"; rm -rf \"$D\"; mkdir -p \"$D\"; adb exec-out run-as io.blueeye cat databases/tracker_database > \"$D/tracker_database\"; adb exec-out run-as io.blueeye cat databases/tracker_database-wal > \"$D/tracker_database-wal\" 2>/dev/null || rm -f \"$D/tracker_database-wal\"; adb exec-out run-as io.blueeye cat databases/tracker_database-shm > \"$D/tracker_database-shm\" 2>/dev/null || rm -f \"$D/tracker_database-shm\"; sqlite3 \"$D/tracker_database\" 'SELECT COUNT(*) FROM signal_samples;'; }; sleep 10; C1=$(snapshot_count /tmp/tracker-fixed-db1 | tail -n1); sleep 15; C2=$(snapshot_count /tmp/tracker-fixed-db2 | tail -n1); echo SCREEN_ON_COUNTS=$C1,$C2; test \"$C2\" -gt \"$C1\" || { echo PRECONDITION_NO_SCREEN_ON_SAMPLE_GROWTH >&2; exit 31; }; echo SCREEN_ON_RF_GROWTH_PASS",
-  "pid": 80774,
+  "command": "set -euo pipefail; snapshot_count(){ D=\"$1\"; rm -rf \"$D\"; mkdir -p \"$D\"; adb exec-out run-as io.blueeye cat databases/tracker_database > \"$D/tracker_database\"; adb exec-out run-as io.blueeye cat databases/tracker_database-wal > \"$D/tracker_database-wal\" 2>/dev/null || rm -f \"$D/tracker_database-wal\"; adb exec-out run-as io.blueeye cat databases/tracker_database-shm > \"$D/tracker_database-shm\" 2>/dev/null || rm -f \"$D/tracker_database-shm\"; sqlite3 \"$D/tracker_database\" 'SELECT COUNT(*) FROM signal_samples;'; }; BEFORE=$(snapshot_count /tmp/tracker-fixed-off-before | tail -n1); PID_BEFORE=$(adb shell pidof io.blueeye | tr -d '\\r'); test -n \"$PID_BEFORE\"; adb shell input keyevent 26; sleep 5; echo '--- POWER_OFF_STATE ---'; POWER1=$(adb shell dumpsys power | grep -E 'mWakefulness=|Display Power: state=' | head -n 10 || true); echo \"$POWER1\"; echo \"$POWER1\" | grep -Eq 'mWakefulness=(Asleep|Dozing)|Display Power: state=OFF'; sleep 90; POWER2=$(adb shell dumpsys power | grep -E 'mWakefulness=|Display Power: state=' | head -n 10 || true); echo '--- POWER_AFTER_90S ---'; echo \"$POWER2\"; echo \"$POWER2\" | grep -Eq 'mWakefulness=(Asleep|Dozing)|Display Power: state=OFF'; PID_OFF=$(adb shell pidof io.blueeye | tr -d '\\r'); test \"$PID_OFF\" = \"$PID_BEFORE\"; adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; adb shell dumpsys activity services io.blueeye | grep -q 'isForeground=true'; AFTER=$(snapshot_count /tmp/tracker-fixed-off-after | tail -n1); echo SCREEN_OFF_COUNTS=$BEFORE,$AFTER; test \"$AFTER\" -gt \"$BEFORE\" || { echo SCREEN_OFF_SAMPLE_GROWTH_FAIL >&2; adb logcat -d -v brief -s BleScanner:V ScannerService:V BleScanSource:V '*:S' | tail -n 160; exit 41; }; echo SCREEN_OFF_SAMPLE_GROWTH_PASS; adb shell input keyevent 26; sleep 4; adb shell wm dismiss-keyguard >/dev/null 2>&1 || true; PID_WAKE=$(adb shell pidof io.blueeye | tr -d '\\r'); test \"$PID_WAKE\" = \"$PID_BEFORE\"; echo '--- BLE_MODE_LOGS ---'; LOGS=$(adb logcat -d -v brief -s BleScanner:V ScannerService:V BleScanSource:V '*:S'); echo \"$LOGS\" | tail -n 180; echo \"$LOGS\" | grep -q 'BACKGROUND_FILTERED'; echo \"$LOGS\" | grep -q 'Switching passive BLE scan from BROAD to BACKGROUND_FILTERED'; echo \"$LOGS\" | grep -q 'Switching passive BLE scan from BACKGROUND_FILTERED to BROAD'; echo '--- APP_FATALS ---'; adb logcat -d -v brief --pid=\"$PID_WAKE\" | grep -E 'FATAL EXCEPTION|AndroidRuntime|SecurityException|IllegalStateException|SQLiteException|OutOfMemoryError' && exit 42 || true; echo SCREEN_STATE_MODE_TRANSITIONS_PASS; echo PHASE3_FIXED_SCREENOFF_ACCEPTANCE_PASS",
+  "pid": 81466,
   "timeout": 1200,
   "idle_timeout": 240,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-11T17:53:55.390468+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-11T17:54:39.539837+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-phase3-fixed-screenoff-accept-20260911-v1",
@@ -18,5 +18,5 @@
   "task_digest": "4fa11223b31badd54990c7e0fb5d17e28242b929076aebd14a7f41e89ce12ea6",
   "daemon_version": "4.18.20",
   "daemon_pid": 79094,
-  "updated_at": "2026-09-11T17:53:55.462861+00:00"
+  "updated_at": "2026-09-11T17:54:39.555272+00:00"
 }
