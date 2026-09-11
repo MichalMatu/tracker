@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.18.20",
-  "state": "running",
-  "pid": 61990,
-  "updated_at": "2026-09-11T02:28:47.009642+00:00",
+  "state": "idle",
+  "pid": 8956,
+  "updated_at": "2026-09-11T03:15:39.403438+00:00",
   "self_revision": "0bb99d790dbed19a528b4cb8ac238432134b5660",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": "tracker-phase3-x5-name-hardening-v3",
+  "current_task_id": null,
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "tracker",
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 61990,
-  "supervisor_pid": 52253,
-  "active_resources": [],
+  "worker_pid": 8956,
+  "supervisor_pid": 8855,
   "execution_variant": "parallel"
 }
