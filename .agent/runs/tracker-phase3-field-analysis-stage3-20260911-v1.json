@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-field-analysis-stage3-20260911-v1",
+  "task_digest": "16af5d461af235486f6d4df907db89090133f6bfb90f04b9415ae60be22ac79e",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 1536,
+  "started_at": "2026-09-11T10:06:26.872446+00:00",
+  "attempt_id": "5f53a61361047f05fc5db2e2",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 76372,
+  "updated_at": "2026-09-11T10:06:26.872583+00:00",
+  "pid": 76372
+}
