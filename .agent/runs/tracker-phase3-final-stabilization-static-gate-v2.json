@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-final-stabilization-static-gate-v2",
+  "task_digest": "64cd452f4687d20efaed3bfdc5040aa36f5460e3413d81a93f28efb38a40bc8d",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-11T07:35:54.688914+00:00",
+  "attempt_id": "c62a4683f36e3b42688d0bde",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 85741,
+  "updated_at": "2026-09-11T07:35:54.689118+00:00",
+  "pid": 85741
+}
