@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-process-death-classify-20260911-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-11T10:20:19.100471+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; ROOT=\"$HOME/agent-workspace/repos/tracker/checkpoints/phase3-field-reacceptance-20260911\"; STAMP=$(cat \"$ROOT/LATEST\"); OUT=\"$ROOT/$STAMP\"; python3 - \"$OUT\" <<'PY'\nimport os,re,sys\nout=sys.argv[1]\nfiles=['logcat-before.txt','logcat-after-export.txt','logcat-final.txt']\nrx=re.compile(r'(Killing|has died|am_kill|Force stopping|lowmemory|lmkd)',re.I)\napp=re.compile(r'io\\.blueeye',re.I)\nrows=[]\nfor fn in files:\n p=os.path.join(out,fn)\n if not os.path.exists(p): continue\n for line in open(p,errors='replace'):\n  if app.search(line) and rx.search(line):\n   s=re.sub(r'pid=\\d+','pid=<PID>',line.strip())\n   s=re.sub(r'ProcessRecord\\{[^}]+\\}','ProcessRecord{...}',s)\n   rows.append((fn,s))\nprint('matched='+str(len(rows)))\nfor fn,s in rows[:20]: print(fn+' | '+s[:500])\nPY",
+      "exit_code": 0,
+      "output": "matched=3\nlogcat-before.txt | 09-11 11:01:30.965  1759  1842 I ActivityManager: Killing 19734:io.blueeye/u0a639 (adj 850): remove task\nlogcat-after-export.txt | 09-11 11:01:30.965  1759  1842 I ActivityManager: Killing 19734:io.blueeye/u0a639 (adj 850): remove task\nlogcat-final.txt | 09-11 11:01:30.965  1759  1842 I ActivityManager: Killing 19734:io.blueeye/u0a639 (adj 850): remove task\n",
+      "elapsed_seconds": 1.247,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 1.88,
+      "output_policy": "stream",
+      "captured_output_chars": 390,
+      "output_truncated": false,
+      "current_rss_mb": 1.88,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.247
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.137
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.076
+  },
+  "finished_at": "2026-09-11T10:20:22.086534+00:00",
+  "task_digest": "602ed30614c166091dd023270af21a38f2144b875854d65edac04af3598e242f",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "attempt_id": "e939b12907de7939cad3d8e7",
+  "daemon_version": "4.18.20"
+}
