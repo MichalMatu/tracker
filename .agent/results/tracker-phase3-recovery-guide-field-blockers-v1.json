@@ -1,0 +1,116 @@
+{
+  "id": "tracker-phase3-recovery-guide-field-blockers-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-11T03:28:59.159667+00:00",
+  "command_timeout": 600,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; EXPECTED='277a89017ee884d4f50a22afaffb982a72761666'; test \"$(git rev-parse HEAD)\" = \"$EXPECTED\"; test -z \"$(git status --porcelain)\"; git fetch origin main; test \"$(git rev-parse origin/main)\" = \"$EXPECTED\"; echo PHASE3_GUIDE_BASE_SHA_PASS",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main       -> FETCH_HEAD\nPHASE3_GUIDE_BASE_SHA_PASS\n",
+      "elapsed_seconds": 0.868,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.41,
+      "output_policy": "stream",
+      "captured_output_chars": 116,
+      "output_truncated": false,
+      "current_rss_mb": 3.41,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "python3 -c 'from pathlib import Path; p=Path(\"docs/STABILITY_RECOVERY_GUIDE.md\"); s=p.read_text(); old=\"- [ ] Complete one varied-density real-device walk using the physically accepted app build from source commit `745fdf30271459a20e380763ea69b8ed2e601839`. Preserve Session Export JSON plus Room/WAL/SHM and reconcile continuity across the walk. Targeted ingest accounting, Settings performance, large Share/OOM and >430 s passive-BLE watchdog evidence are already accepted; do not repeat them unless relevant code changes.\"; new=\"- [ ] Complete the Phase 3 identity-continuity correction using the anonymized OPPO/JBL field fixtures: preserve the accepted short-window carryover behavior, do not extend destructive same-name matching beyond the current 30 s window, and add only reversible/explicit evidence for plausible long-gap continuity. Before broadening any destructive merge path, preserve user-owned `DeviceEntity` state. Phase 4 remains blocked until identity, retention, latency follow-ups and final field reacceptance are complete.\"; assert old in s; s=s.replace(old,new,1); marker=\"## 9. Work Log\\n\\n\"; heading=\"### 2026-09-11 — Phase 3 field-blocker stabilization\\n\"; assert marker in s; assert heading not in s; entry=heading+\"\\n- Alert cancellation/ownership is physically accepted on Samsung S22+: per-alert `Stop alarm` cancels the exact active alert while Tracker Detection remains enabled and a subsequent test alert still dispatches. Final per-alert source baseline before classifier work: `8ef2da7e44f72137e840c710acdae80a539c226e`.\\n- Tactical name hardening is accepted at `36b69af2d7e274ca1e8162cab95cbe01c0efda85`: bare `X5` and `Generic X5 Headset` no longer escalate to tactical/public-safety identity, branded `INVISIO X5` remains recognized, `EADS` is word-bounded, and the Invisio family label no longer falsely claims V60 II. Focused tests/detekt and exact-SHA GitHub workflows passed.\\n- Apple Nearby Info semantics are accepted at `277a89017ee884d4f50a22afaffb982a72761666`: Type 0x10 no longer promotes the low status nibble to a physical model (including the false `Apple Vision Pro` case), while full status/action fields remain available and a specific model from another Continuity TLV survives merge. Exact-SHA Quality #102, Secret Scan and Sandbox Pack passed.\\n- Identity re-audit of the private field export shows the OPPO/JBL examples split across gaps longer than 30 s while in-window carryover still works. Do not solve this by lengthening destructive same-name matching. Current `mergeDevices` moves dependent history rows and deletes the duplicate device row without merging all user-owned `DeviceEntity` state, so merge-state preservation is a prerequisite before any broader destructive correlation.\\n\\n\"; s=s.replace(marker,marker+entry,1); p.write_text(s)' ; git diff --check; git diff -- docs/STABILITY_RECOVERY_GUIDE.md",
+      "exit_code": 0,
+      "output": "diff --git a/docs/STABILITY_RECOVERY_GUIDE.md b/docs/STABILITY_RECOVERY_GUIDE.md\nindex a9cc108..e9b1b37 100644\n--- a/docs/STABILITY_RECOVERY_GUIDE.md\n+++ b/docs/STABILITY_RECOVERY_GUIDE.md\n@@ -17,7 +17,7 @@\n \n ### NEXT ACTION\n \n-- [ ] Complete one varied-density real-device walk using the physically accepted app build from source commit `745fdf30271459a20e380763ea69b8ed2e601839`. Preserve Session Export JSON plus Room/WAL/SHM and reconcile continuity across the walk. Targeted ingest accounting, Settings performance, large Share/OOM and >430 s passive-BLE watchdog evidence are already accepted; do not repeat them unless relevant code changes.\n+- [ ] Complete the Phase 3 identity-continuity correction using the anonymized OPPO/JBL field fixtures: preserve the accepted short-window carryover behavior, do not extend destructive same-name matching beyond the current 30 s window, and add only reversible/explicit evidence for plausible long-gap continuity. Before broadening any destructive merge path, preserve user-owned `DeviceEntity` state. Phase 4 remains blocked until identity, retention, latency follow-ups and final field reacceptance are complete.\n \n When the next task is completed, update this line to the next unfinished item and add an entry to the Work Log at the bottom of this file.\n \n@@ -660,6 +660,13 @@ Do not claim a runtime bug fixed only because unit tests/build are green when th\n \n ## 9. Work Log\n \n+### 2026-09-11 — Phase 3 field-blocker stabilization\n+\n+- Alert cancellation/ownership is physically accepted on Samsung S22+: per-alert `Stop alarm` cancels the exact active alert while Tracker Detection remains enabled and a subsequent test alert still dispatches. Final per-alert source baseline before classifier work: `8ef2da7e44f72137e840c710acdae80a539c226e`.\n+- Tactical name hardening is accepted at `36b69af2d7e274ca1e8162cab95cbe01c0efda85`: bare `X5` and `Generic X5 Headset` no longer escalate to tactical/public-safety identity, branded `INVISIO X5` remains recognized, `EADS` is word-bounded, and the Invisio family label no longer falsely claims V60 II. Focused tests/detekt and exact-SHA GitHub workflows passed.\n+- Apple Nearby Info semantics are accepted at `277a89017ee884d4f50a22afaffb982a72761666`: Type 0x10 no longer promotes the low status nibble to a physical model (including the false `Apple Vision Pro` case), while full status/action fields remain available and a specific model from another Continuity TLV survives merge. Exact-SHA Quality #102, Secret Scan and Sandbox Pack passed.\n+- Identity re-audit of the private field export shows the OPPO/JBL examples split across gaps longer than 30 s while in-window carryover still works. Do not solve this by lengthening destructive same-name matching. Current `mergeDevices` moves dependent history rows and deletes the duplicate device row without merging all user-owned `DeviceEntity` state, so merge-state preservation is a prerequisite before any broader destructive correlation.\n+\n ### 2026-09-09 — Pre-field Radar/UI stabilization and emulator E2E\n \n - Fixed live Radar list jitter by removing volatile RSSI and `lastSeenAt` from card ordering while preserving meaningful priority changes.\n",
+      "elapsed_seconds": 0.436,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.2,
+      "output_policy": "stream",
+      "captured_output_chars": 3206,
+      "output_truncated": false,
+      "current_rss_mb": 2.2,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; test \"$(git diff --name-only | sed '/^$/d' | wc -l | tr -d ' ')\" -eq 1; test \"$(git diff --name-only)\" = 'docs/STABILITY_RECOVERY_GUIDE.md'; git add docs/STABILITY_RECOVERY_GUIDE.md; git commit -m 'Update Phase 3 field blocker recovery status'; NEW=$(git rev-parse HEAD); echo committed_sha=$NEW; git push origin HEAD:main; test \"$(git ls-remote origin refs/heads/main | awk '{print $1}')\" = \"$NEW\"; echo PHASE3_GUIDE_UPDATE_PUSH_PASS",
+      "exit_code": 0,
+      "output": "[agent-work c34a31e] Update Phase 3 field blocker recovery status\n 1 file changed, 8 insertions(+), 1 deletion(-)\ncommitted_sha=c34a31ead48a783d7d9c8c03141788612d6e3e89\nTo https://github.com/MichalMatu/tracker.git\n   277a890..c34a31e  HEAD -> main\nPHASE3_GUIDE_UPDATE_PUSH_PASS\n",
+      "elapsed_seconds": 2.423,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 20.33,
+      "output_policy": "stream",
+      "captured_output_chars": 278,
+      "output_truncated": false,
+      "current_rss_mb": 20.33,
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.868
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.436
+    },
+    {
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 2.423
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.125
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.074
+  },
+  "finished_at": "2026-09-11T03:29:05.105175+00:00",
+  "task_digest": "a88dda55f9e45f558bafc26fec2959ba15529eb434517f403877d453993eb8e7",
+  "idle_timeout": 180,
+  "task_timeout": 900,
+  "memory_limit_mb": 1024,
+  "attempt_id": "034e375dcca9c2a905a4fea9",
+  "daemon_version": "4.18.20"
+}
