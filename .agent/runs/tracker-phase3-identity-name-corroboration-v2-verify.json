@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-identity-name-corroboration-v2-verify",
+  "task_digest": "b9c7acf16d75cf709a8ee370d1eb22577d0596a0133acfcaa381060e592a78a4",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-11T03:58:57.699740+00:00",
+  "attempt_id": "77ef9d0dc4f72b38de9f6278",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 54214,
+  "updated_at": "2026-09-11T03:58:57.700359+00:00",
+  "pid": 54214
+}
