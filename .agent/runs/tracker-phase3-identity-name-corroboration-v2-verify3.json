@@ -1,9 +1,0 @@
-{
-  "event": "invalid_task_rejected",
-  "status": "failed",
-  "failure_reason": "invalid_task_file",
-  "updated_at": "2026-09-11T04:43:59.474937+00:00",
-  "task_id": "tracker-phase3-identity-name-corroboration-v2-verify3",
-  "daemon_version": "4.18.20",
-  "pid": 54828
-}
