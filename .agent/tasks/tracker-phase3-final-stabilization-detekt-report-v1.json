@@ -1,0 +1,19 @@
+{
+  "id": "tracker-phase3-final-stabilization-detekt-report-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 4096,
+  "command_timeout": 900,
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch origin main agent-control; test \"$(git rev-parse origin/main)\" = 'fceced07617c13d00ccd5fae59b913de208fca63'; git checkout --detach 'fceced07617c13d00ccd5fae59b913de208fca63'",
+    "set -euo pipefail; git show origin/agent-control:.agent/scripts/tracker-phase3-retention-milestone-v1.py > /tmp/retention.py; git show origin/agent-control:.agent/scripts/tracker-phase3-latency-location-backoff-v1.py > /tmp/latency.py; git show origin/agent-control:.agent/scripts/tracker-phase3-latency-location-backoff-v1-detekt-cleanup.py > /tmp/latency-cleanup.py; git show origin/agent-control:.agent/scripts/tracker-phase3-quality-ktlint-fix-v1.py > /tmp/quality-fix.py; python3 /tmp/retention.py; python3 /tmp/latency.py; python3 /tmp/latency-cleanup.py; python3 /tmp/quality-fix.py; git diff --check",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew :core:data:detekt --console=plain || true; cat core/data/build/reports/detekt/detekt.txt || true; ./gradlew :feature:settings:ktlintMainSourceSetCheck --console=plain || true; cat feature/settings/build/reports/ktlint/ktlintMainSourceSetCheck/ktlintMainSourceSetCheck.txt 2>/dev/null || true"
+  ]
+}
