@@ -1,0 +1,265 @@
+diff --git a/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceActionDao.kt b/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceActionDao.kt
+--- a/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceActionDao.kt
++++ b/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceActionDao.kt
+@@ -4,6 +4,7 @@ import androidx.room.Delete
+ import androidx.room.Query
+ import androidx.room.Transaction
++import androidx.room.Update
+ import io.blueeye.core.data.db.entity.DeviceEntity
+ import io.blueeye.core.model.DeviceCalibrationLabel
+ import io.blueeye.core.model.IdentityCarryoverVerdict
+@@ -51,12 +52,26 @@ interface DeviceActionDao {
+     @Query("DELETE FROM devices WHERE fingerprint = :fingerprint")
+     suspend fun deleteByFingerprint(fingerprint: String)
+ 
++    @Query("SELECT * FROM devices WHERE fingerprint = :fingerprint")
++    suspend fun getDeviceForMerge(fingerprint: String): DeviceEntity?
++
++    @Update
++    suspend fun updateDeviceForMerge(device: DeviceEntity)
++
+     @Transaction
+     suspend fun mergeDevices(
+         targetFingerprint: String,
+         duplicateFingerprint: String,
+     ) {
++        val target = getDeviceForMerge(targetFingerprint)
++        val duplicate = getDeviceForMerge(duplicateFingerprint)
++        if (target != null && duplicate != null) {
++            val mergedTarget = DeviceMergePolicy.mergeUserState(target, duplicate)
++            if (mergedTarget != target) {
++                updateDeviceForMerge(mergedTarget)
++            }
++        }
+         moveSamples(targetFingerprint, duplicateFingerprint)
+         moveFollowMeObservations(targetFingerprint, duplicateFingerprint)
+         moveAlertEvidenceEvents(targetFingerprint, duplicateFingerprint)
+         deleteByFingerprint(duplicateFingerprint)
+     }
+diff --git a/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceMergePolicy.kt b/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceMergePolicy.kt
+new file mode 100644
+--- /dev/null
++++ b/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceMergePolicy.kt
+@@ -0,0 +1,90 @@
++package io.blueeye.core.data.db.dao
++
++import io.blueeye.core.data.db.entity.DeviceEntity
++import io.blueeye.core.model.DeviceCalibrationLabel
++import io.blueeye.core.model.IdentityCarryoverVerdict
++
++internal object DeviceMergePolicy {
++    fun mergeUserState(
++        target: DeviceEntity,
++        duplicate: DeviceEntity,
++    ): DeviceEntity {
++        val watchlistMetadataSource =
++            if (duplicate.lastWatchlistReturnAlertAt > target.lastWatchlistReturnAlertAt) duplicate else target
++
++        return target.copy(
++            isInWatchlist = mergeDefaultable(
++                field = "isInWatchlist",
++                target = target.isInWatchlist,
++                duplicate = duplicate.isInWatchlist,
++                default = false,
++            ),
++            isSafeBeacon = mergeDefaultable(
++                field = "isSafeBeacon",
++                target = target.isSafeBeacon,
++                duplicate = duplicate.isSafeBeacon,
++                default = false,
++            ),
++            userAlias = mergeOptionalText("userAlias", target.userAlias, duplicate.userAlias),
++            userNotes = mergeOptionalText("userNotes", target.userNotes, duplicate.userNotes),
++            alertSound = mergeDefaultable("alertSound", target.alertSound, duplicate.alertSound, false),
++            alertVibration = mergeDefaultable(
++                "alertVibration",
++                target.alertVibration,
++                duplicate.alertVibration,
++                false,
++            ),
++            isTrackingEnabled = mergeDefaultable(
++                "isTrackingEnabled",
++                target.isTrackingEnabled,
++                duplicate.isTrackingEnabled,
++                true,
++            ),
++            isIgnoredForTracking = mergeDefaultable(
++                "isIgnoredForTracking",
++                target.isIgnoredForTracking,
++                duplicate.isIgnoredForTracking,
++                false,
++            ),
++            calibrationLabel = mergeDefaultable(
++                "calibrationLabel",
++                target.calibrationLabel,
++                duplicate.calibrationLabel,
++                DeviceCalibrationLabel.UNKNOWN,
++            ),
++            identityCarryoverVerdict = mergeDefaultable(
++                "identityCarryoverVerdict",
++                target.identityCarryoverVerdict,
++                duplicate.identityCarryoverVerdict,
++                IdentityCarryoverVerdict.UNREVIEWED,
++            ),
++            lastWatchlistReturnAlertAt = watchlistMetadataSource.lastWatchlistReturnAlertAt,
++            lastWatchlistReturnOfflineDurationMs = watchlistMetadataSource.lastWatchlistReturnOfflineDurationMs,
++        )
++    }
++
++    private fun mergeOptionalText(
++        field: String,
++        target: String?,
++        duplicate: String?,
++    ): String? {
++        val targetMeaningful = target?.takeIf { it.isNotBlank() }
++        val duplicateMeaningful = duplicate?.takeIf { it.isNotBlank() }
++        if (targetMeaningful != null && duplicateMeaningful != null && targetMeaningful != duplicateMeaningful) {
++            throw DeviceMergeConflictException(field)
++        }
++        return targetMeaningful ?: duplicateMeaningful ?: target ?: duplicate
++    }
++
++    private fun <T> mergeDefaultable(
++        field: String,
++        target: T,
++        duplicate: T,
++        default: T,
++    ): T {
++        val targetMeaningful = target != default
++        val duplicateMeaningful = duplicate != default
++        if (targetMeaningful && duplicateMeaningful && target != duplicate) {
++            throw DeviceMergeConflictException(field)
++        }
++        return when {
++            targetMeaningful -> target
++            duplicateMeaningful -> duplicate
++            else -> target
++        }
++    }
++}
++
++internal class DeviceMergeConflictException(
++    val fieldName: String,
++) : IllegalStateException("Conflicting user-owned device state for $fieldName")
+diff --git a/core/data/src/test/kotlin/io/blueeye/core/data/db/dao/DeviceMergePolicyTest.kt b/core/data/src/test/kotlin/io/blueeye/core/data/db/dao/DeviceMergePolicyTest.kt
+new file mode 100644
+--- /dev/null
++++ b/core/data/src/test/kotlin/io/blueeye/core/data/db/dao/DeviceMergePolicyTest.kt
+@@ -0,0 +1,106 @@
++package io.blueeye.core.data.db.dao
++
++import io.blueeye.core.data.db.entity.DeviceEntity
++import io.blueeye.core.model.DeviceCalibrationLabel
++import io.blueeye.core.model.IdentityCarryoverVerdict
++import org.junit.Assert.assertEquals
++import org.junit.Assert.assertFalse
++import org.junit.Assert.assertTrue
++import org.junit.Assert.fail
++import org.junit.Test
++
++class DeviceMergePolicyTest {
++    @Test
++    fun `merge transfers meaningful duplicate user state into neutral target`() {
++        val target = device("target")
++        val duplicate =
++            device("duplicate").copy(
++                isInWatchlist = true,
++                isSafeBeacon = true,
++                userAlias = "Headset",
++                userNotes = "Field note",
++                alertSound = true,
++                alertVibration = true,
++                isTrackingEnabled = false,
++                isIgnoredForTracking = true,
++                calibrationLabel = DeviceCalibrationLabel.SUSPICIOUS,
++                identityCarryoverVerdict = IdentityCarryoverVerdict.CONFIRMED_SAME_DEVICE,
++                lastWatchlistReturnAlertAt = 200L,
++                lastWatchlistReturnOfflineDurationMs = 42L,
++            )
++
++        val merged = DeviceMergePolicy.mergeUserState(target, duplicate)
++
++        assertTrue(merged.isInWatchlist)
++        assertTrue(merged.isSafeBeacon)
++        assertEquals("Headset", merged.userAlias)
++        assertEquals("Field note", merged.userNotes)
++        assertTrue(merged.alertSound)
++        assertTrue(merged.alertVibration)
++        assertFalse(merged.isTrackingEnabled)
++        assertTrue(merged.isIgnoredForTracking)
++        assertEquals(DeviceCalibrationLabel.SUSPICIOUS, merged.calibrationLabel)
++        assertEquals(IdentityCarryoverVerdict.CONFIRMED_SAME_DEVICE, merged.identityCarryoverVerdict)
++        assertEquals(200L, merged.lastWatchlistReturnAlertAt)
++        assertEquals(42L, merged.lastWatchlistReturnOfflineDurationMs)
++    }
++
++    @Test
++    fun `merge keeps meaningful target user state when duplicate is neutral`() {
++        val target =
++            device("target").copy(
++                isInWatchlist = true,
++                userAlias = "Known device",
++                alertSound = true,
++                isTrackingEnabled = false,
++                calibrationLabel = DeviceCalibrationLabel.KNOWN_SAFE,
++                identityCarryoverVerdict = IdentityCarryoverVerdict.INCONCLUSIVE,
++                lastWatchlistReturnAlertAt = 300L,
++                lastWatchlistReturnOfflineDurationMs = 99L,
++            )
++
++        val merged = DeviceMergePolicy.mergeUserState(target, device("duplicate"))
++
++        assertEquals(target, merged)
++    }
++
++    @Test
++    fun `merge rejects conflicting aliases before destructive merge`() {
++        assertConflict("userAlias") {
++            DeviceMergePolicy.mergeUserState(
++                device("target").copy(userAlias = "Keys"),
++                device("duplicate").copy(userAlias = "Backpack"),
++            )
++        }
++    }
++
++    @Test
++    fun `merge rejects conflicting calibration labels`() {
++        assertConflict("calibrationLabel") {
++            DeviceMergePolicy.mergeUserState(
++                device("target").copy(calibrationLabel = DeviceCalibrationLabel.TRUE_POSITIVE),
++                device("duplicate").copy(calibrationLabel = DeviceCalibrationLabel.FALSE_POSITIVE),
++            )
++        }
++    }
++
++    @Test
++    fun `merge rejects conflicting identity verdicts`() {
++        assertConflict("identityCarryoverVerdict") {
++            DeviceMergePolicy.mergeUserState(
++                device("target").copy(identityCarryoverVerdict = IdentityCarryoverVerdict.CONFIRMED_SAME_DEVICE),
++                device("duplicate").copy(identityCarryoverVerdict = IdentityCarryoverVerdict.FALSE_MATCH),
++            )
++        }
++    }
++
++    private fun assertConflict(
++        expectedField: String,
++        block: () -> Unit,
++    ) {
++        try {
++            block()
++            fail("Expected DeviceMergeConflictException")
++        } catch (exception: DeviceMergeConflictException) {
++            assertEquals(expectedField, exception.fieldName)
++        }
++    }
++
++    private fun device(fingerprint: String): DeviceEntity =
++        DeviceEntity(
++            fingerprint = fingerprint,
++            lastMacAddress = null,
++            lastDeviceName = null,
++            firstSeenAt = 100L,
++            lastSeenAt = 100L,
++        )
++}
