@@ -10,6 +10,7 @@ private data class DeviceMovementState(
     val firstSeenAt: Long,
     var lastSeenAt: Long,
     var lastSightingWasMoving: Boolean,
+    var lastSightingContinuedMovingWindow: Boolean,
     var observedWhileMovingMs: Long,
     var movingEncounterCount: Int,
 )
@@ -50,17 +51,12 @@ class FollowMeSessionManager @Inject constructor() {
         private const val MAX_CONTIGUOUS_OBSERVATION_GAP_MS = 30_000L
     }
 
-    // Session timing
     @Volatile
     private var sessionStartTime: Long = System.currentTimeMillis()
 
-    // Device fingerprint -> movement-scoped observation state.
     private val deviceMovementStates = ConcurrentHashMap<String, DeviceMovementState>()
-
-    // Devices seen BEFORE user started moving (baseline - assumed safe)
     private val zastaneDevices = java.util.Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
-    // User movement tracking
     @Volatile
     private var startLocationLat: Double? = null
 
@@ -85,9 +81,6 @@ class FollowMeSessionManager @Inject constructor() {
     @Volatile
     private var lastConfirmedMovementAt: Long = 0L
 
-    /**
-     * Reset all session state. Call when scanning session starts/restarts.
-     */
     @Synchronized
     fun resetSession() {
         sessionStartTime = System.currentTimeMillis()
@@ -105,14 +98,11 @@ class FollowMeSessionManager @Inject constructor() {
     }
 
     /**
-     * Update movement state from the latest location.
-     *
      * [hasUserMoved] remains the session-level historical latch used for baseline semantics.
      * [isUserMoving] is a recent-motion signal used by Follow-Me scoring.
      *
-     * Location accuracy is included in the threshold: displacement must exceed both the fixed
-     * 50-m floor and the combined uncertainty radii of the compared fixes. This prevents a coarse
-     * location fix from latching movement purely from GPS jitter.
+     * Displacement must exceed both the fixed 50-m floor and the combined uncertainty radii of
+     * the compared fixes so coarse GPS jitter cannot latch movement by itself.
      */
     @Synchronized
     fun updateMovement(
@@ -143,11 +133,7 @@ class FollowMeSessionManager @Inject constructor() {
                     currentLat,
                     currentLon,
                 )
-            val requiredDistance =
-                requiredMovementDistance(
-                    startLocationAccuracyM,
-                    accuracyM,
-                )
+            val requiredDistance = requiredMovementDistance(startLocationAccuracyM, accuracyM)
             if (distanceFromStart >= requiredDistance) {
                 userHasMoved = true
                 confirmMovement(currentLat, currentLon, accuracyM, now)
@@ -170,11 +156,7 @@ class FollowMeSessionManager @Inject constructor() {
                     currentLat,
                     currentLon,
                 )
-            val requiredDistance =
-                requiredMovementDistance(
-                    movementAnchorAccuracyM,
-                    accuracyM,
-                )
+            val requiredDistance = requiredMovementDistance(movementAnchorAccuracyM, accuracyM)
             if (distanceFromAnchor >= requiredDistance) {
                 confirmMovement(currentLat, currentLon, accuracyM, now)
             }
@@ -196,8 +178,6 @@ class FollowMeSessionManager @Inject constructor() {
     }
 
     /**
-     * Record a logical-device sighting and return its first-seen time in this session.
-     *
      * Duration is accumulated only between two consecutive sightings that both happened while
      * recent movement was confirmed, and only across short observation gaps. Wall-clock time while
      * a device is absent or while the user is stationary is never counted.
@@ -216,20 +196,24 @@ class FollowMeSessionManager @Inject constructor() {
                     firstSeenAt = now,
                     lastSeenAt = now,
                     lastSightingWasMoving = movingNow,
+                    lastSightingContinuedMovingWindow = false,
                     observedWhileMovingMs = 0L,
                     movingEncounterCount = if (movingNow) 1 else 0,
                 )
             } else {
                 val gapMs = now - state.lastSeenAt
-                if (movingNow) {
-                    state.movingEncounterCount += 1
-                    if (
+                val continuesMovingWindow =
+                    movingNow &&
                         state.lastSightingWasMoving &&
                         gapMs in 1..MAX_CONTIGUOUS_OBSERVATION_GAP_MS
-                    ) {
-                        state.observedWhileMovingMs += gapMs
-                    }
+
+                if (movingNow) {
+                    state.movingEncounterCount += 1
                 }
+                if (continuesMovingWindow) {
+                    state.observedWhileMovingMs += gapMs
+                }
+                state.lastSightingContinuedMovingWindow = continuesMovingWindow
                 if (now > state.lastSeenAt) {
                     state.lastSeenAt = now
                     state.lastSightingWasMoving = movingNow
@@ -239,7 +223,6 @@ class FollowMeSessionManager @Inject constructor() {
 
         deviceMovementStates[fingerprint] = updatedState
 
-        // Mark baseline only after the session has a movement reference point.
         if (hasMovementReference() && !userHasMoved) {
             zastaneDevices.add(fingerprint)
         }
@@ -247,27 +230,22 @@ class FollowMeSessionManager @Inject constructor() {
         return updatedState.firstSeenAt
     }
 
-    /** Continuous observation time accumulated only during recent confirmed movement. */
     fun getObservedWhileMovingDurationMs(fingerprint: String): Long =
         deviceMovementStates[fingerprint]?.observedWhileMovingMs ?: 0L
 
-    /** Number of sightings received while recent confirmed movement was active. */
     fun getMovingEncounterCount(fingerprint: String): Int =
         deviceMovementStates[fingerprint]?.movingEncounterCount ?: 0
 
-    /**
-     * Check if device was seen before user started moving (baseline device).
-     */
+    /** False on the first moving sighting and after a stationary period or observation gap. */
+    fun isMovingObservationContinuous(fingerprint: String): Boolean =
+        deviceMovementStates[fingerprint]?.lastSightingContinuedMovingWindow == true
+
     fun isDeviceZastane(fingerprint: String): Boolean = zastaneDevices.contains(fingerprint)
 
-    /**
-     * Session-level historical movement latch. Keep this for baseline semantics only.
-     */
+    /** Session-level historical movement latch. Keep this for baseline semantics only. */
     fun hasUserMoved(): Boolean = userHasMoved
 
-    /**
-     * True only while a confirmed movement step is recent enough to support Follow-Me scoring.
-     */
+    /** True only while a confirmed movement step is recent enough to support Follow-Me scoring. */
     fun isUserMoving(now: Long = System.currentTimeMillis()): Boolean {
         val lastMovementAt = lastConfirmedMovementAt
         if (!userHasMoved || lastMovementAt <= 0L) return false
@@ -275,14 +253,8 @@ class FollowMeSessionManager @Inject constructor() {
         return ageMs in 0..RECENT_MOVEMENT_WINDOW_MS
     }
 
-    /**
-     * Check if location has provided a reference point for movement/baseline decisions.
-     */
     fun hasMovementReference(): Boolean = startLocationLat != null && startLocationLon != null
 
-    /**
-     * Get session start time.
-     */
     fun getSessionStartTime(): Long = sessionStartTime
 
     private fun requiredMovementDistance(
@@ -293,9 +265,6 @@ class FollowMeSessionManager @Inject constructor() {
         return max(MOVEMENT_THRESHOLD_METERS, uncertaintyM)
     }
 
-    /**
-     * Haversine formula for distance in meters.
-     */
     private fun calculateDistance(
         lat1: Double,
         lon1: Double,
