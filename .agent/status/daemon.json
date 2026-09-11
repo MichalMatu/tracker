@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.18.20",
   "state": "idle",
-  "pid": 59123,
-  "updated_at": "2026-09-11T09:53:22.632727+00:00",
+  "pid": 60590,
+  "updated_at": "2026-09-11T09:54:25.500841+00:00",
   "self_revision": "0bb99d790dbed19a528b4cb8ac238432134b5660",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 59123,
-  "supervisor_pid": 36982,
-  "last_task_id": "tracker-phase3-field-reacceptance-collect-20260911-v1",
+  "worker_pid": 60590,
+  "supervisor_pid": 60446,
   "execution_variant": "parallel"
 }
