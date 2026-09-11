@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-final-logcheck-20260911-v2",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-11T18:09:30.207450+00:00",
+  "command_timeout": 30,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {c++} END{print c+0}')\" = '1'; PID=$(adb shell pidof io.blueeye | tr -d '\\r'); test -n \"$PID\"; adb shell dumpsys activity services io.blueeye | grep -q 'ScannerService'; adb logcat -d -v brief --pid=\"$PID\" | grep -E 'FATAL EXCEPTION|AndroidRuntime|OutOfMemoryError|SQLiteException|SecurityException|BLE scan failed' > /tmp/tracker-phase3-final-errors.txt || true; test ! -s /tmp/tracker-phase3-final-errors.txt || { cat /tmp/tracker-phase3-final-errors.txt; exit 41; }; echo PHASE3_FINAL_LOGCHECK_PASS",
+      "exit_code": 0,
+      "output": "PHASE3_FINAL_LOGCHECK_PASS\n",
+      "elapsed_seconds": 0.646,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.23,
+      "output_policy": "stream",
+      "captured_output_chars": 27,
+      "output_truncated": false,
+      "current_rss_mb": 3.23,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.646
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.153
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.073
+  },
+  "finished_at": "2026-09-11T18:09:32.649429+00:00",
+  "task_digest": "104fb3998029eb643e09ee5de8261d701eed4e45e583bd05f4954b287bd03af8",
+  "idle_timeout": 60,
+  "task_timeout": 180,
+  "memory_limit_mb": 1024,
+  "attempt_id": "bb6d5a7f3053c777ee6075ff",
+  "daemon_version": "4.18.20"
+}
