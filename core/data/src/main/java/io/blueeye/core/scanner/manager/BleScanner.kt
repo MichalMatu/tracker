@@ -289,7 +289,10 @@ constructor(
             return
         }
 
-        stopPassiveModeMonitoring()
+        screenStateMonitor.stop()
+        passiveModeTransitionJob?.cancel()
+        passiveModeTransitionJob = null
+        activePassiveScanMode = null
         scanJob?.cancel()
         _state.value = ScannerState.Starting
         scanJob =
@@ -329,19 +332,15 @@ constructor(
     @SuppressLint("MissingPermission")
     fun stopScanning() {
         Log.i(TAG, "Stopping ALL Scans")
-        stopPassiveModeMonitoring()
+        screenStateMonitor.stop()
+        passiveModeTransitionJob?.cancel()
+        passiveModeTransitionJob = null
+        activePassiveScanMode = null
         scanJob?.cancel()
         scanJob = null
         bleScanSource.stop()
         classicScanSource.stop()
         _state.value = ScannerState.Idle
-    }
-
-    private fun stopPassiveModeMonitoring() {
-        screenStateMonitor.stop()
-        passiveModeTransitionJob?.cancel()
-        passiveModeTransitionJob = null
-        activePassiveScanMode = null
     }
 }
 
