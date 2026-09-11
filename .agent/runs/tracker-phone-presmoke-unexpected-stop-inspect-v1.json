@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phone-presmoke-unexpected-stop-inspect-v1",
+  "task_digest": "09bbcbb5655e5bfb4a9f10efafd26f951081dcfdf5449f7b4e6b691a2ad07e5b",
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-11T08:32:09.461781+00:00",
+  "attempt_id": "4f7486398864c4c2fcea52ce",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 65227,
+  "updated_at": "2026-09-11T08:32:09.461873+00:00",
+  "pid": 65227
+}
