@@ -9,6 +9,7 @@ import kotlin.math.max
 private data class DeviceMovementState(
     val firstSeenAt: Long,
     var lastSeenAt: Long,
+    var lastSightingWasMoving: Boolean,
     var observedWhileMovingMs: Long,
     var movingEncounterCount: Int,
 )
@@ -197,8 +198,9 @@ class FollowMeSessionManager @Inject constructor() {
     /**
      * Record a logical-device sighting and return its first-seen time in this session.
      *
-     * Duration is accumulated only while recent movement is confirmed and only across short,
-     * continuous observation gaps. Wall-clock time while a device is absent is never counted.
+     * Duration is accumulated only between two consecutive sightings that both happened while
+     * recent movement was confirmed, and only across short observation gaps. Wall-clock time while
+     * a device is absent or while the user is stationary is never counted.
      */
     @Synchronized
     fun recordDeviceSighting(
@@ -213,6 +215,7 @@ class FollowMeSessionManager @Inject constructor() {
                 DeviceMovementState(
                     firstSeenAt = now,
                     lastSeenAt = now,
+                    lastSightingWasMoving = movingNow,
                     observedWhileMovingMs = 0L,
                     movingEncounterCount = if (movingNow) 1 else 0,
                 )
@@ -220,12 +223,16 @@ class FollowMeSessionManager @Inject constructor() {
                 val gapMs = now - state.lastSeenAt
                 if (movingNow) {
                     state.movingEncounterCount += 1
-                    if (gapMs in 1..MAX_CONTIGUOUS_OBSERVATION_GAP_MS) {
+                    if (
+                        state.lastSightingWasMoving &&
+                        gapMs in 1..MAX_CONTIGUOUS_OBSERVATION_GAP_MS
+                    ) {
                         state.observedWhileMovingMs += gapMs
                     }
                 }
                 if (now > state.lastSeenAt) {
                     state.lastSeenAt = now
+                    state.lastSightingWasMoving = movingNow
                 }
                 state
             }
