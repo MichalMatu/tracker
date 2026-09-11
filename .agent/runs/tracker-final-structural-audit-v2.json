@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 3,
+  "index": 4,
   "total": 6,
-  "command": "set -euo pipefail; echo '--- ARCHITECTURE_INVARIANTS ---'; python3 - <<'PY'\nfrom pathlib import Path\nimport re\nchecks=[]\ndef scan(paths,pat):\n    r=[]\n    rx=re.compile(pat)\n    for base in paths:\n        b=Path(base)\n        if not b.exists(): continue\n        for p in b.rglob('*.kt'):\n            if 'build' in p.parts: continue\n            for i,line in enumerate(p.read_text(errors='ignore').splitlines(),1):\n                if rx.search(line): r.append((str(p),i,line.strip()))\n    return r\nchecks.append(('CORE_DOMAIN_ANDROID_IMPORTS',scan(['core/domain/src'],r'^\\s*import android\\.')))\nchecks.append(('FEATURE_CORE_DATA_IMPORTS',scan(['feature'],r'io\\.blueeye\\.core\\.data')))\nchecks.append(('FEATURE_RAW_COLORS',scan(['feature'],r'Color\\(0xFF|R\\.color\\.')))\nchecks.append(('LEGACY_APIS',scan(['app','core','feature'],r'FragmentManager|AsyncTask|LiveData|io\\.reactivex|rxjava')))\nxml=list(Path('.').glob('**/src/main/res/layout/*.xml'))\nprint('XML_LAYOUT_COUNT='+str(len(xml)))\nfailed=False\nfor name,hits in checks:\n    print(name+'='+str(len(hits)))\n    for h in hits[:20]: print('  ',h)\n    failed |= bool(hits)\nif xml:\n    failed=True\n    for p in xml[:20]: print('  XML',p)\nif failed: raise SystemExit(2)\nPY\necho ARCHITECTURE_INVARIANTS_PASS",
-  "pid": 30021,
+  "command": "set -euo pipefail; echo '--- INDEPENDENT_COMPLEXITY_TOOL ---'; TMP=/tmp/tracker-final-audit-tools-v2; rm -rf \"$TMP\"; python3 -m venv \"$TMP\"; if \"$TMP/bin/python\" -m pip -q install --disable-pip-version-check lizard; then \"$TMP/bin/lizard\" --version; set +e; \"$TMP/bin/lizard\" -l java -C 15 -L 100 -a 7 app core feature >\"$TMP/lizard.txt\" 2>&1; RC=$?; set -e; echo LIZARD_EXIT=$RC; tail -n 220 \"$TMP/lizard.txt\"; else echo LIZARD_INSTALL_UNAVAILABLE; fi; rm -rf \"$TMP\"; echo INDEPENDENT_TOOL_STEP_DONE",
+  "pid": 30059,
   "timeout": 900,
   "idle_timeout": 300,
   "memory_limit_mb": 2048,
-  "started_at": "2026-09-11T09:28:33.214960+00:00",
-  "stage_name": "command-3",
-  "stage_index": 3,
+  "started_at": "2026-09-11T09:28:34.601284+00:00",
+  "stage_name": "command-4",
+  "stage_index": 4,
   "stage_total": 6,
   "stage_phase": "commands",
   "task_id": "tracker-final-structural-audit-v2",
@@ -18,5 +18,5 @@
   "task_digest": "8802a349dfe234b41ba67f1adc2a6e1d6927565498c7de6cb0c1dc3d736f4d1d",
   "daemon_version": "4.18.20",
   "daemon_pid": 29776,
-  "updated_at": "2026-09-11T09:28:33.292092+00:00"
+  "updated_at": "2026-09-11T09:28:34.676657+00:00"
 }
