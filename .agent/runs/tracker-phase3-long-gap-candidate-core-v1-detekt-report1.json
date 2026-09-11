@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-long-gap-candidate-core-v1-detekt-report1",
+  "task_digest": "cb8123c12d6ac9acb1dd1e20b73c35d4aedfe7de5216abbb17372c606a8812e1",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-11T06:25:32.128363+00:00",
+  "attempt_id": "c55a07651829d5314291b073",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 95359,
+  "updated_at": "2026-09-11T06:25:32.128521+00:00",
+  "pid": 95359
+}
