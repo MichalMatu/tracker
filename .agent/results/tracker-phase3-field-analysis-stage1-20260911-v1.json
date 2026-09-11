@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-field-analysis-stage1-20260911-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-11T10:00:40.364553+00:00",
+  "command_timeout": 1200,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch --no-tags origin agent-control main >/dev/null; test \"$(git rev-parse origin/main)\" = 'd15f6985371ef3ffe0496d7a14454589d56978ee'; git show origin/agent-control:.agent/payloads/tracker-phase3-field-analysis-stage1-20260911-v1.sh > /tmp/tracker-phase3-field-analysis-stage1-v1.sh; chmod 700 /tmp/tracker-phase3-field-analysis-stage1-v1.sh; /tmp/tracker-phase3-field-analysis-stage1-v1.sh",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            agent-control -> FETCH_HEAD\n * branch            main          -> FETCH_HEAD\n   2e8400a..1e4cd29  agent-control -> origin/agent-control\nFrom https://github.com/MichalMatu/tracker\n * branch            agent-control -> FETCH_HEAD\n   1e4cd29..b9d8f3c  agent-control -> origin/agent-control\nPHASE3_STAGE1_ANALYSIS\nprocess_alive_before_collection=False\nwalk_ingest_diagnostics_usable=False\nexport_counts devices=29 samples=15407 session_devices=0 session_samples=0\ningest raw=0 accepted=0 coalesced=0 rejected=0 accounting_ok=True drops=0 processing=0/0/0 sample_outcomes=0/0/0\nroom integrity=ok counts={\"alert_evidence_events\": 0, \"devices\": 29, \"follow_me_observations\": 129, \"identity_continuity_candidates\": 0, \"signal_samples\": 15407} root_delta_pre_export=0 session_delta=None\ngps coverage_pct=0 p50_m=None p90_m=None p95_m=None bins50m=0 max_from_first_m=0.0\nrssi_continuity_devices=0\nidentity candidates=0 long_gap_gt30s=0 verdicts={} reasons={}\nui tracking={} attention=0 attention_without_evidence=0 known_trackers=4 known_without_context=0\nlogcat_counts={\"fatal_exception\": 0, \"ingest_rejected\": 0, \"oom\": 0, \"scan_processing_failed\": 0, \"security_exception\": 24, \"sqlite_exception\": 9, \"watchdog_refresh\": 0}\nbugreport_hci name_matches=2 magic_matches=2 nested_matches=0 text_mentions=0 extracted=True\nhci_sha256=00e4dbf94b0c19bc11e11343dd790ce1c47611b9e80cb23ff2289e6dd2cf77bb hci_bytes=80887\nstage1_safe_report=/Users/michal/agent-workspace/repos/tracker/checkpoints/phase3-field-reacceptance-20260911/20260911T095527Z/phase3-analysis-stage1-safe.json\n",
+      "elapsed_seconds": 12.596,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 382.02,
+      "output_policy": "stream",
+      "captured_output_chars": 1625,
+      "output_truncated": false,
+      "current_rss_mb": 177.42,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 12.596
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.116
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.116
+  },
+  "finished_at": "2026-09-11T10:00:54.976143+00:00",
+  "task_digest": "ca9c76862971e89fea3a67874d4ccecda043a3daed73108b0f66cda6ff51b62d",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 2048,
+  "attempt_id": "4ebaf429763e04d01e87a51a",
+  "daemon_version": "4.18.20"
+}
