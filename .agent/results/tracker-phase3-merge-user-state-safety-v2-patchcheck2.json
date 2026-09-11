@@ -1,0 +1,89 @@
+{
+  "id": "tracker-phase3-merge-user-state-safety-v2-patchcheck2",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-11T05:37:45.180555+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test \"$(git rev-parse HEAD)\" = 'feb3246d482b10f5cef6bd0dda2fcb39d58fd05a'; test -z \"$(git status --porcelain)\"; git fetch origin main agent-control; test \"$(git rev-parse origin/main)\" = 'feb3246d482b10f5cef6bd0dda2fcb39d58fd05a'",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            main          -> FETCH_HEAD\n * branch            agent-control -> FETCH_HEAD\n   638ad66..49ff70d  agent-control -> origin/agent-control\n",
+      "elapsed_seconds": 1.136,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 1.84,
+      "output_policy": "stream",
+      "captured_output_chars": 200,
+      "output_truncated": false,
+      "current_rss_mb": 1.84,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 2,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; git show origin/agent-control:.agent/patches/tracker-phase3-merge-user-state-safety-v2.patch > /tmp/in.patch; awk 'BEGIN{n=0} $0==\"@@\" {n++; if(n==1)$0=\"@@ -5,5 +5,7 @@\"; else if(n==2)$0=\"@@ -57,14 +59,40 @@\"; else if(n==3)$0=\"@@ -0,0 +1,1 @@\"; else if(n==4)$0=\"@@ -0,0 +1,1 @@\"; else if(n==5)$0=\"@@ -3,2 +3,3 @@\"; else if(n==6)$0=\"@@ -1,5 +1,10 @@\"} {print} END{if(n!=6) exit 9}' /tmp/in.patch > /tmp/out.patch; git apply --recount --check /tmp/out.patch; echo PHASE3_MERGE_V2_PATCHCHECK_PASS",
+      "exit_code": 1,
+      "output": "error: patch failed: core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt:3\nerror: core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt: patch does not apply\n",
+      "elapsed_seconds": 0.336,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.0,
+      "output_policy": "stream",
+      "captured_output_chars": 230,
+      "output_truncated": false,
+      "current_rss_mb": 3.0,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 2,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 2,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.136
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 2,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 0.336
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.117
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.076
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-11T05:37:48.422774+00:00",
+  "task_digest": "2da1457532de2e388f3d31982559b2275602ca9d5bd4bacd1261d977d3417bd6",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "attempt_id": "1cb3ac591617ffd6a8b1452e",
+  "daemon_version": "4.18.20"
+}
