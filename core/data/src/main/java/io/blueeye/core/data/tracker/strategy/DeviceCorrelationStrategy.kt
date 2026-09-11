@@ -74,19 +74,20 @@ constructor() {
         for (target in targets) {
             val hasNameFamilyConflict =
                 AppleIdentityConflictGuard.hasNameFamilyConflict(input.deviceName, target.lastDeviceName)
-            val isEligibleTarget = !hasNameFamilyConflict && !isAmbiguousAppleShadowPair(input, target)
-            if (isEligibleTarget) {
-                val timeSinceLastSeen = input.data.timestamp - target.lastSeenAt
-                val isSequentialCarryoverWindow =
-                    timeSinceLastSeen in MIN_DESTRUCTIVE_CARRYOVER_GAP_MS..CARRYOVER_WINDOW_MS
-                if (isSequentialCarryoverWindow) {
-                    immediateMatchForTarget(input, target)?.let { return it }
-                    val weightedMatch = weightedMatchForTarget(input, target)
-                    if (weightedMatch != null && weightedMatch.evidence.confidence > highestScore) {
-                        highestScore = weightedMatch.evidence.confidence
-                        bestMatch = weightedMatch
-                    }
-                }
+            val timeSinceLastSeen = input.data.timestamp - target.lastSeenAt
+            val isSequentialCarryoverWindow =
+                timeSinceLastSeen in MIN_DESTRUCTIVE_CARRYOVER_GAP_MS..CARRYOVER_WINDOW_MS
+            val isEligibleTarget =
+                !hasNameFamilyConflict &&
+                    !isAmbiguousAppleShadowPair(input, target) &&
+                    isSequentialCarryoverWindow
+            if (!isEligibleTarget) continue
+
+            immediateMatchForTarget(input, target)?.let { return it }
+            val weightedMatch = weightedMatchForTarget(input, target)
+            if (weightedMatch != null && weightedMatch.evidence.confidence > highestScore) {
+                highestScore = weightedMatch.evidence.confidence
+                bestMatch = weightedMatch
             }
         }
 
