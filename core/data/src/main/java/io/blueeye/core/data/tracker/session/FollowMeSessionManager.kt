@@ -50,9 +50,6 @@ class FollowMeSessionManager @Inject constructor() {
         private const val MAX_CONTIGUOUS_OBSERVATION_GAP_MS = 30_000L
     }
 
-    @Volatile
-    private var sessionStartTime: Long = System.currentTimeMillis()
-
     private val deviceMovementStates = ConcurrentHashMap<String, DeviceMovementState>()
     private val zastaneDevices = java.util.Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
@@ -82,7 +79,6 @@ class FollowMeSessionManager @Inject constructor() {
 
     @Synchronized
     fun resetSession() {
-        sessionStartTime = System.currentTimeMillis()
         deviceMovementStates.clear()
         zastaneDevices.clear()
         userHasMoved = false
@@ -236,19 +232,17 @@ class FollowMeSessionManager @Inject constructor() {
     }
 
     fun hasMovementReference(): Boolean = startLocationLat != null && startLocationLon != null
-
-    fun getSessionStartTime(): Long = sessionStartTime
 }
 
-private const val EARTH_RADIUS_METERS = 6_371_000.0
-private const val MOVEMENT_THRESHOLD_METERS = 50.0
+private const val EarthRadiusMeters = 6_371_000.0
+private const val MovementThresholdMeters = 50.0
 
 private fun requiredMovementDistance(
     firstAccuracyM: Double?,
     secondAccuracyM: Double?,
 ): Double {
     val uncertaintyM = (firstAccuracyM ?: 0.0) + (secondAccuracyM ?: 0.0)
-    return max(MOVEMENT_THRESHOLD_METERS, uncertaintyM)
+    return max(MovementThresholdMeters, uncertaintyM)
 }
 
 private fun calculateDistance(
@@ -266,7 +260,7 @@ private fun calculateDistance(
             kotlin.math.sin(dLon / 2) *
             kotlin.math.sin(dLon / 2)
     val c = 2 * kotlin.math.atan2(kotlin.math.sqrt(a), kotlin.math.sqrt(1 - a))
-    return EARTH_RADIUS_METERS * c
+    return EarthRadiusMeters * c
 }
 
 private fun Float?.normalizedAccuracy(): Double? =
