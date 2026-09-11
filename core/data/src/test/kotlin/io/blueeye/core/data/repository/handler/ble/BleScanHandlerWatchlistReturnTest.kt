@@ -248,9 +248,11 @@ class BleScanHandlerWatchlistReturnTest {
     fun `handle records follow me alert evidence after persistence`() =
         runTest {
             stubPipeline(existing = watchlistedDevice(lastSeenAt = NOW))
-            whenever(sessionManager.recordDeviceSighting(MAC)).thenReturn(NOW - 900_000L)
-            whenever(sessionManager.hasUserMoved()).thenReturn(true)
-            whenever(sessionManager.isDeviceZastane(MAC)).thenReturn(false)
+            stubMovingSession(
+                firstSeenAt = NOW - 900_000L,
+                observedMovingMs = 360_000L,
+                movingEncounters = 20,
+            )
             whenever(
                 followMeScoreCalculator.calculateScore(
                     metrics = any(),
@@ -265,7 +267,7 @@ class BleScanHandlerWatchlistReturnTest {
                     deviceTypeScore = 0,
                     macBehaviorScore = 15,
                     encounterScore = 19,
-                    explanation = "Seen while moving with repeated encounters",
+                    explanation = "Observed while moving with repeated encounters",
                 ),
             )
             whenever(
@@ -310,13 +312,13 @@ class BleScanHandlerWatchlistReturnTest {
                 mac = MAC,
                 score = 64,
                 status = TrackingStatus.SUSPICIOUS,
-                evidenceReason = "Seen while moving with repeated encounters",
+                evidenceReason = "Observed while moving with repeated encounters",
                 isKnownTracker = false,
             )
         }
 
     @Test
-    fun `handle passes accumulated mac rotation evidence for known alias to follow me scoring`() =
+    fun `handle passes movement scoped duration and accumulated mac rotation to scoring`() =
         runTest {
             stubPipeline(existing = watchlistedDevice(lastSeenAt = NOW))
             whenever(macAddressResolver.resolve(any())).thenAnswer { invocation ->
@@ -325,9 +327,11 @@ class BleScanHandlerWatchlistReturnTest {
                     macChangeCount = 4
                 }
             }
-            whenever(sessionManager.recordDeviceSighting(MAC)).thenReturn(NOW - 900_000L)
-            whenever(sessionManager.hasUserMoved()).thenReturn(true)
-            whenever(sessionManager.isDeviceZastane(MAC)).thenReturn(false)
+            stubMovingSession(
+                firstSeenAt = NOW - 900_000L,
+                observedMovingMs = 245_000L,
+                movingEncounters = 17,
+            )
 
             handler.handle(
                 scan(
@@ -341,8 +345,12 @@ class BleScanHandlerWatchlistReturnTest {
                 metrics = metricsCaptor.capture(),
                 currentTimeMs = any(),
             )
-            assertEquals(4, metricsCaptor.firstValue.macChangeCount)
-            assertTrue(metricsCaptor.firstValue.hasStablePayload)
+            val metrics = metricsCaptor.firstValue
+            assertEquals(4, metrics.macChangeCount)
+            assertTrue(metrics.hasStablePayload)
+            assertEquals(245_000L, metrics.observedWhileMovingDurationMs)
+            assertEquals(17, metrics.encounterCount)
+            assertTrue(metrics.userHasMoved)
         }
 
     @Test
@@ -416,6 +424,19 @@ class BleScanHandlerWatchlistReturnTest {
                 explanation = "Low risk - casual encounter",
             ),
         )
+    }
+
+    private fun stubMovingSession(
+        firstSeenAt: Long,
+        observedMovingMs: Long,
+        movingEncounters: Int,
+    ) {
+        whenever(sessionManager.recordDeviceSighting(eq(MAC), any())).thenReturn(firstSeenAt)
+        whenever(sessionManager.hasMovementReference()).thenReturn(true)
+        whenever(sessionManager.isUserMoving(any())).thenReturn(true)
+        whenever(sessionManager.isDeviceZastane(MAC)).thenReturn(false)
+        whenever(sessionManager.getObservedWhileMovingDurationMs(MAC)).thenReturn(observedMovingMs)
+        whenever(sessionManager.getMovingEncounterCount(MAC)).thenReturn(movingEncounters)
     }
 
     private fun captureWatchlistEvidence(): DetectionEvidence {

@@ -6,7 +6,6 @@ import io.blueeye.core.scanner.model.BleScanResultData
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -18,32 +17,24 @@ class AddressCarryoverTrackerTest {
 
     @Test
     fun `weak signal should be pending`() {
-        // Given a weak signal (Random MAC, no name, no payload)
         val mac = "AA:BB:CC:DD:EE:FF"
         val data = createScanData(mac, name = null, manufacturerData = null, rawData = null)
 
-        // When processed
         val result = tracker.processScan(data, deviceName = null)
 
-        // Then it should be pending
         assertTrue("Result should be pending", result.isPending)
         assertEquals("Target ID should be empty for pending", "", result.targetId)
         assertFalse("Should not be new target yet", result.isNewTarget)
-        
-        // And should be in pending map (implied by result, but internal state check would be nice if accessible, but we trust result)
     }
 
     @Test
     fun `strong signal should not be pending`() {
-        // Given a strong signal (Has Manufacturer Data)
         val mac = "11:22:33:44:55:66"
         val manufData = byteArrayOf(0x01, 0x02, 0x03)
         val data = createScanData(mac, name = null, manufacturerData = manufData, rawData = null)
 
-        // When processed
         val result = tracker.processScan(data, deviceName = null)
 
-        // Then it should NOT be pending
         assertFalse("Result should not be pending", result.isPending)
         assertTrue("Should be new target", result.isNewTarget)
         assertTrue("Target ID should be valid", result.targetId.startsWith("TGT_"))
@@ -52,17 +43,13 @@ class AddressCarryoverTrackerTest {
     @Test
     fun `weak then strong signal should promote`() {
         val mac = "AA:BB:CC:DD:EE:FF"
-        
-        // 1. Weak
         val weakData = createScanData(mac, name = null, manufacturerData = null, rawData = ByteArray(2))
         val result1 = tracker.processScan(weakData, deviceName = null)
         assertTrue("First scan should be pending", result1.isPending)
 
-        // 2. Strong (same MAC, now with Name)
         val strongData = createScanData(mac, name = "MyDevice", manufacturerData = null, rawData = null)
         val result2 = tracker.processScan(strongData, deviceName = "MyDevice")
 
-        // Then it should be promoted
         assertFalse("Second scan should not be pending", result2.isPending)
         assertTrue("Should be new target now", result2.isNewTarget)
         assertTrue("Target ID should be valid", result2.targetId.startsWith("TGT_"))
@@ -83,14 +70,17 @@ class AddressCarryoverTrackerTest {
     }
 
     @Test
-    fun `same specific name with service UUID corroboration may carry over`() {
+    fun `same specific name with service UUID corroboration may carry over sequentially`() {
+        val now = System.currentTimeMillis()
         val serviceUuids = listOf("0000fe2c-0000-1000-8000-00805f9b34fb")
         val first =
             createScanData("31:11:11:11:11:11", "JBL Tune 520BT-LE", null, null).copy(
+                timestamp = now,
                 serviceUuids = serviceUuids,
             )
         val second =
             createScanData("32:22:22:22:22:22", "JBL Tune 520BT-LE", null, null).copy(
+                timestamp = now + 3_000L,
                 serviceUuids = serviceUuids,
             )
 
@@ -104,6 +94,30 @@ class AddressCarryoverTrackerTest {
             CarryoverMatchReason.SAME_NAME_PROXIMITY,
             secondResult.matchEvidence?.reasonCode,
         )
+    }
+
+    @Test
+    fun `same corroborated device seen under two addresses concurrently stays separate`() {
+        val now = System.currentTimeMillis()
+        val serviceUuids = listOf("0000fe2c-0000-1000-8000-00805f9b34fb")
+        val first =
+            createScanData("33:11:11:11:11:11", "JBL Tune 520BT-LE", null, null).copy(
+                timestamp = now,
+                serviceUuids = serviceUuids,
+            )
+        val second =
+            createScanData("34:22:22:22:22:22", "JBL Tune 520BT-LE", null, null).copy(
+                timestamp = now + 500L,
+                serviceUuids = serviceUuids,
+            )
+
+        val firstResult = tracker.processScan(first, first.name)
+        val secondResult = tracker.processScan(second, second.name)
+
+        assertTrue(firstResult.isNewTarget)
+        assertTrue(secondResult.isNewTarget)
+        assertFalse(secondResult.isCarryover)
+        assertNotEquals(firstResult.targetId, secondResult.targetId)
     }
 
     @Test
@@ -156,14 +170,44 @@ class AddressCarryoverTrackerTest {
     }
 
     @Test
+    fun `concurrent apple shadows stay separate despite matching payload and RSSI`() {
+        val now = System.currentTimeMillis()
+        val first = createAppleScanData("61:11:11:11:11:11", "Find My", -45, now)
+        val second = createAppleScanData("62:22:22:22:22:22", "Find My", -46, now + 500L)
+
+        val firstResult = tracker.processScan(first, first.name)
+        val secondResult = tracker.processScan(second, second.name)
+
+        assertTrue(firstResult.isNewTarget)
+        assertTrue(secondResult.isNewTarget)
+        assertFalse(secondResult.isCarryover)
+        assertNotEquals(firstResult.targetId, secondResult.targetId)
+    }
+
+    @Test
+    fun `sequential apple shadow may carry over after coexistence guard window`() {
+        val now = System.currentTimeMillis()
+        val primary = createAppleScanData("63:11:11:11:11:11", "MacBook Air", -45, now)
+        val shadow = createAppleScanData("64:22:22:22:22:22", "Find My", -46, now + 3_000L)
+
+        val primaryResult = tracker.processScan(primary, primary.name)
+        val shadowResult = tracker.processScan(shadow, shadow.name)
+
+        assertTrue(primaryResult.isNewTarget)
+        assertTrue(shadowResult.isCarryover)
+        assertEquals(primaryResult.targetId, shadowResult.targetId)
+        assertEquals(CarryoverMatchReason.APPLE_SHADOW, shadowResult.matchEvidence?.reasonCode)
+    }
+
+    @Test
     fun `known alias should keep reporting primary mac for persistence`() {
         val primaryMac = "69:95:CC:A8:9C:A0"
         val aliasMac = "F1:B0:CE:0D:2E:4B"
         val now = System.currentTimeMillis()
 
         val primary = createAppleScanData(primaryMac, "Michal's MacBook Air", -45, now)
-        val alias = createAppleScanData(aliasMac, "Find My", -45, now + 10)
-        val aliasAgain = createAppleScanData(aliasMac, "Find My", -46, now + 20)
+        val alias = createAppleScanData(aliasMac, "Find My", -45, now + 3_000L)
+        val aliasAgain = createAppleScanData(aliasMac, "Find My", -46, now + 3_010L)
 
         val primaryResult = tracker.processScan(primary, primary.name)
         val aliasResult = tracker.processScan(alias, alias.name)
@@ -184,15 +228,15 @@ class AddressCarryoverTrackerTest {
     }
 
     @Test
-    fun `multiple carryover aliases should expose accumulated mac change count`() {
+    fun `multiple sequential carryover aliases expose accumulated mac change count`() {
         val primaryMac = "69:95:CC:A8:9C:A0"
         val aliasMacA = "F1:B0:CE:0D:2E:4B"
         val aliasMacB = "F2:B0:CE:0D:2E:4C"
         val now = System.currentTimeMillis()
 
         val primary = createAppleScanData(primaryMac, "Michal's MacBook Air", -45, now)
-        val aliasA = createAppleScanData(aliasMacA, "Find My", -45, now + 10)
-        val aliasB = createAppleScanData(aliasMacB, "Find My", -46, now + 20)
+        val aliasA = createAppleScanData(aliasMacA, "Find My", -45, now + 3_000L)
+        val aliasB = createAppleScanData(aliasMacB, "Find My", -46, now + 6_000L)
 
         tracker.processScan(primary, primary.name)
         val aliasAResult = tracker.processScan(aliasA, aliasA.name)
@@ -212,7 +256,7 @@ class AddressCarryoverTrackerTest {
         val now = System.currentTimeMillis()
 
         val smartLight = createNonAppleScanData(nonAppleMac, "TY", -74, now)
-        val appleShadow = createAppleScanData(appleShadowMac, "Apple Device", -68, now + 10)
+        val appleShadow = createAppleScanData(appleShadowMac, "Apple Device", -68, now + 3_000L)
 
         val smartLightResult = tracker.processScan(smartLight, smartLight.name)
         val appleShadowResult = tracker.processScan(appleShadow, appleShadow.name)
@@ -233,7 +277,7 @@ class AddressCarryoverTrackerTest {
         val now = System.currentTimeMillis()
 
         val phone = createAppleScanData(phoneMac, "iPhone", -45, now)
-        val laptop = createAppleScanData(laptopMac, "MacBook Air", -45, now + 10)
+        val laptop = createAppleScanData(laptopMac, "MacBook Air", -45, now + 3_000L)
 
         val phoneResult = tracker.processScan(phone, phone.name)
         val laptopResult = tracker.processScan(laptop, laptop.name)
@@ -248,9 +292,9 @@ class AddressCarryoverTrackerTest {
         mac: String,
         name: String?,
         manufacturerData: ByteArray?,
-        rawData: ByteArray?
-    ): BleScanResultData {
-        return BleScanResultData(
+        rawData: ByteArray?,
+    ): BleScanResultData =
+        BleScanResultData(
             mac = mac,
             rssi = -70,
             timestamp = System.currentTimeMillis(),
@@ -264,9 +308,8 @@ class AddressCarryoverTrackerTest {
             isConnectable = true,
             primaryPhy = 1,
             secondaryPhy = 0,
-            rawData = rawData
+            rawData = rawData,
         )
-    }
 
     private fun createAppleScanData(
         mac: String,

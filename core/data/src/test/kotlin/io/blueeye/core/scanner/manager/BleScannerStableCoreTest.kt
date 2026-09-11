@@ -5,6 +5,7 @@ import io.blueeye.core.domain.repository.DeviceRepository
 import io.blueeye.core.scanner.extractor.ScanResultExtractor
 import io.blueeye.core.scanner.source.BleScanSource
 import io.blueeye.core.scanner.source.ClassicScanSource
+import io.blueeye.core.scanner.source.PassiveBleScanMode
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -15,6 +16,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -27,21 +29,18 @@ class BleScannerStableCoreTest {
         val bleScanSource: BleScanSource = mock()
         val classicScanSource: ClassicScanSource = mock()
         whenever(bleScanSource.isScanning()).thenReturn(false)
-        whenever(bleScanSource.start(anyOrNull(), any(), any())).thenReturn(true)
+        whenever(bleScanSource.start(anyOrNull(), any(), any(), any())).thenReturn(true)
 
-        val scanner =
-            BleScanner(
-                context = mock<Context>(),
-                repository = mock<DeviceRepository>(),
-                adapter = null,
-                bleScanSource = bleScanSource,
-                classicScanSource = classicScanSource,
-                scanResultExtractor = mock<ScanResultExtractor>(),
-            )
+        val scanner = createScanner(bleScanSource, classicScanSource)
 
         scanner.performPassiveBleScan()
 
-        verify(bleScanSource).start(anyOrNull(), any(), any())
+        verify(bleScanSource).start(
+            anyOrNull(),
+            any(),
+            any(),
+            eq(PassiveBleScanMode.BROAD),
+        )
         verify(classicScanSource, never()).start(any())
         assertSame(ScannerState.Scanning, scanner.state.value)
     }
@@ -51,17 +50,9 @@ class BleScannerStableCoreTest {
         val bleScanSource: BleScanSource = mock()
         val classicScanSource: ClassicScanSource = mock()
         whenever(bleScanSource.isScanning()).thenReturn(false)
-        whenever(bleScanSource.start(anyOrNull(), any(), any())).thenReturn(true)
+        whenever(bleScanSource.start(anyOrNull(), any(), any(), any())).thenReturn(true)
 
-        val scanner =
-            BleScanner(
-                context = mock<Context>(),
-                repository = mock<DeviceRepository>(),
-                adapter = null,
-                bleScanSource = bleScanSource,
-                classicScanSource = classicScanSource,
-                scanResultExtractor = mock<ScanResultExtractor>(),
-            )
+        val scanner = createScanner(bleScanSource, classicScanSource)
 
         scanner.performPassiveBleScan()
         val maintenanceJob = launch { scanner.maintainPassiveScan(refreshIntervalMs = 1L) }
@@ -71,10 +62,49 @@ class BleScannerStableCoreTest {
         maintenanceJob.cancel()
 
         verify(bleScanSource).stop()
-        verify(bleScanSource, times(2)).start(anyOrNull(), any(), any())
+        verify(bleScanSource, times(2)).start(anyOrNull(), any(), any(), any())
         verify(classicScanSource, never()).start(any())
         assertSame(ScannerState.Scanning, scanner.state.value)
         assertTrue(ScannerConstants.PASSIVE_SCAN_REFRESH_INTERVAL_MS < 300_000L)
+    }
+
+    @Test
+    fun `screen state transitions switch passive BLE mode without restarting Classic`() = runTest {
+        val bleScanSource: BleScanSource = mock()
+        val classicScanSource: ClassicScanSource = mock()
+        whenever(bleScanSource.isScanning()).thenReturn(false)
+        whenever(bleScanSource.start(anyOrNull(), any(), any(), any())).thenReturn(true)
+
+        val scanner = createScanner(bleScanSource, classicScanSource)
+
+        scanner.performPassiveBleScan()
+        scanner.transitionPassiveScanMode(PassiveBleScanMode.BACKGROUND_FILTERED)
+        scanner.transitionPassiveScanMode(PassiveBleScanMode.BROAD)
+
+        verify(bleScanSource, times(2)).stop()
+        verify(bleScanSource).start(
+            anyOrNull(),
+            any(),
+            any(),
+            eq(PassiveBleScanMode.BACKGROUND_FILTERED),
+        )
+        verify(bleScanSource, times(2)).start(
+            anyOrNull(),
+            any(),
+            any(),
+            eq(PassiveBleScanMode.BROAD),
+        )
+        verify(classicScanSource, never()).start(any())
+        assertSame(ScannerState.Scanning, scanner.state.value)
+    }
+
+    @Test
+    fun `screen policy keeps broad foreground and filtered background modes`() {
+        assertSame(PassiveBleScanMode.BROAD, passiveBleScanModeForInteractive(isInteractive = true))
+        assertSame(
+            PassiveBleScanMode.BACKGROUND_FILTERED,
+            passiveBleScanModeForInteractive(isInteractive = false),
+        )
     }
 
     @Test
@@ -85,4 +115,17 @@ class BleScannerStableCoreTest {
         assertFalse(ScannerState.Starting.allowsPassiveStart())
         assertFalse(ScannerState.Scanning.allowsPassiveStart())
     }
+
+    private fun createScanner(
+        bleScanSource: BleScanSource,
+        classicScanSource: ClassicScanSource,
+    ): BleScanner =
+        BleScanner(
+            context = mock<Context>(),
+            repository = mock<DeviceRepository>(),
+            adapter = null,
+            bleScanSource = bleScanSource,
+            classicScanSource = classicScanSource,
+            scanResultExtractor = mock<ScanResultExtractor>(),
+        )
 }

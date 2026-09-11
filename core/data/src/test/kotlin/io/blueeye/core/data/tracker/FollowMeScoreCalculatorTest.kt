@@ -22,71 +22,98 @@ class FollowMeScoreCalculatorTest {
 
     @Test
     fun `calculateScore SHOULD return 0 for short casual encounter`() {
-        // Given
         val metrics = FollowMeScoreCalculator.DeviceMetrics(
             deviceType = DeviceType.UNKNOWN,
             firstSeenAt = 1000L,
-            lastSeenAt = 2000L, // 1 sec duration
+            lastSeenAt = 2000L,
             encounterCount = 1,
-            rssiSamples = listOf(-80, -82)
+            rssiSamples = listOf(-80, -82),
         )
         whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(0)
 
-        // When
         val result = calculator.calculateScore(metrics)
 
-        // Then
         assertEquals(0, result.totalScore)
         assertEquals(TrackingStatus.SAFE, result.status)
     }
 
     @Test
     fun `calculateScore SHOULD give points for Known Tracker Type`() {
-        // Given
         val metrics = FollowMeScoreCalculator.DeviceMetrics(
             deviceType = DeviceType.AIRTAG,
             firstSeenAt = 1000L,
             lastSeenAt = 2000L,
             encounterCount = 1,
-            rssiSamples = listOf(-80)
+            rssiSamples = listOf(-80),
         )
         whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(0)
 
-        // When
         val result = calculator.calculateScore(metrics)
 
-        // Then
-        // 20 points for AIRTAG
         assertEquals(20, result.deviceTypeScore)
         assertEquals(20, result.totalScore)
     }
 
     @Test
     fun `calculateScore SHOULD give max points for Long Duration`() {
-        // Given
-        // > 30 mins (30 * 60 * 1000 = 1,800,000)
         val start = 1000L
-        val end = start + 1_900_000L 
-        
+        val end = start + 1_900_000L
         val metrics = FollowMeScoreCalculator.DeviceMetrics(
             deviceType = DeviceType.UNKNOWN,
             firstSeenAt = start,
             lastSeenAt = end,
-            encounterCount = 15, // > MIN_ENCOUNTERS_FOR_TRACKING (10)
-            rssiSamples = emptyList()
+            encounterCount = 15,
+            rssiSamples = emptyList(),
         )
         whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(0)
 
-        // When
         val result = calculator.calculateScore(metrics)
 
-        // Then
-        // Duration > 30min -> 30 points
-        // Encounters > 10 -> 4 points (SCORE_ENCOUNTERS_LOW)
-        // Total = 34
         assertEquals(30, result.durationScore)
         assertEquals(4, result.encounterScore)
         assertEquals(34, result.totalScore)
+    }
+
+    @Test
+    fun `explicit moving duration ignores long wall clock absence`() {
+        val metrics = FollowMeScoreCalculator.DeviceMetrics(
+            deviceType = DeviceType.UNKNOWN,
+            firstSeenAt = 1_000L,
+            lastSeenAt = 3_601_000L,
+            encounterCount = 100,
+            rssiSamples = emptyList(),
+            userHasMoved = true,
+            observedWhileMovingDurationMs = 4 * 60_000L,
+        )
+        whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(0)
+
+        val result = calculator.calculateScore(metrics)
+
+        assertEquals(0, result.durationScore)
+        assertEquals(10, result.encounterScore)
+        assertEquals(10, result.totalScore)
+        assertFalse(result.explanation.contains("Observed for"))
+    }
+
+    @Test
+    fun `explicit moving duration scores only accumulated observed movement`() {
+        val metrics = FollowMeScoreCalculator.DeviceMetrics(
+            deviceType = DeviceType.UNKNOWN,
+            firstSeenAt = 1_000L,
+            lastSeenAt = 3_601_000L,
+            encounterCount = 10,
+            rssiSamples = emptyList(),
+            userHasMoved = true,
+            observedWhileMovingDurationMs = 6 * 60_000L,
+        )
+        whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(0)
+
+        val result = calculator.calculateScore(metrics)
+
+        assertEquals(15, result.durationScore)
+        assertEquals(4, result.encounterScore)
+        assertEquals(19, result.totalScore)
+        assertTrue(result.explanation.contains("Observed for 6min while moving"))
     }
 
     @Test
@@ -99,7 +126,7 @@ class FollowMeScoreCalculatorTest {
             rssiSamples = listOf(-50, -50, -51, -50, -50),
             macChangeCount = 5,
             hasStablePayload = true,
-            userHasMoved = false
+            userHasMoved = false,
         )
         whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(25)
 
@@ -148,7 +175,7 @@ class FollowMeScoreCalculatorTest {
             macChangeCount = 5,
             hasStablePayload = true,
             userHasMoved = true,
-            isBaselineDevice = true
+            isBaselineDevice = true,
         )
         whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(25)
 
@@ -167,7 +194,7 @@ class FollowMeScoreCalculatorTest {
             lastSeenAt = 1_901_000L,
             encounterCount = 100,
             rssiSamples = listOf(-50, -50, -51, -50, -50),
-            userHasMoved = false
+            userHasMoved = false,
         )
         whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(25)
 
@@ -189,7 +216,7 @@ class FollowMeScoreCalculatorTest {
             rssiSamples = listOf(-62, -63, -62, -63, -62),
             macChangeCount = 3,
             hasStablePayload = false,
-            userHasMoved = true
+            userHasMoved = true,
         )
         whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(0)
 
@@ -209,7 +236,7 @@ class FollowMeScoreCalculatorTest {
             rssiSamples = listOf(-62, -63, -62, -63, -62),
             macChangeCount = 3,
             hasStablePayload = true,
-            userHasMoved = true
+            userHasMoved = true,
         )
         whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(0)
 
@@ -221,38 +248,41 @@ class FollowMeScoreCalculatorTest {
 
     @Test
     fun `calculateScore SHOULD identify DANGEROUS device`() {
-        // Given
-        // Known tracker + Long Duration + Stable RSSI + MAC changes
         val start = 1000L
-        val end = start + 1_900_000L // 30+ mins
-
+        val end = start + 1_900_000L
         val metrics = FollowMeScoreCalculator.DeviceMetrics(
-            deviceType = DeviceType.TILE, // 20 pts
+            deviceType = DeviceType.TILE,
             firstSeenAt = start,
-            lastSeenAt = end, // 30 pts (Duration)
-            encounterCount = 100, // 10 pts (Max Encounters)
-            rssiSamples = listOf(-50, -50, -50), // Stable
-            macChangeCount = 5, // 15 pts (Max MAC changes)
-            hasStablePayload = true
+            lastSeenAt = end,
+            encounterCount = 100,
+            rssiSamples = listOf(-50, -50, -50),
+            macChangeCount = 5,
+            hasStablePayload = true,
         )
-        // Mock analyzer to return stable score (e.g. 20)
         whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(20)
 
-        // When
         val result = calculator.calculateScore(metrics)
 
-        // Then
-        // Type: 20
-        // Duration: 30
-        // RSSI: 20
-        // MAC: 15
-        // Encounter: 10
-        // Total: 95
         assertEquals(95, result.totalScore)
         assertEquals(TrackingStatus.DANGEROUS, result.status)
         assertTrue(result.explanation.contains("Known tracker type"))
         assertTrue(result.explanation.contains("RSSI stayed stable during movement window"))
         assertFalse(result.explanation.contains("moving together"))
+    }
+
+    @Test
+    fun `shouldMonitor ignores long wall clock span when observed moving duration is short`() {
+        val metrics = FollowMeScoreCalculator.DeviceMetrics(
+            deviceType = DeviceType.UNKNOWN,
+            firstSeenAt = 1_000L,
+            lastSeenAt = 3_601_000L,
+            encounterCount = 100,
+            rssiSamples = emptyList(),
+            userHasMoved = true,
+            observedWhileMovingDurationMs = 4 * 60_000L,
+        )
+
+        assertFalse(calculator.shouldMonitor(metrics))
     }
 
     @Test
@@ -266,7 +296,7 @@ class FollowMeScoreCalculatorTest {
             macChangeCount = 5,
             hasStablePayload = true,
             userHasMoved = true,
-            isBaselineDevice = true
+            isBaselineDevice = true,
         )
 
         assertFalse(calculator.shouldMonitor(metrics))
@@ -280,7 +310,7 @@ class FollowMeScoreCalculatorTest {
             lastSeenAt = 2000L,
             encounterCount = 1,
             rssiSamples = listOf(-80),
-            userHasMoved = false
+            userHasMoved = false,
         )
 
         assertTrue(calculator.shouldMonitor(metrics))

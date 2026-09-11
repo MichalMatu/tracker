@@ -208,7 +208,6 @@ class BleScanHandler @Inject constructor(
     }
 
     private suspend fun calculateFollowMeScore(ctx: ScanDataContext) {
-        // Public-safety signal evidence is reviewed by its own pipeline.
         if (ctx.isTactical) return
 
         val existing = ctx.existingDevice
@@ -230,10 +229,15 @@ class BleScanHandler @Inject constructor(
         }
 
         val currentLocation = locationProvider.getFreshCoordinates()
-        sessionManager.updateMovement(currentLocation?.first, currentLocation?.second)
-        val sessionFirstSeen = sessionManager.recordDeviceSighting(fingerprint)
+        sessionManager.updateMovement(
+            currentLat = currentLocation?.first,
+            currentLon = currentLocation?.second,
+            currentAccuracyM = currentLocation?.third,
+            now = now,
+        )
+        val sessionFirstSeen = sessionManager.recordDeviceSighting(fingerprint, now)
         val movementTrackingAvailable = sessionManager.hasMovementReference()
-        val userHasMoved = sessionManager.hasUserMoved()
+        val userIsMoving = sessionManager.isUserMoving(now)
         val isBaselineDevice = sessionManager.isDeviceZastane(fingerprint)
 
         val deviceType = classifier.resolveType(ctx)
@@ -243,11 +247,8 @@ class BleScanHandler @Inject constructor(
             DeviceType.SAMSUNG_TAG,
         )
 
-        val encounterCount = (existing?.encounterCount ?: 0) + 1
-        val history = rssiBuffer.getOrPut(fingerprint) { ArrayDeque(10) }
-        history.addLast(ctx.validRssi)
-        if (history.size > 10) history.removeFirst()
-        val rssiSamples = history.toList()
+        val encounterCount = sessionManager.getMovingEncounterCount(fingerprint)
+        val rssiSamples = movingRssiSamples(fingerprint, ctx.validRssi, userIsMoving)
 
         val metrics = FollowMeScoreCalculator.DeviceMetrics(
             deviceType = deviceType,
@@ -258,9 +259,11 @@ class BleScanHandler @Inject constructor(
             macChangeCount = ctx.macChangeCount,
             isKnownTracker = isKnownTracker,
             hasStablePayload = ctx.hasStablePayloadEvidence(),
-            userHasMoved = userHasMoved,
+            userHasMoved = userIsMoving,
             isBaselineDevice = isBaselineDevice,
             movementTrackingAvailable = movementTrackingAvailable,
+            observedWhileMovingDurationMs =
+                sessionManager.getObservedWhileMovingDurationMs(fingerprint),
         )
 
         val result = followMeScoreCalculator.calculateScore(metrics)
@@ -273,7 +276,7 @@ class BleScanHandler @Inject constructor(
         ctx.followMeDeviceTypeScore = result.deviceTypeScore
         ctx.followMeMacBehaviorScore = result.macBehaviorScore
         ctx.followMeEncounterScore = result.encounterScore
-        ctx.followMeUserMoved = userHasMoved
+        ctx.followMeUserMoved = userIsMoving
         ctx.followMeBaselineDevice = isBaselineDevice
 
         scope.launch {
@@ -283,16 +286,16 @@ class BleScanHandler @Inject constructor(
 
         val shouldAlert = alertDecisionEngine.shouldAlert(
             isIgnored = isIgnored,
-            userHasMoved = userHasMoved,
+            userHasMoved = userIsMoving,
             isZastane = isBaselineDevice,
-            trackingStatus = result.status
+            trackingStatus = result.status,
         )
 
         if (shouldAlert) {
             val decisionExplanation = alertDecisionEngine.getDecisionExplanation(
                 isIgnored = isIgnored,
                 isKnownTracker = isKnownTracker,
-                userHasMoved = userHasMoved,
+                userHasMoved = userIsMoving,
                 isZastane = isBaselineDevice,
                 trackingStatus = result.status,
             )
@@ -310,6 +313,21 @@ class BleScanHandler @Inject constructor(
                 isKnownTracker = isKnownTracker,
             )
         }
+    }
+
+    private fun movingRssiSamples(
+        fingerprint: String,
+        rssi: Int,
+        userIsMoving: Boolean,
+    ): List<Int> {
+        val history = rssiBuffer.getOrPut(fingerprint) { ArrayDeque(10) }
+        val continuesMovingWindow = sessionManager.isMovingObservationContinuous(fingerprint)
+        if (!userIsMoving || !continuesMovingWindow) history.clear()
+        if (userIsMoving) {
+            history.addLast(rssi)
+            if (history.size > 10) history.removeFirst()
+        }
+        return history.toList()
     }
 
     /** Reset logical tracking memory only on an explicit tracking reset, never on a technical scan restart. */
