@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-process-death-classify-20260911-v1",
+  "task_digest": "602ed30614c166091dd023270af21a38f2144b875854d65edac04af3598e242f",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-11T10:20:19.100417+00:00",
+  "attempt_id": "e939b12907de7939cad3d8e7",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 95624,
+  "updated_at": "2026-09-11T10:20:19.100528+00:00",
+  "pid": 95624
+}
