@@ -12,6 +12,7 @@ import io.blueeye.core.permission.PermissionManager
 import io.blueeye.core.scanner.extractor.ScanResultExtractor
 import io.blueeye.core.scanner.source.BleScanSource
 import io.blueeye.core.scanner.source.ClassicScanSource
+import io.blueeye.core.scanner.source.PassiveBleScanMode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +22,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -56,6 +59,7 @@ constructor(
     private val bleScanSource: BleScanSource,
     private val classicScanSource: ClassicScanSource,
     scanResultExtractor: ScanResultExtractor,
+    private val screenStateMonitor: PassiveBleScreenStateMonitor,
 ) {
     companion object {
         private const val TAG = "BleScanner"
@@ -76,7 +80,15 @@ constructor(
             onProcessingError = { message -> _state.value = ScannerState.Error(message) },
         )
 
+    private val passiveScanTransitionMutex = Mutex()
     private var scanJob: Job? = null
+    private var passiveModeTransitionJob: Job? = null
+
+    @Volatile
+    private var desiredPassiveScanMode = PassiveBleScanMode.BROAD
+
+    @Volatile
+    private var activePassiveScanMode: PassiveBleScanMode? = null
 
     val isBluetoothEnabled: Boolean
         get() = adapter?.isEnabled == true
@@ -100,6 +112,8 @@ constructor(
                 Log.w(TAG, "Passive BLE scanning already active")
             }
             else -> {
+                desiredPassiveScanMode = screenStateMonitor.currentMode()
+                screenStateMonitor.start(::requestPassiveScanMode)
                 _state.value = ScannerState.Starting
                 scanJob?.cancel()
                 scanJob =
@@ -120,11 +134,13 @@ constructor(
                 delay(ScannerConstants.SCAN_TRANSITION_DELAY_MS)
             }
 
-            Log.i(TAG, "Starting passive BLE scan...")
-            if (!startPassiveBleSource()) {
+            val startingMode = desiredPassiveScanMode
+            Log.i(TAG, "Starting passive BLE scan in $startingMode mode...")
+            if (!startPassiveBleSource(startingMode)) {
                 _state.value = ScannerState.Error("BLE scanner unavailable")
                 return
             }
+            activePassiveScanMode = startingMode
 
             if (ScannerRuntimePolicy.allowsClassicDiscovery) {
                 startClassicDiscovery()
@@ -135,6 +151,10 @@ constructor(
                 )
             }
             _state.value = ScannerState.Scanning
+
+            if (activePassiveScanMode != desiredPassiveScanMode) {
+                requestPassiveScanMode(desiredPassiveScanMode)
+            }
         } catch (error: CancellationException) {
             throw error
         } catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
@@ -163,12 +183,12 @@ constructor(
     @SuppressLint("MissingPermission")
     private suspend fun refreshPassiveBleScan() {
         try {
-            Log.i(TAG, "Refreshing passive BLE scan registration...")
-            bleScanSource.stop()
-            delay(ScannerConstants.SCAN_TRANSITION_DELAY_MS)
+            val refreshMode = desiredPassiveScanMode
+            Log.i(TAG, "Refreshing passive BLE scan registration in $refreshMode mode...")
+            val restarted = restartPassiveBleSource(refreshMode)
             if (_state.value !is ScannerState.Scanning) return
 
-            if (!startPassiveBleSource()) {
+            if (!restarted) {
                 _state.value = ScannerState.Error("BLE scanner unavailable during refresh")
                 return
             }
@@ -181,8 +201,58 @@ constructor(
         }
     }
 
+    private fun requestPassiveScanMode(mode: PassiveBleScanMode) {
+        desiredPassiveScanMode = mode
+        if (_state.value !is ScannerState.Scanning || activePassiveScanMode == mode) return
+
+        passiveModeTransitionJob?.cancel()
+        passiveModeTransitionJob =
+            scope.launch {
+                try {
+                    transitionPassiveScanMode(mode)
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
+                    Log.e(TAG, "Error switching passive BLE scan mode", error)
+                    _state.value = ScannerState.Error(error.message ?: "Unknown error")
+                }
+            }
+    }
+
     @SuppressLint("MissingPermission")
-    private fun startPassiveBleSource(): Boolean =
+    internal suspend fun transitionPassiveScanMode(mode: PassiveBleScanMode) {
+        desiredPassiveScanMode = mode
+        if (_state.value !is ScannerState.Scanning || activePassiveScanMode == mode) return
+
+        Log.i(TAG, "Switching passive BLE scan from $activePassiveScanMode to $mode")
+        val restarted = restartPassiveBleSource(mode)
+        if (_state.value !is ScannerState.Scanning) return
+
+        if (!restarted) {
+            _state.value = ScannerState.Error("BLE scanner unavailable during mode switch")
+            return
+        }
+        Log.i(TAG, "Passive BLE scan mode switched to $mode")
+    }
+
+    @SuppressLint("MissingPermission")
+    private suspend fun restartPassiveBleSource(mode: PassiveBleScanMode): Boolean =
+        passiveScanTransitionMutex.withLock {
+            if (_state.value !is ScannerState.Scanning) return@withLock false
+
+            bleScanSource.stop()
+            delay(ScannerConstants.SCAN_TRANSITION_DELAY_MS)
+            if (_state.value !is ScannerState.Scanning) return@withLock false
+
+            val started = startPassiveBleSource(mode)
+            if (started) {
+                activePassiveScanMode = mode
+            }
+            started
+        }
+
+    @SuppressLint("MissingPermission")
+    private fun startPassiveBleSource(mode: PassiveBleScanMode): Boolean =
         bleScanSource.start(
             macFilter = null,
             onResult = ingestPipeline::onBleResult,
@@ -191,6 +261,7 @@ constructor(
                 Log.e(TAG, message)
                 _state.value = ScannerState.Error(message)
             },
+            passiveMode = mode,
         )
 
     @SuppressLint("MissingPermission")
@@ -205,6 +276,7 @@ constructor(
             return
         }
 
+        stopPassiveModeMonitoring()
         scanJob?.cancel()
         _state.value = ScannerState.Starting
         scanJob =
@@ -244,11 +316,19 @@ constructor(
     @SuppressLint("MissingPermission")
     fun stopScanning() {
         Log.i(TAG, "Stopping ALL Scans")
+        stopPassiveModeMonitoring()
         scanJob?.cancel()
         scanJob = null
         bleScanSource.stop()
         classicScanSource.stop()
         _state.value = ScannerState.Idle
+    }
+
+    private fun stopPassiveModeMonitoring() {
+        screenStateMonitor.stop()
+        passiveModeTransitionJob?.cancel()
+        passiveModeTransitionJob = null
+        activePassiveScanMode = null
     }
 
     @SuppressLint("MissingPermission")
