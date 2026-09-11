@@ -35,7 +35,6 @@ class FollowMeSessionManager @Inject constructor() {
 
     companion object {
         private const val TAG = "FollowMeSession"
-        private const val MOVEMENT_THRESHOLD_METERS = 50.0
 
         /**
          * Recent movement must stay shorter than the 5-minute Follow-Me duration threshold so a
@@ -114,7 +113,6 @@ class FollowMeSessionManager @Inject constructor() {
         if (currentLat == null || currentLon == null) return userHasMoved
 
         val accuracyM = currentAccuracyM.normalizedAccuracy()
-
         if (startLocationLat == null || startLocationLon == null) {
             startLocationLat = currentLat
             startLocationLon = currentLon
@@ -122,10 +120,7 @@ class FollowMeSessionManager @Inject constructor() {
             movementAnchorLat = currentLat
             movementAnchorLon = currentLon
             movementAnchorAccuracyM = accuracyM
-            return false
-        }
-
-        if (!userHasMoved) {
+        } else if (!userHasMoved) {
             val distanceFromStart =
                 calculateDistance(
                     startLocationLat!!,
@@ -136,45 +131,32 @@ class FollowMeSessionManager @Inject constructor() {
             val requiredDistance = requiredMovementDistance(startLocationAccuracyM, accuracyM)
             if (distanceFromStart >= requiredDistance) {
                 userHasMoved = true
-                confirmMovement(currentLat, currentLon, accuracyM, now)
+                movementAnchorLat = currentLat
+                movementAnchorLon = currentLon
+                movementAnchorAccuracyM = accuracyM
+                lastConfirmedMovementAt = now
                 Log.i(
                     TAG,
                     "User movement confirmed at ${distanceFromStart.toInt()}m " +
                         "(required=${requiredDistance.toInt()}m)",
                 )
             }
-            return userHasMoved
-        }
-
-        val anchorLat = movementAnchorLat
-        val anchorLon = movementAnchorLon
-        if (anchorLat != null && anchorLon != null) {
-            val distanceFromAnchor =
-                calculateDistance(
-                    anchorLat,
-                    anchorLon,
-                    currentLat,
-                    currentLon,
-                )
-            val requiredDistance = requiredMovementDistance(movementAnchorAccuracyM, accuracyM)
-            if (distanceFromAnchor >= requiredDistance) {
-                confirmMovement(currentLat, currentLon, accuracyM, now)
+        } else {
+            val anchorLat = movementAnchorLat
+            val anchorLon = movementAnchorLon
+            if (anchorLat != null && anchorLon != null) {
+                val distanceFromAnchor = calculateDistance(anchorLat, anchorLon, currentLat, currentLon)
+                val requiredDistance = requiredMovementDistance(movementAnchorAccuracyM, accuracyM)
+                if (distanceFromAnchor >= requiredDistance) {
+                    movementAnchorLat = currentLat
+                    movementAnchorLon = currentLon
+                    movementAnchorAccuracyM = accuracyM
+                    lastConfirmedMovementAt = now
+                }
             }
         }
 
         return userHasMoved
-    }
-
-    private fun confirmMovement(
-        lat: Double,
-        lon: Double,
-        accuracyM: Double?,
-        now: Long,
-    ) {
-        movementAnchorLat = lat
-        movementAnchorLon = lon
-        movementAnchorAccuracyM = accuracyM
-        lastConfirmedMovementAt = now
     }
 
     /**
@@ -256,33 +238,35 @@ class FollowMeSessionManager @Inject constructor() {
     fun hasMovementReference(): Boolean = startLocationLat != null && startLocationLon != null
 
     fun getSessionStartTime(): Long = sessionStartTime
+}
 
-    private fun requiredMovementDistance(
-        firstAccuracyM: Double?,
-        secondAccuracyM: Double?,
-    ): Double {
-        val uncertaintyM = (firstAccuracyM ?: 0.0) + (secondAccuracyM ?: 0.0)
-        return max(MOVEMENT_THRESHOLD_METERS, uncertaintyM)
-    }
+private const val EARTH_RADIUS_METERS = 6_371_000.0
+private const val MOVEMENT_THRESHOLD_METERS = 50.0
 
-    private fun calculateDistance(
-        lat1: Double,
-        lon1: Double,
-        lat2: Double,
-        lon2: Double,
-    ): Double {
-        val earthRadiusM = 6_371_000.0
-        val dLat = Math.toRadians(lat2 - lat1)
-        val dLon = Math.toRadians(lon2 - lon1)
-        val a =
-            kotlin.math.sin(dLat / 2) * kotlin.math.sin(dLat / 2) +
-                kotlin.math.cos(Math.toRadians(lat1)) *
-                kotlin.math.cos(Math.toRadians(lat2)) *
-                kotlin.math.sin(dLon / 2) *
-                kotlin.math.sin(dLon / 2)
-        val c = 2 * kotlin.math.atan2(kotlin.math.sqrt(a), kotlin.math.sqrt(1 - a))
-        return earthRadiusM * c
-    }
+private fun requiredMovementDistance(
+    firstAccuracyM: Double?,
+    secondAccuracyM: Double?,
+): Double {
+    val uncertaintyM = (firstAccuracyM ?: 0.0) + (secondAccuracyM ?: 0.0)
+    return max(MOVEMENT_THRESHOLD_METERS, uncertaintyM)
+}
+
+private fun calculateDistance(
+    lat1: Double,
+    lon1: Double,
+    lat2: Double,
+    lon2: Double,
+): Double {
+    val dLat = Math.toRadians(lat2 - lat1)
+    val dLon = Math.toRadians(lon2 - lon1)
+    val a =
+        kotlin.math.sin(dLat / 2) * kotlin.math.sin(dLat / 2) +
+            kotlin.math.cos(Math.toRadians(lat1)) *
+            kotlin.math.cos(Math.toRadians(lat2)) *
+            kotlin.math.sin(dLon / 2) *
+            kotlin.math.sin(dLon / 2)
+    val c = 2 * kotlin.math.atan2(kotlin.math.sqrt(a), kotlin.math.sqrt(1 - a))
+    return EARTH_RADIUS_METERS * c
 }
 
 private fun Float?.normalizedAccuracy(): Double? =
