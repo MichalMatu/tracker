@@ -1,13 +1,11 @@
 {
-  "event": "task_finished",
-  "task_id": "tracker-phase3-x5-name-hardening-v3",
-  "task_digest": "9caf202926abc54600a5b2cdaa10f830e9c202f7f7d92edcd28c42b11fc4f957",
+  "event": "result_republished",
   "status": "done",
   "failure_reason": null,
-  "finished_at": "2026-09-11T02:29:21.410370+00:00",
   "attempt_id": "4188c34628ecba2a1deeefce",
+  "task_digest": "9caf202926abc54600a5b2cdaa10f830e9c202f7f7d92edcd28c42b11fc4f957",
+  "updated_at": "2026-09-11T03:15:32.648704+00:00",
+  "task_id": "tracker-phase3-x5-name-hardening-v3",
   "daemon_version": "4.18.20",
-  "daemon_pid": 61990,
-  "updated_at": "2026-09-11T02:29:21.722531+00:00",
-  "pid": 61990
+  "pid": 8956
 }
