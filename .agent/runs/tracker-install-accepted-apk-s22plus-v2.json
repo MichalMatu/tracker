@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 3,
-  "command": "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin main; test \"$(git rev-parse origin/main)\" = '40eac7a504d363a05cd6c235c25146e01bb36ff2'; git checkout -B main origin/main; test \"$(git rev-parse HEAD)\" = '40eac7a504d363a05cd6c235c25146e01bb36ff2'; adb start-server >/dev/null; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {c++} END{print c+0}')\" = '1'; MODEL=$(adb shell getprop ro.product.model | tr -d '\\r'); echo DEVICE_MODEL=$MODEL; case \"$MODEL\" in SM-S906*) ;; *) echo 'Unexpected Android device model' >&2; exit 20;; esac; if adb shell pm path io.blueeye | grep -q '^package:'; then echo 'io.blueeye still installed' >&2; exit 21; fi",
-  "pid": 52348,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew :app:assembleDebug --console=plain; APK=app/build/outputs/apk/debug/app-debug.apk; test -f \"$APK\"; echo APK_SHA256=$(shasum -a 256 \"$APK\" | awk '{print $1}'); test \"$(git rev-parse HEAD)\" = '40eac7a504d363a05cd6c235c25146e01bb36ff2'",
+  "pid": 52423,
   "timeout": 1800,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-11T08:16:56.164995+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-11T08:17:00.370510+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-install-accepted-apk-s22plus-v2",
@@ -18,5 +18,5 @@
   "task_digest": "459a8a2e0c9e47e8b527aea7ebf6f3f78c392b96212f930e283d10b74811cf18",
   "daemon_version": "4.18.20",
   "daemon_pid": 52176,
-  "updated_at": "2026-09-11T08:16:56.165239+00:00"
+  "updated_at": "2026-09-11T08:17:00.472301+00:00"
 }
