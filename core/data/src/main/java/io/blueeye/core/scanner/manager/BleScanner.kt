@@ -59,7 +59,6 @@ constructor(
     private val bleScanSource: BleScanSource,
     private val classicScanSource: ClassicScanSource,
     scanResultExtractor: ScanResultExtractor,
-    private val screenStateMonitor: PassiveBleScreenStateMonitor,
 ) {
     companion object {
         private const val TAG = "BleScanner"
@@ -68,6 +67,7 @@ constructor(
     // Process-lifetime scope: ScannerService owns scan Start/Stop, while ingest processing remains
     // available for already-accepted work during the same process lifetime.
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val screenStateMonitor = PassiveBleScreenStateMonitor(context)
 
     private val _state = MutableStateFlow<ScannerState>(ScannerState.Idle)
     val state = _state.asStateFlow()
@@ -143,7 +143,19 @@ constructor(
             activePassiveScanMode = startingMode
 
             if (ScannerRuntimePolicy.allowsClassicDiscovery) {
-                startClassicDiscovery()
+                val classicStarted =
+                    classicScanSource.start { device, rssi, classOfDevice, uuids ->
+                        ingestPipeline.onClassicResult(
+                            mac = device.address,
+                            name = device.name,
+                            rssi = rssi,
+                            classOfDevice = classOfDevice,
+                            serviceUuids = uuids.toServiceUuidStrings(),
+                        )
+                    }
+                if (!classicStarted) {
+                    Log.w(TAG, "Classic discovery unavailable; continuing BLE-only passive scan")
+                }
             } else {
                 Log.i(
                     TAG,
@@ -222,17 +234,18 @@ constructor(
     @SuppressLint("MissingPermission")
     internal suspend fun transitionPassiveScanMode(mode: PassiveBleScanMode) {
         desiredPassiveScanMode = mode
-        if (_state.value !is ScannerState.Scanning || activePassiveScanMode == mode) return
-
-        Log.i(TAG, "Switching passive BLE scan from $activePassiveScanMode to $mode")
-        val restarted = restartPassiveBleSource(mode)
-        if (_state.value !is ScannerState.Scanning) return
-
-        if (!restarted) {
-            _state.value = ScannerState.Error("BLE scanner unavailable during mode switch")
-            return
+        val shouldTransition = _state.value is ScannerState.Scanning && activePassiveScanMode != mode
+        if (shouldTransition) {
+            Log.i(TAG, "Switching passive BLE scan from $activePassiveScanMode to $mode")
+            val restarted = restartPassiveBleSource(mode)
+            if (_state.value is ScannerState.Scanning) {
+                if (restarted) {
+                    Log.i(TAG, "Passive BLE scan mode switched to $mode")
+                } else {
+                    _state.value = ScannerState.Error("BLE scanner unavailable during mode switch")
+                }
+            }
         }
-        Log.i(TAG, "Passive BLE scan mode switched to $mode")
     }
 
     @SuppressLint("MissingPermission")
@@ -329,24 +342,6 @@ constructor(
         passiveModeTransitionJob?.cancel()
         passiveModeTransitionJob = null
         activePassiveScanMode = null
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun startClassicDiscovery() {
-        val classicStarted =
-            classicScanSource.start { device, rssi, classOfDevice, uuids ->
-                ingestPipeline.onClassicResult(
-                    mac = device.address,
-                    name = device.name,
-                    rssi = rssi,
-                    classOfDevice = classOfDevice,
-                    serviceUuids = uuids.toServiceUuidStrings(),
-                )
-            }
-
-        if (!classicStarted) {
-            Log.w(TAG, "Classic discovery unavailable; continuing BLE-only passive scan")
-        }
     }
 }
 
