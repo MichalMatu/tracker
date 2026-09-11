@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phone-presmoke-service-state-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-11T08:26:49.041975+00:00",
+  "command_timeout": 180,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test \"$(git rev-parse HEAD)\" = '40eac7a504d363a05cd6c235c25146e01bb36ff2'; test -n \"$(adb shell pidof io.blueeye | tr -d '\\r')\"; echo '--- SCANNER_SERVICE ---'; adb shell dumpsys activity services io.blueeye | grep -E 'ScannerService|foreground|startRequested|isForeground' || true; echo '--- NOTIFICATION ---'; adb shell dumpsys notification --noredact | grep -E 'io.blueeye|scanner_channel' | head -n 40 || true; echo '--- RECENT_SCANNER_LOGS ---'; adb logcat -d -v brief -s ScannerService:V BleScanner:V '*:S' | tail -n 120",
+      "exit_code": 0,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\n--- SCANNER_SERVICE ---\n  * ServiceRecord{4127e7e u0 io.blueeye/.service.ScannerService c:io.blueeye}\n    intent={act=ACTION_START cmp=io.blueeye/.service.ScannerService}\n    infoAllowStartForeground=[callingPackage: io.blueeye; callingUid: 10639; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { act=ACTION_START xflg=0x4 cmp=io.blueeye/.service.ScannerService }; code:PROC_STATE_TOP; tempAllowListReason:<null>; allowWiu:12; targetSdkVersion:33; callerTargetSdkVersion:33; startForegroundCount:0; bindFromPackage:null: isBindService:false]\n    isForeground=true foregroundId=101 types=0x00000018 foregroundNoti=Notification(channel=scanner_channel shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|NO_CLEAR|FOREGROUND_SERVICE color=0x00000000 actions=1 vis=PRIVATE semFlags=0x0 semPriority=0 semMissedCount=0)\n    startRequested=true delayedStop=false stopIfKilled=true callStart=true lastStartId=1\n--- NOTIFICATION ---\n    NotificationRecord(0x031651ba: pkg=io.blueeye user=UserHandle{0} id=101 tag=null importance=2 key=0|io.blueeye|101|null|10639: Notification(channel=scanner_channel shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|NO_CLEAR|FOREGROUND_SERVICE color=0x00000000 actions=1 vis=PRIVATE semFlags=0x0 semPriority=0 semMissedCount=0))\n      opPkg=io.blueeye\n      icon=Icon(typ=RESOURCE pkg=io.blueeye id=0x0108004f)\n      key=0|io.blueeye|101|null|10639\n      groupKey=0|io.blueeye|101|null|10639\n            contentIntent=PendingIntent{d43a86b: PendingIntentRecord{2964c7c io.blueeye startActivity (allowlist: d81b85e:+30s0ms/0/NOTIFICATION_SERVICE/NotificationManagerService)}}\n                [0] \"Stop\" -> PendingIntent{e17fc8: PendingIntentRecord{1de6fdf io.blueeye startService (allowlist: d81b85e:+30s0ms/0/NOTIFICATION_SERVICE/NotificationManagerService)}}\n                android.appInfo=ApplicationInfo (ApplicationInfo{1a28861 io.blueeye})\n      effectiveNotificationChannel=NotificationChannel{mId='scanner_channel', mName=Background Scanner, mDescription=hasDescription , mImportance=2, mBypassDnd=false, mLockscreenVisibility=-1000, mSound=content://settings/system/notification_sound, mLights=false, mLightColor=0, mVibrationPattern=null, mVibrationEffect=null, mUserLockedFields=0, mUserVisibleTaskShown=true, mVibrationEnabled=false, mShowBadge=false, mDeleted=false, mDeletedTimeMs=-1, mGroup='null', mAudioAttributes=AudioAttributes: usage=USAGE_NOTIFICATION content=CONTENT_TYPE_SONIFICATION flags=0x800 tags= bundle=null, mBlockableSystem=false, mAllowBubbles=-1, mImportanceLockedByOEM=false, mImportanceLockedDefaultApp=false, mOriginalImp=2, mParent=null, mConversationId=null, mDemoted=false, mImportantConvo=false, mLastNotificationUpdateTimeMs=0, mSoundMissingReason=0}\n    StatusBarNotification(pkg=io.blueeye user=UserHandle{0} id=101 tag=null key=0|io.blueeye|101|null|10639: Notification(channel=scanner_channel shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|NO_CLEAR|FOREGROUND_SERVICE color=0x00000000 actions=1 vis=PRIVATE semFlags=0x0 semPriority=0 semMissedCount=0))\n      AppSettings: io.blueeye.core.data.test (10570) importance=NONE userSet=false\n      AppSettings: io.blueeye (10550)\n      AppSettings: io.blueeye (10556)\n      AppSettings: io.blueeye (10557)\n      AppSettings: io.blueeye (10559)\n      AppSettings: io.blueeye (10560)\n      AppSettings: io.blueeye (10561)\n      AppSettings: io.blueeye (10563)\n      AppSettings: io.blueeye (10564)\n      AppSettings: io.blueeye (10566)\n      AppSettings: io.blueeye (10639) importance=DEFAULT userSet=true\n        NotificationChannel{mId='scanner_channel', mName=Background Scanner, mDescription=hasDescription , mImportance=2, mBypassDnd=false, mLockscreenVisibility=-1000, mSound=content://settings/system/notification_sound, mLights=false, mLightColor=0, mVibrationPattern=null, mVibrationEffect=null, mUserLockedFields=0, mUserVisibleTaskShown=true, mVibrationEnabled=false, mShowBadge=false, mDeleted=false, mDeletedTimeMs=-1, mGroup='null', mAudioAttributes=AudioAttributes: usage=USAGE_NOTIFICATION content=CONTENT_TYPE_SONIFICATION flags=0x800 tags= bundle=null, mBlockableSystem=false, mAllowBubbles=-1, mImportanceLockedByOEM=false, mImportanceLockedDefaultApp=false, mOriginalImp=2, mParent=null, mConversationId=null, mDemoted=false, mImportantConvo=false, mLastNotificationUpdateTimeMs=0, mSoundMissingReason=0}\n    2026-09-11T10:16:03.122357 - config: io.blueeye|removeAutomaticZenRules (ORIGIN_SYSTEM) no changes\n    2026-09-11T10:16:03.122734 - set_zen_mode: off,io.blueeye|removeAutomaticZenRules\n      key='io.blueeye',\n    mKeys [Pair{392672262 0|io.blueeye|101|null|10639}]\n        0|io.blueeye|g:Aggregate_NormalNotificationSection\n            0|io.blueeye|101|null|10639\n--- RECENT_SCANNER_LOGS ---\n--------- beginning of main\nI/ScannerService(19734): lifecycle=SERVICE_CREATED\nI/ScannerService(19734): lifecycle=START_REQUESTED\nI/BleScanner(19734): Starting passive BLE scan...\nI/BleScanner(19734): Classic discovery suppressed by runtime profile STABLE_CORE\nI/ScannerService(19734): lifecycle=RUNNING\nI/ScannerService(19734): lifecycle=STOP_REQUESTED\nI/BleScanner(19734): Stopping ALL Scans\nI/ScannerService(19734): lifecycle=DESTROYED\nI/BleScanner(19734): Stopping ALL Scans\nI/ScannerService(19734): lifecycle=SERVICE_CREATED\nI/ScannerService(19734): lifecycle=START_REQUESTED\nI/BleScanner(19734): Starting passive BLE scan...\nI/BleScanner(19734): Classic discovery suppressed by runtime profile STABLE_CORE\nI/ScannerService(19734): lifecycle=RUNNING\n",
+      "elapsed_seconds": 3.809,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 12.12,
+      "output_policy": "stream",
+      "captured_output_chars": 5676,
+      "output_truncated": false,
+      "current_rss_mb": 12.12,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 3.809
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.145
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.071
+  },
+  "finished_at": "2026-09-11T08:26:54.837504+00:00",
+  "task_digest": "9438ce590cfffd7649f116e197aec9bf416b591562f66a4462981a96fb3fbd74",
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "attempt_id": "bd9c860d123d1d63d27b043e",
+  "daemon_version": "4.18.20"
+}
