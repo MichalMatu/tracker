@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "tracker-phase3-gps-range-20260911-v1",
   "task_digest": "c7142c2f6b8a6cec8dcab337663589c504abb722553eb320ff135f6dbfb77b05",
-  "idle_timeout": 120,
-  "task_timeout": 600,
-  "memory_limit_mb": 1024,
-  "started_at": "2026-09-11T10:21:07.077549+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-11T10:21:09.458308+00:00",
   "attempt_id": "98654e25327ed6615d69ed87",
   "daemon_version": "4.18.20",
   "daemon_pid": 96957,
-  "updated_at": "2026-09-11T10:21:07.077661+00:00",
+  "updated_at": "2026-09-11T10:21:09.751047+00:00",
   "pid": 96957
 }
