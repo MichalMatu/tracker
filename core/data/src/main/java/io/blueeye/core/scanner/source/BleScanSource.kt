@@ -3,6 +3,7 @@ package io.blueeye.core.scanner.source
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.os.Build
@@ -94,20 +95,14 @@ constructor(private val adapter: BluetoothAdapter?) {
                 }
                 .build()
 
-        val filters =
-            if (macFilter != null) {
-                val filter =
-                    android.bluetooth.le.ScanFilter.Builder()
-                        .setDeviceAddress(macFilter)
-                        .build()
-                listOf(filter)
-            } else {
-                null
-            }
+        val filters = buildScanFilters(macFilter)
 
         return try {
             scanner.startScan(filters, settings, callback)
-            Log.i("BleScanSource", "BLE Scan started (Filter: ${macFilter ?: "None"})")
+            Log.i(
+                "BleScanSource",
+                "BLE Scan started (Filter: ${macFilter ?: "broad all-pass"})",
+            )
             true
         } catch (e: RuntimeException) {
             if (scanCallback === callback) {
@@ -117,6 +112,22 @@ constructor(private val adapter: BluetoothAdapter?) {
             throw e
         }
     }
+
+    /**
+     * Android suspends unfiltered ScanCallback scans while the screen is off. Keep the broad radar
+     * scan on the filtered API path by supplying a non-empty all-pass filter list instead of null.
+     * Specific-MAC scans continue to use an exact address filter.
+     */
+    private fun buildScanFilters(macFilter: String?): List<ScanFilter> =
+        if (macFilter != null) {
+            listOf(
+                ScanFilter.Builder()
+                    .setDeviceAddress(macFilter)
+                    .build(),
+            )
+        } else {
+            listOf(ScanFilter.Builder().build())
+        }
 
     @SuppressLint("MissingPermission")
     @Synchronized
