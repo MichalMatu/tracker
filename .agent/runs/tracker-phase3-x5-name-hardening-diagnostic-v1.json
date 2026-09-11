@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phase3-x5-name-hardening-diagnostic-v1",
+  "task_digest": "5b0779336a1f6de069b686e1d7c4cd01e759d0482607aed49910a14cd0d2c235",
+  "idle_timeout": 240,
+  "task_timeout": 1200,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-11T02:27:09.822848+00:00",
+  "attempt_id": "f427c1c72c73828942ea4e7b",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 60272,
+  "updated_at": "2026-09-11T02:27:09.822994+00:00",
+  "pid": 60272
+}
