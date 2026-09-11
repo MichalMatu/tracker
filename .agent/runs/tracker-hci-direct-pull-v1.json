@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-hci-direct-pull-v1",
+  "task_digest": "318f7eb21debace2a4af0eb8c1bacfa1fee8c31a421159c2c06e981dd073b994",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-11T09:20:43.907254+00:00",
+  "attempt_id": "2e49f84db849c5b444ab8ba6",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 20858,
+  "updated_at": "2026-09-11T09:20:43.907303+00:00",
+  "pid": 20858
+}
