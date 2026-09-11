@@ -248,16 +248,7 @@ class BleScanHandler @Inject constructor(
         )
 
         val encounterCount = sessionManager.getMovingEncounterCount(fingerprint)
-        val history = rssiBuffer.getOrPut(fingerprint) { ArrayDeque(10) }
-        val continuesMovingWindow = sessionManager.isMovingObservationContinuous(fingerprint)
-        if (!userIsMoving || !continuesMovingWindow) {
-            history.clear()
-        }
-        if (userIsMoving) {
-            history.addLast(ctx.validRssi)
-            if (history.size > 10) history.removeFirst()
-        }
-        val rssiSamples = history.toList()
+        val rssiSamples = movingRssiSamples(fingerprint, ctx.validRssi, userIsMoving)
 
         val metrics = FollowMeScoreCalculator.DeviceMetrics(
             deviceType = deviceType,
@@ -322,6 +313,21 @@ class BleScanHandler @Inject constructor(
                 isKnownTracker = isKnownTracker,
             )
         }
+    }
+
+    private fun movingRssiSamples(
+        fingerprint: String,
+        rssi: Int,
+        userIsMoving: Boolean,
+    ): List<Int> {
+        val history = rssiBuffer.getOrPut(fingerprint) { ArrayDeque(10) }
+        val continuesMovingWindow = sessionManager.isMovingObservationContinuous(fingerprint)
+        if (!userIsMoving || !continuesMovingWindow) history.clear()
+        if (userIsMoving) {
+            history.addLast(rssi)
+            if (history.size > 10) history.removeFirst()
+        }
+        return history.toList()
     }
 
     /** Reset logical tracking memory only on an explicit tracking reset, never on a technical scan restart. */
