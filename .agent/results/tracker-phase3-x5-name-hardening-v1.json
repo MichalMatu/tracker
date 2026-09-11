@@ -1,0 +1,9 @@
+{
+  "id": "tracker-phase3-x5-name-hardening-v1",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "started_at": null,
+  "finished_at": "2026-09-11T02:22:01.868672+00:00",
+  "daemon_version": "4.18.20",
+  "error": "JSONDecodeError: Invalid control character at: line 16 column 1338 (char 2032)"
+}
