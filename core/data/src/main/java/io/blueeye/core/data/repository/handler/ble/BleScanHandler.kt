@@ -208,7 +208,6 @@ class BleScanHandler @Inject constructor(
     }
 
     private suspend fun calculateFollowMeScore(ctx: ScanDataContext) {
-        // Public-safety signal evidence is reviewed by its own pipeline.
         if (ctx.isTactical) return
 
         val existing = ctx.existingDevice
@@ -250,6 +249,10 @@ class BleScanHandler @Inject constructor(
 
         val encounterCount = sessionManager.getMovingEncounterCount(fingerprint)
         val history = rssiBuffer.getOrPut(fingerprint) { ArrayDeque(10) }
+        val continuesMovingWindow = sessionManager.isMovingObservationContinuous(fingerprint)
+        if (!userIsMoving || !continuesMovingWindow) {
+            history.clear()
+        }
         if (userIsMoving) {
             history.addLast(ctx.validRssi)
             if (history.size > 10) history.removeFirst()
