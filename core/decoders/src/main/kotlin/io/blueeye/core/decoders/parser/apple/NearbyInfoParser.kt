@@ -17,9 +17,8 @@ constructor() {
         val activity = (status shr 4) and 0x0F
         val actionDescription = getActionDescription(activity)
 
-        // Lower Nibble: Device Type (Low 4 bits)
-        val deviceTypeId = status and 0x0F
-        val deviceModel = getDeviceType(deviceTypeId)
+        // The lower nibble belongs to Nearby Info protocol/status semantics. It is not reliable
+        // physical-model evidence and must not be promoted to deviceModel.
 
         // FuriousMAC: Status Flags (often in next byte, low nibble)
         // 0001 Primary Device (Y/N)
@@ -34,7 +33,7 @@ constructor() {
             }
 
         return AppleDeviceData(
-            deviceModel = deviceModel,
+            deviceModel = null,
             statusFlags = status,
             nearbyActionCode = activity,
             nearbyActionDescription = actionDescription,
@@ -56,28 +55,6 @@ constructor() {
             0x0D -> "User in Vehicle"
             0x0E -> "PhoneCall/FaceTime"
             else -> "Unknown Activity (0x${"%02X".format(action)})"
-        }
-    }
-
-    private fun getDeviceType(id: Int): String {
-        return when (id) {
-            0 -> "Unknown / Generic"
-            1 -> "iPhone"
-            2 -> "iPad"
-            3 -> "Apple Watch"
-            4 -> "MacBook"
-            5 -> "Mac Desktop"
-            6 -> "Apple TV"
-            7 -> "AirPods"
-            8 -> "HomePod"
-            9 -> "AirPods Pro"
-            10 -> "AirPods Max"
-            11 -> "AirPods Pro 2"
-            12 -> "iPhone (Modern)"
-            13 -> "iPad Pro"
-            14 -> "AirTag"
-            15 -> "Apple Vision Pro"
-            else -> "Unknown Type ($id)"
         }
     }
 }
