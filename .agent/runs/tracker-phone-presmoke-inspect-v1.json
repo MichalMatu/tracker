@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 3,
-  "command": "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch origin main >/dev/null; test \"$(git rev-parse origin/main)\" = '40eac7a504d363a05cd6c235c25146e01bb36ff2'; test \"$(git rev-parse HEAD)\" = '40eac7a504d363a05cd6c235c25146e01bb36ff2'; test \"$(adb devices | awk 'NR>1 && $2==\"device\" {c++} END{print c+0}')\" = '1'; echo MODEL=$(adb shell getprop ro.product.model | tr -d '\\r'); adb shell pm path io.blueeye | grep '^package:'; adb shell wm size",
-  "pid": 56583,
+  "command": "set -euo pipefail; adb logcat -c; adb shell am force-stop io.blueeye; adb shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/tmp/tracker-launch.txt 2>&1; sleep 2; PID=$(adb shell pidof io.blueeye | tr -d '\\r'); test -n \"$PID\"; echo PID=$PID; adb shell uiautomator dump /sdcard/tracker-window.xml >/dev/null; adb shell cat /sdcard/tracker-window.xml | tr '>' '>\\n' | head -n 120",
+  "pid": 56666,
   "timeout": 300,
   "idle_timeout": 120,
   "memory_limit_mb": 1024,
-  "started_at": "2026-09-11T08:22:36.519275+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-11T08:22:40.931232+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-phone-presmoke-inspect-v1",
@@ -18,5 +18,5 @@
   "task_digest": "e47e41b1b476c273a6174999264b5b25234c32dcdd5649b858437d1aa92069e4",
   "daemon_version": "4.18.20",
   "daemon_pid": 56419,
-  "updated_at": "2026-09-11T08:22:36.519445+00:00"
+  "updated_at": "2026-09-11T08:22:41.027775+00:00"
 }
