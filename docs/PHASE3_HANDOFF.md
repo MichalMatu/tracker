@@ -1,3 +1,11 @@
+<!-- PHASE3-2026-09-11-FINAL-OVERRIDE -->
+> **2026-09-11 continuation override — read this before the historical handoff below.**
+>
+> Application milestone SHA: `630e184dbc328672a961e2826208fddd77a68f02` (`Stabilize retention and location latency`).
+> Phase 3 source stabilization work from the field-walk blockers is implemented through this SHA. Local final static gate `tracker-phase3-final-stabilization-static-gate-v2` is terminal PASS (`core:data:detekt` + exact `feature:settings` ktlint check). Secret Scan #137 and Sandbox Pack #62 are exact-SHA PASS. Quality #107 (`34575320891`) and Android UI Smoke #38 (`34575320942`) were still `in_progress` when this handoff was written. Do not claim Phase 3 final acceptance until those exact-SHA workflows are checked terminally and the targeted Samsung field reacceptance below is completed.
+>
+> The authoritative compact continuation record is `docs/PHASE3_FINAL_HANDOFF_2026-09-11.md`. The older text below remains historical evidence and should not be treated as the current blocker list.
+
 # Phase 3 New-Chat Handoff — Field Walk Findings and Targeted Stabilization
 
 Status: **FIELD WALK COMPLETED; BLOCKING FIELD DEFECTS FOUND; PHASE 3 NOT CLOSED**
