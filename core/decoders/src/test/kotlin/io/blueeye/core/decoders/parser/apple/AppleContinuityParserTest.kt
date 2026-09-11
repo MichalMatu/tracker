@@ -2,6 +2,7 @@ package io.blueeye.core.decoders.parser.apple
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class AppleContinuityParserTest {
@@ -58,17 +59,51 @@ class AppleContinuityParserTest {
     }
 
     @Test
-    fun parse_shouldDecodeNearbyInfo_actionAndFlags() {
-        // status byte: lower nibble deviceType=1 (iPhone), upper nibble action=0x0B (Active User)
+    fun parse_shouldDecodeNearbyInfo_actionAndFlags_withoutPhysicalModelGuess() {
+        // status byte: upper nibble action=0x0B (Active User); lower nibble remains protocol/status data.
         // flags byte: 0b0101 -> primary device + airdrop receiving (per FuriousMAC low nibble)
         val mfg = byteArrayOf(0x10, 0x02, 0xB1.toByte(), 0x05)
 
         val result = parser.parse(mfg)
         assertNotNull(result)
-        assertEquals("iPhone", result?.deviceModel)
+        assertNull(result?.deviceModel)
+        assertEquals(0xB1, result?.statusFlags)
         assertEquals(0x0B, result?.nearbyActionCode)
         assertEquals("Active User", result?.nearbyActionDescription)
         assertEquals(0x05, result?.nearbyStatusFlags)
+    }
+
+    @Test
+    fun parse_shouldNotTreatNearbyInfoLowNibbleAsVisionProModel() {
+        val mfg = byteArrayOf(0x10, 0x02, 0xBF.toByte(), 0x05)
+
+        val result = parser.parse(mfg)
+        assertNotNull(result)
+        assertNull(result?.deviceModel)
+        assertEquals(0xBF, result?.statusFlags)
+        assertEquals(0x0B, result?.nearbyActionCode)
+        assertEquals("Active User", result?.nearbyActionDescription)
+    }
+
+    @Test
+    fun parse_shouldPreserveSpecificModelWhenNearbyInfoFollowsAnotherTlv() {
+        val mfg =
+            byteArrayOf(
+                0x07,
+                0x01,
+                0x0B,
+                0x10,
+                0x02,
+                0xBF.toByte(),
+                0x05,
+            )
+
+        val result = parser.parse(mfg)
+        assertNotNull(result)
+        assertEquals("AirPods Pro", result?.deviceModel)
+        assertEquals(0x0B, result?.proximitySubtype)
+        assertEquals(0x0B, result?.nearbyActionCode)
+        assertEquals("Active User", result?.nearbyActionDescription)
     }
 
     @Test
