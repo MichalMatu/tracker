@@ -32,7 +32,7 @@ class AddressCarryoverTrackerTest {
     }
 
     @Test
-    fun `processScan correlates device with identical Payload Hash regardless of RSSI`() {
+    fun `processScan correlates sequential device with identical Payload Hash regardless of RSSI`() {
         val hashData = byteArrayOf(0x01, 0x02, 0x03, 0x04, 0x05)
 
         // 1. First Scan (Mac A)
@@ -49,12 +49,12 @@ class AddressCarryoverTrackerTest {
         val res1 = tracker.processScan(data1, deviceName = null)
         assertTrue("First device should be new", res1.isNewTarget)
 
-        // 2. Second Scan (Mac B)
+        // 2. Second Scan (Mac B), clearly sequential rather than coexisting.
         val data2 =
             io.blueeye.core.scanner.model.BleScanResultData(
                 mac = "22:22:22:22:22:22",
                 rssi = -80,
-                timestamp = 2000L,
+                timestamp = 4000L,
                 technology = "BLE",
                 manufacturerData = hashData,
                 serviceUuids = emptyList(),
@@ -134,7 +134,7 @@ class AddressCarryoverTrackerTest {
     }
 
     @Test
-    fun `processScan detects Service UUID match with RSSI`() {
+    fun `processScan detects sequential Service UUID match with RSSI`() {
         val uuids = listOf("0000fe95-0000-1000-8000-00805f9b34fb")
 
         // 1. First Scan
@@ -148,12 +148,12 @@ class AddressCarryoverTrackerTest {
             )
         val res1 = tracker.processScan(data1, deviceName = null)
 
-        // 2. Second Scan
+        // 2. Second Scan, after the coexistence guard window.
         val data2 =
             io.blueeye.core.scanner.model.BleScanResultData(
                 mac = "FF:FF:FF:22:22:22",
                 rssi = -65,
-                timestamp = 2000L,
+                timestamp = 4000L,
                 technology = "BLE",
                 serviceUuids = uuids
             )
