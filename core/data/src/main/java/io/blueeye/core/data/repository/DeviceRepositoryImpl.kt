@@ -89,6 +89,12 @@ constructor(
             .asResult()
     }
 
+    override suspend fun getIdentityCandidatesSince(
+        sinceTimestamp: Long,
+    ): Result<List<io.blueeye.core.model.IdentityContinuityCandidate>> = runCatching {
+        deviceHistoryDataSource.getIdentityCandidatesSince(sinceTimestamp)
+    }
+
     override suspend fun updateDeviceConfig(
         fingerprint: String,
         config: io.blueeye.core.domain.repository.DeviceConfig,

@@ -4,6 +4,7 @@ import io.blueeye.core.model.AlertEvidenceEvent
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.IdentityCarryoverVerdict
+import io.blueeye.core.model.IdentityContinuityCandidate
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -38,6 +39,8 @@ interface DeviceAlertEvidenceRepository {
     fun getAlertEvidenceEvents(fingerprint: String): Flow<Result<List<AlertEvidenceEvent>>>
 
     fun getRecentAlertEvidenceEvents(): Flow<Result<List<AlertEvidenceEvent>>>
+
+    suspend fun getIdentityCandidatesSince(sinceTimestamp: Long): Result<List<IdentityContinuityCandidate>>
 }
 
 /**

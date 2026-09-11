@@ -2,6 +2,7 @@ package io.blueeye.core.data.repository.handler.ble
 
 import io.blueeye.core.data.db.dao.DeviceDao
 import io.blueeye.core.data.db.dao.FollowMeObservationDao
+import io.blueeye.core.data.db.dao.IdentityContinuityCandidateDao
 import io.blueeye.core.data.db.dao.SignalSampleDao
 import io.blueeye.core.data.db.entity.DeviceEntity
 import io.blueeye.core.data.repository.handler.common.DeviceTypePriorityHelper
@@ -27,6 +28,7 @@ class DevicePersisterDebounceTest {
     private val deviceDao: DeviceDao = mock()
     private val signalSampleDao: SignalSampleDao = mock()
     private val followMeObservationDao: FollowMeObservationDao = mock()
+    private val identityContinuityCandidateDao: IdentityContinuityCandidateDao = mock()
     private val followMeObservationRecorder = FollowMeObservationRecorder(followMeObservationDao)
     private val scanThrottler: ScanThrottler = mock()
     private val locationProvider: LocationProvider = mock()
@@ -43,6 +45,7 @@ class DevicePersisterDebounceTest {
         scanThrottler = scanThrottler,
         priorityHelper = priorityHelper,
         signalSamplePersister = signalSamplePersister,
+        identityContinuityCandidateDao = identityContinuityCandidateDao,
     )
 
     @Test

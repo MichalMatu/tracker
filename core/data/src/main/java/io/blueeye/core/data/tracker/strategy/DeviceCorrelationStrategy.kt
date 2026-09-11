@@ -4,6 +4,7 @@ import io.blueeye.core.data.classifier.AppleIdentityConflictGuard
 import io.blueeye.core.data.tracker.model.CarryoverMatch
 import io.blueeye.core.data.tracker.model.CarryoverMatchEvidence
 import io.blueeye.core.data.tracker.model.CarryoverMatchReason
+import io.blueeye.core.data.tracker.model.IdentityCandidateMatch
 import io.blueeye.core.data.tracker.model.TrackedTarget
 import io.blueeye.core.scanner.model.BleScanResultData
 import javax.inject.Inject
@@ -20,8 +21,11 @@ class DeviceCorrelationStrategy
 @Inject
 constructor() {
     companion object {
-        /** Maximum time to consider for carryover (30 seconds) */
+        /** Maximum time to consider for destructive carryover (30 seconds). */
         const val CARRYOVER_WINDOW_MS = 30_000L
+
+        /** Maximum age for a non-destructive long-gap identity candidate. */
+        const val LONG_GAP_CANDIDATE_WINDOW_MS = 300_000L
 
         /** Maximum RSSI difference for correlation */
         const val MAX_RSSI_DIFF = 25
@@ -56,14 +60,7 @@ constructor() {
         advertisingInterval: Long?,
         targets: Collection<TrackedTarget>,
     ): CarryoverMatch? {
-        val input =
-            MatchInput(
-                data = data,
-                deviceName = deviceName,
-                advertisingInterval = advertisingInterval,
-                serviceUuids = data.serviceUuids.toSet(),
-                rawData = data.rawData ?: data.manufacturerData,
-            )
+        val input = buildMatchInput(data, deviceName, advertisingInterval)
 
         // Select best target based on score
         var bestMatch: CarryoverMatch? = null
@@ -85,6 +82,75 @@ constructor() {
         }
 
         return bestMatch
+    }
+
+    /**
+     * Finds review-only continuity evidence outside the destructive 30-second carryover window.
+     * The caller must not use this result to rewrite the current fingerprint or merge records.
+     */
+    fun findLongGapCandidate(
+        data: BleScanResultData,
+        deviceName: String?,
+        advertisingInterval: Long?,
+        targets: Collection<TrackedTarget>,
+    ): IdentityCandidateMatch? {
+        val input = buildMatchInput(data, deviceName, advertisingInterval)
+        for (target in targets) {
+            val timeSinceLastSeen = input.data.timestamp - target.lastSeenAt
+            val isWithinCandidateWindow =
+                timeSinceLastSeen > CARRYOVER_WINDOW_MS &&
+                    timeSinceLastSeen <= LONG_GAP_CANDIDATE_WINDOW_MS
+            val hasNameFamilyConflict =
+                AppleIdentityConflictGuard.hasNameFamilyConflict(input.deviceName, target.lastDeviceName)
+            if (isWithinCandidateWindow && !hasNameFamilyConflict) {
+                val evidence = longGapSameNameEvidence(input, target)
+                if (evidence != null) {
+                    return IdentityCandidateMatch(
+                        candidateFingerprint = target.primaryMac,
+                        evidence = evidence,
+                    )
+                }
+            }
+        }
+        return null
+    }
+
+    private fun buildMatchInput(
+        data: BleScanResultData,
+        deviceName: String?,
+        advertisingInterval: Long?,
+    ): MatchInput =
+        MatchInput(
+            data = data,
+            deviceName = deviceName,
+            advertisingInterval = advertisingInterval,
+            serviceUuids = data.serviceUuids.toSet(),
+            rawData = data.rawData ?: data.manufacturerData,
+        )
+
+    private fun longGapSameNameEvidence(
+        input: MatchInput,
+        target: TrackedTarget,
+    ): CarryoverMatchEvidence? {
+        val name = input.deviceName
+        val hasMatchingSpecificName =
+            !name.isNullOrBlank() &&
+                name == target.lastDeviceName &&
+                !isGenericName(name)
+        val rssiDiff = abs(input.data.rssi - target.lastRssi)
+        return when {
+            !hasMatchingSpecificName -> null
+            !hasSameNameCorroboration(input, target) -> null
+            rssiDiff > MAX_RSSI_DIFF || input.data.rssi <= -95 -> null
+            else ->
+                carryoverEvidence(
+                    reasonCode = CarryoverMatchReason.SAME_NAME_PROXIMITY,
+                    confidence = 1.0f,
+                    input = input,
+                    target = target,
+                    details = "candidateOnly=true;scorePct=100",
+                )
+        }
     }
 
     private fun weightedMatchForTarget(

@@ -13,6 +13,7 @@ import io.blueeye.core.data.db.TrackerDatabase
 import io.blueeye.core.data.db.dao.AlertEvidenceEventDao
 import io.blueeye.core.data.db.dao.DeviceDao
 import io.blueeye.core.data.db.dao.FollowMeObservationDao
+import io.blueeye.core.data.db.dao.IdentityContinuityCandidateDao
 import io.blueeye.core.data.db.dao.SignalSampleDao
 import io.blueeye.core.data.db.dao.WatchlistDao
 import javax.inject.Singleton
@@ -33,7 +34,7 @@ object DatabaseModule {
         )
             .addMigrations(migration13To14, migration14To15)
             .addMigrations(migration15To16, migration16To17, migration17To18, migration18To19)
-            .addMigrations(migration19To20, migration20To21, migration21To22)
+            .addMigrations(migration19To20, migration20To21, migration21To22, migration22To23)
             .fallbackToDestructiveMigration() // Na etapie developmentu
             .build()
     }
@@ -64,6 +65,12 @@ object DatabaseModule {
 
     @Provides
     @Singleton
+    fun provideIdentityContinuityCandidateDao(database: TrackerDatabase): IdentityContinuityCandidateDao {
+        return database.identityContinuityCandidateDao()
+    }
+
+    @Provides
+    @Singleton
     fun provideWatchlistDao(database: TrackerDatabase): WatchlistDao {
         return database.watchlistDao()
     }
@@ -78,6 +85,7 @@ object DatabaseModule {
     private const val DATABASE_VERSION_20 = 20
     private const val DATABASE_VERSION_21 = 21
     private const val DATABASE_VERSION_22 = 22
+    private const val DATABASE_VERSION_23 = 23
 
     private val migration13To14 =
         object : Migration(DATABASE_VERSION_13, DATABASE_VERSION_14) {
@@ -265,6 +273,39 @@ object DatabaseModule {
                 }
 
                 db.execSQL("ALTER TABLE signal_samples ADD COLUMN followingScore REAL")
+            }
+        }
+
+    private val migration22To23 =
+        object : Migration(DATABASE_VERSION_22, DATABASE_VERSION_23) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS identity_continuity_candidates (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        deviceFingerprint TEXT NOT NULL,
+                        candidateFingerprint TEXT NOT NULL,
+                        timestamp INTEGER NOT NULL,
+                        reasonCode TEXT NOT NULL,
+                        confidence REAL NOT NULL,
+                        featureSummary TEXT NOT NULL,
+                        verdict TEXT NOT NULL DEFAULT 'UNREVIEWED',
+                        FOREIGN KEY(deviceFingerprint) REFERENCES devices(fingerprint) ON DELETE CASCADE
+                    )
+                    """.trimIndent(),
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_identity_continuity_candidates_deviceFingerprint " +
+                        "ON identity_continuity_candidates(deviceFingerprint)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_identity_continuity_candidates_candidateFingerprint " +
+                        "ON identity_continuity_candidates(candidateFingerprint)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_identity_continuity_candidates_timestamp " +
+                        "ON identity_continuity_candidates(timestamp)",
+                )
             }
         }
 }

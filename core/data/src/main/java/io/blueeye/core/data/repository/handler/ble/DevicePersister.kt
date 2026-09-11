@@ -4,7 +4,9 @@ import android.util.Log
 import io.blueeye.core.data.classifier.AppleIdentityConflictGuard
 import io.blueeye.core.data.classifier.chipset.ChipsetIdentifier
 import io.blueeye.core.data.db.dao.DeviceDao
+import io.blueeye.core.data.db.dao.IdentityContinuityCandidateDao
 import io.blueeye.core.data.db.entity.DeviceEntity
+import io.blueeye.core.data.db.entity.IdentityContinuityCandidateEntity
 import io.blueeye.core.data.repository.handler.common.DeviceTypePriorityHelper
 import io.blueeye.core.data.util.NameUtils
 import io.blueeye.core.scanner.throttle.ScanThrottler
@@ -38,6 +40,7 @@ class DevicePersister @Inject constructor(
     private val scanThrottler: ScanThrottler,
     private val priorityHelper: DeviceTypePriorityHelper,
     private val signalSamplePersister: SignalSamplePersister,
+    private val identityContinuityCandidateDao: IdentityContinuityCandidateDao,
 ) {
 
     internal suspend fun persist(
@@ -61,12 +64,28 @@ class DevicePersister @Inject constructor(
         if (stageOutcome.shouldRecordFollowMeObservation) {
             followMeObservationRecorder.record(ctx)
         }
+        persistIdentityCandidate(ctx)
 
         val signalSampleOutcome = signalSamplePersister.persist(ctx, classifier)
         return BlePersistenceOutcome(
             deviceUpdated = stageOutcome.deviceUpdated,
             deviceUpdateThrottled = stageOutcome.deviceUpdateThrottled,
             signalSampleOutcome = signalSampleOutcome,
+        )
+    }
+
+    private suspend fun persistIdentityCandidate(ctx: ScanDataContext) {
+        val candidate = ctx.identityCandidate ?: return
+        if (ctx.fingerprint != ctx.mac || candidate.candidateFingerprint == ctx.fingerprint) return
+        identityContinuityCandidateDao.insert(
+            IdentityContinuityCandidateEntity(
+                deviceFingerprint = ctx.fingerprint,
+                candidateFingerprint = candidate.candidateFingerprint,
+                timestamp = ctx.timestamp,
+                reasonCode = candidate.evidence.reasonCode.name,
+                confidence = candidate.evidence.confidence,
+                featureSummary = candidate.evidence.featureSummary,
+            ),
         )
     }
 

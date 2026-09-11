@@ -546,6 +546,8 @@ class AppleDeduplicationScenariosTest {
         override suspend fun moveSamples(targetFingerprint: String, sourceFingerprint: String) {}
         override suspend fun moveFollowMeObservations(targetFingerprint: String, sourceFingerprint: String) {}
         override suspend fun moveAlertEvidenceEvents(targetFingerprint: String, sourceFingerprint: String) {}
+        override suspend fun moveIdentityCandidates(targetFingerprint: String, sourceFingerprint: String) {}
+        override suspend fun retargetIdentityCandidates(targetFingerprint: String, sourceFingerprint: String) {}
         override suspend fun deleteByFingerprint(fingerprint: String) { 
              db.remove(fingerprint) 
         }

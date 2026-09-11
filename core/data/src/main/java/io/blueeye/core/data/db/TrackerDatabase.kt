@@ -6,11 +6,13 @@ import androidx.room.TypeConverters
 import io.blueeye.core.data.db.dao.AlertEvidenceEventDao
 import io.blueeye.core.data.db.dao.DeviceDao
 import io.blueeye.core.data.db.dao.FollowMeObservationDao
+import io.blueeye.core.data.db.dao.IdentityContinuityCandidateDao
 import io.blueeye.core.data.db.dao.SignalSampleDao
 import io.blueeye.core.data.db.dao.WatchlistDao
 import io.blueeye.core.data.db.entity.AlertEvidenceEventEntity
 import io.blueeye.core.data.db.entity.DeviceEntity
 import io.blueeye.core.data.db.entity.FollowMeObservationEntity
+import io.blueeye.core.data.db.entity.IdentityContinuityCandidateEntity
 import io.blueeye.core.data.db.entity.SignalSampleEntity
 
 /**
@@ -30,9 +32,10 @@ import io.blueeye.core.data.db.entity.SignalSampleEntity
         SignalSampleEntity::class,
         FollowMeObservationEntity::class,
         AlertEvidenceEventEntity::class,
+        IdentityContinuityCandidateEntity::class,
         io.blueeye.core.data.db.entity.WatchlistEntity::class,
     ],
-    version = 22,
+    version = 23,
     exportSchema = false,
 )
 @TypeConverters(Converters::class, EvidenceConverters::class)
@@ -50,6 +53,8 @@ abstract class TrackerDatabase : RoomDatabase() {
     abstract fun followMeObservationDao(): FollowMeObservationDao
 
     abstract fun alertEvidenceEventDao(): AlertEvidenceEventDao
+
+    abstract fun identityContinuityCandidateDao(): IdentityContinuityCandidateDao
 
     abstract fun watchlistDao(): WatchlistDao
 

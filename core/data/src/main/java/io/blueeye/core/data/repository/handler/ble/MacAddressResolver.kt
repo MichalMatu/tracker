@@ -94,6 +94,7 @@ class MacAddressResolver @Inject constructor(
         }
 
         ctx.macChangeCount = correlationInfo.macChangeCount
+        ctx.identityCandidate = correlationInfo.identityCandidate
 
         val stableMac = correlationInfo.correlatedMac
         if (stableMac != null && stableMac != ctx.mac) {

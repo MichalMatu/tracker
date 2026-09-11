@@ -21,6 +21,12 @@ data class CarryoverMatch(
     val evidence: CarryoverMatchEvidence,
 )
 
+/** Non-destructive identity-continuity candidate for later persistence and review. */
+data class IdentityCandidateMatch(
+    val candidateFingerprint: String,
+    val evidence: CarryoverMatchEvidence,
+)
+
 /** Result of correlation attempt. */
 data class CorrelationResult(
     val targetId: String,
@@ -30,4 +36,5 @@ data class CorrelationResult(
     val correlatedMac: String?,
     val macChangeCount: Int = 0,
     val matchEvidence: CarryoverMatchEvidence? = null,
+    val identityCandidate: IdentityCandidateMatch? = null,
 )

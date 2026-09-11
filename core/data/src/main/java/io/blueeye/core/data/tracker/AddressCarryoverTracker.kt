@@ -162,6 +162,17 @@ constructor(
             advertisingInterval,
             targets.values
         )
+        val identityCandidate =
+            if (carryoverMatch == null) {
+                correlationStrategy.findLongGapCandidate(
+                    data = data,
+                    deviceName = deviceName,
+                    advertisingInterval = advertisingInterval,
+                    targets = targets.values,
+                )
+            } else {
+                null
+            }
 
         val result = if (carryoverMatch != null) {
             handleCarryover(
@@ -181,7 +192,7 @@ constructor(
                 deviceName,
                 data.rawData ?: data.manufacturerData,
                 advertisingInterval
-            )
+            ).copy(identityCandidate = identityCandidate)
         }
         
         return result

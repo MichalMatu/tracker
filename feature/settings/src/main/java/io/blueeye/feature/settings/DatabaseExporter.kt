@@ -11,6 +11,7 @@ import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.FollowMeHistorySample
 import io.blueeye.core.model.IdentityCarryoverVerdict
+import io.blueeye.core.model.IdentityContinuityCandidate
 import io.blueeye.core.model.SignalSample
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -95,6 +96,11 @@ class DatabaseExporter
                     devices = sessionDevices,
                     sessionStartedAt = sessionStartedAt,
                 )
+            val sessionIdentityCandidates =
+                runCatching {
+                    deviceRepository.getIdentityCandidatesSince(sessionStartedAt)
+                        .getOrDefault(emptyList())
+                }.getOrDefault(emptyList())
 
             return DatabaseExportData(
                 devices = devices,
@@ -109,6 +115,7 @@ class DatabaseExporter
                         activeCollectionEnabled = activeCollectionEnabled,
                         followMeObservations = sessionFollowMeObservations,
                         alertEvidenceEvents = sessionAlertEvidenceEvents,
+                        identityCandidates = sessionIdentityCandidates,
                     ),
                 exportDate = exportDate,
             )
@@ -163,6 +170,7 @@ internal data class DatabaseExportSessionData(
     val activeCollectionEnabled: Boolean,
     val followMeObservations: List<SessionFollowMeObservation>,
     val alertEvidenceEvents: List<AlertEvidenceEvent>,
+    val identityCandidates: List<IdentityContinuityCandidate> = emptyList(),
 )
 
 internal data class SessionFollowMeObservation(
@@ -315,6 +323,7 @@ internal object DatabaseExportJsonMapper {
                     ),
                 ),
             )
+            put("identityContinuityCandidates", SessionIdentityCandidateExportMapper.map(session.identityCandidates))
             put(
                 "decodedSignals",
                 SessionDecodedSignalExportMapper.decodedSignals(session.devices),
@@ -504,7 +513,24 @@ internal object DatabaseExportJsonMapper {
             put("probeError", sample.probeError)
         }
 
-    private const val SCHEMA_VERSION = 19
+    private const val SCHEMA_VERSION = 20
+}
+
+internal object SessionIdentityCandidateExportMapper {
+    fun map(candidates: List<IdentityContinuityCandidate>): JsonArray =
+        JsonArray(candidates.map(::mapCandidate))
+
+    private fun mapCandidate(candidate: IdentityContinuityCandidate): JsonObject =
+        buildJsonObject {
+            put("id", candidate.id)
+            put("deviceFingerprint", candidate.deviceFingerprint)
+            put("candidateFingerprint", candidate.candidateFingerprint)
+            put("timestamp", candidate.timestamp)
+            put("reasonCode", candidate.reasonCode)
+            put("confidence", candidate.confidence)
+            put("featureSummary", candidate.featureSummary)
+            put("verdict", candidate.verdict.name)
+        }
 }
 
 private val SessionReviewDeviceQueueDecision.kind: String

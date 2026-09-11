@@ -107,6 +107,55 @@ class AddressCarryoverTrackerTest {
     }
 
     @Test
+    fun `long gap corroborated JBL name becomes candidate without carryover`() {
+        val now = System.currentTimeMillis()
+        val serviceUuids = listOf("0000fe2c-0000-1000-8000-00805f9b34fb")
+        val first =
+            createScanData("41:11:11:11:11:11", "JBL Tune 520BT-LE", null, null).copy(
+                timestamp = now,
+                serviceUuids = serviceUuids,
+            )
+        val second =
+            createScanData("42:22:22:22:22:22", "JBL Tune 520BT-LE", null, null).copy(
+                timestamp = now + 108_000L,
+                serviceUuids = serviceUuids,
+            )
+
+        val firstResult = tracker.processScan(first, first.name)
+        val secondResult = tracker.processScan(second, second.name)
+
+        assertTrue(firstResult.isNewTarget)
+        assertTrue(secondResult.isNewTarget)
+        assertFalse(secondResult.isCarryover)
+        assertNotEquals(firstResult.targetId, secondResult.targetId)
+        assertEquals(first.mac, secondResult.identityCandidate?.candidateFingerprint)
+        assertEquals(
+            CarryoverMatchReason.SAME_NAME_PROXIMITY,
+            secondResult.identityCandidate?.evidence?.reasonCode,
+        )
+        assertTrue(secondResult.identityCandidate?.evidence?.featureSummary.orEmpty().contains("candidateOnly=true"))
+        assertTrue(secondResult.identityCandidate?.evidence?.featureSummary.orEmpty().contains("timeDeltaMs=108000"))
+    }
+
+    @Test
+    fun `long gap OPPO name without corroboration stays separate without candidate`() {
+        val now = System.currentTimeMillis()
+        val first =
+            createScanData("51:11:11:11:11:11", "OPPO Enco Buds3 Pro", null, null).copy(timestamp = now)
+        val second =
+            createScanData("52:22:22:22:22:22", "OPPO Enco Buds3 Pro", null, null).copy(timestamp = now + 72_000L)
+
+        val firstResult = tracker.processScan(first, first.name)
+        val secondResult = tracker.processScan(second, second.name)
+
+        assertTrue(firstResult.isNewTarget)
+        assertTrue(secondResult.isNewTarget)
+        assertFalse(secondResult.isCarryover)
+        assertNotEquals(firstResult.targetId, secondResult.targetId)
+        assertNull(secondResult.identityCandidate)
+    }
+
+    @Test
     fun `known alias should keep reporting primary mac for persistence`() {
         val primaryMac = "69:95:CC:A8:9C:A0"
         val aliasMac = "F1:B0:CE:0D:2E:4B"

@@ -57,6 +57,24 @@ interface DeviceActionDao {
         sourceFingerprint: String,
     )
 
+    @Query(
+        "UPDATE identity_continuity_candidates SET deviceFingerprint = :targetFingerprint " +
+            "WHERE deviceFingerprint = :sourceFingerprint",
+    )
+    suspend fun moveIdentityCandidates(
+        targetFingerprint: String,
+        sourceFingerprint: String,
+    )
+
+    @Query(
+        "UPDATE identity_continuity_candidates SET candidateFingerprint = :targetFingerprint " +
+            "WHERE candidateFingerprint = :sourceFingerprint",
+    )
+    suspend fun retargetIdentityCandidates(
+        targetFingerprint: String,
+        sourceFingerprint: String,
+    )
+
     @Query("DELETE FROM devices WHERE fingerprint = :fingerprint")
     suspend fun deleteByFingerprint(fingerprint: String)
 
@@ -100,6 +118,8 @@ interface DeviceActionDao {
         moveSamples(targetFingerprint, duplicateFingerprint)
         moveFollowMeObservations(targetFingerprint, duplicateFingerprint)
         moveAlertEvidenceEvents(targetFingerprint, duplicateFingerprint)
+        moveIdentityCandidates(targetFingerprint, duplicateFingerprint)
+        retargetIdentityCandidates(targetFingerprint, duplicateFingerprint)
         deleteByFingerprint(duplicateFingerprint)
     }
 

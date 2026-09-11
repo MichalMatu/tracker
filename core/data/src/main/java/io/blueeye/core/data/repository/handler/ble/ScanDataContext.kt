@@ -1,6 +1,7 @@
 package io.blueeye.core.data.repository.handler.ble
 
 import io.blueeye.core.data.db.entity.DeviceEntity
+import io.blueeye.core.data.tracker.model.IdentityCandidateMatch
 import io.blueeye.core.model.DetectionEvidence
 import io.blueeye.core.model.DeviceType
 import io.blueeye.core.model.MacAddressType
@@ -64,6 +65,9 @@ data class ScanDataContext(
 
     /** Compact feature summary used by the MAC carryover matcher */
     var carryoverFeatures: String? = null,
+
+    /** Review-only continuity candidate; never changes the current fingerprint by itself. */
+    var identityCandidate: IdentityCandidateMatch? = null,
 
     /** Whether this scan result is provisional (too weak to persist) */
     var isProvisional: Boolean = false,
