@@ -43,6 +43,14 @@ class DeviceHistoryDataSource @Inject constructor(
     suspend fun getIdentityCandidatesSince(sinceTimestamp: Long): List<IdentityContinuityCandidate> =
         identityContinuityCandidateDao.getSince(sinceTimestamp).toIdentityContinuityCandidateDomain()
 
+    suspend fun deleteExpiredHistory(now: Long) {
+        signalSampleDao.deleteOldSamples(now - SIGNAL_SAMPLE_RETENTION_MS)
+        val evidenceBefore = now - EVIDENCE_RETENTION_MS
+        followMeObservationDao.deleteOldObservations(evidenceBefore)
+        alertEvidenceEventDao.deleteOldEvents(evidenceBefore)
+        identityContinuityCandidateDao.deleteOldCandidates(evidenceBefore)
+    }
+
     suspend fun deleteOrphanedHistory() {
         signalSampleDao.deleteOrphanedSamples()
         followMeObservationDao.deleteOrphanedObservations()
@@ -54,5 +62,11 @@ class DeviceHistoryDataSource @Inject constructor(
         followMeObservationDao.deleteAll()
         alertEvidenceEventDao.deleteAll()
         identityContinuityCandidateDao.deleteAll()
+    }
+
+    private companion object {
+        const val DAY_MS = 24L * 60 * 60 * 1000
+        const val SIGNAL_SAMPLE_RETENTION_MS = 7L * DAY_MS
+        const val EVIDENCE_RETENTION_MS = 30L * DAY_MS
     }
 }

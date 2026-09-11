@@ -247,8 +247,9 @@ constructor(
     }
 
     override suspend fun deleteOldDevices(maxAgeMs: Long): Result<Int> = runCatching {
-        val timestamp = System.currentTimeMillis() - maxAgeMs
-        deviceDao.deleteOldDevices(timestamp)
+        val now = System.currentTimeMillis()
+        deviceHistoryDataSource.deleteExpiredHistory(now)
+        deviceDao.deleteOldDevices(now - maxAgeMs)
     }
 
     override fun setActiveProbe(mac: String?) {

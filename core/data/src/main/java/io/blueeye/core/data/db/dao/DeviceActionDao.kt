@@ -16,7 +16,25 @@ interface DeviceActionDao {
     @Delete
     suspend fun delete(device: DeviceEntity)
 
-    @Query("DELETE FROM devices WHERE lastSeenAt < :beforeTimestamp AND isInWatchlist = 0")
+    @Query(
+        """
+        DELETE FROM devices
+        WHERE lastSeenAt < :beforeTimestamp
+            AND isInWatchlist = 0
+            AND isSafeBeacon = 0
+            AND (userAlias IS NULL OR TRIM(userAlias) = '')
+            AND (userNotes IS NULL OR TRIM(userNotes) = '')
+            AND alertSound = 0
+            AND alertVibration = 0
+            AND isTrackingEnabled = 1
+            AND isIgnoredForTracking = 0
+            AND calibrationLabel = 'UNKNOWN'
+            AND identityCarryoverVerdict = 'UNREVIEWED'
+            AND fingerprint NOT IN (SELECT deviceFingerprint FROM watchlist)
+            AND fingerprint NOT IN (SELECT deviceFingerprint FROM identity_continuity_candidates)
+            AND fingerprint NOT IN (SELECT candidateFingerprint FROM identity_continuity_candidates)
+        """,
+    )
     suspend fun deleteOldDevices(beforeTimestamp: Long): Int
 
     @Query("DELETE FROM devices")

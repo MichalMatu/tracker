@@ -517,8 +517,7 @@ internal object DatabaseExportJsonMapper {
 }
 
 internal object SessionIdentityCandidateExportMapper {
-    fun map(candidates: List<IdentityContinuityCandidate>): JsonArray =
-        JsonArray(candidates.map(::mapCandidate))
+    fun map(candidates: List<IdentityContinuityCandidate>): JsonArray = JsonArray(candidates.map(::mapCandidate))
 
     private fun mapCandidate(candidate: IdentityContinuityCandidate): JsonObject =
         buildJsonObject {

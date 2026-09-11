@@ -26,6 +26,9 @@ interface IdentityContinuityCandidateDao {
     )
     suspend fun setVerdict(id: Long, verdict: IdentityCarryoverVerdict)
 
+    @Query("DELETE FROM identity_continuity_candidates WHERE timestamp < :beforeTimestamp")
+    suspend fun deleteOldCandidates(beforeTimestamp: Long): Int
+
     @Query("DELETE FROM identity_continuity_candidates")
     suspend fun deleteAll()
 }

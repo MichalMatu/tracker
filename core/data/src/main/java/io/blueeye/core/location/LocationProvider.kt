@@ -37,6 +37,7 @@ open class LocationProvider @Inject constructor(
     private var cachedLocation: Location? = null
 
     private val readGate = LocationReadGate(PROVIDER_READ_THROTTLE_MS)
+    private val activeFixGate = LocationReadGate(ACTIVE_FIX_RETRY_BACKOFF_MS)
 
     /**
      * Get the last known location.
@@ -101,7 +102,11 @@ open class LocationProvider @Inject constructor(
         val location =
             activeFixMutex.withLock {
                 cachedLocation?.takeIf(::isActiveFixFresh)
-                    ?: requestActiveLocation()
+                    ?: if (activeFixGate.shouldReadProviders()) {
+                        requestActiveLocation()
+                    } else {
+                        null
+                    }
                     ?: getLastLocation()
             }
 
@@ -198,6 +203,7 @@ open class LocationProvider @Inject constructor(
     companion object {
         private const val LAST_KNOWN_FRESHNESS_THRESHOLD_MS = 5 * 60 * 1000
         private const val ACTIVE_FIX_REUSE_MS = 10_000L
+        private const val ACTIVE_FIX_RETRY_BACKOFF_MS = 10_000L
         private const val ACTIVE_FIX_TIMEOUT_MS = 2_000L
         private const val PROVIDER_READ_THROTTLE_MS = 2_000L
         private const val LOCATION_MIN_TIME_MS = 0L
