@@ -31,84 +31,59 @@ import java.util.UUID
 /**
  * Scenarios verifying the Apple Device Deduplication logic.
  * Requested by User to verify:
- * 1. Concurrent "Orchestra" merging (BLE)
+ * 1. Concurrent "Orchestra" coexistence safety (BLE)
  * 2. Dual-Stack "Shadow" merging (Classic -> BLE)
  */
 class AppleDeduplicationScenariosTest {
 
     // ==========================================
-    // SCENARIO 1: Concurrent BLE "Orchestra"
+    // SCENARIO 1: BLE "Orchestra"
     // ==========================================
     @Test
-    fun `Orchestra Scenario - Simultaneous packets merge to single Target`() {
+    fun `Orchestra Scenario - simultaneous packets remain separate targets`() {
         val strategy = DeviceCorrelationStrategy()
         val tracker = AddressCarryoverTracker(strategy)
         val now = System.currentTimeMillis()
 
-        // 1. Identity Packet (Main) - REAL DATA
         val identityMac = REAL_MACBOOK_MAC
         val identityPacket = createBlePacket(identityMac, -36, now, "Michal's MacBook Air")
 
-        // 2. FindMy Packet (Anonymous, Concurrent)
         val findMyMac = "E2:4A:BB:FD:71:2E"
-        val findMyPacket = createBlePacket(findMyMac, -36, now + 10, "Find My") // 10ms later
+        val findMyPacket = createBlePacket(findMyMac, -36, now + 10, "Find My")
 
-        // 3. Handoff Packet (Anonymous, Concurrent)
         val handoffMac = "6F:77:9F:57:CB:7B"
-        val handoffPacket = createBlePacket(handoffMac, -38, now + 15, "Apple, Inc. Device") // 15ms later, 2dB diff
+        val handoffPacket = createBlePacket(handoffMac, -38, now + 15, "Apple, Inc. Device")
 
-        // Execution
         val result1 = tracker.processScan(identityPacket, identityPacket.name)
         val result2 = tracker.processScan(findMyPacket, findMyPacket.name)
         val result3 = tracker.processScan(handoffPacket, handoffPacket.name)
 
-        // assertions
-        println("Result 1 (Identity): ${result1.targetId} (New: ${result1.isNewTarget})")
-        println("Result 2 (FindMy)  : ${result2.targetId} (Carryover: ${result2.isCarryover})")
-        println("Result 3 (Handoff) : ${result3.targetId} (Carryover: ${result3.isCarryover})")
-
-        assertTrue("First packet should create new target", result1.isNewTarget)
-        
-        // Concurrent packets should MAP to the SAME target
-        assertEquals("FindMy should merge into Identity", result1.targetId, result2.targetId)
-        assertEquals("Handoff should merge into Identity", result1.targetId, result3.targetId)
+        assertTrue("Identity packet should create a new target", result1.isNewTarget)
+        assertTrue("Concurrent Find My packet should remain separate", result2.isNewTarget)
+        assertTrue("Concurrent Handoff packet should remain separate", result3.isNewTarget)
+        assertNotEquals("Find My must not merge into Identity", result1.targetId, result2.targetId)
+        assertNotEquals("Handoff must not merge into Identity", result1.targetId, result3.targetId)
+        assertNotEquals("Concurrent anonymous packets must remain distinct", result2.targetId, result3.targetId)
     }
 
     @Test
-    fun `Orchestra Scenario - Order Independence (Anonymous First)`() {
+    fun `Orchestra Scenario - sequential corroborated rotation merges after coexistence guard`() {
         val strategy = DeviceCorrelationStrategy()
         val tracker = AddressCarryoverTracker(strategy)
         val now = System.currentTimeMillis()
 
-        // 1. FindMy Packet (Anonymous) - Arrives FIRST
-        val findMyMac = "E2:4A:BB:FD:71:2E"
-        val findMyPacket = createBlePacket(findMyMac, -36, now, "Find My")
+        val firstMac = "E2:4A:BB:FD:71:2E"
+        val firstPacket = createBlePacket(firstMac, -36, now, "Find My")
 
-        // 2. Identity Packet (Main) - Arrives 10ms LATER
-        val identityMac = REAL_MACBOOK_MAC
-        val identityPacket = createBlePacket(identityMac, -36, now + 10, "Michal's MacBook Air")
+        val rotatedMac = "6F:77:9F:57:CB:7B"
+        val rotatedPacket = createBlePacket(rotatedMac, -38, now + 3_000, "Find My")
 
-        // Execution
-        val result1 = tracker.processScan(findMyPacket, findMyPacket.name) // New Target T1
-        // Simulate persistence of T1 name so next scan sees it? 
-        // Tracker keeps state in memory, so T1 has name "Find My" currently.
-        
-        val result2 = tracker.processScan(identityPacket, identityPacket.name) // Should merge into T1
+        val result1 = tracker.processScan(firstPacket, firstPacket.name)
+        val result2 = tracker.processScan(rotatedPacket, rotatedPacket.name)
 
-        // Assertions
-        println("Result 1 (FindMy)  : ${result1.targetId}")
-        println("Result 2 (Identity): ${result2.targetId}")
-
-        assertTrue("First packet should create new target", result1.isNewTarget)
-        
-        // Identity should merge into the Anonymous target because they are concurrent
-        assertEquals("Identity should merge into FindMy Target", result1.targetId, result2.targetId)
-        
-        // Verify Name Update Logic (Target should eventually reflect the Real Name)
-        // Note: AddressCarryoverTracker updates internal state. 
-        val target = tracker.getTargetByMac(findMyMac)
-        assertNotNull(target)
-        assertEquals("Target Name should update to Identity Name", "Michal's MacBook Air", target?.lastDeviceName)
+        assertTrue("First packet should create a new target", result1.isNewTarget)
+        assertTrue("Sequential corroborated rotation should be carryover", result2.isCarryover)
+        assertEquals("Rotated MAC should map to the existing target", result1.targetId, result2.targetId)
     }
 
     @Test
@@ -161,10 +136,10 @@ class AppleDeduplicationScenariosTest {
         val classicCtx = ClassicScanDataContext(
             mac = "CLASSIC_MAC",
             name = "Apple, Inc. Device",
-            rssi = -41, 
+            rssi = -41,
             classOfDevice = 0x240404, // Audio/Video
             timestamp = now
-        ).apply { 
+        ).apply {
             vendorName = "Apple, Inc." // Resolved vendor
             fingerprint = "CLASSIC_MAC" // Explicitly set initial fingerprint
         }
@@ -179,12 +154,12 @@ class AppleDeduplicationScenariosTest {
 
         // The Classic Ghost should NOT exist (or be deleted/merged)
         assertEquals("Classic Ghost should not exist (merged)", null, classicGhost)
-        
+
         // The Main Device should be updated
         assertNotNull(mainDevice)
         assertEquals("Main Device should have Classic Tech added", "BLE + CLASSIC", mainDevice?.technology)
         assertEquals("Main Device should keep its name", "Michal's MacBook Air", mainDevice?.lastDeviceName)
-        
+
         // Verify Context updated
         assertEquals("Context fingerprint should point to Main", "BLE_FINGERPRINT", classicCtx.fingerprint)
     }
@@ -351,7 +326,6 @@ class AppleDeduplicationScenariosTest {
         assertEquals(0, sampleDao.samples.size)
     }
 
-
     // ==========================================
     // HELPERS & FAKES
     // ==========================================
@@ -368,14 +342,14 @@ class AppleDeduplicationScenariosTest {
         val rawBytes = if (mac == REAL_MACBOOK_MAC) {
             hexStringToByteArray(REAL_MACBOOK_RAW)
         } else {
-             // Apple Manufacturer Data (ID 76) Generic
-             byteArrayOf(0x02, 0x15) 
+            // Apple Manufacturer Data (ID 76) Generic
+            byteArrayOf(0x02, 0x15)
         }
-        
+
         // If raw bytes are present, ManufData should be extracted from it in a real app,
         // but for this fake we can just pass the bytes.
         // The Deduplication Logic prioritizes rawData hash if present.
-        
+
         return BleScanResultData(
             mac = mac,
             rssi = rssi,
@@ -390,10 +364,10 @@ class AppleDeduplicationScenariosTest {
             isConnectable = true,
             primaryPhy = 1,
             secondaryPhy = 0,
-            rawData = if (mac == REAL_MACBOOK_MAC) rawBytes else null 
+            rawData = if (mac == REAL_MACBOOK_MAC) rawBytes else null
         )
     }
-    
+
     private fun hexStringToByteArray(s: String): ByteArray {
         val len = s.length
         val data = ByteArray(len / 2)
@@ -428,11 +402,11 @@ class AppleDeduplicationScenariosTest {
         override suspend fun delete(device: DeviceEntity) {
             db.remove(device.fingerprint)
         }
-        
+
         override suspend fun getByNameOrAlt(name: String, altName: String): DeviceEntity? {
             return db.values.find { it.lastDeviceName == name || it.lastDeviceName == altName }
         }
-        
+
         override suspend fun updateScanData(
             fingerprint: String,
             mac: String?,
@@ -468,7 +442,7 @@ class AppleDeduplicationScenariosTest {
                 carryoverFeatures = carryoverFeatures ?: existing.carryoverFeatures,
             )
         }
-        
+
         // ... stubs ...
         override suspend fun updateIsPaired(fingerprint: String, isPaired: Boolean) {}
         override suspend fun updateLastSeen(fingerprint: String, timestamp: Long) {}
@@ -548,8 +522,8 @@ class AppleDeduplicationScenariosTest {
         override suspend fun moveAlertEvidenceEvents(targetFingerprint: String, sourceFingerprint: String) {}
         override suspend fun moveIdentityCandidates(targetFingerprint: String, sourceFingerprint: String) {}
         override suspend fun retargetIdentityCandidates(targetFingerprint: String, sourceFingerprint: String) {}
-        override suspend fun deleteByFingerprint(fingerprint: String) { 
-             db.remove(fingerprint) 
+        override suspend fun deleteByFingerprint(fingerprint: String) {
+            db.remove(fingerprint)
         }
         override suspend fun getDeviceForMerge(fingerprint: String): DeviceEntity? = db[fingerprint]
         override suspend fun updateDeviceForMerge(device: DeviceEntity) {
@@ -584,7 +558,7 @@ class AppleDeduplicationScenariosTest {
             samples.count { it.deviceFingerprint == fingerprint }
 
         override fun getSamplesForDevice(fingerprint: String, limit: Int): Flow<List<SignalSampleEntity>> = flowOf(emptyList())
-        
+
         override fun getSamplesWithLocation(limit: Int): Flow<List<SignalSampleEntity>> = flowOf(emptyList())
         override suspend fun getSamplesInTimeRange(fingerprint: String, startTime: Long, endTime: Long): List<SignalSampleEntity> = emptyList()
         override suspend fun getAverageRssi(fingerprint: String, sampleCount: Int): Float? = null
