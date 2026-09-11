@@ -1,0 +1,60 @@
+{
+  "id": "tracker-phase3-field-analysis-stage3-20260911-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-11T10:06:26.872513+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch --no-tags origin agent-control main >/dev/null; test \"$(git rev-parse origin/main)\" = 'd15f6985371ef3ffe0496d7a14454589d56978ee'; git show origin/agent-control:.agent/payloads/tracker-phase3-field-analysis-stage3-20260911-v1.sh > /tmp/tracker-phase3-field-analysis-stage3-v1.sh; chmod 700 /tmp/tracker-phase3-field-analysis-stage3-v1.sh; /tmp/tracker-phase3-field-analysis-stage3-v1.sh",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch            agent-control -> FETCH_HEAD\n * branch            main          -> FETCH_HEAD\n   8f06625..a827bb2  agent-control -> origin/agent-control\nPHASE3_STAGE3_ANALYSIS\ntshark_available=False tshark_checks=[]\nhci1 basename=bcm_bt_ewp.log packet_types={\"4\": 710} event_codes={\"255\": 710} le_subevents={} overlap_walk_ms=0 records_in_walk=0 events_in_walk=0 start_delta_ms=-42354415267.73389 end_delta_ms=-42263278490.70093\nhci2 basename=bcm_bt_ewp.log.last packet_types={\"4\": 905} event_codes={\"255\": 905} le_subevents={} overlap_walk_ms=0 records_in_walk=0 events_in_walk=0 start_delta_ms=-42475427722.76294 end_delta_ms=-42356432444.354004\nknown_trackers=[{\"deviceType\": \"TRACKER\", \"distinctObservedMacs\": 4, \"evidenceConfidences\": [\"LOW\", \"MEDIUM\"], \"evidenceCount\": 2, \"evidenceSources\": [\"IDENTITY_CARRYOVER\", \"NAME\"], \"followingScore\": 0.0, \"id\": \"c01c9ba594\", \"rawContext\": true, \"rssiMax\": -81, \"rssiMin\": -97, \"sampleCount\": 930, \"trackingStatus\": \"SAFE\"}, {\"deviceType\": \"TRACKER\", \"distinctObservedMacs\": 1, \"evidenceConfidences\": [\"MEDIUM\"], \"evidenceCount\": 1, \"evidenceSources\": [\"RAW_PAYLOAD\"], \"followingScore\": 0.0, \"id\": \"bc697b8db0\", \"rawContext\": true, \"rssiMax\": -88, \"rssiMin\": -95, \"sampleCount\": 3, \"trackingStatus\": \"SAFE\"}, {\"deviceType\": \"TRACKER\", \"distinctObservedMacs\": 5, \"evidenceConfidences\": [\"LOW\", \"MEDIUM\"], \"evidenceCount\": 2, \"evidenceSources\": [\"IDENTITY_CARRYOVER\", \"NAME\"], \"followingScore\": 0.0, \"id\": \"23227b4d62\", \"rawContext\": true, \"rssiMax\": -32, \"rssiMin\": -100, \"sampleCount\": 6384, \"trackingStatus\": \"SAFE\"}, {\"deviceType\": \"TRACKER\", \"distinctObservedMacs\": 10, \"evidenceConfidences\": [\"LOW\", \"MEDIUM\"], \"evidenceCount\": 3, \"evidenceSources\": [\"IDENTITY_CARRYOVER\", \"MODEL\", \"NAME\"], \"followingScore\": 0.0, \"id\": \"255e0d6758\", \"rawContext\": true, \"rssiMax\": -30, \"rssiMin\": -100, \"sampleCount\": 2109, \"trackingStatus\": \"SAFE\"}]\nrotation={\"fingerprintsWithMultipleObservedMacs\": 6, \"topPseudonymous\": [{\"distinctMacs\": 10, \"id\": \"255e0d6758\", \"longSwitchesOver30s\": 1, \"sampleCount\": 2109, \"switches\": 2019}, {\"distinctMacs\": 5, \"id\": \"4edea790cb\", \"longSwitchesOver30s\": 1, \"sampleCount\": 3623, \"switches\": 3401}, {\"distinctMacs\": 4, \"id\": \"1b7fed38d1\", \"longSwitchesOver30s\": 1, \"sampleCount\": 461, \"switches\": 3}, {\"distinctMacs\": 3, \"id\": \"30c8671181\", \"longSwitchesOver30s\": 1, \"sampleCount\": 12, \"switches\": 2}, {\"distinctMacs\": 5, \"id\": \"23227b4d62\", \"longSwitchesOver30s\": 0, \"sampleCount\": 6384, \"switches\": 6154}, {\"distinctMacs\": 4, \"id\": \"c01c9ba594\", \"longSwitchesOver30s\": 0, \"sampleCount\": 930, \"switches\": 889}], \"withLongMacSwitchOver30s\": 4}\nprocess_death={\"directKillDeathLines\": 3, \"earliestDeltaFromWalkEndMs\": 386335, \"latestDeltaFromWalkEndMs\": 386335}\nstage3_safe_report=/Users/michal/agent-workspace/repos/tracker/checkpoints/phase3-field-reacceptance-20260911/20260911T095527Z/phase3-analysis-stage3-safe.json\n",
+      "elapsed_seconds": 3.269,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1536,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 450.95,
+      "output_policy": "stream",
+      "captured_output_chars": 2940,
+      "output_truncated": false,
+      "current_rss_mb": 450.95,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 3.269
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.108
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.069
+  },
+  "finished_at": "2026-09-11T10:06:31.978079+00:00",
+  "task_digest": "16af5d461af235486f6d4df907db89090133f6bfb90f04b9415ae60be22ac79e",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 1536,
+  "attempt_id": "5f53a61361047f05fc5db2e2",
+  "daemon_version": "4.18.20"
+}
