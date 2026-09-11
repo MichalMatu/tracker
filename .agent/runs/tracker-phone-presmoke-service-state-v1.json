@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-phone-presmoke-service-state-v1",
+  "task_digest": "9438ce590cfffd7649f116e197aec9bf416b591562f66a4462981a96fb3fbd74",
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-11T08:26:49.041892+00:00",
+  "attempt_id": "bd9c860d123d1d63d27b043e",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 60360,
+  "updated_at": "2026-09-11T08:26:49.042306+00:00",
+  "pid": 60360
+}
