@@ -38,6 +38,7 @@ constructor() {
         private const val MAX_SUMMARY_VALUE_LENGTH = 64
         private const val EXTREME_RSSI_DIFF = 50
         private const val RSSI_PENALTY_MULTIPLIER = 0.5f
+        private const val SAME_NAME_MIN_PAYLOAD_SCORE = 0.8f
 
         // Known Vendor Headers to strip (Little Endian Manufacturer ID)
         private val HEADER_APPLE = byteArrayOf(0x4C.toByte(), 0x00.toByte())
@@ -106,6 +107,8 @@ constructor() {
                     },
                 interval = matchInterval(input.advertisingInterval, target.lastAdvertisingInterval),
             )
+        val hasIndependentIdentityEvidence = scores.hasIndependentIdentityEvidence()
+
         val normalizedScore =
             weightedScore(
                 input = input,
@@ -113,7 +116,7 @@ constructor() {
                 scores = scores,
             ).withRssiPenalty(input, target, scores.name)
 
-        if (normalizedScore <= MATCH_THRESHOLD) return null
+        if (!hasIndependentIdentityEvidence || normalizedScore <= MATCH_THRESHOLD) return null
 
         return CarryoverMatch(
             targetId = target.targetId,
@@ -133,6 +136,9 @@ constructor() {
                 ),
         )
     }
+
+    private fun FeatureScores.hasIndependentIdentityEvidence(): Boolean =
+        uuid > 0f || finalPayload >= SAME_NAME_MIN_PAYLOAD_SCORE || interval > 0f
 
     private fun weightedScore(
         input: MatchInput,
@@ -189,7 +195,7 @@ constructor() {
             when {
                 matchShadow(data, target) >= 1.0f -> CarryoverMatchReason.APPLE_SHADOW
                 matchMicrosoft(data, target) >= 1.0f -> CarryoverMatchReason.MICROSOFT_SHADOW
-                matchSameNameHeuristic(data, target) >= 1.0f -> CarryoverMatchReason.SAME_NAME_PROXIMITY
+                matchSameNameHeuristic(input, target) >= 1.0f -> CarryoverMatchReason.SAME_NAME_PROXIMITY
                 else -> null
             } ?: return null
 
@@ -387,45 +393,61 @@ constructor() {
     }
 
     private fun matchSameNameHeuristic(
-        data: BleScanResultData,
-        target: TrackedTarget
+        input: MatchInput,
+        target: TrackedTarget,
     ): Float {
-        // 1. Must have same non-empty name
-        if (data.name.isNullOrBlank() || target.lastDeviceName.isNullOrBlank()) {
-             // android.util.Log.v("ShadowMatch", "Same Name SKIP: Name missing. '${data.name}' vs '${target.lastDeviceName}'")
-             return 0f
-        }
-        
-        if (data.name != target.lastDeviceName) {
-             // Log only if both are Apple-ish to reduce noise
-             // android.util.Log.v("ShadowMatch", "Same Name SKIP: '$data.name' != '${target.lastDeviceName}'")
-             return 0f
-        }
-        
-        // 2. Correlation Strength Check
-        // If Apple, we trust it more easily.
-        // If NOT Apple, we only merge if the name is "Specific" (not "iPhone", "TV", etc.)
-        val isAppleInfo = data.manufacturerId == 76 || 
-                          (data.manufacturerData != null && data.manufacturerData.size >= 2 && 
-                           data.manufacturerData[0] == 0x4C.toByte() && data.manufacturerData[1] == 0x00.toByte())
+        val data = input.data
+        return when {
+            data.name.isNullOrBlank() || target.lastDeviceName.isNullOrBlank() -> 0f
+            data.name != target.lastDeviceName -> 0f
+            else -> {
+                // If Apple, we trust it more easily. Otherwise require a specific name.
+                val isAppleInfo =
+                    data.manufacturerId == 76 ||
+                        (data.manufacturerData != null &&
+                            data.manufacturerData.size >= 2 &&
+                            data.manufacturerData[0] == 0x4C.toByte() &&
+                            data.manufacturerData[1] == 0x00.toByte())
+                val isSafeName =
+                    (isAppleInfo || !isGenericName(data.name)) &&
+                        hasSameNameCorroboration(input, target)
 
-        val isSafeName = isAppleInfo || !isGenericName(data.name)
-        
-        if (!isSafeName) return 0f
-
-        // 3. Must be strong signals and close
-        val rssiDiff = abs(data.rssi - target.lastRssi)
-        
-        // Relaxed MAX: Allow diff <= 20 (was 15) and RSSI > -95 (was -90)
-        // Same Name is a very strong signal of identity, so we can trust spatial locality more loosely.
-        if (rssiDiff <= 20 && data.rssi > -95) {
-            android.util.Log.i("ShadowMatch", "Same Name MATCH: ${data.mac} (${data.name}) -> ${target.primaryMac}. RSSI: ${data.rssi}/${target.lastRssi}")
-            return 1.0f
-        } else {
-             android.util.Log.v("ShadowMatch", "Same Name REJECT: ${data.mac} vs ${target.primaryMac}. Name '${data.name}'. RSSI: ${data.rssi}/${target.lastRssi} (Diff: $rssiDiff)")
+                if (!isSafeName) {
+                    0f
+                } else {
+                    val rssiDiff = abs(data.rssi - target.lastRssi)
+                    if (rssiDiff <= 20 && data.rssi > -95) {
+                        android.util.Log.i(
+                            "ShadowMatch",
+                            "Same Name MATCH: ${data.mac} (${data.name}) -> ${target.primaryMac}. " +
+                                "RSSI: ${data.rssi}/${target.lastRssi}",
+                        )
+                        1.0f
+                    } else {
+                        android.util.Log.v(
+                            "ShadowMatch",
+                            "Same Name REJECT: ${data.mac} vs ${target.primaryMac}. " +
+                                "Name '${data.name}'. RSSI: ${data.rssi}/${target.lastRssi} (Diff: $rssiDiff)",
+                        )
+                        0f
+                    }
+                }
+            }
         }
-        
-        return 0f
+    }
+
+    private fun hasSameNameCorroboration(
+        input: MatchInput,
+        target: TrackedTarget,
+    ): Boolean {
+        val payloadScore =
+            matchPayloadFuzzy(
+                stripHeaders(input.rawData),
+                stripHeaders(target.lastPayload),
+            )
+        return matchUuids(input.serviceUuids, target.lastServiceUuids) > 0f ||
+            payloadScore >= SAME_NAME_MIN_PAYLOAD_SCORE ||
+            matchInterval(input.advertisingInterval, target.lastAdvertisingInterval) > 0f
     }
 
     private fun isGenericName(name: String?): Boolean {

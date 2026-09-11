@@ -69,6 +69,44 @@ class AddressCarryoverTrackerTest {
     }
 
     @Test
+    fun `same specific name and RSSI alone should stay separate`() {
+        val first = createScanData("21:11:11:11:11:11", "JBL Tune 520BT-LE", null, null)
+        val second = createScanData("22:22:22:22:22:22", "JBL Tune 520BT-LE", null, null)
+
+        val firstResult = tracker.processScan(first, first.name)
+        val secondResult = tracker.processScan(second, second.name)
+
+        assertTrue(firstResult.isNewTarget)
+        assertTrue(secondResult.isNewTarget)
+        assertFalse(secondResult.isCarryover)
+        assertNotEquals(firstResult.targetId, secondResult.targetId)
+    }
+
+    @Test
+    fun `same specific name with service UUID corroboration may carry over`() {
+        val serviceUuids = listOf("0000fe2c-0000-1000-8000-00805f9b34fb")
+        val first =
+            createScanData("31:11:11:11:11:11", "JBL Tune 520BT-LE", null, null).copy(
+                serviceUuids = serviceUuids,
+            )
+        val second =
+            createScanData("32:22:22:22:22:22", "JBL Tune 520BT-LE", null, null).copy(
+                serviceUuids = serviceUuids,
+            )
+
+        val firstResult = tracker.processScan(first, first.name)
+        val secondResult = tracker.processScan(second, second.name)
+
+        assertTrue(firstResult.isNewTarget)
+        assertTrue(secondResult.isCarryover)
+        assertEquals(firstResult.targetId, secondResult.targetId)
+        assertEquals(
+            CarryoverMatchReason.SAME_NAME_PROXIMITY,
+            secondResult.matchEvidence?.reasonCode,
+        )
+    }
+
+    @Test
     fun `known alias should keep reporting primary mac for persistence`() {
         val primaryMac = "69:95:CC:A8:9C:A0"
         val aliasMac = "F1:B0:CE:0D:2E:4B"

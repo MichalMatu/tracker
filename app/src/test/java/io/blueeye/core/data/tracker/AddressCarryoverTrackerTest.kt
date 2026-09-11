@@ -67,7 +67,7 @@ class AddressCarryoverTrackerTest {
     }
 
     @Test
-    fun `processScan correlates device with Same Name and Similar RSSI`() {
+    fun `processScan keeps same name and similar RSSI separate without corroboration`() {
         // 1. First Scan
         val data1 =
             io.blueeye.core.scanner.model.BleScanResultData(
@@ -97,8 +97,9 @@ class AddressCarryoverTrackerTest {
             )
         val res2 = tracker.processScan(data2, deviceName = "MyHeadphones")
 
-        assertTrue("Should be carryover due to Name+RSSI", res2.isCarryover)
-        assertEquals(res1.targetId, res2.targetId)
+        assertFalse("Name+RSSI alone must not be carryover", res2.isCarryover)
+        assertTrue("Second same-name device should stay separate", res2.isNewTarget)
+        assertFalse("Target IDs should remain distinct", res1.targetId == res2.targetId)
     }
 
     @Test
