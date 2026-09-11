@@ -1,0 +1,17 @@
+{
+  "id": "tracker-phase3-process-death-classify-20260911-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; ROOT=\"$HOME/agent-workspace/repos/tracker/checkpoints/phase3-field-reacceptance-20260911\"; STAMP=$(cat \"$ROOT/LATEST\"); OUT=\"$ROOT/$STAMP\"; python3 - \"$OUT\" <<'PY'\nimport os,re,sys\nout=sys.argv[1]\nfiles=['logcat-before.txt','logcat-after-export.txt','logcat-final.txt']\nrx=re.compile(r'(Killing|has died|am_kill|Force stopping|lowmemory|lmkd)',re.I)\napp=re.compile(r'io\\.blueeye',re.I)\nrows=[]\nfor fn in files:\n p=os.path.join(out,fn)\n if not os.path.exists(p): continue\n for line in open(p,errors='replace'):\n  if app.search(line) and rx.search(line):\n   s=re.sub(r'pid=\\d+','pid=<PID>',line.strip())\n   s=re.sub(r'ProcessRecord\\{[^}]+\\}','ProcessRecord{...}',s)\n   rows.append((fn,s))\nprint('matched='+str(len(rows)))\nfor fn,s in rows[:20]: print(fn+' | '+s[:500])\nPY"
+  ]
+}
