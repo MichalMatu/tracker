@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-installed-apk-signing-evidence-v1",
+  "task_digest": "aa81f4efd4b8ad6ab47ef42fb312fc649ad6211d638c52c6d5e7c26a0c1ffe6b",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-11T09:33:14.367156+00:00",
+  "attempt_id": "c714bcac2b97a4f4e572e49f",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 35149,
+  "updated_at": "2026-09-11T09:33:14.367344+00:00",
+  "pid": 35149
+}
