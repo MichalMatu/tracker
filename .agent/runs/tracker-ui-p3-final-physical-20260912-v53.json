@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p3-final-physical-20260912-v53",
+  "task_digest": "6bca3375f97749161f576d04a287c22bb36f38fef8748c788a89e404a1a5709f",
+  "idle_timeout": 900,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T21:15:55.883351+00:00",
+  "attempt_id": "dedd0bc5c7449155b073b45f",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 31334,
+  "updated_at": "2026-09-12T21:15:55.883402+00:00",
+  "pid": 31334
+}
