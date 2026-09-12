@@ -1,0 +1,19 @@
+{
+  "id": "tracker-docs-final-pointer-cleanup-20260912-v2",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 120,
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test \"$(git rev-parse HEAD)\" = 'b0e87bd3efc91fb054e1ab52f7c65e58efb13d6c'; test \"$(git status --porcelain | wc -l | tr -d ' ')\" = '3'; git status --porcelain | grep -q 'MVP_GOAL_PROMPT.md'; git status --porcelain | grep -q 'docs/SANDBOX_EXECUTION_FLOW.md'; git status --porcelain | grep -q 'docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md'",
+    "set -euo pipefail; python3 -c 'from pathlib import Path; p=Path(\"docs/SANDBOX_EXECUTION_FLOW.md\"); s=p.read_text(); s=s.replace(\"Status: **ACTIVE engineering workflow**  \\n\",\"Status: **ACTIVE engineering workflow**\\n\",1).replace(\"Canonical documentation entry point: `docs/README.md`  \\n\",\"Canonical documentation entry point: `docs/README.md`\\n\",1); p.write_text(s)'; git diff --check; git diff --stat; git diff -- MVP_GOAL_PROMPT.md docs/SANDBOX_EXECUTION_FLOW.md docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md",
+    "set -euo pipefail; git add MVP_GOAL_PROMPT.md docs/SANDBOX_EXECUTION_FLOW.md docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md; git commit -m 'Clean remaining historical doc pointers'; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo FINAL_POINTER_CLEANUP_PASS; git rev-parse HEAD"
+  ]
+}
