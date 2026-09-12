@@ -1,0 +1,21 @@
+{
+  "id": "tracker-ui-p2c-radar-summary-20260912-v8",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 6144,
+  "command_timeout": 1800,
+  "idle_timeout": 600,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"372ac629cf08f5b4d76f33210d04312034872881\"; git merge-base --is-ancestor 0d40dd1418456f42008a35222ae30c0a2498d41d HEAD; echo P2C_V8_BASELINE_CLEAN",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p2c-radar-summary-20260912-v3.py.gz.b64 | tr -d '\\n\\r ' | base64 -d | gzip -dc | python3; python3 - <<'PY'\nfrom pathlib import Path\nmapper = Path('core/data/src/main/java/io/blueeye/core/data/mapper/RadarDeviceMapper.kt')\ns = mapper.read_text()\ncount = s.count('RssiNormalization')\nassert count >= 2, count\nmapper.write_text(s.replace('RssiNormalization', 'RadarRssiNormalization'))\n\ntest_file = Path('core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt')\ns = test_file.read_text()\nneedle = '        override fun getRecentDevicesFlow(sinceTimestamp: Long): Flow<List<DeviceEntity>> = flowOf(emptyList())\\n'\nassert needle in s\ninsert = needle + '        override fun getRecentRadarDevicesFlow(sinceTimestamp: Long): Flow<List<io.blueeye.core.data.db.projection.RadarDeviceProjection>> = flowOf(emptyList())\\n'\ntest_file.write_text(s.replace(needle, insert, 1))\n\nvm = Path('feature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarViewModel.kt')\ns = vm.read_text()\nif 'import io.blueeye.core.model.RadarDeviceSummary\\n' not in s:\n    anchor = 'import io.blueeye.core.model.DeviceType\\n'\n    assert anchor in s\n    s = s.replace(anchor, anchor + 'import io.blueeye.core.model.RadarDeviceSummary\\n', 1)\nlist_count = s.count('List<Device>')\nassert list_count >= 1, list_count\ns = s.replace('List<Device>', 'List<RadarDeviceSummary>')\ns = s.replace('import io.blueeye.core.model.Device\\n', '')\nassert 'List<Device>' not in s\nvm.write_text(s)\nprint(f'P2C_V8_PATCHED mapper_occurrences={count} fake_dao=1 vm_list_device_replacements={list_count}')\nPY\ngit diff --check; echo P2C_V8_PATCH_READY",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :core:data:testDebugUnitTest --tests io.blueeye.core.data.evidence.DeviceEvidenceFactoryRadarSignalsTest; ./gradlew :feature:radar:testDebugUnitTest --tests io.blueeye.feature.radar.presentation.RadarUiSectionMapperTest --tests io.blueeye.feature.radar.presentation.RadarUiMapperTest --tests io.blueeye.feature.radar.presentation.RadarUiFormatterTest --tests io.blueeye.feature.radar.presentation.RadarUiCardOrderTest --tests io.blueeye.feature.radar.presentation.RadarSectionViewMapperTest; echo P2C_V8_FOCUSED_CONTRACTS_PASS",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :core:data:detekt :core:domain:detekt :feature:radar:detekt :feature:radar:compileDebugKotlin :app:assembleDebug; git diff --check; echo P2C_V8_LOCAL_GATES_PASS",
+    "set -euo pipefail; git add core feature; git diff --cached --check; git commit -m 'perf: add lightweight radar device path'; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo P2C_V8_COMMIT_PUSH_PASS"
+  ]
+}
