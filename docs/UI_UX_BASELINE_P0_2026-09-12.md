@@ -1,6 +1,6 @@
 # UI/UX P0 baseline — 2026-09-12
 
-Status: **BASELINE CAPTURED; DENSE-DATASET COUNT PENDING FINAL READOUT**
+Status: **P0 CLOSED; BASELINE CAPTURED; PHASE 1 IN PROGRESS**
 
 Working branch: `ui/radar-details-redesign`
 
@@ -42,11 +42,39 @@ Baseline result:
 
 These numbers are not a universal product benchmark; they are the **before** measurement for the same device and comparable test procedure after Phase 1/2 changes.
 
+## Dataset baseline
+
+A read-only ADB/`run-as` capture of the current Room main database (`tracker_database`) was inspected only long enough to count the relevant tables. The temporary private copy was removed by the Local Agent task and the application was relaunched afterward.
+
+Current physical dataset at P0:
+
+- device rows: `967`
+- signal samples: `43,705`
+- Room table count: `9`
+- devices whose `lastSeenAt` falls inside the final 180 s of the dataset: `16`
+- private DB-copy SHA-256 during the bounded inspection: `abb747827a118014b136c70ef803971c3c935cfc2dab20c1f4bad8fd8158e6f6`
+
+The important consequence is that the current phone database is **not** a valid 100+ recent-device benchmark. We therefore do not relabel old rows or mutate the real phone database merely to satisfy a UI test.
+
+### Controlled long-list reference scenario
+
+For Phase 1/2 acceptance, the reproducible dense-list scenario is defined as:
+
+- `120` synthetic/replay Radar items;
+- all considered recent inside the same 180 s Radar window;
+- stable unique fingerprints/keys;
+- mixed normal, unknown/noise, watchlist and suspicious sections;
+- mixed short and long display/vendor strings;
+- live RSSI/last-seen value updates while the item identity and card geometry remain stable;
+- no production database mutation and no change to scanner/parser/scoring behavior.
+
+The synthetic/replay scenario is a controlled performance/layout fixture. Real field datasets remain a separate acceptance source and must not be rewritten to manufacture density.
+
 ## Current Radar structure
 
 The current Radar already uses `LazyColumn` and stable item keys based on `fingerprint`, which should be preserved.
 
-The current device card still contains multiple independently changing regions:
+The pre-redesign device card contained multiple independently changing regions:
 
 1. display name + live RSSI,
 2. vendor/type,
@@ -55,15 +83,15 @@ The current device card still contains multiple independently changing regions:
 5. optional full evidence summary,
 6. separate action row with Details, Calibration and Watchlist.
 
-The entire card uses `stableLiveHeight()`. That helper remembers the largest measured height while the composable remains alive. It prevents later shrinking, but it does **not** stop first-time growth and can permanently retain an unnecessarily tall card after transient content appears.
+The entire card used `stableLiveHeight()`. That helper remembers the largest measured height while the composable remains alive. It prevents later shrinking, but it does **not** stop first-time growth and can permanently retain an unnecessarily tall card after transient content appears.
 
 ### P0 Radar geometry risks
 
 - Evidence appearing can increase card height.
-- Evidence reason/value currently reserve several lines and dominate compact scanning.
-- The action row duplicates navigation and adds a full persistent row.
-- Optional badge content changes card information density even when row height itself remains stable.
-- A card that once grows can remain at that maximum due to `stableLiveHeight()`.
+- Evidence reason/value reserved several lines and dominated compact scanning.
+- The action row duplicated navigation and added a full persistent row.
+- Optional badge content changed card information density even when row height itself remained stable.
+- A card that once grew could remain at that maximum due to `stableLiveHeight()`.
 
 ## Current Details structure
 
@@ -118,7 +146,7 @@ Use the same Samsung `SM-S906B` and the same basic procedure:
 5. record total/janky frames and p50/p90/p95/p99,
 6. compare card geometry visually against the private P0 Radar screenshot,
 7. verify that live RSSI/last-seen updates do not change card height,
-8. repeat with a dense 100+ recent-device scenario before Phase 2 is accepted.
+8. run the controlled 120-item dense-list scenario before Phase 1 acceptance and again after Phase 2 data-path optimization.
 
 ## P0 gate state
 
@@ -128,12 +156,10 @@ Completed:
 - current Radar screenshot captured privately;
 - current Details screenshot captured privately;
 - frame/jank baseline captured;
+- current physical dataset size/recent-window density measured read-only;
+- reproducible controlled 120-item long-list scenario defined without mutating field data;
 - current Radar/Details geometry risks recorded;
 - stable-height rules defined;
 - scanner/parser/scoring/persistence semantics remain untouched.
 
-Still required before declaring P0 fully closed:
-
-- record/confirm the dense-list reference scenario with at least 100 devices in the relevant recent-device window, or define a reproducible non-production fixture if the current physical dataset does not contain such a window.
-
-No application source code was changed for this baseline.
+P0 is **closed**. Phase 1 may change Radar presentation only; the P0 measurements above remain the comparison baseline.
