@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 3,
-  "command": "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p2c-radar-summary-20260912-v3.py.gz.b64 | tr -d '\\n\\r ' | base64 -d | gzip -dc | python3; git show origin/agent-control:.agent/payloads/tracker-ui-p2c-radar-summary-20260912-v14-fixes.py | python3; python3 - <<'PY'\nfrom pathlib import Path\np=Path('core/domain/src/main/java/io/blueeye/core/domain/repository/DeviceSplitRepositories.kt')\ns=p.read_text(); needle='interface DeviceQueryRepository {\\n'; assert needle in s; p.write_text(s.replace(needle,'@Suppress(\"TooManyFunctions\")\\n'+needle,1))\nPY\ngit diff --check; echo P2C_V17_PATCH_READY",
-  "pid": 28898,
+  "command": "set -o pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; set +e; ./gradlew :feature:radar:detekt --rerun-tasks --console=plain 2>&1 | tee /tmp/p2c-v17-radar-detekt.log; rc=${PIPESTATUS[0]}; echo '--- DETEKT REPORT ---'; cat feature/radar/build/reports/detekt/detekt.txt 2>/dev/null || true; exit $rc",
+  "pid": 28924,
   "timeout": 1800,
   "idle_timeout": 600,
   "memory_limit_mb": 6144,
-  "started_at": "2026-09-12T13:40:22.922799+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-12T13:40:23.482720+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p2c-radar-summary-20260912-v17-radar-detekt-inspect",
@@ -18,5 +18,5 @@
   "task_digest": "81f76e36422d64f93e2b32e6fab46a4faa274ea95cf6f11a2b006e4a371c5c66",
   "daemon_version": "4.18.20",
   "daemon_pid": 28690,
-  "updated_at": "2026-09-12T13:40:23.019761+00:00"
+  "updated_at": "2026-09-12T13:40:23.552791+00:00"
 }
