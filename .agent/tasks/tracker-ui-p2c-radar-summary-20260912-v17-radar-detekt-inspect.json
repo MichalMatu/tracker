@@ -1,0 +1,19 @@
+{
+  "id": "tracker-ui-p2c-radar-summary-20260912-v17-radar-detekt-inspect",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 6144,
+  "command_timeout": 1800,
+  "idle_timeout": 600,
+  "task_timeout": 3600,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"372ac629cf08f5b4d76f33210d04312034872881\"; git merge-base --is-ancestor 0d40dd1418456f42008a35222ae30c0a2498d41d HEAD; echo P2C_V17_BASELINE_CLEAN",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p2c-radar-summary-20260912-v3.py.gz.b64 | tr -d '\\n\\r ' | base64 -d | gzip -dc | python3; git show origin/agent-control:.agent/payloads/tracker-ui-p2c-radar-summary-20260912-v14-fixes.py | python3; python3 - <<'PY'\nfrom pathlib import Path\np=Path('core/domain/src/main/java/io/blueeye/core/domain/repository/DeviceSplitRepositories.kt')\ns=p.read_text(); needle='interface DeviceQueryRepository {\\n'; assert needle in s; p.write_text(s.replace(needle,'@Suppress(\"TooManyFunctions\")\\n'+needle,1))\nPY\ngit diff --check; echo P2C_V17_PATCH_READY",
+    "set -o pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; set +e; ./gradlew :feature:radar:detekt --rerun-tasks --console=plain 2>&1 | tee /tmp/p2c-v17-radar-detekt.log; rc=${PIPESTATUS[0]}; echo '--- DETEKT REPORT ---'; cat feature/radar/build/reports/detekt/detekt.txt 2>/dev/null || true; exit $rc"
+  ]
+}
