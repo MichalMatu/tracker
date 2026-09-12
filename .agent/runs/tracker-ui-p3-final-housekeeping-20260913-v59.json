@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 3,
-  "command": "set -euo pipefail; serial=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$serial\"; test \"$(adb -s \"$serial\" shell getprop ro.product.model | tr -d '\\r')\" = \"SM-S906B\"; adb -s \"$serial\" shell am force-stop io.blueeye; sleep 1; adb -s \"$serial\" shell am start -W -n io.blueeye/.MainActivity >/dev/null; sleep 2; test -n \"$(adb -s \"$serial\" shell pidof io.blueeye | tr -d '\\r')\"; echo P3_V59_APP_RELAUNCHED_SCAN_RESET",
-  "pid": 94997,
+  "command": "set -euo pipefail; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"e1e09df50caf7cf9939420d42bd48bfb21ea6823\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"e1e09df50caf7cf9939420d42bd48bfb21ea6823\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; echo P3_V59_HOUSEKEEPING_PASS",
+  "pid": 95192,
   "timeout": 1800,
   "idle_timeout": 900,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T22:23:00.353185+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-12T22:23:08.007645+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p3-final-housekeeping-20260913-v59",
@@ -18,5 +18,5 @@
   "task_digest": "a728b8ba006b065f636adcc4fcb80b87d2afa317a016df27ef38ec7fa7a48601",
   "daemon_version": "4.18.20",
   "daemon_pid": 94732,
-  "updated_at": "2026-09-12T22:23:00.398925+00:00"
+  "updated_at": "2026-09-12T22:23:08.082292+00:00"
 }
