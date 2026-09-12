@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 4,
+  "index": 5,
   "total": 6,
-  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:radar:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=io.blueeye.feature.radar.presentation.RadarDenseListStabilityTest --console=plain; echo P2C_V23_DENSE120_S22_PASS",
-  "pid": 13968,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew --parallel --max-workers=3 qualityCheck --console=plain; git diff --check; echo P2C_V23_QUALITY_PASS",
+  "pid": 14287,
   "timeout": 3600,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T14:30:56.645113+00:00",
-  "stage_name": "command-4",
-  "stage_index": 4,
+  "started_at": "2026-09-12T14:31:14.337616+00:00",
+  "stage_name": "command-5",
+  "stage_index": 5,
   "stage_total": 6,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p2c-dense120-fixture-run-20260912-v23",
@@ -18,5 +18,5 @@
   "task_digest": "d65691ea879984fa6d28a2149517e149fac5057dd1fb308f16198012c3f74114",
   "daemon_version": "4.18.20",
   "daemon_pid": 13338,
-  "updated_at": "2026-09-12T14:30:56.726351+00:00"
+  "updated_at": "2026-09-12T14:31:14.429392+00:00"
 }
