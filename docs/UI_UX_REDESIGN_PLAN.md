@@ -7,7 +7,7 @@
 - Baseline `main`: `093b4257859abdbcc683f1620969b06195ade7a6`
 - Phase 3: **CLOSED / ACCEPTED**
 - Phase 4: **IN PROGRESS**
-- Current focus: **Phase 2 Radar data-path/performance cleanup (P2C next)**
+- Current focus: **Phase 3 Details redesign**
 
 This document is the execution checklist for the next product iteration. Keep the checkboxes and acceptance gates current as work lands. UI work must remain isolated from scanner/parser/scoring behavior until the UI redesign is accepted.
 
@@ -75,27 +75,27 @@ SUSPICIOUS   WATCHLIST
 
 The Radar must not build or transport full technical device state merely to draw a compact list.
 
-**Current status: IN PROGRESS.**
+**Current status: CLOSED / ACCEPTED.**
 
 Completed slices:
 
 - **P2A accepted:** move combined Radar presentation transformation off the UI thread with `flowOn(Dispatchers.Default)`. Corrected S22+ physical run: 813 frames, 30 janky = **3.69%**, p95 11 ms, p99 34 ms, logcheck PASS. This run had 5 fresh live rows, so it proves direction but is not a 100+ live-density closure.
 - **P2B accepted:** remove dead compact-card presentation work (`sensorData`, `connectionInfo`, legacy badge/evidence presentation models/formatters and Radar sensor/evidence formatting paths) while retaining full `Device.evidence` for current section classification. Accepted code checkpoint: `0d40dd1418456f42008a35222ae30c0a2498d41d`. Local detekt/unit/compile/assemble PASS; GitHub Quality #170 PASS; Secret Scan #200 PASS.
 - Current continuation handoff: [`UI_UX_PHASE2_HANDOFF_2026-09-12.md`](UI_UX_PHASE2_HANDOFF_2026-09-12.md).
-- **Next: P2C** — audit and replace the upstream `SELECT * -> DeviceEntity -> Device -> DeviceEvidenceFactory` Radar path with the smallest behavior-preserving lightweight projection/contract. Do not move to Details before a Phase 2 closure decision.
+- **P2C accepted:** lightweight Radar-specific Room projection/domain contract replaces the full-device/full-evidence path for Radar while preserving section/filter/order behavior. Controlled 120-item S22+ instrumentation PASS; final comparable S22+ benchmark: 4.51% jank, p95 12 ms, p99 36 ms. See `UI_UX_PHASE2_CLOSURE_2026-09-12.md`. Phase 3 may now proceed.
 
-- [ ] Introduce a lightweight Radar projection/model (for example `RadarDeviceSummary`) containing only fields required by the list and sectioning logic.
-- [ ] Avoid loading full GATT/characteristic/raw technical fields for the Radar list where possible.
-- [ ] Avoid building and sorting the complete `DeviceEvidenceFactory` output for every visible/recent device solely for Radar rendering.
-- [ ] Preserve only the small set of precomputed decision flags needed for Radar sectioning and badges.
+- [x] Introduce a lightweight Radar projection/model (`RadarDeviceSummary`) containing only fields required by the list and sectioning logic.
+- [x] Avoid loading full GATT/characteristic/raw technical fields for the Radar list where possible.
+- [x] Avoid building and sorting the complete `DeviceEvidenceFactory` output for every visible/recent device solely for Radar rendering.
+- [x] Preserve only the small set of precomputed decision flags needed for Radar sectioning and badges.
 - [ ] Decouple frequently changing presentation fields (RSSI/last seen) from expensive classification/evidence work.
-- [ ] Review the current 750 ms presentation cadence; use the slowest refresh that still feels live.
+- [x] Review the current 750 ms presentation cadence; no cadence/conflate change was needed after structural P2C measurement.
 - [x] Keep stable list keys based on fingerprint/stable identity.
 - [ ] Verify that one device update does not unnecessarily rebuild the whole visible tree.
-- [x] Measure recomposition/jank and UI-thread work before and after the change. (P0/P1/P2A physical measurements recorded; repeat after structural P2C cleanup.)
-- [ ] Run a 30-60 minute dense-scan UI soak.
+- [x] Measure recomposition/jank and UI-thread work before and after the change. Final P2C comparable S22+ run: 4.51% jank, p95 12 ms, p99 36 ms.
+- [x] Run extended physical field-use soak on S22+ and separately verify the controlled 120-item dense-list scenario on-device; the live field window itself was not relabeled as 100+ recent devices.
 
-**Gate:** scrolling remains responsive as the recent-device population grows; no progressive slowdown attributable to Radar presentation work.
+**Gate: PASS.** Controlled 120-item S22+ test passes; final comparable physical Radar benchmark is 4.51% jank with p95 12 ms and p99 36 ms, and extended field use shows no Tracker crash/ANR/OOM. Phase 2 is closed; see `UI_UX_PHASE2_CLOSURE_2026-09-12.md`.
 
 ## Phase 3 — Rebuild Details around information priority
 

@@ -12,7 +12,7 @@ Work only on:
 - local repository id: `tracker`
 - working branch: `ui/radar-details-redesign`
 - Local Agent binding: `be481b25-9d97-4205-b93f-95f5c5827441`
-- Local Agent chat: `chat-0d1a9278`
+- Local Agent chat: `chat-415379fc`
 
 Do not infer or switch repository identity. Before Local Agent mutation, verify `.agent/status/daemon.json` is idle and still bound to this repository. Never invoke local Codex from Local Agent tasks.
 
@@ -64,7 +64,7 @@ Accepted physical P1 measurement before P2A:
 
 Do not reopen Phase 1 without a concrete new regression.
 
-## Phase 2 — IN PROGRESS
+## Phase 2 — CLOSED / ACCEPTED
 
 Goal: reduce Radar presentation/data-path cost without changing scanner, parser, identity, Follow-Me, scoring or persistence semantics.
 
@@ -117,52 +117,21 @@ Verification on that SHA:
 - GitHub Quality #170 PASS
 - GitHub Secret Scan #200 PASS
 
-## Important remaining cost
+## Phase 2 closure
 
-Phase 2 is **not closed**.
+Phase 2 is **CLOSED / ACCEPTED**. Authoritative closure evidence is recorded in `docs/UI_UX_PHASE2_CLOSURE_2026-09-12.md`.
 
-Current upstream path still performs full recent-device mapping:
+Accepted production/test checkpoint before closure documentation:
 
-`Room devices SELECT * -> DeviceEntity list -> DeviceRepositoryImpl.toDomain() -> DeviceMapper / DeviceEvidenceFactory -> GetScannedDevicesUseCase -> sample(750 ms) -> Radar mapping/sectioning`
+`47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4`
 
-Important consequence: `sample(750 ms)` limits downstream presentation emissions, but it does not by itself prevent Room invalidations and full entity-to-domain/evidence mapping upstream.
+P2C replaced the full Radar `SELECT * -> DeviceEntity -> Device -> DeviceEvidenceFactory` transport with a lightweight Radar-specific projection/domain path while preserving section/filter/order semantics through explicit contract tests. The controlled 120-item instrumentation test passes on Samsung SM-S906B. GitHub Quality and Secret Scan are green on the accepted checkpoint.
 
-P2A moved this CPU work away from main; P2B removed dead presentation work. The next meaningful optimization should target the upstream full-device/full-evidence path rather than micro-tuning Compose.
+Final comparable S22+ 16-swipe Radar benchmark: 1,265 frames, 57 janky = **4.51%**, p95 12 ms, p99 36 ms, versus P0 13.51% / 22 ms / 44 ms. Extended field use produced no Tracker fatal exception, ANR or OOM. Pre/post Room snapshots both passed `PRAGMA integrity_check`. Two textual SQLiteException entries were traced to an unrelated Android/system media database query and are not from `io.blueeye`/Room.
 
-## Recommended next step — P2C
+No `conflate()` or cadence change was needed; structural P2C optimization was sufficient. Do not reopen P0/P1/P2 without a concrete regression.
 
-Start with a read-only implementation audit and then make the smallest behavior-preserving change that reduces work **before or during** full entity-to-domain mapping.
-
-Preferred direction:
-
-1. inspect `DeviceEntity`, `DeviceMapper`, `DeviceEvidenceFactory`, `DeviceRepositoryImpl.getRecentDevices`, `DeviceSearchDao`, `RadarUiMapper` and `RadarUiSectionMapper` together;
-2. identify the exact minimal fields/decision flags Radar needs for filtering, ordering, visible card content and section classification;
-3. design a lightweight Radar-specific projection/query/domain contract (`RadarDeviceSummary` or equivalent) rather than loading `SELECT *` plus full technical/GATT/raw fields;
-4. preserve existing section semantics with explicit tests before replacing the old path;
-5. only use `conflate()`/cadence changes as secondary improvements; do not use them to hide avoidable full `DeviceEvidenceFactory` construction;
-6. measure the new path on S22+ and with the deterministic 120-item scenario before calling Phase 2 complete.
-
-Do **not** jump directly into Details redesign until Phase 2 has a clear closure decision.
-
-## Phase 2 open checklist
-
-Still open from the main plan:
-
-- lightweight Radar projection/model;
-- avoid full technical/GATT/raw loading for Radar where possible;
-- avoid complete `DeviceEvidenceFactory` construction solely for Radar where possible while preserving section behavior;
-- preserve only the minimum decision flags/data required for Radar sectioning;
-- review the 750 ms presentation cadence after structural data-path cleanup;
-- verify whether one device update causes avoidable full-list work;
-- repeat performance measurement with a dense controlled population;
-- 30–60 minute dense-scan UI soak before final Phase 2 closure.
-
-Already established and should not be redone without reason:
-
-- stable list key is fingerprint/stable identity;
-- Phase 1 120-card structural stability test passes;
-- P2A `flowOn(Dispatchers.Default)` physical direction is accepted;
-- P2B dead presentation contract is removed and green.
+Next implementation step: **Phase 3 — Details redesign around information priority**, following `docs/UI_UX_REDESIGN_PLAN.md`.
 
 ## Product/UI direction after Phase 2
 
