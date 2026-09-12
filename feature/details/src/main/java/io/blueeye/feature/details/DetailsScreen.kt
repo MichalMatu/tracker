@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
@@ -26,7 +25,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -53,7 +50,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceConnectionState
 import io.blueeye.core.model.SensorData
-import io.blueeye.core.ui.R
 import io.blueeye.core.ui.stableLiveHeight
 import io.blueeye.core.ui.theme.BlueEyeTheme
 import io.blueeye.core.ui.theme.Dimens
@@ -113,38 +109,12 @@ fun DetailsScreen(
                     IconButton(onClick = { viewModel.refreshFocusedScan() }) {
                         Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh focused scan")
                     }
-                    IconButton(onClick = { showEditDialog.value = true }) {
-                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
-                    }
                     IconButton(onClick = { showRawDataDialog.value = true }) {
                         Icon(imageVector = Icons.Default.Info, contentDescription = "Raw Data")
                     }
                 }
             )
         },
-        floatingActionButton = {
-            device?.let { dev ->
-                FloatingActionButton(onClick = { viewModel.toggleWatchlist() }) {
-                    Icon(
-                        painter =
-                            painterResource(
-                                id =
-                                    if (dev.isInWatchlist) {
-                                        R.drawable.ic_visibility_off
-                                    } else {
-                                        R.drawable.ic_visibility
-                                    },
-                            ),
-                        contentDescription =
-                            if (dev.isInWatchlist) {
-                                "Remove from watchlist"
-                            } else {
-                                "Watch device"
-                            },
-                    )
-                }
-            }
-        }
     ) { paddingValues ->
         Column(
             modifier =
@@ -175,6 +145,12 @@ fun DetailsScreen(
                         "Technology" to dev.technology,
                         "Type" to dev.deviceType.name
                     )
+                )
+
+                DetailsActionsReviewCard(
+                    device = dev,
+                    onToggleWatchlist = { viewModel.toggleWatchlist() },
+                    onEdit = { showEditDialog.value = true },
                 )
 
                 CalibrationCard(
@@ -281,6 +257,51 @@ fun HeaderCard(device: Device) {
                     maxLines = 1,
                 )
                 DetailsDecisionSummaryText(summary)
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailsActionsReviewCard(
+    device: Device,
+    onToggleWatchlist: () -> Unit,
+    onEdit: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth().stableLiveHeight(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+        Column(
+            modifier = Modifier.padding(Dimens.PaddingMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
+        ) {
+            Text(
+                text = "Actions / Review",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = "Manage Watchlist status, alias, notes and alert preferences for this device.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
+            ) {
+                OutlinedButton(
+                    onClick = onToggleWatchlist,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(if (device.isInWatchlist) "Remove Watchlist" else "Add Watchlist")
+                }
+                Button(
+                    onClick = onEdit,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Edit profile & alerts")
+                }
             }
         }
     }
