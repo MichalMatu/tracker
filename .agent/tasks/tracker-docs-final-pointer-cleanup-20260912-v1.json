@@ -1,0 +1,19 @@
+{
+  "id": "tracker-docs-final-pointer-cleanup-20260912-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 120,
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin ui/radar-details-redesign; git checkout ui/radar-details-redesign; git merge --ff-only origin/ui/radar-details-redesign; test \"$(git rev-parse HEAD)\" = 'b0e87bd3efc91fb054e1ab52f7c65e58efb13d6c'",
+    "set -euo pipefail; python3 -c 'from pathlib import Path; p=Path(\"docs/SANDBOX_EXECUTION_FLOW.md\"); s=p.read_text(); old=\"Status: **ACTIVE during stability recovery**  \\nCanonical product/recovery plan: `docs/STABILITY_RECOVERY_GUIDE.md`\"; new=\"Status: **ACTIVE engineering workflow**  \\nCanonical documentation entry point: `docs/README.md`  \\nCurrent active plan: `docs/UI_UX_REDESIGN_PLAN.md`\"; assert old in s; p.write_text(s.replace(old,new,1)); p=Path(\"MVP_GOAL_PROMPT.md\"); s=p.read_text(); old=\"> **Historical execution plan.** During the stability feature freeze, do not execute this checklist in order. `docs/STABILITY_RECOVERY_GUIDE.md` is authoritative, and `docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md` defines the current Phase 1 implementation boundary.\"; new=\"> **Historical execution plan.** Do not execute this checklist as current work. Phase 3 is closed; current project status and the active plan start at `docs/README.md` and `docs/UI_UX_REDESIGN_PLAN.md`.\"; assert old in s; p.write_text(s.replace(old,new,1)); p=Path(\"docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md\"); s=p.read_text(); banner=\"> **HISTORICAL STATUS NOTICE:** This Phase 1 audit is retained as stabilization provenance. Phase 3 is now ACCEPTED / CLOSED; current work starts from `docs/README.md` and the active plan named there.\\n\\n\"; p.write_text(s if s.startswith(banner) else banner+s)'; git diff --check; git diff --stat; git diff -- docs/SANDBOX_EXECUTION_FLOW.md MVP_GOAL_PROMPT.md docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md",
+    "set -euo pipefail; git add docs/SANDBOX_EXECUTION_FLOW.md MVP_GOAL_PROMPT.md docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md; git commit -m 'Clean remaining historical doc pointers'; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo FINAL_POINTER_CLEANUP_PASS; git rev-parse HEAD"
+  ]
+}
