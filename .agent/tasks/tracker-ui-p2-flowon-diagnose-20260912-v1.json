@@ -1,0 +1,19 @@
+{
+  "id": "tracker-ui-p2-flowon-diagnose-20260912-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 2048,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin ui/radar-details-redesign; git checkout ui/radar-details-redesign; git merge --ff-only origin/ui/radar-details-redesign; test \"$(git rev-parse HEAD)\" = 'ae35d7e218cd0efa983ff74570916ce50e0ac97f'; echo P2_DIAG_HEAD_VERIFIED",
+    "set -euo pipefail; OUT=\"$HOME/agent-workspace/repos/tracker/checkpoints/ui-p2-flowon-20260912\"; test -d \"$OUT\"; echo P2_DIAG_FILES; ls -la \"$OUT\"; echo P2_DIAG_SEEN_COUNT=$(grep -o 'text=\"Seen ' \"$OUT/a.xml\" 2>/dev/null | wc -l | tr -d ' '); echo P2_DIAG_PAUSED_COUNT=$(grep -o 'text=\"Paused\"' \"$OUT/a.xml\" 2>/dev/null | wc -l | tr -d ' '); echo P2_DIAG_SCANNING_COUNT=$(grep -o 'text=\"Scanning\"' \"$OUT/a.xml\" 2>/dev/null | wc -l | tr -d ' '); echo P2_DIAG_SCAN_DESC_COUNT=$(grep -o 'content-desc=\"Scan\"' \"$OUT/a.xml\" 2>/dev/null | wc -l | tr -d ' '); if test -f \"$OUT/gfxinfo.txt\"; then grep -E 'Total frames rendered|Janky frames|50th percentile|90th percentile|95th percentile|99th percentile' \"$OUT/gfxinfo.txt\" || true; else echo P2_DIAG_NO_GFXINFO; fi; if test -f \"$OUT/logcat-tail.txt\"; then grep -E 'FATAL EXCEPTION|AndroidRuntime: FATAL|OutOfMemoryError|SQLiteException|SecurityException' \"$OUT/logcat-tail.txt\" || true; else echo P2_DIAG_NO_LOGCAT; fi; echo P2_DIAG_CHECKPOINT_DONE",
+    "set -euo pipefail; ADB=adb; SERIAL=$($ADB devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$SERIAL\"; echo P2_DIAG_MODEL=$($ADB -s \"$SERIAL\" shell getprop ro.product.model | tr -d '\\r'); echo P2_DIAG_PID=$($ADB -s \"$SERIAL\" shell pidof io.blueeye | tr -d '\\r'); $ADB -s \"$SERIAL\" shell uiautomator dump /sdcard/p2-diag-now.xml >/dev/null; $ADB -s \"$SERIAL\" pull /sdcard/p2-diag-now.xml \"$OUT/now.xml\" >/dev/null; echo P2_DIAG_NOW_SEEN=$(grep -o 'text=\"Seen ' \"$OUT/now.xml\" | wc -l | tr -d ' '); echo P2_DIAG_NOW_PAUSED=$(grep -o 'text=\"Paused\"' \"$OUT/now.xml\" | wc -l | tr -d ' '); test -z \"$(git status --porcelain)\"; echo P2_DIAG_PASS"
+  ]
+}
