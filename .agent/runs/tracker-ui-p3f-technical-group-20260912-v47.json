@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 5,
-  "command": "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p3f-technical-group-v47.py | python3; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:ktlintFormat --console=plain; git diff --check; actual=$(git status --porcelain | sed 's/^...//' | sort); expected=$(printf '%s\n' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsTechnicalSection.kt' | sort); test \"$actual\" = \"$expected\"; echo P3F_V47_PATCH_READY",
-  "pid": 69592,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:testDebugUnitTest :feature:details:ktlintCheck :feature:details:detekt :feature:details:compileDebugKotlin :app:assembleDebug --console=plain; echo P3F_V47_FOCUSED_PASS",
+  "pid": 69732,
   "timeout": 3600,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T20:09:08.728867+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-12T20:09:14.529221+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p3f-technical-group-20260912-v47",
@@ -18,5 +18,5 @@
   "task_digest": "a087e560acb8c100c2dd71eb346617b9902dab11a0f317d1de555349e4a39cdc",
   "daemon_version": "4.18.20",
   "daemon_pid": 69286,
-  "updated_at": "2026-09-12T20:09:08.823485+00:00"
+  "updated_at": "2026-09-12T20:09:14.629221+00:00"
 }
