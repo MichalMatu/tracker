@@ -1,0 +1,60 @@
+{
+  "id": "tracker-ui-p2b-type-reference-audit-20260912-v1",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "started_at": "2026-09-12T10:54:42.148078+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin ui/radar-details-redesign; git checkout ui/radar-details-redesign; git merge --ff-only origin/ui/radar-details-redesign; test \"$(git rev-parse HEAD)\" = 'ae35d7e218cd0efa983ff74570916ce50e0ac97f'; for term in RadarUiConnectionInfo RadarBadgeInfo RadarEvidenceInfo RadarEvidenceChipInfo RadarParsedSensorData; do echo \"=== $term ===\"; grep -RIn --exclude-dir=build -- \"$term\" feature/radar || true; done; test -z \"$(git status --porcelain)\"; echo P2B_TYPE_AUDIT_PASS",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch              ui/radar-details-redesign -> FETCH_HEAD\nSwitched to branch 'ui/radar-details-redesign'\nYour branch is up to date with 'origin/ui/radar-details-redesign'.\nAlready up to date.\n=== RadarUiConnectionInfo ===\nfeature/radar/src/androidTest/java/io/blueeye/feature/radar/presentation/RadarDenseListStabilityTest.kt:141:                RadarUiConnectionInfo(\nfeature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarSectionViewMapperTest.kt:162:                RadarUiConnectionInfo(\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiFormatter.kt:85:    fun formatConnectionInfo(device: Device): RadarUiConnectionInfo {\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiFormatter.kt:87:            \"PROBED\" -> RadarUiConnectionInfo(true, \"LINKED\", RadarUiColorToken.SAFE)\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiFormatter.kt:88:            \"RFCOMM_OK\" -> RadarUiConnectionInfo(true, \"RFCOMM\", RadarUiColorToken.SAFE)\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiFormatter.kt:89:            \"RFCOMM_FAIL\" -> RadarUiConnectionInfo(true, \"RFCOMM ERR\", RadarUiColorToken.SUSPICIOUS)\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiFormatter.kt:90:            \"FAILED\" -> RadarUiConnectionInfo(true, \"RETRY ${device.connectionAttempts}\", RadarUiColorToken.SUSPICIOUS)\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiFormatter.kt:91:            \"FAILED_PERMANENT\" -> RadarUiConnectionInfo(true, \"FAILED\", RadarUiColorToken.DANGEROUS)\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiFormatter.kt:92:            \"PROBING\" -> RadarUiConnectionInfo(true, \"PROBING\", RadarUiColorToken.SUSPICIOUS)\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiFormatter.kt:104:                    RadarUiConnectionInfo(true, text, color)\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiFormatter.kt:106:                    RadarUiConnectionInfo(false, \"\", RadarUiColorToken.TRANSPARENT)\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiMapper.kt:45:                connectionInfo = RadarUiConnectionInfo(true, \"PROBING\", RadarUiColorToken.SUSPICIOUS),\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiModels.kt:13:    val connectionInfo: RadarUiConnectionInfo,\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiModels.kt:43:data class RadarUiConnectionInfo(\n=== RadarBadgeInfo ===\nfeature/radar/src/androidTest/java/io/blueeye/feature/radar/presentation/RadarDenseListStabilityTest.kt:152:                RadarBadgeInfo(\nfeature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarSectionViewMapperTest.kt:173:                RadarBadgeInfo(\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiFormatter.kt:119:    fun formatBadges(device: Device): RadarBadgeInfo {\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiFormatter.kt:143:        return RadarBadgeInfo(\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiModels.kt:15:    val badges: RadarBadgeInfo,\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiModels.kt:54:data class RadarBadgeInfo(\n=== RadarEvidenceInfo ===\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarEvidenceUiFormatter.kt:10:    fun format(evidence: List<DetectionEvidence>): RadarEvidenceInfo {\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarEvidenceUiFormatter.kt:22:        return RadarEvidenceInfo(\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarEvidenceUiFormatter.kt:32:    private fun noAttentionEvidence(): RadarEvidenceInfo =\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarEvidenceUiFormatter.kt:33:        RadarEvidenceInfo(\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiModels.kt:21:    val evidenceInfo: RadarEvidenceInfo?\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiModels.kt:141:data class RadarEvidenceInfo(\n=== RadarEvidenceChipInfo ===\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarEvidenceUiFormatter.kt:41:                    RadarEvidenceChipInfo(\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarEvidenceUiFormatter.kt:48:    private fun DetectionEvidence.toChipInfo(): RadarEvidenceChipInfo =\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarEvidenceUiFormatter.kt:49:        RadarEvidenceChipInfo(\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiModels.kt:147:    val chips: List<RadarEvidenceChipInfo>\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarUiModels.kt:150:data class RadarEvidenceChipInfo(\n=== RadarParsedSensorData ===\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarSensorDataParser.kt:5:data class RadarParsedSensorData(\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarSensorDataParser.kt:35:    fun parse(device: Device): RadarParsedSensorData {\nfeature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarSensorDataParser.kt:70:        return RadarParsedSensorData(batteryText, temperatureText, humidityText, voltageText, extraText)\nP2B_TYPE_AUDIT_PASS\n",
+      "elapsed_seconds": 1.118,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.5,
+      "output_policy": "stream",
+      "captured_output_chars": 5491,
+      "output_truncated": false,
+      "current_rss_mb": 3.5,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.118
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.118
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.076
+  },
+  "finished_at": "2026-09-12T10:54:45.115094+00:00",
+  "task_digest": "e3cbfbd790eb4660ca54bf44c115a28e32d8242507cb6b5b0e1cc637dc4c4605",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "attempt_id": "eaa006b10a517b8997201eb2",
+  "daemon_version": "4.18.20"
+}
