@@ -1,0 +1,15 @@
+{
+  "id": "tracker-ui-p3-final-physical-diagnose-20260912-v52",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1800,
+  "task_timeout": 3600,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"f398bf978393a19aa1f7eb76f0ca4356e364851f\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"f398bf978393a19aa1f7eb76f0ca4356e364851f\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; serial=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$serial\"; test \"$(adb -s \"$serial\" shell getprop ro.product.model | tr -d '\\r')\" = \"SM-S906B\"; echo P3_V52_BASELINE_DEVICE_OK",
+    "set -euo pipefail; private=\"$HOME/agent-private/tracker/ui-p3-final-physical-20260912-v51\"; test -d \"$private\"; echo '--- ARTIFACTS ---'; find \"$private\" -maxdepth 1 -type f -exec basename {} \\; | sort; echo '--- SEMANTIC ARTIFACT CHECKS ---'; python3 - \"$private\" <<'PY'\nfrom pathlib import Path\nimport sys\nroot=Path(sys.argv[1])\nfor name in ['radar-before-scan.xml','radar-after-5min-scan.xml','details-top.xml','details-identity.xml','details-actions.xml','details-history.xml','details-technical.xml','details-all-evidence.xml','radar-final.xml','current.xml']:\n p=root/name\n print(f'{name.upper().replace("-","_").replace(".","_")}_EXISTS={"PASS" if p.exists() and p.stat().st_size else "NO"}')\n if p.exists():\n  s=p.read_text(errors='replace')\n  for label in ['Details','Identity','Actions / Review','History','Technical details','All evidence']:\n   print(f'{name}:{label}={"YES" if label in s else "NO"}')\nPY\nserial=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); echo APP_PID=$(adb -s \"$serial\" shell pidof io.blueeye | tr -d '\\r' || true); adb -s \"$serial\" shell dumpsys activity activities | grep -m1 'mResumedActivity' | sed -E 's/.* ([A-Za-z0-9._]+\/[A-Za-z0-9.$_]+).*/RESUMED=\\1/' || true; echo P3_V52_ARTIFACT_DIAG_DONE",
+    "set -euo pipefail; private=\"$HOME/agent-private/tracker/ui-p3-final-physical-20260912-v51\"; if test -f \"$private/logcat.txt\"; then echo LOG_FATAL_EXCEPTION_COUNT=$(grep -c 'FATAL EXCEPTION' \"$private/logcat.txt\" || true); echo LOG_OOM_COUNT=$(grep -c 'OutOfMemoryError' \"$private/logcat.txt\" || true); echo LOG_ANR_COUNT=$(grep -c 'ANR in io.blueeye' \"$private/logcat.txt\" || true); else echo LOGCAT_CAPTURED=NO; fi; test -z \"$(git status --porcelain)\"; echo P3_V52_DIAG_COMPLETE"
+  ]
+}
