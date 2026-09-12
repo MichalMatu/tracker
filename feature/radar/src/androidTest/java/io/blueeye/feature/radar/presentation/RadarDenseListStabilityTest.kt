@@ -117,7 +117,6 @@ class RadarDenseListStabilityTest {
             fingerprint = fingerprint,
             displayName = device.name.orEmpty(),
             vendorAndType = "${device.vendorName} · Unknown",
-            sensorData = null,
             signalInfo =
                 RadarUiSignalInfo(
                     rssi = -60,
@@ -133,43 +132,24 @@ class RadarDenseListStabilityTest {
                 RadarUiStatusInfo(
                     text = if (suspicious) "SUSPICIOUS" else "SAFE",
                     textColor = if (suspicious) RadarUiColorToken.SUSPICIOUS else RadarUiColorToken.SAFE,
-                    backgroundTint = if (suspicious) RadarUiColorToken.SUSPICIOUS_CONTAINER else RadarUiColorToken.SAFE_CONTAINER,
+                    backgroundTint =
+                        if (suspicious) {
+                            RadarUiColorToken.SUSPICIOUS_CONTAINER
+                        } else {
+                            RadarUiColorToken.SAFE_CONTAINER
+                        },
                     isWarning = suspicious,
                     cardBackgroundColor = null,
-                ),
-            connectionInfo =
-                RadarUiConnectionInfo(
-                    isVisible = false,
-                    text = "",
-                    textColor = RadarUiColorToken.TRANSPARENT,
                 ),
             icons =
                 RadarUiIcons(
                     mainIconRes = android.R.drawable.ic_menu_search,
                     isConnectable = false,
                 ),
-            badges =
-                RadarBadgeInfo(
-                    techBadge = "BLE",
-                    techColor = RadarUiColorToken.PRIMARY,
-                    privacyBadge = "PUBLIC",
-                    watchlistBadge = if (watchlist) "WATCHLIST" else null,
-                    watchlistColor = RadarUiColorToken.PRIMARY,
-                    statusBadge = if (suspicious) "SUSPICIOUS" else null,
-                    statusColor = if (suspicious) RadarUiColorToken.SUSPICIOUS else RadarUiColorToken.SAFE,
-                    calibrationBadge = null,
-                    calibrationColor = RadarUiColorToken.GRAY,
-                    batteryText = null,
-                    temperatureText = null,
-                    humidityText = null,
-                    voltageText = null,
-                    extraText = null,
-                ),
             isNew = false,
             isInWatchlist = watchlist,
             isIgnored = false,
             nameColor = RadarUiColorToken.PRIMARY,
-            evidenceInfo = null,
         )
     }
 
