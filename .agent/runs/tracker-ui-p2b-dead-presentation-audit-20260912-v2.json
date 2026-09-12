@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p2b-dead-presentation-audit-20260912-v2",
+  "task_digest": "ad2882a625622075542903ef0e3ae05fd27143366bfd95d370873a5fdd2789b1",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-12T10:52:55.299282+00:00",
+  "attempt_id": "32657e8bd61478038cd5d5fc",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 4030,
+  "updated_at": "2026-09-12T10:52:55.299404+00:00",
+  "pid": 4030
+}
