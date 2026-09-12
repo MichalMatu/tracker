@@ -133,39 +133,10 @@ class RadarSectionViewMapperTest {
         )
 
     private fun item(fingerprint: String): RadarUiItem =
-        RadarUiItem(
+        RadarUiMapper.mapToUi(
             device = device(fingerprint),
-            fingerprint = fingerprint,
-            displayName = fingerprint,
-            vendorAndType = "",
-            signalInfo =
-                RadarUiSignalInfo(
-                    rssi = -60,
-                    rssiText = "-60 dBm",
-                    signalColor = RadarUiColorToken.PRIMARY,
-                    signalProgress = 50,
-                    distanceText = "Unknown",
-                    techBadge = "BLE",
-                    techBadgeColor = RadarUiColorToken.PRIMARY,
-                    timeSinceSeen = "now",
-                ),
-            statusInfo =
-                RadarUiStatusInfo(
-                    text = "SAFE",
-                    textColor = RadarUiColorToken.SAFE,
-                    backgroundTint = RadarUiColorToken.SAFE_CONTAINER,
-                    isWarning = false,
-                    cardBackgroundColor = null,
-                ),
-            icons =
-                RadarUiIcons(
-                    mainIconRes = 0,
-                    isConnectable = false,
-                ),
             isNew = false,
-            isInWatchlist = false,
-            isIgnored = false,
-            nameColor = RadarUiColorToken.PRIMARY,
+            activeProbeMac = null,
         )
 
     private fun device(fingerprint: String): Device =

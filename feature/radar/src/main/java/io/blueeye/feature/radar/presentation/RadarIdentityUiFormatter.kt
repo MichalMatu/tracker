@@ -1,26 +1,27 @@
 package io.blueeye.feature.radar.presentation
 
-import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceType
+import io.blueeye.core.model.RadarDeviceSummary
 
 object RadarIdentityUiFormatter {
-    fun displayName(device: Device): String =
+    fun displayName(device: RadarDeviceSummary): String =
         device.userAlias?.takeIf { it.isMeaningfulIdentityValue() }
             ?: device.name?.takeIf { it.isMeaningfulIdentityValue() }
             ?: device.predictedModel?.takeIf { it.isMeaningfulIdentityValue() }
             ?: knownVendorName(device)?.let { "$it Device" }
             ?: fallbackDisplayName(device)
 
-    fun hasIdentitySignal(device: Device): Boolean =
+    fun hasIdentitySignal(device: RadarDeviceSummary): Boolean =
         device.deviceType != DeviceType.UNKNOWN ||
             device.name.isMeaningfulIdentityValue() ||
             device.userAlias.isMeaningfulIdentityValue() ||
             device.predictedModel.isMeaningfulIdentityValue() ||
             device.vendorName.isKnownVendorName()
 
-    fun knownVendorName(device: Device): String? = device.vendorName?.takeIf { it.isKnownVendorName() }
+    fun knownVendorName(device: RadarDeviceSummary): String? =
+        device.vendorName?.takeIf { it.isKnownVendorName() }
 
-    private fun fallbackDisplayName(device: Device): String =
+    private fun fallbackDisplayName(device: RadarDeviceSummary): String =
         if (device.technology.contains(BLE_TECHNOLOGY, ignoreCase = true)) {
             "Unknown BLE device"
         } else {

@@ -143,9 +143,9 @@ fun RadarScreen(
                         onMenuClick = onMenuClick,
                         onScanToggle = { viewModel.toggleScanning() },
                         onBaselineToggle = {
-                            val currentItems =
-                                (uiState as? RadarUiState.Success)?.items?.map { it.device }.orEmpty()
-                            viewModel.toggleBaseline(currentItems)
+                            val currentFingerprints =
+                                (uiState as? RadarUiState.Success)?.items?.map { it.fingerprint }.orEmpty()
+                            viewModel.toggleBaseline(currentFingerprints)
                         },
                         onAutoActiveProbeToggle = {
                             handleAutoActiveProbeToggle(
@@ -242,10 +242,8 @@ fun RadarScreen(
                                 ) { item ->
                                     RadarDeviceItem(
                                         item = item,
-                                        onClick = { onDeviceClick(item.fingerprint) },
-                                        onWatchlistClick = { device ->
-                                            viewModel.toggleWatchlist(device)
-                                        },
+                                        onClick = onDeviceClick,
+                                        onWatchlistClick = viewModel::toggleWatchlist,
                                     )
                                 }
                             }

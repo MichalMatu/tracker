@@ -29,14 +29,14 @@ class RadarUiCardOrderTest {
     fun `last seen updates do not reorder existing cards`() {
         val initial =
             listOf(
-                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW).withLastSeen(NOW + 10_000),
-                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000).withLastSeen(NOW),
+                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW, lastSeenAt = NOW + 10_000),
+                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000, lastSeenAt = NOW),
             ).sortedWith(RadarUiCardOrder.comparator)
 
         val afterLastSeenSwap =
             listOf(
-                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW).withLastSeen(NOW),
-                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000).withLastSeen(NOW + 20_000),
+                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW, lastSeenAt = NOW),
+                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000, lastSeenAt = NOW + 20_000),
             ).sortedWith(RadarUiCardOrder.comparator)
 
         assertEquals(initial.map { it.fingerprint }, afterLastSeenSwap.map { it.fingerprint })
@@ -65,11 +65,13 @@ class RadarUiCardOrderTest {
         assertEquals(listOf("watch", "new", "ordinary"), sorted.map { it.fingerprint })
     }
 
+    @Suppress("LongParameterList")
     private fun item(
         fingerprint: String,
         displayName: String,
         rssi: Int = -60,
         firstSeenAt: Long = NOW,
+        lastSeenAt: Long = NOW,
         priority: RadarItemPriority = RadarItemPriority.ORDINARY,
     ): RadarUiItem =
         RadarUiMapper.mapToUi(
@@ -92,22 +94,13 @@ class RadarUiCardOrderTest {
                     alertSound = false,
                     alertVibration = false,
                     firstSeenAt = firstSeenAt,
-                    lastSeenAt = NOW,
+                    lastSeenAt = lastSeenAt,
                     rssi = rssi,
                     encounterCount = 1,
                 ),
             isNew = priority == RadarItemPriority.NEW,
             activeProbeMac = null,
         )
-
-    private fun RadarUiItem.withLastSeen(lastSeenAt: Long): RadarUiItem {
-        return copy(
-            device =
-                device.copy(
-                    lastSeenAt = lastSeenAt,
-                ),
-        )
-    }
 
     private enum class RadarItemPriority {
         ORDINARY,

@@ -30,15 +30,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import io.blueeye.core.model.Device
 import io.blueeye.core.ui.theme.Dimens
 import io.blueeye.core.ui.theme.extendedColors
 
 @Composable
 fun RadarDeviceItem(
     item: RadarUiItem,
-    onClick: (Device) -> Unit,
-    onWatchlistClick: (Device) -> Unit,
+    onClick: (String) -> Unit,
+    onWatchlistClick: (String) -> Unit,
 ) {
     val cardBackgroundColor =
         item.statusInfo.cardBackgroundColor?.resolve()
@@ -49,7 +48,7 @@ fun RadarDeviceItem(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = Dimens.PaddingMedium, vertical = Dimens.PaddingExtraSmall)
-                .clickable { onClick(item.device) },
+                .clickable { onClick(item.fingerprint) },
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
         elevation = CardDefaults.cardElevation(defaultElevation = Dimens.CardElevation),
     ) {
@@ -97,7 +96,7 @@ fun RadarDeviceItem(
 @Composable
 private fun RadarPrimaryRow(
     item: RadarUiItem,
-    onWatchlistClick: (Device) -> Unit,
+    onWatchlistClick: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -124,7 +123,7 @@ private fun RadarPrimaryRow(
         )
 
         IconButton(
-            onClick = { onWatchlistClick(item.device) },
+            onClick = { onWatchlistClick(item.fingerprint) },
             modifier = Modifier.size(40.dp),
         ) {
             Icon(

@@ -2,6 +2,7 @@ package io.blueeye.feature.radar.presentation
 
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceType
+import io.blueeye.core.model.RadarDeviceSummary
 import io.blueeye.core.model.TrackingStatus
 import io.blueeye.core.ui.utils.DeviceUiUtils
 import kotlin.math.max
@@ -9,7 +10,10 @@ import kotlin.math.min
 
 @Suppress("MagicNumber", "CyclomaticComplexMethod", "MaxLineLength")
 object RadarUiFormatter {
-    fun formatVendorAndType(device: Device): String {
+    fun formatVendorAndType(device: Device): String =
+        formatVendorAndType(device.toRadarSummaryForUi())
+
+    fun formatVendorAndType(device: RadarDeviceSummary): String {
         val vendor = RadarIdentityUiFormatter.knownVendorName(device)
         val type =
             DeviceUiUtils.mapDeviceTypeToString(device.deviceType)
@@ -17,12 +21,14 @@ object RadarUiFormatter {
         return listOfNotNull(vendor, type).joinToString(separator = " • ")
     }
 
-    fun formatSignalInfo(device: Device): RadarUiSignalInfo {
+    fun formatSignalInfo(device: Device): RadarUiSignalInfo =
+        formatSignalInfo(device.toRadarSummaryForUi())
+
+    fun formatSignalInfo(device: RadarDeviceSummary): RadarUiSignalInfo {
         val minRssi = -100
         val maxRssi = -40
         val progress = ((device.rssi - minRssi).toFloat() * 100 / (maxRssi - minRssi)).toInt()
 
-        // RSSI is only signal quality, not a safety or risk verdict.
         val color =
             when {
                 device.rssi > -60 -> RadarUiColorToken.PRIMARY
@@ -49,6 +55,11 @@ object RadarUiFormatter {
 
     fun formatStatusInfo(
         device: Device,
+        isNew: Boolean,
+    ): RadarUiStatusInfo = formatStatusInfo(device.toRadarSummaryForUi(), isNew)
+
+    fun formatStatusInfo(
+        device: RadarDeviceSummary,
         isNew: Boolean,
     ): RadarUiStatusInfo {
         if (isNew) {
@@ -78,12 +89,15 @@ object RadarUiFormatter {
     }
 
     fun formatIcons(device: Device): RadarUiIcons =
+        formatIcons(device.toRadarSummaryForUi())
+
+    fun formatIcons(device: RadarDeviceSummary): RadarUiIcons =
         RadarUiIcons(
             mainIconRes = DeviceUiUtils.getIconForType(device.deviceType),
             isConnectable = device.isConnectable == true,
         )
 
-    private fun getTechBadgeAndColor(device: Device): Pair<String, RadarUiColorToken> =
+    private fun getTechBadgeAndColor(device: RadarDeviceSummary): Pair<String, RadarUiColorToken> =
         when {
             device.technology.contains("Ext", true) || device.technology.contains("Phy", true) ->
                 "BLE 5" to RadarUiColorToken.PRIMARY

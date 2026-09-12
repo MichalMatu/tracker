@@ -1,9 +1,10 @@
 package io.blueeye.feature.radar.presentation
 
-import io.blueeye.core.model.Device
+import io.blueeye.core.model.DeviceCalibrationLabel
+import io.blueeye.core.model.RadarEvidenceSignals
+import io.blueeye.core.model.TrackingStatus
 
 data class RadarUiItem(
-    val device: Device,
     val fingerprint: String,
     val displayName: String,
     val vendorAndType: String,
@@ -14,6 +15,13 @@ data class RadarUiItem(
     val isInWatchlist: Boolean,
     val isIgnored: Boolean,
     val nameColor: RadarUiColorToken,
+    val firstSeenAt: Long,
+    val trackingStatus: TrackingStatus,
+    val followingScore: Float,
+    val isSafeBeacon: Boolean,
+    val calibrationLabel: DeviceCalibrationLabel,
+    val hasIdentitySignal: Boolean,
+    val evidenceSignals: RadarEvidenceSignals,
     val isProbing: Boolean = false,
 )
 
