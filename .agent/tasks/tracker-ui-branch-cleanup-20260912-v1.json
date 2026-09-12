@@ -1,0 +1,19 @@
+{
+  "id": "tracker-ui-branch-cleanup-20260912-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 120,
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin main fix/phase3-field-blockers; test \"$(git rev-parse origin/main)\" = '093b4257859abdbcc683f1620969b06195ade7a6'; test \"$(git rev-parse origin/fix/phase3-field-blockers)\" = '2e5223f22128059935c36bb24946cfef95eba958'; test \"$(gh pr view 6 --repo MichalMatu/tracker --json state,mergedAt,headRefOid --jq '.state + \" \" + (.mergedAt // \"\") + \" \" + .headRefOid')\" = 'MERGED 2026-09-11T18:10:15Z 2e5223f22128059935c36bb24946cfef95eba958'",
+    "set -euo pipefail; git push origin --delete fix/phase3-field-blockers",
+    "set -euo pipefail; git fetch --prune origin; test -z \"$(git ls-remote --heads origin refs/heads/fix/phase3-field-blockers)\"; test \"$(git rev-parse origin/main)\" = '093b4257859abdbcc683f1620969b06195ade7a6'; echo MERGED_BRANCH_CLEANUP_PASS; test -z \"$(git status --porcelain)\""
+  ]
+}
