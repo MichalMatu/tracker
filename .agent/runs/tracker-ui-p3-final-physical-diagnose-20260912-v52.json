@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-12T21:04:09.576576+00:00",
+  "task_id": "tracker-ui-p3-final-physical-diagnose-20260912-v52",
+  "daemon_version": "4.18.20",
+  "pid": 20830
+}
