@@ -1,0 +1,9 @@
+{
+  "id": "tracker-docs-audit-20260912-v1",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "started_at": null,
+  "finished_at": "2026-09-12T03:23:35.803187+00:00",
+  "daemon_version": "4.18.20",
+  "error": "JSONDecodeError: Invalid \\escape: line 16 column 184 (char 889)"
+}
