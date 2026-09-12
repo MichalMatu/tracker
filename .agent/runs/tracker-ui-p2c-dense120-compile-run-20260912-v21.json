@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 4,
-  "command": "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"d107dad886894f0e8e663f53006d11e0f9910f4f\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"d107dad886894f0e8e663f53006d11e0f9910f4f\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; serial=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$serial\"; test \"$(adb -s \"$serial\" shell getprop ro.product.model | tr -d '\\r')\" = \"SM-S906B\"; echo P2C_V21_BASELINE_DEVICE_OK",
-  "pid": 4994,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:radar:compileDebugAndroidTestKotlin --console=plain; echo P2C_V21_ANDROIDTEST_COMPILE_PASS",
+  "pid": 5084,
   "timeout": 1800,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T14:20:46.351280+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-12T14:20:51.122089+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 4,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p2c-dense120-compile-run-20260912-v21",
@@ -18,5 +18,5 @@
   "task_digest": "2cea856fee89025500f36ea9157650f9771c4fc57703d787fbdb5db60335a018",
   "daemon_version": "4.18.20",
   "daemon_pid": 4825,
-  "updated_at": "2026-09-12T14:20:46.351431+00:00"
+  "updated_at": "2026-09-12T14:20:51.218453+00:00"
 }
