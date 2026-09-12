@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p3e-hide-empty-all-evidence-20260912-v46",
+  "task_digest": "0fefd0fcf0685c7f0cdc1a5ad2ce4abf64667b6789ae467ee6e4b9d6a0ffc366",
+  "idle_timeout": 300,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T19:58:12.311626+00:00",
+  "attempt_id": "8ae9db2a80dd5d851d347220",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 60185,
+  "updated_at": "2026-09-12T19:58:12.311739+00:00",
+  "pid": 60185
+}
