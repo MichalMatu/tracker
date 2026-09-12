@@ -6,8 +6,8 @@
 - Working branch: `ui/radar-details-redesign`
 - Baseline `main`: `093b4257859abdbcc683f1620969b06195ade7a6`
 - Phase 3: **CLOSED / ACCEPTED**
-- Phase 4: **UNBLOCKED**
-- Current focus: Radar + Details usability, stability and presentation performance
+- Phase 4: **IN PROGRESS**
+- Current focus: **Phase 2 Radar data-path/performance cleanup (P2C next)**
 
 This document is the execution checklist for the next product iteration. Keep the checkboxes and acceptance gates current as work lands. UI work must remain isolated from scanner/parser/scoring behavior until the UI redesign is accepted.
 
@@ -29,14 +29,16 @@ This document is the execution checklist for the next product iteration. Keep th
 
 ## Phase 0 — Baseline and guardrails
 
-- [ ] Capture baseline screenshots of current Radar and Details on a representative dataset.
-- [ ] Record a baseline long-list scenario (100+ recent devices) for later performance comparison.
-- [ ] Keep all redesign changes on `ui/radar-details-redesign` until acceptance.
-- [ ] Do not change BLE collection, parser, identity carryover, Follow-Me scoring or persistence semantics as part of visual cleanup.
-- [ ] Treat information in three levels: **summary -> evidence/context -> technical/raw**.
-- [ ] Define reusable stable-height rules for live cards instead of using layout growth as a side effect of incoming data.
+- [x] Capture baseline screenshots of current Radar and Details on a representative dataset.
+- [x] Record a baseline long-list scenario (100+ recent devices) for later performance comparison.
+- [x] Keep all redesign changes on `ui/radar-details-redesign` until acceptance.
+- [x] Do not change BLE collection, parser, identity carryover, Follow-Me scoring or persistence semantics as part of visual cleanup.
+- [x] Treat information in three levels: **summary -> evidence/context -> technical/raw**.
+- [x] Define reusable stable-height rules for live cards instead of using layout growth as a side effect of incoming data.
 
-**Gate:** baseline captured and UI work can be compared without changing field semantics.
+**Status: CLOSED.** Baseline captured; private field artifacts remain outside the repository. The controlled 120-item scenario is used for dense-list acceptance because the captured final 180-second live window contained fewer recent devices.
+
+**Gate:** PASS — baseline captured and UI work can be compared without changing field semantics.
 
 ## Phase 1 — Compact Radar cards
 
@@ -49,27 +51,38 @@ Seen now · BLE
 SUSPICIOUS   WATCHLIST
 ```
 
-- [ ] Remove the redundant `Details` button; tapping the card already opens Details.
-- [ ] Remove the full evidence summary from each Radar card.
-- [ ] Remove default `Source`, `Reason`, `Value`, raw payload and evidence chips from Radar.
-- [ ] Remove calibration controls from Radar.
-- [ ] Keep display name / user alias as the primary label.
-- [ ] Keep vendor + classified type as compact secondary identity.
-- [ ] Keep RSSI prominent and in a fixed slot.
-- [ ] Keep `Seen now / Xs ago` freshness.
-- [ ] Keep BLE / Classic technology as low-priority context.
-- [ ] Show at most 1-2 important status badges such as `SUSPICIOUS`, `WATCHLIST` or `PUBLIC SAFETY`.
-- [ ] Evaluate whether `SAFE` should be omitted when it adds no decision value.
-- [ ] If Watchlist remains a quick action, use one compact icon in a fixed position instead of a full action row.
-- [ ] Limit name and identity lines to one line each with ellipsis.
-- [ ] Prevent badge wrapping from changing card height.
-- [ ] Give every normal Radar card the same structural slots so live values do not reflow the list.
+- [x] Remove the redundant `Details` button; tapping the card already opens Details.
+- [x] Remove the full evidence summary from each Radar card.
+- [x] Remove default `Source`, `Reason`, `Value`, raw payload and evidence chips from Radar.
+- [x] Remove calibration controls from Radar.
+- [x] Keep display name / user alias as the primary label.
+- [x] Keep vendor + classified type as compact secondary identity.
+- [x] Keep RSSI prominent and in a fixed slot.
+- [x] Keep `Seen now / Xs ago` freshness.
+- [x] Keep BLE / Classic technology as low-priority context.
+- [x] Show at most 1-2 important status badges such as `SUSPICIOUS`, `WATCHLIST` or `PUBLIC SAFETY`.
+- [x] Evaluate whether `SAFE` should be omitted when it adds no decision value.
+- [x] If Watchlist remains a quick action, use one compact icon in a fixed position instead of a full action row.
+- [x] Limit name and identity lines to one line each with ellipsis.
+- [x] Prevent badge wrapping from changing card height.
+- [x] Give every normal Radar card the same structural slots so live values do not reflow the list.
 
-**Gate:** with 100+ devices and live RSSI updates, cards under the user's finger do not move because their own height changes.
+**Status: CLOSED / ACCEPTED.** See `UI_UX_PHASE1_ACCEPTANCE_2026-09-12.md`. The 120-card instrumentation stability test passed on S22+, and real live updates preserved card geometry.
+
+**Gate:** PASS — with 100+ controlled devices and live-value updates, card height remains stable.
 
 ## Phase 2 — Radar data-path and performance cleanup
 
 The Radar must not build or transport full technical device state merely to draw a compact list.
+
+**Current status: IN PROGRESS.**
+
+Completed slices:
+
+- **P2A accepted:** move combined Radar presentation transformation off the UI thread with `flowOn(Dispatchers.Default)`. Corrected S22+ physical run: 813 frames, 30 janky = **3.69%**, p95 11 ms, p99 34 ms, logcheck PASS. This run had 5 fresh live rows, so it proves direction but is not a 100+ live-density closure.
+- **P2B accepted:** remove dead compact-card presentation work (`sensorData`, `connectionInfo`, legacy badge/evidence presentation models/formatters and Radar sensor/evidence formatting paths) while retaining full `Device.evidence` for current section classification. Accepted code checkpoint: `0d40dd1418456f42008a35222ae30c0a2498d41d`. Local detekt/unit/compile/assemble PASS; GitHub Quality #170 PASS; Secret Scan #200 PASS.
+- Current continuation handoff: [`UI_UX_PHASE2_HANDOFF_2026-09-12.md`](UI_UX_PHASE2_HANDOFF_2026-09-12.md).
+- **Next: P2C** — audit and replace the upstream `SELECT * -> DeviceEntity -> Device -> DeviceEvidenceFactory` Radar path with the smallest behavior-preserving lightweight projection/contract. Do not move to Details before a Phase 2 closure decision.
 
 - [ ] Introduce a lightweight Radar projection/model (for example `RadarDeviceSummary`) containing only fields required by the list and sectioning logic.
 - [ ] Avoid loading full GATT/characteristic/raw technical fields for the Radar list where possible.
@@ -77,9 +90,9 @@ The Radar must not build or transport full technical device state merely to draw
 - [ ] Preserve only the small set of precomputed decision flags needed for Radar sectioning and badges.
 - [ ] Decouple frequently changing presentation fields (RSSI/last seen) from expensive classification/evidence work.
 - [ ] Review the current 750 ms presentation cadence; use the slowest refresh that still feels live.
-- [ ] Keep stable list keys based on fingerprint/stable identity.
+- [x] Keep stable list keys based on fingerprint/stable identity.
 - [ ] Verify that one device update does not unnecessarily rebuild the whole visible tree.
-- [ ] Measure recomposition/jank and UI-thread work before and after the change.
+- [x] Measure recomposition/jank and UI-thread work before and after the change. (P0/P1/P2A physical measurements recorded; repeat after structural P2C cleanup.)
 - [ ] Run a 30-60 minute dense-scan UI soak.
 
 **Gate:** scrolling remains responsive as the recent-device population grows; no progressive slowdown attributable to Radar presentation work.
