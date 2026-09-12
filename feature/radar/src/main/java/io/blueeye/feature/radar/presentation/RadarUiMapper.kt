@@ -14,8 +14,10 @@ object RadarUiMapper {
     ): RadarUiItem {
         val isProbing =
             activeProbeMac != null &&
-                (device.macAddress.equals(activeProbeMac, ignoreCase = true) ||
-                    device.fingerprint.equals(activeProbeMac, ignoreCase = true))
+                (
+                    device.macAddress.equals(activeProbeMac, ignoreCase = true) ||
+                        device.fingerprint.equals(activeProbeMac, ignoreCase = true)
+                )
 
         return RadarUiItem(
             device = device,
