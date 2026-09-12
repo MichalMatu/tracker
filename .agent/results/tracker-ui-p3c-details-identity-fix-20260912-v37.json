@@ -1,0 +1,61 @@
+{
+  "id": "tracker-ui-p3c-details-identity-fix-20260912-v37",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "started_at": "2026-09-12T19:06:23.185368+00:00",
+  "command_timeout": 3600,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test \"$(git rev-parse HEAD)\" = \"17b821dddf05a2e6160334c624b61b6b42f79950\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"17b821dddf05a2e6160334c624b61b6b42f79950\"; actual=$(git status --porcelain | sed 's/^...//' | sort); expected=$(printf '%s\\n' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsUiFormatter.kt' 'feature/details/src/test/java/io/blueeye/feature/details/DetailsIdentityUiFormatterTest.kt' | sort); test \"$actual\" = \"$expected\"; echo P3C_V37_DIRTY_BASELINE_OK",
+      "exit_code": 1,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch              ui/radar-details-redesign -> FETCH_HEAD\n * branch              main          -> FETCH_HEAD\n * branch              agent-control -> FETCH_HEAD\n   dd146d06..0f26497e  agent-control -> origin/agent-control\nSwitched to branch 'ui/radar-details-redesign'\nYour branch is up to date with 'origin/ui/radar-details-redesign'.\n",
+      "elapsed_seconds": 1.361,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.08,
+      "output_policy": "stream",
+      "captured_output_chars": 383,
+      "output_truncated": false,
+      "current_rss_mb": 3.08,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 5,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 5,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 1.361
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.142
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.078
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-12T19:06:26.452124+00:00",
+  "task_digest": "2a082eac67742f2615eb21eac6e753dbbf01c366f4f3b5548c84cf433de9cf99",
+  "idle_timeout": 300,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "attempt_id": "7d74939248a7f776b22649df",
+  "daemon_version": "4.18.20"
+}
