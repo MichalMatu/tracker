@@ -7,18 +7,14 @@ data class RadarUiItem(
     val fingerprint: String,
     val displayName: String,
     val vendorAndType: String,
-    val sensorData: String?,
     val signalInfo: RadarUiSignalInfo,
     val statusInfo: RadarUiStatusInfo,
-    val connectionInfo: RadarUiConnectionInfo,
     val icons: RadarUiIcons,
-    val badges: RadarBadgeInfo,
     val isNew: Boolean,
     val isInWatchlist: Boolean,
     val isIgnored: Boolean,
     val nameColor: RadarUiColorToken,
     val isProbing: Boolean = false,
-    val evidenceInfo: RadarEvidenceInfo?
 )
 
 data class RadarUiSignalInfo(
@@ -29,7 +25,7 @@ data class RadarUiSignalInfo(
     val distanceText: String,
     val techBadge: String,
     val techBadgeColor: RadarUiColorToken,
-    val timeSinceSeen: String
+    val timeSinceSeen: String,
 )
 
 data class RadarUiStatusInfo(
@@ -37,35 +33,12 @@ data class RadarUiStatusInfo(
     val textColor: RadarUiColorToken,
     val backgroundTint: RadarUiColorToken,
     val isWarning: Boolean,
-    val cardBackgroundColor: RadarUiColorToken?
-)
-
-data class RadarUiConnectionInfo(
-    val isVisible: Boolean,
-    val text: String,
-    val textColor: RadarUiColorToken
+    val cardBackgroundColor: RadarUiColorToken?,
 )
 
 data class RadarUiIcons(
     val mainIconRes: Int,
-    val isConnectable: Boolean
-)
-
-data class RadarBadgeInfo(
-    val techBadge: String,
-    val techColor: RadarUiColorToken,
-    val privacyBadge: String,
-    val watchlistBadge: String?,
-    val watchlistColor: RadarUiColorToken,
-    val statusBadge: String?,
-    val statusColor: RadarUiColorToken,
-    val calibrationBadge: String?,
-    val calibrationColor: RadarUiColorToken,
-    val batteryText: String?,
-    val temperatureText: String?,
-    val humidityText: String?,
-    val voltageText: String?,
-    val extraText: String?
+    val isConnectable: Boolean,
 )
 
 enum class RadarUiSectionType(
@@ -136,18 +109,4 @@ data class RadarTopBarActions(
     val onAutoActiveProbeToggle: () -> Unit,
     val onFilterClick: () -> Unit,
     val onClearClick: () -> Unit,
-)
-
-data class RadarEvidenceInfo(
-    val confidenceText: String,
-    val confidenceColor: RadarUiColorToken,
-    val primarySourceText: String,
-    val primaryReasonText: String,
-    val primaryValueText: String?,
-    val chips: List<RadarEvidenceChipInfo>
-)
-
-data class RadarEvidenceChipInfo(
-    val text: String,
-    val color: RadarUiColorToken
 )
