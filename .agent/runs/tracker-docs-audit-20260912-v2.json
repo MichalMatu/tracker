@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-docs-audit-20260912-v2",
+  "task_digest": "60ad87bf54a72b4d296acdb4f8d549db2f82dba22f439e4e1624cdfc807212ee",
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-12T03:24:55.289414+00:00",
+  "attempt_id": "ef1f74e8a47a9a02d3fa449c",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 68859,
+  "updated_at": "2026-09-12T03:24:55.289571+00:00",
+  "pid": 68859
+}
