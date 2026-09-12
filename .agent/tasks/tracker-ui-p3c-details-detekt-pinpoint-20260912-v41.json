@@ -1,0 +1,15 @@
+{
+  "id": "tracker-ui-p3c-details-detekt-pinpoint-20260912-v41",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 1800,
+  "task_timeout": 3600,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"17b821dddf05a2e6160334c624b61b6b42f79950\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"17b821dddf05a2e6160334c624b61b6b42f79950\"; echo P3C_V41_BASELINE_OK",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p3c-details-identity-v36.py | python3; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:ktlintFormat --console=plain >/dev/null; echo P3C_V41_PATCH_READY",
+    "set -uo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; set +e; ./gradlew :feature:details:detekt --console=plain >/tmp/p3c-detekt.out 2>&1; rc=$?; set -e; echo DETEKT_EXIT_CODE=$rc; echo '--- CONSOLE MATCHES ---'; grep -nE 'Details(Screen|UiFormatter|IdentityUiFormatter)|weighted issues|Analysis failed' /tmp/p3c-detekt.out | tail -n 80 || true; echo '--- REPORT FILES ---'; find feature/details/build/reports -type f -iname '*detekt*' -print; echo '--- REPORT MATCHES ---'; find feature/details/build/reports -type f -iname '*detekt*' -exec grep -HnE 'Details(Screen|UiFormatter|IdentityUiFormatter)|LongMethod|ComplexMethod|TooManyFunctions|MagicNumber|ReturnCount|NestedBlockDepth|CyclomaticComplexMethod|CognitiveComplexMethod' {} \; 2>/dev/null | head -n 120 || true; echo '--- END ---'"
+  ]
+}
