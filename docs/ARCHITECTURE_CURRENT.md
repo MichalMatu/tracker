@@ -1,6 +1,6 @@
 # Current Architecture
 
-> **Stabilization note (2026-09-08):** Phase 2 scanner/service lifecycle is accepted. Phase 3 software boundedness/observability and critical-path structural hardening are implemented; real-device field reconciliation is still required before Phase 4. Recovery work must follow `STABILITY_RECOVERY_GUIDE.md`. The BLE-only Stable Core still takes precedence over older recommendations that keep Classic or active probing in the default path.
+> **Current-status note (2026-09-12):** Phase 3 field reacceptance is **ACCEPTED / CLOSED** and Phase 4 is **UNBLOCKED**. The final Phase 3 authority is `PHASE3_FIELD_REACCEPTANCE_CLOSURE_2026-09-11.md`. Current execution order comes from `README.md` and `UI_UX_REDESIGN_PLAN.md`; the older stability-recovery guide remains historical provenance. The accepted scanner/ingest behavior must not be changed incidentally during the UI/UX workstream.
 
 Status after tooling review: the project is modern Android in framework choices, but not yet clean in dependency direction.
 
@@ -46,11 +46,11 @@ Passive BLE/Classics observation is the default. Active GATT collection is behin
 
 ### P2: Scanner Service Boundary Is Controlled but Still Structurally Leaky
 
-Phase 2 resolved runtime ownership: direct `BleScanner` lifecycle calls are confined to `ScannerService`, and feature modules control scanning through domain-facing contracts. The remaining debt is structural: `ScannerService` still lives in `core:data` under package `io.blueeye.service` and combines service lifecycle, notification, wake-lock, Bluetooth receiver and cleanup orchestration. At 423 LOC / 25 functions it is a refactor candidate, but it is not a Phase 3 blocker and should not be churned while queue instrumentation is being established.
+Phase 2 resolved runtime ownership: direct `BleScanner` lifecycle calls are confined to `ScannerService`, and feature modules control scanning through domain-facing contracts. The remaining debt is structural: `ScannerService` still lives in `core:data` under package `io.blueeye.service` and combines service lifecycle, notification, wake-lock, Bluetooth receiver and cleanup orchestration. At 423 LOC / 25 functions it is a refactor candidate, but the behavior is already field-accepted and this debt is not part of the current Radar/Details redesign unless a measured defect requires touching it.
 
 ### P1: `core:data` Is Too Broad
 
-`core:data` still owns scanning, repositories, database, classification, tracking sessions, alerts, and foreground service control. This remains too broad for long-term change safety. The Phase 3 critical ingest path is now decomposed internally, which reduces immediate runtime coupling without pretending the entire module boundary is solved.
+`core:data` still owns scanning, repositories, database, classification, tracking sessions, alerts, and foreground service control. This remains too broad for long-term change safety. The Phase 3 critical ingest path is decomposed internally, which reduces immediate runtime coupling without pretending the entire module boundary is solved.
 
 ### P1/P2: Oversized Responsibilities Are Recorded Debt
 
@@ -62,10 +62,10 @@ Detekt baselines exist for current debt. Ktlint excludes `core:data/src` and `co
 
 ## Recommended Next Refactor Order
 
-The list below is broader architectural follow-up and is **paused while the stability recovery guide is active**.
+The list below is architectural follow-up. It must be reconciled with the active execution plan in `UI_UX_REDESIGN_PLAN.md`; do not let broad cleanup preempt measured UX/performance work or the later parser/reducer milestones.
 
 1. Keep active probing explicit and add a separate RFCOMM opt-in boundary only if product evidence shows it is worth the cost.
 2. Use real session review outcomes for Follow-Me and identity/carryover tuning before raising confidence thresholds.
 3. Continue converting general classifier outputs into explicit evidence where the source can be preserved.
-4. Split oversized `core:data` areas after the product flows stabilize.
+4. Split oversized `core:data` areas when the active product/data-flow work provides a clear boundary and regression coverage.
 5. Pay down detekt/ktlint baselines module by module.
