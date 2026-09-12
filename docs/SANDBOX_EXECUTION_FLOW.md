@@ -1,7 +1,8 @@
 # Tracker Sandbox-First Execution Flow
 
-Status: **ACTIVE during stability recovery**  
-Canonical product/recovery plan: `docs/STABILITY_RECOVERY_GUIDE.md`
+Status: **ACTIVE engineering workflow**
+Canonical documentation entry point: `docs/README.md`
+Current active plan: `docs/UI_UX_REDESIGN_PLAN.md`
 
 ## 1. Goal
 

@@ -1,6 +1,6 @@
 # BlueEye Field MVP Goal Prompt
 
-> **Historical execution plan.** During the stability feature freeze, do not execute this checklist in order. `docs/STABILITY_RECOVERY_GUIDE.md` is authoritative, and `docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md` defines the current Phase 1 implementation boundary.
+> **Historical execution plan.** Do not execute this checklist as current work. Phase 3 is closed; current project status and the active plan start at `docs/README.md` and `docs/UI_UX_REDESIGN_PLAN.md`.
 
 ## Operator Decision
 
