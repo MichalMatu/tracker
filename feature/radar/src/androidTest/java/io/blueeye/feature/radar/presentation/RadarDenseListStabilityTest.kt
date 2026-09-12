@@ -10,9 +10,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollToIndex
-import io.blueeye.core.model.Device
-import io.blueeye.core.model.DeviceType
-import io.blueeye.core.model.MacAddressType
+import io.blueeye.core.model.DeviceCalibrationLabel
+import io.blueeye.core.model.RadarEvidenceSignals
 import io.blueeye.core.model.TrackingStatus
 import io.blueeye.core.ui.theme.BlueEyeTheme
 import org.junit.Assert.assertEquals
@@ -88,35 +87,11 @@ class RadarDenseListStabilityTest {
         val fingerprint = "dense-$index"
         val watchlist = index % 17 == 0
         val suspicious = index % 11 == 0
-        val device =
-            Device(
-                fingerprint = fingerprint,
-                macAddress = "AA:BB:CC:${index % 100}:${(index + 1) % 100}:${(index + 2) % 100}",
-                macAddressType = MacAddressType.PUBLIC,
-                technology = "BLE",
-                name = "Synthetic device $index",
-                deviceType = DeviceType.UNKNOWN,
-                vendorName = "Vendor ${index % 7}",
-                predictedModel = null,
-                trackingStatus = if (suspicious) TrackingStatus.SUSPICIOUS else TrackingStatus.SAFE,
-                followingScore = if (suspicious) 60f else 0f,
-                isSafeBeacon = false,
-                isInWatchlist = watchlist,
-                userAlias = null,
-                userNotes = null,
-                alertSound = false,
-                alertVibration = false,
-                firstSeenAt = NOW_MS - index * 1_000L,
-                lastSeenAt = NOW_MS,
-                rssi = -60,
-                encounterCount = 1,
-            )
 
         return RadarUiItem(
-            device = device,
             fingerprint = fingerprint,
-            displayName = device.name.orEmpty(),
-            vendorAndType = "${device.vendorName} · Unknown",
+            displayName = "Synthetic device $index",
+            vendorAndType = "Vendor ${index % 7} · Unknown",
             signalInfo =
                 RadarUiSignalInfo(
                     rssi = -60,
@@ -150,6 +125,20 @@ class RadarDenseListStabilityTest {
             isInWatchlist = watchlist,
             isIgnored = false,
             nameColor = RadarUiColorToken.PRIMARY,
+            firstSeenAt = NOW_MS - index * 1_000L,
+            trackingStatus = if (suspicious) TrackingStatus.SUSPICIOUS else TrackingStatus.SAFE,
+            followingScore = if (suspicious) 60f else 0f,
+            isSafeBeacon = false,
+            calibrationLabel = DeviceCalibrationLabel.UNKNOWN,
+            hasIdentitySignal = true,
+            evidenceSignals =
+                RadarEvidenceSignals(
+                    hasWatchlistEvidence = watchlist,
+                    hasTrackerLikeEvidence = suspicious,
+                    hasPublicSafetyLikeEvidence = false,
+                    hasAttentionEvidence = suspicious || watchlist,
+                    hasAttentionFollowMeEvidence = suspicious,
+                ),
         )
     }
 
