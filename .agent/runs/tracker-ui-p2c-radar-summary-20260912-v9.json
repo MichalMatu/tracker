@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 5,
-  "command": "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p2c-radar-summary-20260912-v3.py.gz.b64 | tr -d '\\n\\r ' | base64 -d | gzip -dc | python3; python3 - <<'PY'\nfrom pathlib import Path\nmapper = Path('core/data/src/main/java/io/blueeye/core/data/mapper/RadarDeviceMapper.kt')\ns = mapper.read_text()\ncount = s.count('RssiNormalization')\nassert count >= 2, count\nmapper.write_text(s.replace('RssiNormalization', 'RadarRssiNormalization'))\n\ntest_file = Path('core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt')\ns = test_file.read_text()\nneedle = '        override fun getRecentDevicesFlow(sinceTimestamp: Long): Flow<List<DeviceEntity>> = flowOf(emptyList())\\n'\ninsert = needle + '        override fun getRecentRadarDevicesFlow(sinceTimestamp: Long): Flow<List<io.blueeye.core.data.db.projection.RadarDeviceProjection>> = flowOf(emptyList())\\n'\nassert needle in s\ntest_file.write_text(s.replace(needle, insert, 1))\n\nvm = Path('feature/radar/src/main/java/io/blueeye/feature/radar/presentation/RadarViewModel.kt')\ns = vm.read_text()\nold = '        ): List<Device> {\\n'\nnew = '        ): List<RadarDeviceSummary> {\\n'\nassert s.count(old) == 1, s.count(old)\nvm.write_text(s.replace(old, new, 1))\nprint(f'P2C_V9_PATCHED mapper_occurrences={count} fake_dao=1 viewmodel_return=1')\nPY\ngit diff --check; git status --short; echo P2C_V9_PATCH_READY",
-  "pid": 21545,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :core:data:testDebugUnitTest --tests io.blueeye.core.data.evidence.DeviceEvidenceFactoryRadarSignalsTest; ./gradlew :feature:radar:testDebugUnitTest --tests io.blueeye.feature.radar.presentation.RadarUiSectionMapperTest --tests io.blueeye.feature.radar.presentation.RadarUiMapperTest --tests io.blueeye.feature.radar.presentation.RadarUiFormatterTest --tests io.blueeye.feature.radar.presentation.RadarUiCardOrderTest --tests io.blueeye.feature.radar.presentation.RadarSectionViewMapperTest; echo P2C_V9_FOCUSED_CONTRACTS_PASS",
+  "pid": 21575,
   "timeout": 1800,
   "idle_timeout": 600,
   "memory_limit_mb": 6144,
-  "started_at": "2026-09-12T12:24:00.996926+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-12T12:24:01.553212+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p2c-radar-summary-20260912-v9",
@@ -18,5 +18,5 @@
   "task_digest": "bf5df8e6379088a1c2b059ce594f5ae836a710a6f4c211ed27d9f9dc113c01b2",
   "daemon_version": "4.18.20",
   "daemon_pid": 21245,
-  "updated_at": "2026-09-12T12:24:01.025445+00:00"
+  "updated_at": "2026-09-12T12:24:01.628427+00:00"
 }
