@@ -155,49 +155,27 @@ fun DetailsScreen(
                     DetailsAlertHistoryCard(events = alertEvidenceEvents)
                 }
 
-                // Technical and diagnostic actions stay available, but below decision content.
-                ConnectionCard(
-                    connectionState = connectionState,
+                InfoSection(
+                    title = "History",
+                    items =
+                        listOf(
+                            "First Seen" to DetailsUiFormatter.formatFriendlyTimestamp(dev.firstSeenAt),
+                            "Last Seen" to DetailsUiFormatter.formatFriendlyTimestamp(dev.lastSeenAt),
+                            "Encounters" to dev.encounterCount.toString(),
+                        ),
+                )
+
+                DetailsTechnicalSection(
+                    state =
+                        DetailsTechnicalState(
+                            device = dev,
+                            connectionState = connectionState,
+                            sensorData = sensorData,
+                            services = services,
+                        ),
                     onConnect = { viewModel.connect() },
-                    onDisconnect = { viewModel.disconnect() }
+                    onDisconnect = { viewModel.disconnect() },
                 )
-
-                if (sensorData != null) {
-                    SensorDataCard(sensorData!!)
-                }
-
-                InfoSection("Activity",
-                    listOf(
-                        "First Seen" to DetailsUiFormatter.formatFriendlyTimestamp(dev.firstSeenAt),
-                        "Last Seen" to DetailsUiFormatter.formatFriendlyTimestamp(dev.lastSeenAt),
-                        "Encounters" to dev.encounterCount.toString()
-                    )
-                )
-
-                InfoSection("Radio",
-                    listOf(
-                        "PHY" to DetailsUiFormatter.formatPhy(dev.primaryPhy, dev.secondaryPhy),
-                        "Interval" to (dev.advertisingIntervalMs?.let { "~${it}ms" } ?: "Unknown"),
-                        "Beacon Type" to (dev.beaconType ?: "N/A")
-                    )
-                )
-
-                // Extended Info (Conditional)
-                val extendedProps =
-                    listOfNotNull(
-                        dev.modelNumber?.let { "Model" to it },
-                        dev.serialNumber?.let { "Serial" to it },
-                        dev.firmwareRevision?.let { "Firmware" to it },
-                        dev.batteryLevel?.let { "Battery" to "$it%" }
-                    )
-                if (extendedProps.isNotEmpty()) {
-                    InfoSection("Extended Info", extendedProps)
-                }
-
-                // Services
-                if (services.isNotEmpty()) {
-                    InfoSection("Services (${services.size})", services.map { it.uuid to it.name })
-                }
 
                 if (dev.evidence.isNotEmpty()) {
                     DetailsEvidenceSection(
