@@ -1,3 +1,5 @@
+> **HISTORICAL STATUS NOTICE:** Phase 3 is ACCEPTED / CLOSED and Phase 4 is UNBLOCKED. This file is retained as stabilization provenance; do not use any older NEXT ACTION, pending-walk status, pre-field build, or blocked-phase statement below as current instructions. Current work starts from docs/README.md and docs/UI_UX_REDESIGN_PLAN.md.
+
 # Phase 3 Pre-Field Golden Candidate
 
 Status: **SOFTWARE + EMULATOR E2E + TARGETED PHYSICAL ACCEPTANCE PASS; VARIED-DENSITY FIELD WALK PENDING**
