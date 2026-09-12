@@ -114,7 +114,7 @@ Never put GitHub tokens, signing keys, Android keystores, account cookies or oth
 A future chat that needs substantial Tracker work should do this before expensive execution:
 
 1. Read `AGENTS.md`.
-2. Read `docs/STABILITY_RECOVERY_GUIDE.md` and its `NEXT ACTION`.
+2. Read `docs/README.md`, then the active execution plan named there (currently `docs/UI_UX_REDESIGN_PLAN.md`).
 3. Read this file.
 4. Inspect current `main` SHA and Local Agent state.
 5. Search ChatGPT Library under `/Tracker/Sandbox/`.
@@ -335,5 +335,5 @@ After a substantial task:
 2. record focused checks actually run,
 3. record GitHub Actions result,
 4. record device evidence separately if any,
-5. update `docs/STABILITY_RECOVERY_GUIDE.md`, especially `NEXT ACTION` and Work Log,
+5. update the active execution plan/checklist, and update `docs/README.md` whenever the canonical status or documentation entry points change,
 6. refresh Library source/cache packs only when their keys changed.
