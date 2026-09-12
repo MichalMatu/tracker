@@ -1,0 +1,132 @@
+{
+  "id": "tracker-ui-p3a-details-priority-20260912-v30",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "started_at": "2026-09-12T18:06:43.387894+00:00",
+  "command_timeout": 3600,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"448f6c297de57e7c3f02666d0c516d9bda6152be\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"448f6c297de57e7c3f02666d0c516d9bda6152be\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; echo P3A_V30_BASELINE_OK",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch              ui/radar-details-redesign -> FETCH_HEAD\n * branch              main          -> FETCH_HEAD\n * branch              agent-control -> FETCH_HEAD\n   e777b62e..9acb18bc  agent-control -> origin/agent-control\nSwitched to branch 'ui/radar-details-redesign'\nYour branch is up to date with 'origin/ui/radar-details-redesign'.\nP3A_V30_BASELINE_OK\n",
+      "elapsed_seconds": 1.351,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.08,
+      "output_policy": "stream",
+      "captured_output_chars": 403,
+      "output_truncated": false,
+      "current_rss_mb": 2.08,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 5,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p3a-details-priority-v30.py | python3; git diff --check; test \"$(git diff --name-only | wc -l | tr -d ' ')\" = \"4\"; test -z \"$(git diff --name-only | grep -v -E '^feature/details/src/(main|test)/java/io/blueeye/feature/details/' || true)\"; echo P3A_V30_PATCH_READY",
+      "exit_code": 0,
+      "output": "P3A_V30_PATCH_READY\n",
+      "elapsed_seconds": 0.232,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": null,
+      "output_policy": "stream",
+      "captured_output_chars": 20,
+      "output_truncated": false,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 5,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:testDebugUnitTest --tests io.blueeye.feature.details.DetailsEvidenceUiFormatterTest :feature:details:ktlintCheck :feature:details:detekt :feature:details:compileDebugKotlin :app:assembleDebug --console=plain; echo P3A_V30_FOCUSED_PASS",
+      "exit_code": 1,
+      "output": "Starting a Gradle Daemon (subsequent builds will be faster)\nCalculating task graph as no cached configuration is available for tasks: :feature:details:testDebugUnitTest --tests io.blueeye.feature.details.DetailsEvidenceUiFormatterTest :feature:details:ktlintCheck :feature:details:detekt :feature:details:compileDebugKotlin :app:assembleDebug\nWarning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.\n> Task :core:domain:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:domain:compileKotlin UP-TO-DATE\n> Task :core:domain:compileJava NO-SOURCE\n> Task :core:domain:processResources NO-SOURCE\n> Task :core:domain:classes UP-TO-DATE\n> Task :core:domain:jar UP-TO-DATE\n> Task :core:ui:checkKotlinGradlePluginConfigurationErrors\n> Task :core:ui:preBuild UP-TO-DATE\n> Task :core:ui:preDebugBuild UP-TO-DATE\n> Task :core:ui:generateDebugResValues UP-TO-DATE\n> Task :core:ui:generateDebugResources UP-TO-DATE\n> Task :core:ui:packageDebugResources UP-TO-DATE\n> Task :core:ui:parseDebugLocalResources UP-TO-DATE\n> Task :core:ui:generateDebugRFile UP-TO-DATE\n> Task :core:ui:compileDebugKotlin UP-TO-DATE\n> Task :core:ui:javaPreCompileDebug UP-TO-DATE\n> Task :core:ui:compileDebugJavaWithJavac NO-SOURCE\n> Task :core:ui:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:ui:processDebugJavaRes UP-TO-DATE\n> Task :feature:details:preBuild UP-TO-DATE\n> Task :feature:details:preDebugBuild UP-TO-DATE\n> Task :core:ui:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :feature:details:checkKotlinGradlePluginConfigurationErrors\n> Task :feature:details:generateDebugResValues UP-TO-DATE\n> Task :feature:details:generateDebugResources UP-TO-DATE\n> Task :feature:details:packageDebugResources UP-TO-DATE\n> Task :feature:details:parseDebugLocalResources UP-TO-DATE\n> Task :feature:details:generateDebugRFile UP-TO-DATE\n> Task :feature:details:kaptGenerateStubsDebugKotlin\n\n> Task :feature:details:kaptDebugKotlin\nwarning: The following options were not recognized by any processor: '[dagger.fastInit, dagger.hilt.android.internal.disableAndroidSuperclassValidation, dagger.hilt.android.internal.projectType, dagger.hilt.internal.useAggregatingRootProcessor, kapt.kotlin.generated]'\n\n> Task :feature:details:compileDebugKotlin\nw: file:///Users/michal/agent-workspace/repos/tracker/work/feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt:64:5 Parameter 'fingerprint' is never used\n\n> Task :feature:details:javaPreCompileDebug UP-TO-DATE\n> Task :feature:details:compileDebugJavaWithJavac UP-TO-DATE\n> Task :feature:details:transformDebugClassesWithAsm\n> Task :feature:details:bundleLibRuntimeToJarDebug\n> Task :feature:details:preDebugUnitTestBuild UP-TO-DATE\n> Task :feature:details:generateDebugUnitTestStubRFile UP-TO-DATE\n> Task :feature:details:processDebugJavaRes UP-TO-DATE\n> Task :feature:details:bundleLibCompileToJarDebug\n> Task :feature:details:kaptGenerateStubsDebugUnitTestKotlin\n\n> Task :feature:details:kaptDebugUnitTestKotlin\nwarning: The following options were not recognized by any processor: '[dagger.fastInit, dagger.hilt.android.internal.disableAndroidSuperclassValidation, dagger.hilt.android.internal.projectType, dagger.hilt.internal.useAggregatingRootProcessor, kapt.kotlin.generated]'\n\n> Task :feature:details:compileDebugUnitTestKotlin\n> Task :feature:details:javaPreCompileDebugUnitTest UP-TO-DATE\n> Task :feature:details:compileDebugUnitTestJavaWithJavac NO-SOURCE\n> Task :feature:details:hiltAggregateDepsDebugUnitTest UP-TO-DATE\n> Task :feature:details:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :feature:details:processDebugUnitTestJavaRes UP-TO-DATE\n> Task :feature:details:transformDebugUnitTestClassesWithAsm\n> Task :feature:details:testDebugUnitTest\n> Task :feature:details:loadKtlintReporters UP-TO-DATE\n> Task :feature:details:runKtlintCheckOverAndroidTestDebugSourceSet NO-SOURCE\n> Task :feature:details:ktlintAndroidTestDebugSourceSetCheck SKIPPED\n> Task :feature:details:runKtlintCheckOverAndroidTestReleaseSourceSet NO-SOURCE\n> Task :feature:details:ktlintAndroidTestReleaseSourceSetCheck SKIPPED\n> Task :feature:details:runKtlintCheckOverAndroidTestSourceSet NO-SOURCE\n> Task :feature:details:ktlintAndroidTestSourceSetCheck SKIPPED\n> Task :feature:details:runKtlintCheckOverDebugSourceSet NO-SOURCE\n> Task :feature:details:ktlintDebugSourceSetCheck SKIPPED\n> Task :feature:details:runKtlintCheckOverKotlinScripts UP-TO-DATE\n> Task :feature:details:ktlintKotlinScriptCheck UP-TO-DATE\n> Task :feature:details:runKtlintCheckOverMainSourceSet\n\n> Task :feature:details:ktlintMainSourceSetCheck FAILED\n/Users/michal/agent-workspace/repos/tracker/work/feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceSection.kt:29:1 Needless blank line(s)\n\nFAILURE: Build failed with an exception.\n\n* What went wrong:\nExecution failed for task ':feature:details:ktlintMainSourceSetCheck'.\n> A failure occurred while executing org.jlleitschuh.gradle.ktlint.worker.ConsoleReportWorkAction\n   > KtLint found code style violations. Please see the following reports:\n     - /Users/michal/agent-workspace/repos/tracker/work/feature/details/build/reports/ktlint/ktlintMainSourceSetCheck/ktlintMainSourceSetCheck.txt\n\n* Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights.\n> Get more help at https://help.gradle.org.\n\nDeprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.\n\nYou can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.\n\nFor more on this, please refer to https://docs.gradle.org/8.9/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.\n\nBUILD FAILED in 24s\n46 actionable tasks: 17 executed, 29 up-to-date\nConfiguration cache entry stored.\n",
+      "elapsed_seconds": 25.644,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 96.38,
+      "output_policy": "stream",
+      "captured_output_chars": 6314,
+      "output_truncated": false,
+      "current_rss_mb": 37.27,
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 5,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 5,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.351
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 5,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.232
+    },
+    {
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 5,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 25.644
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": " M feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceSection.kt\n M feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceUiFormatter.kt\n M feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt\n M feature/details/src/test/java/io/blueeye/feature/details/DetailsEvidenceUiFormatterTest.kt\n",
+    "elapsed_seconds": 0.121
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "diff --git a/feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceSection.kt b/feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceSection.kt\nindex 7eea16b7..6506907a 100644\n--- a/feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceSection.kt\n+++ b/feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceSection.kt\n@@ -26,10 +26,66 @@ import io.blueeye.core.ui.theme.BlueEyeTheme\n import io.blueeye.core.ui.theme.Dimens\n import io.blueeye.core.ui.theme.extendedColors\n \n+\n+@Composable\n+fun DetailsKeyEvidenceSection(\n+    evidence: List<DetectionEvidence>,\n+    modifier: Modifier = Modifier,\n+) {\n+    val evidenceItems = remember(evidence) { DetailsEvidenceUiFormatter.formatKeyEvidence(evidence) }\n+    if (evidenceItems.isEmpty()) return\n+\n+    Card(modifier = modifier.fillMaxWidth().stableLiveHeight()) {\n+        Column(modifier = Modifier.padding(Dimens.PaddingMedium)) {\n+            Text(\n+                text = \"Key evidence\",\n+                style = MaterialTheme.typography.titleMedium,\n+                color = MaterialTheme.colorScheme.primary,\n+            )\n+            HorizontalDivider(modifier = Modifier.padding(vertical = Dimens.PaddingSmall))\n+            Column(verticalArrangement = Arrangement.spacedBy(Dimens.PaddingMedium)) {\n+                evidenceItems.forEach { item ->\n+                    DetailsKeyEvidenceItem(item)\n+                }\n+            }\n+        }\n+    }\n+}\n+\n+@Composable\n+private fun DetailsKeyEvidenceItem(item: DetailsEvidenceUiItem) {\n+    Column(verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall)) {\n+        Row(\n+            modifier = Modifier.fillMaxWidth(),\n+            horizontalArrangement = Arrangement.SpaceBetween,\n+            verticalAlignment = Alignment.Top,\n+        ) {\n+            Text(\n+                text = item.sourceText,\n+                style = MaterialTheme.typography.titleSmall,\n+                fontWeight = FontWeight.SemiBold,\n+                modifier = Modifier.weight(1f),\n+                maxLines = 1,\n+                overflow = TextOverflow.Ellipsis,\n+            )\n+            DetailsEvidenceConfidencePill(item)\n+        }\n+        Text(\n+            text = item.reasonText,\n+            style = MaterialTheme.typography.bodyMedium,\n+            color = MaterialTheme.colorScheme.onSurfaceVariant,\n+            minLines = EvidenceLayout.REASON_TEXT_LINES,\n+            maxLines = EvidenceLayout.REASON_TEXT_LINES,\n+            overflow = TextOverflow.Ellipsis,\n+        )\n+    }\n+}\n+\n @Composable\n fun DetailsEvidenceSection(\n     evidence: List<DetectionEvidence>,\n     modifier: Modifier = Modifier,\n+    title: String = \"Evidence\",\n ) {\n     val evidenceItems = remember(evidence) { DetailsEvidenceUiFormatter.format(evidence) }\n     val emptyState = remember { DetailsEvidenceUiFormatter.emptyState() }\n@@ -37,7 +93,7 @@ fun DetailsEvidenceSection(\n     Card(modifier = modifier.fillMaxWidth().stableLiveHeight()) {\n         Column(modifier = Modifier.padding(Dimens.PaddingMedium)) {\n             Text(\n-                text = \"Evidence\",\n+                text = title,\n                 style = MaterialTheme.typography.titleMedium,\n                 color = MaterialTheme.colorScheme.primary,\n             )\ndiff --git a/feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceUiFormatter.kt b/feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceUiFormatter.kt\nindex 05557611..f1a4e331 100644\n--- a/feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceUiFormatter.kt\n+++ b/feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceUiFormatter.kt\n@@ -14,6 +14,15 @@ object DetailsEvidenceUiFormatter {\n             modeText = \"Passive scan review\",\n         )\n \n+    fun formatKeyEvidence(\n+        evidence: List<DetectionEvidence>,\n+        timestampFormatter: (Long) -> String = DetailsUiFormatter::formatFriendlyTimestamp,\n+    ): List<DetailsEvidenceUiItem> =\n+        format(\n+            evidence = evidence.filter(DetectionEvidenceClassifier::isAttentionEvidence),\n+            timestampFormatter = timestampFormatter,\n+        ).take(KEY_EVIDENCE_LIMIT)\n+\n     fun format(\n         evidence: List<DetectionEvidence>,\n         timestampFormatter: (Long) -> String = DetailsUiFormatter::formatFriendlyTimestamp,\n@@ -108,6 +117,7 @@ object DetailsEvidenceUiFormatter {\n     private const val ACTIVE_MODE_TEXT = \"Active probe\"\n     private const val USER_VERDICT_MODE_TEXT = \"User verdict\"\n     private const val EMPTY_TECHNICAL_VALUE = \"None\"\n+    private const val KEY_EVIDENCE_LIMIT = 3\n }\n \n data class DetailsEvidenceUiItem(\ndiff --git a/feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt b/feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt\nindex 5bd7ed12..c190e25b 100644\n--- a/feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt\n+++ b/feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt\n@@ -99,21 +99,10 @@ fun DetailsScreen(\n         topBar = {\n             TopAppBar(\n                 title = {\n-                    Column {\n-                        Text(\n-                            text = device?.getDisplayName() ?: \"Unknown Device\",\n-                            style = MaterialTheme.typography.titleMedium,\n-                            maxLines = 1,\n-                            overflow = TextOverflow.Ellipsis,\n-                        )\n-                        Text(\n-                            text = fingerprint,\n-                            style = MaterialTheme.typography.bodySmall,\n-                            color = MaterialTheme.colorScheme.onSurfaceVariant,\n-                            maxLines = 1,\n-                            overflow = TextOverflow.Ellipsis,\n-                        )\n-                    }\n+                    Text(\n+                        text = \"Details\",\n+                        style = MaterialTheme.typography.titleMedium,\n+                    )\n                 },\n                 navigationIcon = {\n                     IconButton(onClick = onBackClick) {\n@@ -167,49 +156,47 @@ fun DetailsScreen(\n             verticalArrangement = Arrangement.spacedBy(16.dp)\n         ) {\n             device?.let { dev ->\n-                // Header Info\n+                // Decision-first content: summary, tracking/signal, key evidence, identity, then review/actions.\n                 HeaderCard(dev)\n \n-                DetailsEvidenceSection(evidence = dev.evidence)\n+                if (signalSamples.isNotEmpty()) {\n+                    DetailsSignalHistoryCard(samples = signalSamples)\n+                }\n \n-                if (alertEvidenceEvents.isNotEmpty()) {\n-                    DetailsAlertHistoryCard(events = alertEvidenceEvents)\n+                if (followMeHistory.isNotEmpty()) {\n+                    DetailsFollowMeHistoryCard(samples = followMeHistory)\n                 }\n \n+                DetailsKeyEvidenceSection(evidence = dev.evidence)\n+\n+                InfoSection(\"Identity\",\n+                    listOf(\n+                        \"Vendor\" to (dev.vendorName ?: \"Unknown\"),\n+                        \"Technology\" to dev.technology,\n+                        \"Type\" to dev.deviceType.name\n+                    )\n+                )\n+\n                 CalibrationCard(\n                     device = dev,\n                     onSelectLabel = { viewModel.updateCalibrationLabel(it) },\n                 )\n \n-                // Connection Control\n+                if (alertEvidenceEvents.isNotEmpty()) {\n+                    DetailsAlertHistoryCard(events = alertEvidenceEvents)\n+                }\n+\n+                // Technical and diagnostic actions stay available, but below decision content.\n                 ConnectionCard(\n                     connectionState = connectionState,\n                     onConnect = { viewModel.connect() },\n                     onDisconnect = { viewModel.disconnect() }\n                 )\n \n-                if (signalSamples.isNotEmpty()) {\n-                    DetailsSignalHistoryCard(samples = signalSamples)\n-                }\n-\n-                if (followMeHistory.isNotEmpty()) {\n-                    DetailsFollowMeHistoryCard(samples = followMeHistory)\n-                }\n-\n-                // Sensor Data\n                 if (sensorData != null) {\n                     SensorDataCard(sensorData!!)\n                 }\n \n-                // Info Sections\n-                InfoSection(\"Identity\",\n-                    listOf(\n-                        \"Vendor\" to (dev.vendorName ?: \"Unknown\"),\n-                        \"Technology\" to dev.technology,\n-                        \"Type\" to dev.deviceType.name\n-                    )\n-                )\n-\n                 InfoSection(\"Activity\",\n                     listOf(\n                         \"First Seen\" to DetailsUiFormatter.formatFriendlyTimestamp(dev.firstSeenAt),\n@@ -243,6 +230,11 @@ fun DetailsScreen(\n                     InfoSection(\"Services (${services.size})\", services.map { it.uuid to it.name })\n                 }\n \n+                DetailsEvidenceSection(\n+                    evidence = dev.evidence,\n+                    title = \"All evidence\",\n+                )\n+\n                 Spacer(Modifier.height(Dimens.PaddingExtraLarge * 2)) // Spacing for FAB\n             } ?: run {\n                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {\ndiff --git a/feature/details/src/test/java/io/blueeye/feature/details/DetailsEvidenceUiFormatterTest.kt b/feature/details/src/test/java/io/blueeye/feature/details/DetailsEvidenceUiFormatterTest.kt\nindex 24b448b9..fa61fb8a 100644\n--- a/feature/details/src/test/java/io/blueeye/feature/details/DetailsEvidenceUiFormatterTest.kt\n+++ b/feature/details/src/test/java/io/blueeye/feature/details/DetailsEvidenceUiFormatterTest.kt\n@@ -211,6 +211,27 @@ class DetailsEvidenceUiFormatterTest {\n         assertEquals(\"None\", item.parsedValueText)\n     }\n \n+    @Test\n+    fun `key evidence keeps only attention evidence and caps default list at three`() {\n+        val items =\n+            DetailsEvidenceUiFormatter.formatKeyEvidence(\n+                evidence =\n+                    listOf(\n+                        evidence(EvidenceSource.MODEL, DetectionConfidence.LOW, \"Low model context\"),\n+                        evidence(EvidenceSource.NAME, DetectionConfidence.MEDIUM, \"Medium name match\"),\n+                        evidence(EvidenceSource.SERVICE_UUID, DetectionConfidence.HIGH, \"High service match\"),\n+                        evidence(EvidenceSource.WATCHLIST, DetectionConfidence.CRITICAL, \"Watchlist match\"),\n+                        evidence(EvidenceSource.GATT_PROBE, DetectionConfidence.MEDIUM, \"Probe result\"),\n+                    ),\n+                timestampFormatter = { it.toString() },\n+            )\n+\n+        assertEquals(3, items.size)\n+        assertEquals(\"Watchlist\", items[0].sourceText)\n+        assertEquals(\"Service UUID\", items[1].sourceText)\n+        assertFalse(items.any { item -> item.sourceText == \"Model\" })\n+    }\n+\n     private fun evidence(\n         source: EvidenceSource,\n         confidence: DetectionConfidence,\n",
+    "elapsed_seconds": 0.032
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-12T18:07:12.376408+00:00",
+  "workspace_checkpoint": {
+    "version": 2,
+    "task_id": "tracker-ui-p3a-details-priority-20260912-v30",
+    "reason": "task-exit",
+    "created_at": "2026-09-12T18:07:12.857475+00:00",
+    "base_head": "448f6c297de57e7c3f02666d0c516d9bda6152be",
+    "work_branch": "ui/radar-details-redesign",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/tracker-ui-p3a-details-priority-20260912-v30/1789236432685972000-task-exit",
+    "tracked_patch": "tracked.patch",
+    "untracked_root": "untracked",
+    "untracked_files": [],
+    "tracked_patch_bytes": 11513,
+    "untracked_bytes": 0,
+    "total_bytes": 11513,
+    "status": " M feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceSection.kt\n M feature/details/src/main/java/io/blueeye/feature/details/DetailsEvidenceUiFormatter.kt\n M feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt\n M feature/details/src/test/java/io/blueeye/feature/details/DetailsEvidenceUiFormatterTest.kt\n"
+  },
+  "task_digest": "579c56fac5ad016ff1d23564743639775e3dba6bb64a890f000a0600476d45b2",
+  "idle_timeout": 300,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "attempt_id": "5fe53657db9aea27b0aab0e7",
+  "daemon_version": "4.18.20"
+}
