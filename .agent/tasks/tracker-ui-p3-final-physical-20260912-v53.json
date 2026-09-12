@@ -1,0 +1,16 @@
+{
+  "id": "tracker-ui-p3-final-physical-20260912-v53",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 3600,
+  "idle_timeout": 900,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"f398bf978393a19aa1f7eb76f0ca4356e364851f\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"f398bf978393a19aa1f7eb76f0ca4356e364851f\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; echo P3_V53_BASELINE_OK",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p3-final-physical-v53.sh > /tmp/tracker-ui-p3-final-physical-v53.sh; chmod +x /tmp/tracker-ui-p3-final-physical-v53.sh; /tmp/tracker-ui-p3-final-physical-v53.sh",
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"f398bf978393a19aa1f7eb76f0ca4356e364851f\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"f398bf978393a19aa1f7eb76f0ca4356e364851f\"; echo P3_V53_TREE_CLEAN_EXACT_SHA"
+  ]
+}
