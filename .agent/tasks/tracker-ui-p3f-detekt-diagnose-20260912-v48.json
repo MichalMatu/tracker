@@ -1,0 +1,14 @@
+{
+  "id": "tracker-ui-p3f-detekt-diagnose-20260912-v48",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 1800,
+  "task_timeout": 3600,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign agent-control; git checkout ui/radar-details-redesign; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"4f31036e3285b68f133767af71a805d2877f7756\"; if test -z \"$(git status --porcelain)\"; then git show origin/agent-control:.agent/payloads/tracker-ui-p3f-technical-group-v47.py | python3; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:ktlintFormat --console=plain >/dev/null; fi; actual=$(git status --porcelain | sed 's/^...//' | sort); expected=$(printf '%s\n' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsTechnicalSection.kt' | sort); test \"$actual\" = \"$expected\"; git diff --check; echo P3F_V48_PATCH_READY",
+    "set -uo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; set +e; ./gradlew :feature:details:detekt --console=plain; rc=$?; echo DETEKT_EXIT_CODE=$rc; echo '--- MATCHES ---'; grep -R -n 'DetailsTechnicalSection.kt' feature/details/build/reports 2>/dev/null || true; grep -R -n 'DetailsScreen.kt' feature/details/build/reports 2>/dev/null || true; echo '--- REPORT FILES ---'; find feature/details/build/reports -type f -iname '*detekt*' -print 2>/dev/null || true; echo '--- END ---'; exit 0"
+  ]
+}
