@@ -139,12 +139,9 @@ fun DetailsScreen(
 
                 DetailsKeyEvidenceSection(evidence = dev.evidence)
 
-                InfoSection("Identity",
-                    listOf(
-                        "Vendor" to (dev.vendorName ?: "Unknown"),
-                        "Technology" to dev.technology,
-                        "Type" to dev.deviceType.name
-                    )
+                InfoSection(
+                    title = "Identity",
+                    items = DetailsUiFormatter.formatIdentity(dev),
                 )
 
                 DetailsActionsReviewCard(
@@ -255,6 +252,13 @@ fun HeaderCard(device: Device) {
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
+                )
+                Text(
+                    text = "Last seen ${DetailsUiFormatter.formatFriendlyTimestamp(device.lastSeenAt)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 DetailsDecisionSummaryText(summary)
             }
