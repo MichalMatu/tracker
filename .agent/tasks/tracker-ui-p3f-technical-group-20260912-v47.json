@@ -1,0 +1,17 @@
+{
+  "id": "tracker-ui-p3f-technical-group-20260912-v47",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 3600,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"4f31036e3285b68f133767af71a805d2877f7756\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"4f31036e3285b68f133767af71a805d2877f7756\"; echo P3F_V47_BASELINE_OK",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p3f-technical-group-v47.py | python3; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:ktlintFormat --console=plain; git diff --check; actual=$(git status --porcelain | sed 's/^...//' | sort); expected=$(printf '%s\n' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsTechnicalSection.kt' | sort); test \"$actual\" = \"$expected\"; echo P3F_V47_PATCH_READY",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:testDebugUnitTest :feature:details:ktlintCheck :feature:details:detekt :feature:details:compileDebugKotlin :app:assembleDebug --console=plain; echo P3F_V47_FOCUSED_PASS",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew --parallel --max-workers=3 qualityCheck --console=plain; git diff --check; echo P3F_V47_QUALITY_PASS",
+    "set -euo pipefail; git add feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt feature/details/src/main/java/io/blueeye/feature/details/DetailsTechnicalSection.kt; git diff --cached --check; test \"$(git diff --cached --name-only | wc -l | tr -d ' ')\" = \"2\"; git commit -m 'ui: group details technical content'; test \"$(git rev-parse HEAD^)\" = \"4f31036e3285b68f133767af71a805d2877f7756\"; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo P3F_V47_PUSHED_SHA=$(git rev-parse HEAD)"
+  ]
+}
