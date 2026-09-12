@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p3f-detekt-diagnose-20260912-v48",
+  "task_digest": "6f0035a28a8dcbf0d5a76cd7008804e9b5795b47879a84557dc1d491cdef680f",
+  "idle_timeout": 300,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T20:19:45.585605+00:00",
+  "attempt_id": "da41ee909911fc28de7cc4b5",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 78352,
+  "updated_at": "2026-09-12T20:19:45.585653+00:00",
+  "pid": 78352
+}
