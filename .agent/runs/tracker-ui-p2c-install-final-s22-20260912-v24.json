@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 3,
-  "command": "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; serial=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$serial\"; test \"$(adb -s \"$serial\" shell getprop ro.product.model | tr -d '\\r')\" = \"SM-S906B\"; echo P2C_V24_BASELINE_DEVICE_OK",
-  "pid": 17080,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :app:installDebug --console=plain; echo P2C_V24_INSTALL_PASS",
+  "pid": 17156,
   "timeout": 1800,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T14:34:46.328801+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-12T14:34:50.817847+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p2c-install-final-s22-20260912-v24",
@@ -18,5 +18,5 @@
   "task_digest": "7929898cdf9142eba50ff55b185eafbda7b5cff10a7257d5a4672e5887662ee7",
   "daemon_version": "4.18.20",
   "daemon_pid": 16890,
-  "updated_at": "2026-09-12T14:34:46.328957+00:00"
+  "updated_at": "2026-09-12T14:34:50.895425+00:00"
 }
