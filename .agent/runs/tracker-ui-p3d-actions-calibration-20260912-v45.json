@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 5,
-  "command": "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p3d-actions-calibration-v45.py | python3; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:ktlintFormat --console=plain; git diff --check; actual=$(git status --porcelain | sed 's/^...//' | sort); expected=$(printf '%s\\n' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsCalibrationCard.kt' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt' | sort); test \"$actual\" = \"$expected\"; echo P3D_V45_PATCH_READY",
-  "pid": 50415,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:testDebugUnitTest --tests io.blueeye.feature.details.DetailsCalibrationUiFormatterTest :feature:details:ktlintCheck :feature:details:detekt :feature:details:compileDebugKotlin :app:assembleDebug --console=plain; echo P3D_V45_FOCUSED_PASS",
+  "pid": 50536,
   "timeout": 3600,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T19:46:51.278600+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-12T19:46:57.077961+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p3d-actions-calibration-20260912-v45",
@@ -18,5 +18,5 @@
   "task_digest": "135530732201769be4f41fb9906a368d1880f2a00924b823b59a383f4e6d462d",
   "daemon_version": "4.18.20",
   "daemon_pid": 50180,
-  "updated_at": "2026-09-12T19:46:51.299566+00:00"
+  "updated_at": "2026-09-12T19:46:57.153826+00:00"
 }
