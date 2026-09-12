@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 5,
+  "index": 6,
   "total": 6,
-  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew --parallel --max-workers=3 qualityCheck --console=plain; git diff --check; echo P2C_V23_QUALITY_PASS",
-  "pid": 14287,
+  "command": "set -euo pipefail; git add feature/radar/src/androidTest/java/io/blueeye/feature/radar/presentation/RadarDenseListStabilityTest.kt; git diff --cached --check; test \"$(git diff --cached --name-only)\" = \"feature/radar/src/androidTest/java/io/blueeye/feature/radar/presentation/RadarDenseListStabilityTest.kt\"; git commit -m 'test: update radar dense fixture for summary model'; new_sha=$(git rev-parse HEAD); test \"$(git rev-parse HEAD^)\" = \"d107dad886894f0e8e663f53006d11e0f9910f4f\"; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo P2C_V23_PUSHED_SHA=$new_sha",
+  "pid": 14506,
   "timeout": 3600,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T14:31:14.337616+00:00",
-  "stage_name": "command-5",
-  "stage_index": 5,
+  "started_at": "2026-09-12T14:31:23.357574+00:00",
+  "stage_name": "command-6",
+  "stage_index": 6,
   "stage_total": 6,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p2c-dense120-fixture-run-20260912-v23",
@@ -18,5 +18,5 @@
   "task_digest": "d65691ea879984fa6d28a2149517e149fac5057dd1fb308f16198012c3f74114",
   "daemon_version": "4.18.20",
   "daemon_pid": 13338,
-  "updated_at": "2026-09-12T14:31:14.429392+00:00"
+  "updated_at": "2026-09-12T14:31:23.428332+00:00"
 }
