@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p0-baseline-20260912-v1",
+  "task_digest": "23671005a0caf9542fe7b72195e77dfb60eda789c29ba22681117265d025ba93",
+  "idle_timeout": 120,
+  "task_timeout": 900,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-12T03:57:14.018419+00:00",
+  "attempt_id": "3a7ebd130b2be881b071737f",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 3517,
+  "updated_at": "2026-09-12T03:57:14.018472+00:00",
+  "pid": 3517
+}
