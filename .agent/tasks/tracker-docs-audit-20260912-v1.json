@@ -1,0 +1,19 @@
+{
+  "id": "tracker-docs-audit-20260912-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 120,
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin main ui/radar-details-redesign; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = '093b4257859abdbcc683f1620969b06195ade7a6'; echo '=== DOC FILES ==='; find docs -maxdepth 1 -type f -name '*.md' -print | sort",
+    "set -euo pipefail; echo '=== HEADINGS / STATUS MARKERS ==='; for f in $(find docs -maxdepth 1 -type f -name '*.md' | sort); do echo \"--- $f\"; grep -nEi '^(# |## status|status:|\*\*status|> ?status|.*superseded|.*canonical|.*closed|.*blocked|.*unblocked)' \"$f\" | head -n 12 || true; done",
+    "set -euo pipefail; echo '=== CROSS-REFERENCES TO PHASE 3 HANDOFFS ==='; grep -RInE 'PHASE3_(FINAL_HANDOFF|HANDOFF|FIELD_REACCEPTANCE_HANDOFF|CAPTURED_DATA_ANALYSIS_HANDOFF)' docs --include='*.md' || true; test -z \"$(git status --porcelain)\""
+  ]
+}
