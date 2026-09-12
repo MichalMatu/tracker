@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p2-flowon-diagnose-20260912-v1",
+  "task_digest": "40198356a881a996c7d53673d399fdc76f3fcb472c2a7be2bff994a58584a285",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-12T10:42:33.406949+00:00",
+  "attempt_id": "044b7c765d0a4b984a70d417",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 89610,
+  "updated_at": "2026-09-12T10:42:33.407075+00:00",
+  "pid": 89610
+}
