@@ -1,0 +1,16 @@
+{
+  "id": "tracker-ui-p3-final-physical-20260912-v50",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 3600,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"f398bf978393a19aa1f7eb76f0ca4356e364851f\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"f398bf978393a19aa1f7eb76f0ca4356e364851f\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; serial=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$serial\"; test \"$(adb -s \"$serial\" shell getprop ro.product.model | tr -d '\\r')\" = \"SM-S906B\"; echo P3_V50_BASELINE_DEVICE_OK",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :app:installDebug --console=plain; echo P3_V50_INSTALL_PASS",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p3-final-physical-v50.sh > /tmp/tracker-ui-p3-final-physical-v50.sh; chmod +x /tmp/tracker-ui-p3-final-physical-v50.sh; /tmp/tracker-ui-p3-final-physical-v50.sh; echo P3_V50_PHYSICAL_AUDIT_DONE",
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"f398bf978393a19aa1f7eb76f0ca4356e364851f\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"f398bf978393a19aa1f7eb76f0ca4356e364851f\"; echo P3_V50_TREE_CLEAN_EXACT_SHA"
+  ]
+}
