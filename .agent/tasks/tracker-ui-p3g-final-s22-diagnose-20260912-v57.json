@@ -1,0 +1,16 @@
+{
+  "id": "tracker-ui-p3g-final-s22-diagnose-20260912-v57",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1800,
+  "idle_timeout": 900,
+  "task_timeout": 3600,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"e1e09df50caf7cf9939420d42bd48bfb21ea6823\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"e1e09df50caf7cf9939420d42bd48bfb21ea6823\"; serial=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$serial\"; test \"$(adb -s \"$serial\" shell getprop ro.product.model | tr -d '\\r')\" = \"SM-S906B\"; echo P3G_V57_BASELINE_OK",
+    "set -euo pipefail; private=\"$HOME/agent-private/tracker/ui-p3g-final-s22-20260912-v56\"; echo V56_DIR_EXISTS=$(test -d \"$private\" && echo PASS || echo NO); for f in launch.txt current.xml card.coords details-top.xml logcat.txt; do if test -s \"$private/$f\"; then echo V56_ARTIFACT_${f//[^A-Za-z0-9]/_}=PASS; else echo V56_ARTIFACT_${f//[^A-Za-z0-9]/_}=NO; fi; done; serial=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); adb -s \"$serial\" shell am start -W -n io.blueeye/.MainActivity >/dev/null; sleep 2; adb -s \"$serial\" shell uiautomator dump /sdcard/blueeye-v57.xml >/dev/null; adb -s \"$serial\" exec-out cat /sdcard/blueeye-v57.xml > /tmp/blueeye-v57.xml; echo APP_PID_PRESENT=$(test -n \"$(adb -s \"$serial\" shell pidof io.blueeye | tr -d '\\r' || true)\" && echo PASS || echo NO); echo UI_HAS_MENU=$(grep -c 'content-desc=\"Menu\"' /tmp/blueeye-v57.xml || true); echo UI_HAS_DETAILS_TITLE=$(grep -c 'text=\"Details\"' /tmp/blueeye-v57.xml || true); echo UI_HAS_RAW_DATA=$(grep -c 'text=\"Raw Data\"' /tmp/blueeye-v57.xml || true); echo UI_HAS_RSSI=$(grep -Ec 'text=\"-?[0-9]+ dBm\"' /tmp/blueeye-v57.xml || true); echo UI_HAS_SEEN=$(grep -c 'text=\"Seen ' /tmp/blueeye-v57.xml || true); echo P3G_V57_DIAG_DONE",
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; echo P3G_V57_TREE_CLEAN"
+  ]
+}
