@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 3,
-  "command": "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p2c-radar-summary-20260912-v3.py.gz.b64 | tr -d '\\n\\r ' | base64 -d | gzip -dc | python3; git show origin/agent-control:.agent/payloads/tracker-ui-p2c-radar-summary-20260912-v14-fixes.py | python3; git diff --check; echo P2C_V15_PATCH_READY",
-  "pid": 9600,
+  "command": "set -o pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; set +e; ./gradlew :core:domain:detekt --rerun-tasks --console=plain 2>&1 | tee /tmp/p2c-v15-domain-detekt.log; rc=${PIPESTATUS[0]}; echo '--- DETEKT REPORT ---'; cat core/domain/build/reports/detekt/detekt.txt 2>/dev/null || true; exit $rc",
+  "pid": 9627,
   "timeout": 1800,
   "idle_timeout": 600,
   "memory_limit_mb": 6144,
-  "started_at": "2026-09-12T13:29:57.927862+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-12T13:29:58.457030+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p2c-radar-summary-20260912-v15-domain-detekt-inspect",
@@ -18,5 +18,5 @@
   "task_digest": "680e685d3c54632dac085405725e9504eba144dc62048b934618232f13ff1324",
   "daemon_version": "4.18.20",
   "daemon_pid": 9139,
-  "updated_at": "2026-09-12T13:29:57.965378+00:00"
+  "updated_at": "2026-09-12T13:29:58.534080+00:00"
 }
