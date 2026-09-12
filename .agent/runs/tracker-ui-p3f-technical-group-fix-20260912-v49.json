@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p3f-technical-group-fix-20260912-v49",
+  "task_digest": "f762b8da07f1a0c267e66225d977df37e508aeb2f4fdeef468cf90b53e18fd7f",
+  "idle_timeout": 300,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T20:30:45.590535+00:00",
+  "attempt_id": "83254b02eae938cd4bb450d8",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 88912,
+  "updated_at": "2026-09-12T20:30:45.590700+00:00",
+  "pid": 88912
+}
