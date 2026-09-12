@@ -1,0 +1,17 @@
+{
+  "id": "tracker-ui-p3e-hide-empty-all-evidence-20260912-v46",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 3600,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"098bc58072fdd23f9eab2319f4c1dceb4cba45fe\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"098bc58072fdd23f9eab2319f4c1dceb4cba45fe\"; echo P3E_V46_BASELINE_OK",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p3e-hide-empty-all-evidence-v46.py | python3; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:ktlintFormat --console=plain; git diff --check; test \"$(git status --porcelain | sed 's/^...//')\" = \"feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt\"; echo P3E_V46_PATCH_READY",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:testDebugUnitTest --tests io.blueeye.feature.details.DetailsEvidenceUiFormatterTest :feature:details:ktlintCheck :feature:details:detekt :feature:details:compileDebugKotlin :app:assembleDebug --console=plain; echo P3E_V46_FOCUSED_PASS",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew --parallel --max-workers=3 qualityCheck --console=plain; git diff --check; echo P3E_V46_QUALITY_PASS",
+    "set -euo pipefail; git add feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt; git diff --cached --check; test \"$(git diff --cached --name-only)\" = \"feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt\"; git commit -m 'ui: hide empty all evidence card'; test \"$(git rev-parse HEAD^)\" = \"098bc58072fdd23f9eab2319f4c1dceb4cba45fe\"; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo P3E_V46_PUSHED_SHA=$(git rev-parse HEAD)"
+  ]
+}
