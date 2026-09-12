@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p3d-actions-calibration-20260912-v45",
+  "task_digest": "135530732201769be4f41fb9906a368d1880f2a00924b823b59a383f4e6d462d",
+  "idle_timeout": 300,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T19:46:48.276185+00:00",
+  "attempt_id": "a7ecee8a882f54d9e2e03def",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 50180,
+  "updated_at": "2026-09-12T19:46:48.276354+00:00",
+  "pid": 50180
+}
