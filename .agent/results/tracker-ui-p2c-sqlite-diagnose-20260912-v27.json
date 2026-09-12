@@ -1,0 +1,116 @@
+{
+  "id": "tracker-ui-p2c-sqlite-diagnose-20260912-v27",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "started_at": "2026-09-12T17:50:21.473262+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; echo P2C_V27_BASELINE_OK",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch              ui/radar-details-redesign -> FETCH_HEAD\n * branch              main          -> FETCH_HEAD\n * branch              agent-control -> FETCH_HEAD\n   ab0de538..d351778f  agent-control -> origin/agent-control\nSwitched to branch 'ui/radar-details-redesign'\nYour branch is up to date with 'origin/ui/radar-details-redesign'.\nP2C_V27_BASELINE_OK\n",
+      "elapsed_seconds": 1.286,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.05,
+      "output_policy": "stream",
+      "captured_output_chars": 403,
+      "output_truncated": false,
+      "current_rss_mb": 3.05,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; log=\"$HOME/agent-private/tracker/ui-p2c-final-physical-20260912-v26/logcat.txt\"; test -f \"$log\"; echo SQLITE_EXCEPTION_COUNT=$(grep -c 'SQLiteException' \"$log\" || true); grep -n -B 4 -A 20 'SQLiteException' \"$log\" | grep -E 'SQLiteException|android\\.database|androidx\\.room|io\\.blueeye|FATAL EXCEPTION|Caused by| at ' | head -n 120; echo P2C_V27_SQLITE_CONTEXT_DONE",
+      "exit_code": 0,
+      "output": "SQLITE_EXCEPTION_COUNT=2\n837:         1789235167.515 20989 21016 E DatabaseUtils: android.database.sqlite.SQLiteException: no such column: files._id (code 1 SQLITE_ERROR[1]): , while compiling: SELECT files._id,files._data,files.title,files.datetime,scene.scene_name,scene.is_subscene FROM scene WHERE (server_id IS NULL) AND (files.datetime BETWEEN ? AND ? AND scene.scene_type = ?  AND (files.group_type IS NULL OR files.group_type != ? OR (files.group_type = ? AND files.best_image = ?)) AND files.bucket_id IN (?)) ORDER BY files.datetime DESC LIMIT 500\n838-         1789235167.515 20989 21016 E DatabaseUtils: \tat android.database.sqlite.SQLiteConnection.nativePrepareStatement(Native Method)\n839-         1789235167.515 20989 21016 E DatabaseUtils: \tat android.database.sqlite.SQLiteConnection.-$$Nest$smnativePrepareStatement(SQLiteConnection.java:0)\n840-         1789235167.515 20989 21016 E DatabaseUtils: \tat android.database.sqlite.SQLiteConnection$PreparedStatementCache.createStatement(SQLiteConnection.java:2056)\n841-         1789235167.515 20989 21016 E DatabaseUtils: \tat android.database.sqlite.SQLiteConnection.acquirePreparedStatementLI(SQLiteConnection.java:1570)\n842-         1789235167.515 20989 21016 E DatabaseUtils: \tat android.database.sqlite.SQLiteConnection.acquirePreparedStatement(SQLiteConnection.java:1598)\n843-         1789235167.515 20989 21016 E DatabaseUtils: \tat android.database.sqlite.SQLiteConnection.prepare(SQLiteConnection.java:1004)\n844-         1789235167.515 20989 21016 E DatabaseUtils: \tat android.database.sqlite.SQLiteSession.prepare(SQLiteSession.java:625)\n845-         1789235167.515 20989 21016 E DatabaseUtils: \tat android.database.sqlite.SQLiteDatabase.validateSql(SQLiteDatabase.java:2905)\n854:         1789235167.516 30229 30385 W System.err: android.database.sqlite.SQLiteException: no such column: files._id (code 1 SQLITE_ERROR[1]): , while compiling: SELECT files._id,files._data,files.title,files.datetime,scene.scene_name,scene.is_subscene FROM scene WHERE (server_id IS NULL) AND (files.datetime BETWEEN ? AND ? AND scene.scene_type = ?  AND (files.group_type IS NULL OR files.group_type != ? OR (files.group_type = ? AND files.best_image = ?)) AND files.bucket_id IN (?)) ORDER BY files.datetime DESC LIMIT 500\n855-         1789235167.516 30229 30385 W System.err: \tat android.database.DatabaseUtils.readExceptionFromParcel(DatabaseUtils.java:197)\n856-         1789235167.516 30229 30385 W System.err: \tat android.database.DatabaseUtils.readExceptionFromParcel(DatabaseUtils.java:153)\nP2C_V27_SQLITE_CONTEXT_DONE\n",
+      "elapsed_seconds": 0.128,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.36,
+      "output_policy": "stream",
+      "captured_output_chars": 2578,
+      "output_truncated": false,
+      "current_rss_mb": 3.36,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; test -z \"$(git status --porcelain)\"; echo P2C_V27_TREE_CLEAN",
+      "exit_code": 0,
+      "output": "P2C_V27_TREE_CLEAN\n",
+      "elapsed_seconds": 0.422,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 4.31,
+      "output_policy": "stream",
+      "captured_output_chars": 19,
+      "output_truncated": false,
+      "current_rss_mb": 4.31,
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.286
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.128
+    },
+    {
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.422
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.116
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.074
+  },
+  "finished_at": "2026-09-12T17:50:25.166373+00:00",
+  "task_digest": "69f3af52ad37c6560b66cfe77f94f41c7c85616df2bf2f86b0e7cf3b58970baa",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "958daf5208f22b1e174dc6f9",
+  "daemon_version": "4.18.20"
+}
