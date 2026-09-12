@@ -1,0 +1,19 @@
+{
+  "id": "tracker-ui-p2c-dense120-fixture-run-20260912-v23",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "repository": "MichalMatu/tracker",
+  "repo_id": "tracker",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 3600,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"d107dad886894f0e8e663f53006d11e0f9910f4f\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"d107dad886894f0e8e663f53006d11e0f9910f4f\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; serial=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$serial\"; test \"$(adb -s \"$serial\" shell getprop ro.product.model | tr -d '\\r')\" = \"SM-S906B\"; echo P2C_V23_BASELINE_DEVICE_OK",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p2c-dense120-fixture-v23.py | python3; git diff --check; test \"$(git diff --name-only)\" = \"feature/radar/src/androidTest/java/io/blueeye/feature/radar/presentation/RadarDenseListStabilityTest.kt\"; echo P2C_V23_FIXTURE_PATCH_READY",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:radar:compileDebugAndroidTestKotlin :feature:radar:ktlintCheck :feature:radar:detekt --console=plain; echo P2C_V23_ANDROIDTEST_STATIC_PASS",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:radar:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=io.blueeye.feature.radar.presentation.RadarDenseListStabilityTest --console=plain; echo P2C_V23_DENSE120_S22_PASS",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew --parallel --max-workers=3 qualityCheck --console=plain; git diff --check; echo P2C_V23_QUALITY_PASS",
+    "set -euo pipefail; git add feature/radar/src/androidTest/java/io/blueeye/feature/radar/presentation/RadarDenseListStabilityTest.kt; git diff --cached --check; test \"$(git diff --cached --name-only)\" = \"feature/radar/src/androidTest/java/io/blueeye/feature/radar/presentation/RadarDenseListStabilityTest.kt\"; git commit -m 'test: update radar dense fixture for summary model'; new_sha=$(git rev-parse HEAD); test \"$(git rev-parse HEAD^)\" = \"d107dad886894f0e8e663f53006d11e0f9910f4f\"; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo P2C_V23_PUSHED_SHA=$new_sha"
+  ]
+}
