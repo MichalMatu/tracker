@@ -1,0 +1,18 @@
+{
+  "id": "tracker-ui-p3c-details-identity-fix-20260912-v37",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "repository": "MichalMatu/tracker",
+  "repo_id": "tracker",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 3600,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test \"$(git rev-parse HEAD)\" = \"17b821dddf05a2e6160334c624b61b6b42f79950\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"17b821dddf05a2e6160334c624b61b6b42f79950\"; actual=$(git status --porcelain | sed 's/^...//' | sort); expected=$(printf '%s\\n' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt' 'feature/details/src/main/java/io/blueeye/feature/details/DetailsUiFormatter.kt' 'feature/details/src/test/java/io/blueeye/feature/details/DetailsIdentityUiFormatterTest.kt' | sort); test \"$actual\" = \"$expected\"; echo P3C_V37_DIRTY_BASELINE_OK",
+    "set -euo pipefail; python3 - <<'PY'\nfrom pathlib import Path\np = Path('feature/details/src/test/java/io/blueeye/feature/details/DetailsIdentityUiFormatterTest.kt')\ns = p.read_text()\nold = '''    private fun List<Pair<String, String>>.value(label: String): String =\n        first { (itemLabel, _) -> itemLabel == label }.second\n'''\nnew = '''    private fun List<Pair<String, String>>.value(label: String): String = first { (itemLabel, _) -> itemLabel == label }.second\n'''\nassert s.count(old) == 1, 'expected exact ktlint-only target once'\np.write_text(s.replace(old, new, 1))\nPY\ngit diff --check; test \"$(git status --porcelain | wc -l | tr -d ' ')\" = \"3\"; echo P3C_V37_KTLINT_FIX_READY",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:testDebugUnitTest --tests io.blueeye.feature.details.DetailsIdentityUiFormatterTest :feature:details:ktlintCheck :feature:details:detekt :feature:details:compileDebugKotlin :app:assembleDebug --console=plain; echo P3C_V37_FOCUSED_PASS",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew --parallel --max-workers=3 qualityCheck --console=plain; git diff --check; echo P3C_V37_QUALITY_PASS",
+    "set -euo pipefail; git add feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt feature/details/src/main/java/io/blueeye/feature/details/DetailsUiFormatter.kt feature/details/src/test/java/io/blueeye/feature/details/DetailsIdentityUiFormatterTest.kt; git diff --cached --check; test \"$(git diff --cached --name-only | wc -l | tr -d ' ')\" = \"3\"; git commit -m 'ui: clarify details identity context'; new_sha=$(git rev-parse HEAD); test \"$(git rev-parse HEAD^)\" = \"17b821dddf05a2e6160334c624b61b6b42f79950\"; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo P3C_V37_PUSHED_SHA=$new_sha"
+  ]
+}
