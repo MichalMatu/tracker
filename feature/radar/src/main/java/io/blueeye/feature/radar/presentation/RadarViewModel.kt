@@ -3,8 +3,6 @@ package io.blueeye.feature.radar.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.blueeye.core.domain.calibration.suppressesTracking
-import io.blueeye.core.domain.calibration.toCalibrationDeviceConfig
 import io.blueeye.core.domain.model.DeviceFilter
 import io.blueeye.core.domain.repository.ActiveCollectionRepository
 import io.blueeye.core.domain.repository.WatchlistRepository
@@ -12,7 +10,6 @@ import io.blueeye.core.domain.scanner.ScannerRuntimeController
 import io.blueeye.core.domain.scanner.ScannerRuntimeState
 import io.blueeye.core.domain.usecase.GetScannedDevicesUseCase
 import io.blueeye.core.model.Device
-import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.DeviceType
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -225,23 +222,6 @@ class RadarViewModel
         fun toggleWatchlist(device: Device) {
             viewModelScope.launch {
                 watchlistRepository.toggleWatchlist(device.fingerprint)
-            }
-        }
-
-        fun updateCalibrationLabel(
-            device: Device,
-            label: DeviceCalibrationLabel,
-        ) {
-            viewModelScope.launch {
-                val result =
-                    deviceRepository.updateDeviceConfig(
-                        fingerprint = device.fingerprint,
-                        config = device.toCalibrationDeviceConfig(label),
-                    )
-                if (result.isSuccess) {
-                    deviceRepository.setIgnoredForTracking(device.fingerprint, label.suppressesTracking())
-                    deviceRepository.setCalibrationLabel(device.fingerprint, label)
-                }
             }
         }
 
