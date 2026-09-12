@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 3,
-  "command": "set -euo pipefail; ADB=adb; SERIAL=$($ADB devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$SERIAL\"; test \"$($ADB -s \"$SERIAL\" shell getprop ro.product.model | tr -d '\\r')\" = 'SM-S906B'; $ADB -s \"$SERIAL\" shell input keyevent 224 >/dev/null 2>&1 || true; $ADB -s \"$SERIAL\" shell wm dismiss-keyguard >/dev/null 2>&1 || true; $ADB -s \"$SERIAL\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null; sleep 3; OUT=\"$HOME/agent-workspace/repos/tracker/checkpoints/ui-p1-real-radar-v3\"; mkdir -p \"$OUT\"; $ADB -s \"$SERIAL\" shell uiautomator dump /sdcard/p1-v3-initial.xml >/dev/null; $ADB -s \"$SERIAL\" pull /sdcard/p1-v3-initial.xml \"$OUT/initial.xml\" >/dev/null; if grep -q 'text=\"Paused\"' \"$OUT/initial.xml\"; then python3 -c \"import re,subprocess,pathlib; s=pathlib.Path('$OUT/initial.xml').read_text(); m=re.search(r'content-desc=\\\"Scan\\\"[^>]*bounds=\\\"\\[([0-9]+),([0-9]+)\\]\\[([0-9]+),([0-9]+)\\]\\\"',s); assert m,'Scan button not found'; x=(int(m.group(1))+int(m.group(3)))//2; y=(int(m.group(2))+int(m.group(4)))//2; subprocess.check_call(['adb','-s','$SERIAL','shell','input','tap',str(x),str(y)])\"; echo P1_SCAN_STARTED_FROM_PAUSED; fi; sleep 20; $ADB -s \"$SERIAL\" shell uiautomator dump /sdcard/p1-v3-a.xml >/dev/null; $ADB -s \"$SERIAL\" pull /sdcard/p1-v3-a.xml \"$OUT/a.xml\" >/dev/null; sleep 5; $ADB -s \"$SERIAL\" shell uiautomator dump /sdcard/p1-v3-b.xml >/dev/null; $ADB -s \"$SERIAL\" pull /sdcard/p1-v3-b.xml \"$OUT/b.xml\" >/dev/null; python3 -c \"import re,pathlib; out=pathlib.Path('$OUT');\nfor n in ('a','b'):\n s=(out/f'{n}.xml').read_text(); seen=re.findall(r'text=\\\"Seen ([^\\\"]+) • ([^\\\"]+)\\\"[^>]*bounds=\\\"\\[([0-9]+),([0-9]+)\\]\\[([0-9]+),([0-9]+)\\]\\\"',s); rssi=re.findall(r'text=\\\"(-?[0-9]+ dBm)\\\"',s); print('P1_'+n.upper()+'_SEEN_ROWS',len(seen),'RSSI_LABELS',len(rssi),'SEEN_SAMPLE',[x[0]+' '+x[1] for x in seen[:5]]); ys=[(int(x[3])+int(x[5]))//2 for x in seen]; gaps=[b-a for a,b in zip(ys,ys[1:]) if b>a]; print('P1_'+n.upper()+'_ROW_GAPS',gaps[:10]);\nassert len(re.findall(r'text=\\\"Seen ',(out/'a.xml').read_text()))>0,'No live Radar cards after scan wait'\"; echo P1_REAL_RADAR_VISIBLE_PASS",
-  "pid": 49586,
+  "command": "set -euo pipefail; ADB=adb; SERIAL=$($ADB devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); OUT=\"$HOME/agent-workspace/repos/tracker/checkpoints/ui-p1-real-radar-v3\"; $ADB -s \"$SERIAL\" shell dumpsys gfxinfo io.blueeye reset >/dev/null || true; SIZE=$($ADB -s \"$SERIAL\" shell wm size | tail -n1 | grep -oE '[0-9]+x[0-9]+' | tail -n1); W=${SIZE%x*}; H=${SIZE#*x}; X=$((W/2)); Y1=$((H*78/100)); Y2=$((H*32/100)); for i in $(seq 1 8); do $ADB -s \"$SERIAL\" shell input swipe $X $Y1 $X $Y2 240 >/dev/null; sleep 0.12; done; for i in $(seq 1 8); do $ADB -s \"$SERIAL\" shell input swipe $X $Y2 $X $Y1 240 >/dev/null; sleep 0.12; done; $ADB -s \"$SERIAL\" shell dumpsys gfxinfo io.blueeye > \"$OUT/gfxinfo.txt\"; grep -E 'Total frames rendered|Janky frames|50th percentile|90th percentile|95th percentile|99th percentile' \"$OUT/gfxinfo.txt\"; FRAMES=$(grep 'Total frames rendered:' \"$OUT/gfxinfo.txt\" | head -n1 | awk '{print $4}'); test \"${FRAMES:-0}\" -gt 0; PID=$($ADB -s \"$SERIAL\" shell pidof io.blueeye | tr -d '\\r'); test -n \"$PID\"; $ADB -s \"$SERIAL\" shell logcat -d --pid=\"$PID\" -t 1200 > \"$OUT/logcat-tail.txt\"; ! grep -Eq 'FATAL EXCEPTION|AndroidRuntime: FATAL|OutOfMemoryError|SQLiteException|SecurityException' \"$OUT/logcat-tail.txt\"; echo P1_REAL_GFXINFO_LOGCHECK_PASS; test -z \"$(git status --porcelain)\"",
+  "pid": 50331,
   "timeout": 300,
   "idle_timeout": 120,
   "memory_limit_mb": 2048,
-  "started_at": "2026-09-12T04:29:52.342577+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-12T04:30:31.472564+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p1-real-radar-diagnostic-20260912-v3",
@@ -18,5 +18,5 @@
   "task_digest": "c411ab2870491011c3d01c4b703bfdfd4388a8f79940d7dbe38ad31e52c538f6",
   "daemon_version": "4.18.20",
   "daemon_pid": 49379,
-  "updated_at": "2026-09-12T04:29:52.430234+00:00"
+  "updated_at": "2026-09-12T04:30:31.500201+00:00"
 }
