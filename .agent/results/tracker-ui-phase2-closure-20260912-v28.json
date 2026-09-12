@@ -1,0 +1,106 @@
+{
+  "id": "tracker-ui-phase2-closure-20260912-v28",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "started_at": "2026-09-12T17:53:15.318738+00:00",
+  "command_timeout": 3600,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; echo P2C_V28_BASELINE_OK",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch              ui/radar-details-redesign -> FETCH_HEAD\n * branch              main          -> FETCH_HEAD\n * branch              agent-control -> FETCH_HEAD\n   d351778f..d9c59030  agent-control -> origin/agent-control\nSwitched to branch 'ui/radar-details-redesign'\nYour branch is up to date with 'origin/ui/radar-details-redesign'.\nP2C_V28_BASELINE_OK\n",
+      "elapsed_seconds": 1.277,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 1.83,
+      "output_policy": "stream",
+      "captured_output_chars": 403,
+      "output_truncated": false,
+      "current_rss_mb": 1.83,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 4,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-phase2-closure-v28.py | python3; git diff --check; test -n \"$(git diff --name-only)\"; test -z \"$(git diff --name-only | grep -v '^docs/' || true)\"; test \"$(git diff --name-only | wc -l | tr -d ' ')\" = \"3\"; grep -q 'Phase 2 is CLOSED / ACCEPTED' docs/UI_UX_PHASE2_CLOSURE_2026-09-12.md; grep -q '## Phase 2 — CLOSED / ACCEPTED' docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md; grep -q 'Current status: CLOSED / ACCEPTED' docs/UI_UX_REDESIGN_PLAN.md; echo P2C_V28_DOCS_READY",
+      "exit_code": 1,
+      "output": "",
+      "elapsed_seconds": 0.526,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": null,
+      "output_policy": "stream",
+      "captured_output_chars": 0,
+      "output_truncated": false,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 4,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 4,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.277
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 4,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 0.526
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": " M docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md\n M docs/UI_UX_REDESIGN_PLAN.md\n?? docs/UI_UX_PHASE2_CLOSURE_2026-09-12.md\n",
+    "elapsed_seconds": 0.114
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "diff --git a/docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md b/docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md\nindex 41f333ae..6b755b7a 100644\n--- a/docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md\n+++ b/docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md\n@@ -12,7 +12,7 @@ Work only on:\n - local repository id: `tracker`\n - working branch: `ui/radar-details-redesign`\n - Local Agent binding: `be481b25-9d97-4205-b93f-95f5c5827441`\n-- Local Agent chat: `chat-0d1a9278`\n+- Local Agent chat: `chat-415379fc`\n \n Do not infer or switch repository identity. Before Local Agent mutation, verify `.agent/status/daemon.json` is idle and still bound to this repository. Never invoke local Codex from Local Agent tasks.\n \n@@ -64,7 +64,7 @@ Accepted physical P1 measurement before P2A:\n \n Do not reopen Phase 1 without a concrete new regression.\n \n-## Phase 2 — IN PROGRESS\n+## Phase 2 — CLOSED / ACCEPTED\n \n Goal: reduce Radar presentation/data-path cost without changing scanner, parser, identity, Follow-Me, scoring or persistence semantics.\n \n@@ -117,52 +117,21 @@ Verification on that SHA:\n - GitHub Quality #170 PASS\n - GitHub Secret Scan #200 PASS\n \n-## Important remaining cost\n+## Phase 2 closure\n \n-Phase 2 is **not closed**.\n+Phase 2 is **CLOSED / ACCEPTED**. Authoritative closure evidence is recorded in `docs/UI_UX_PHASE2_CLOSURE_2026-09-12.md`.\n \n-Current upstream path still performs full recent-device mapping:\n+Accepted production/test checkpoint before closure documentation:\n \n-`Room devices SELECT * -> DeviceEntity list -> DeviceRepositoryImpl.toDomain() -> DeviceMapper / DeviceEvidenceFactory -> GetScannedDevicesUseCase -> sample(750 ms) -> Radar mapping/sectioning`\n+`47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4`\n \n-Important consequence: `sample(750 ms)` limits downstream presentation emissions, but it does not by itself prevent Room invalidations and full entity-to-domain/evidence mapping upstream.\n+P2C replaced the full Radar `SELECT * -> DeviceEntity -> Device -> DeviceEvidenceFactory` transport with a lightweight Radar-specific projection/domain path while preserving section/filter/order semantics through explicit contract tests. The controlled 120-item instrumentation test passes on Samsung SM-S906B. GitHub Quality and Secret Scan are green on the accepted checkpoint.\n \n-P2A moved this CPU work away from main; P2B removed dead presentation work. The next meaningful optimization should target the upstream full-device/full-evidence path rather than micro-tuning Compose.\n+Final comparable S22+ 16-swipe Radar benchmark: 1,265 frames, 57 janky = **4.51%**, p95 12 ms, p99 36 ms, versus P0 13.51% / 22 ms / 44 ms. Extended field use produced no Tracker fatal exception, ANR or OOM. Pre/post Room snapshots both passed `PRAGMA integrity_check`. Two textual SQLiteException entries were traced to an unrelated Android/system media database query and are not from `io.blueeye`/Room.\n \n-## Recommended next step — P2C\n+No `conflate()` or cadence change was needed; structural P2C optimization was sufficient. Do not reopen P0/P1/P2 without a concrete regression.\n \n-Start with a read-only implementation audit and then make the smallest behavior-preserving change that reduces work **before or during** full entity-to-domain mapping.\n-\n-Preferred direction:\n-\n-1. inspect `DeviceEntity`, `DeviceMapper`, `DeviceEvidenceFactory`, `DeviceRepositoryImpl.getRecentDevices`, `DeviceSearchDao`, `RadarUiMapper` and `RadarUiSectionMapper` together;\n-2. identify the exact minimal fields/decision flags Radar needs for filtering, ordering, visible card content and section classification;\n-3. design a lightweight Radar-specific projection/query/domain contract (`RadarDeviceSummary` or equivalent) rather than loading `SELECT *` plus full technical/GATT/raw fields;\n-4. preserve existing section semantics with explicit tests before replacing the old path;\n-5. only use `conflate()`/cadence changes as secondary improvements; do not use them to hide avoidable full `DeviceEvidenceFactory` construction;\n-6. measure the new path on S22+ and with the deterministic 120-item scenario before calling Phase 2 complete.\n-\n-Do **not** jump directly into Details redesign until Phase 2 has a clear closure decision.\n-\n-## Phase 2 open checklist\n-\n-Still open from the main plan:\n-\n-- lightweight Radar projection/model;\n-- avoid full technical/GATT/raw loading for Radar where possible;\n-- avoid complete `DeviceEvidenceFactory` construction solely for Radar where possible while preserving section behavior;\n-- preserve only the minimum decision flags/data required for Radar sectioning;\n-- review the 750 ms presentation cadence after structural data-path cleanup;\n-- verify whether one device update causes avoidable full-list work;\n-- repeat performance measurement with a dense controlled population;\n-- 30–60 minute dense-scan UI soak before final Phase 2 closure.\n-\n-Already established and should not be redone without reason:\n-\n-- stable list key is fingerprint/stable identity;\n-- Phase 1 120-card structural stability test passes;\n-- P2A `flowOn(Dispatchers.Default)` physical direction is accepted;\n-- P2B dead presentation contract is removed and green.\n+Next implementation step: **Phase 3 — Details redesign around information priority**, following `docs/UI_UX_REDESIGN_PLAN.md`.\n \n ## Product/UI direction after Phase 2\n \ndiff --git a/docs/UI_UX_REDESIGN_PLAN.md b/docs/UI_UX_REDESIGN_PLAN.md\nindex 23bf26e2..893b1937 100644\n--- a/docs/UI_UX_REDESIGN_PLAN.md\n+++ b/docs/UI_UX_REDESIGN_PLAN.md\n@@ -7,7 +7,7 @@\n - Baseline `main`: `093b4257859abdbcc683f1620969b06195ade7a6`\n - Phase 3: **CLOSED / ACCEPTED**\n - Phase 4: **IN PROGRESS**\n-- Current focus: **Phase 2 Radar data-path/performance cleanup (P2C next)**\n+- Current focus: **Phase 3 Details redesign**\n \n This document is the execution checklist for the next product iteration. Keep the checkboxes and acceptance gates current as work lands. UI work must remain isolated from scanner/parser/scoring behavior until the UI redesign is accepted.\n \n@@ -75,27 +75,27 @@ SUSPICIOUS   WATCHLIST\n \n The Radar must not build or transport full technical device state merely to draw a compact list.\n \n-**Current status: IN PROGRESS.**\n+**Current status: CLOSED / ACCEPTED.**\n \n Completed slices:\n \n - **P2A accepted:** move combined Radar presentation transformation off the UI thread with `flowOn(Dispatchers.Default)`. Corrected S22+ physical run: 813 frames, 30 janky = **3.69%**, p95 11 ms, p99 34 ms, logcheck PASS. This run had 5 fresh live rows, so it proves direction but is not a 100+ live-density closure.\n - **P2B accepted:** remove dead compact-card presentation work (`sensorData`, `connectionInfo`, legacy badge/evidence presentation models/formatters and Radar sensor/evidence formatting paths) while retaining full `Device.evidence` for current section classification. Accepted code checkpoint: `0d40dd1418456f42008a35222ae30c0a2498d41d`. Local detekt/unit/compile/assemble PASS; GitHub Quality #170 PASS; Secret Scan #200 PASS.\n - Current continuation handoff: [`UI_UX_PHASE2_HANDOFF_2026-09-12.md`](UI_UX_PHASE2_HANDOFF_2026-09-12.md).\n-- **Next: P2C** — audit and replace the upstream `SELECT * -> DeviceEntity -> Device -> DeviceEvidenceFactory` Radar path with the smallest behavior-preserving lightweight projection/contract. Do not move to Details before a Phase 2 closure decision.\n+- **P2C accepted:** lightweight Radar-specific Room projection/domain contract replaces the full-device/full-evidence path for Radar while preserving section/filter/order behavior. Controlled 120-item S22+ instrumentation PASS; final comparable S22+ benchmark: 4.51% jank, p95 12 ms, p99 36 ms. See `UI_UX_PHASE2_CLOSURE_2026-09-12.md`. Phase 3 may now proceed.\n \n-- [ ] Introduce a lightweight Radar projection/model (for example `RadarDeviceSummary`) containing only fields required by the list and sectioning logic.\n-- [ ] Avoid loading full GATT/characteristic/raw technical fields for the Radar list where possible.\n-- [ ] Avoid building and sorting the complete `DeviceEvidenceFactory` output for every visible/recent device solely for Radar rendering.\n-- [ ] Preserve only the small set of precomputed decision flags needed for Radar sectioning and badges.\n+- [x] Introduce a lightweight Radar projection/model (`RadarDeviceSummary`) containing only fields required by the list and sectioning logic.\n+- [x] Avoid loading full GATT/characteristic/raw technical fields for the Radar list where possible.\n+- [x] Avoid building and sorting the complete `DeviceEvidenceFactory` output for every visible/recent device solely for Radar rendering.\n+- [x] Preserve only the small set of precomputed decision flags needed for Radar sectioning and badges.\n - [ ] Decouple frequently changing presentation fields (RSSI/last seen) from expensive classification/evidence work.\n-- [ ] Review the current 750 ms presentation cadence; use the slowest refresh that still feels live.\n+- [x] Review the current 750 ms presentation cadence; no cadence/conflate change was needed after structural P2C measurement.\n - [x] Keep stable list keys based on fingerprint/stable identity.\n - [ ] Verify that one device update does not unnecessarily rebuild the whole visible tree.\n-- [x] Measure recomposition/jank and UI-thread work before and after the change. (P0/P1/P2A physical measurements recorded; repeat after structural P2C cleanup.)\n-- [ ] Run a 30-60 minute dense-scan UI soak.\n+- [x] Measure recomposition/jank and UI-thread work before and after the change. Final P2C comparable S22+ run: 4.51% jank, p95 12 ms, p99 36 ms.\n+- [x] Run extended physical field-use soak on S22+ and separately verify the controlled 120-item dense-list scenario on-device; the live field window itself was not relabeled as 100+ recent devices.\n \n-**Gate:** scrolling remains responsive as the recent-device population grows; no progressive slowdown attributable to Radar presentation work.\n+**Gate: PASS.** Controlled 120-item S22+ test passes; final comparable physical Radar benchmark is 4.51% jank with p95 12 ms and p99 36 ms, and extended field use shows no Tracker crash/ANR/OOM. Phase 2 is closed; see `UI_UX_PHASE2_CLOSURE_2026-09-12.md`.\n \n ## Phase 3 — Rebuild Details around information priority\n \n",
+    "elapsed_seconds": 0.03
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-12T17:53:19.014938+00:00",
+  "workspace_checkpoint": {
+    "version": 2,
+    "task_id": "tracker-ui-phase2-closure-20260912-v28",
+    "reason": "task-exit",
+    "created_at": "2026-09-12T17:53:19.437259+00:00",
+    "base_head": "47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4",
+    "work_branch": "ui/radar-details-redesign",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/tracker-ui-phase2-closure-20260912-v28/1789235599262947000-task-exit",
+    "tracked_patch": "tracked.patch",
+    "untracked_root": "untracked",
+    "untracked_files": [
+      "docs/UI_UX_PHASE2_CLOSURE_2026-09-12.md"
+    ],
+    "tracked_patch_bytes": 10361,
+    "untracked_bytes": 7201,
+    "total_bytes": 17562,
+    "status": " M docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md\n M docs/UI_UX_REDESIGN_PLAN.md\n?? docs/UI_UX_PHASE2_CLOSURE_2026-09-12.md\n"
+  },
+  "task_digest": "fcc6e0bad87e20c872e98c3e291ac0dcb87423ca925f43fb5060d6a83e875e4a",
+  "idle_timeout": 300,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "attempt_id": "ea2a59f4ed06384a3cc02f1c",
+  "daemon_version": "4.18.20"
+}
