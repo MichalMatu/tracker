@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p3a-details-detekt-diagnose-20260912-v32",
+  "task_digest": "e00733f7749ba3038d253056f6d009d0784990e0a7383e50e57dc214ddc5f232",
+  "idle_timeout": 300,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T18:29:58.078212+00:00",
+  "attempt_id": "f36fcf13ea8c79128caca77d",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 69611,
+  "updated_at": "2026-09-12T18:29:58.078421+00:00",
+  "pid": 69611
+}
