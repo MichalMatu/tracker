@@ -187,10 +187,15 @@ private fun RadarDecisionBadges(item: RadarUiItem) {
         horizontalArrangement = Arrangement.spacedBy(Dimens.PaddingExtraSmall),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (item.statusInfo.text != "SAFE") {
+        if (item.isNew || item.statusInfo.isWarning) {
             Badge(
                 text = item.statusInfo.text,
-                color = item.statusInfo.textColor.resolve(),
+                color =
+                    if (item.isNew) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        item.statusInfo.textColor.resolve()
+                    },
             )
         }
 
