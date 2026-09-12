@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p3g-raw-data-deepen-20260912-v55",
+  "task_digest": "3530a055fed6c71439c96d6ab68dbea8d2327ed4707f03f511bde6577e335f8d",
+  "idle_timeout": 300,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T21:38:04.335618+00:00",
+  "attempt_id": "1e131eb033804e9a33facf6b",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 49017,
+  "updated_at": "2026-09-12T21:38:04.335726+00:00",
+  "pid": 49017
+}
