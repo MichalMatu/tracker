@@ -246,9 +246,6 @@ fun RadarScreen(
                                         onWatchlistClick = { device ->
                                             viewModel.toggleWatchlist(device)
                                         },
-                                        onCalibrationClick = { device, label ->
-                                            viewModel.updateCalibrationLabel(device, label)
-                                        },
                                     )
                                 }
                             }
