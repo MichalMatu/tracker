@@ -1,0 +1,9 @@
+{
+  "id": "tracker-ui-p3c-details-detekt-pinpoint-20260912-v40",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "started_at": null,
+  "finished_at": "2026-09-12T19:14:19.007132+00:00",
+  "daemon_version": "4.18.20",
+  "error": "JSONDecodeError: Invalid \\escape: line 13 column 295 (char 1246)"
+}
