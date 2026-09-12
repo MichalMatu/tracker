@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p2c-sqlite-diagnose-20260912-v27",
+  "task_digest": "69f3af52ad37c6560b66cfe77f94f41c7c85616df2bf2f86b0e7cf3b58970baa",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T17:50:21.473231+00:00",
+  "attempt_id": "958daf5208f22b1e174dc6f9",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 37516,
+  "updated_at": "2026-09-12T17:50:21.473297+00:00",
+  "pid": 37516
+}
