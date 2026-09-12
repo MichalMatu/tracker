@@ -1,10 +1,8 @@
 package io.blueeye.feature.radar.presentation
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,13 +10,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -26,10 +22,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -37,8 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.blueeye.core.model.Device
-import io.blueeye.core.model.DeviceCalibrationLabel
-import io.blueeye.core.ui.stableLiveHeight
 import io.blueeye.core.ui.theme.Dimens
 import io.blueeye.core.ui.theme.extendedColors
 
@@ -47,182 +39,95 @@ fun RadarDeviceItem(
     item: RadarUiItem,
     onClick: (Device) -> Unit,
     onWatchlistClick: (Device) -> Unit,
-    onCalibrationClick: (Device, DeviceCalibrationLabel) -> Unit,
 ) {
     val cardBackgroundColor =
-        if (item.statusInfo.cardBackgroundColor != null) {
-            item.statusInfo.cardBackgroundColor.resolve()
-        } else {
-            MaterialTheme.colorScheme.surface
-        }
+        item.statusInfo.cardBackgroundColor?.resolve()
+            ?: MaterialTheme.colorScheme.surface
 
     Card(
         modifier =
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = Dimens.PaddingMedium, vertical = Dimens.PaddingExtraSmall)
-                .stableLiveHeight()
                 .clickable { onClick(item.device) },
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = Dimens.CardElevation)
+        elevation = CardDefaults.cardElevation(defaultElevation = Dimens.CardElevation),
     ) {
-        Column(
+        Row(
             modifier =
                 Modifier
-                    .padding(Dimens.CardCornerRadius) // 12.dp
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(Dimens.CardCornerRadius),
+            verticalAlignment = Alignment.Top,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-            ) {
-                DeviceIcon(item = item)
+            DeviceIcon(item = item)
 
-                Spacer(modifier = Modifier.width(Dimens.CardCornerRadius))
+            Spacer(modifier = Modifier.width(Dimens.CardCornerRadius))
 
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = item.displayName,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = item.nameColor.resolve(),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f, fill = false)
-                        )
+            Column(modifier = Modifier.weight(1f)) {
+                RadarPrimaryRow(
+                    item = item,
+                    onWatchlistClick = onWatchlistClick,
+                )
 
-                        Spacer(modifier = Modifier.width(Dimens.PaddingSmall))
+                Text(
+                    text = item.vendorAndType.ifBlank { " " },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline,
+                    minLines = 1,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
 
-                        val scale by animateFloatAsState(targetValue = 1f, label = "rssiScale")
+                Text(
+                    text = "Seen ${item.signalInfo.timeSinceSeen} • ${item.signalInfo.techBadge}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    minLines = 1,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
 
-                        Text(
-                            text = "${item.signalInfo.rssi}",
-                            color = item.signalInfo.signalColor.resolve(),
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.scale(scale)
-                        )
-                    }
-
-                    Text(
-                        text = item.vendorAndType.ifBlank { " " },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline,
-                        minLines = 1,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Text(
-                        text = "Seen ${item.signalInfo.timeSinceSeen} • RSSI ${item.signalInfo.rssiText}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        minLines = 1,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-
-                    BadgeRow(item = item)
-
-                    item.evidenceInfo?.let { evidenceInfo ->
-                        RadarEvidenceSummary(
-                            evidenceInfo = evidenceInfo,
-                            modifier = Modifier.padding(top = Dimens.PaddingSmall),
-                        )
-                    }
-                }
+                RadarDecisionBadges(item = item)
             }
-
-            RadarDeviceActions(
-                item = item,
-                onClick = onClick,
-                onWatchlistClick = onWatchlistClick,
-                onCalibrationClick = onCalibrationClick,
-            )
         }
     }
 }
 
 @Composable
-private fun DeviceIcon(item: RadarUiItem) {
-    Box(modifier = Modifier.size(Dimens.IconHuge)) {
-        Image(
-            painter = painterResource(id = item.icons.mainIconRes),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-            modifier = Modifier.fillMaxSize()
-        )
-        if (item.isProbing) {
-            androidx.compose.material3.CircularProgressIndicator(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(2.dp),
-                strokeWidth = 2.dp,
-                color = MaterialTheme.colorScheme.tertiary
-            )
-        }
-    }
-}
-
-@Composable
-private fun BadgeRow(item: RadarUiItem) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(top = Dimens.PaddingExtraSmall)
-                .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(Dimens.PaddingExtraSmall),
-    ) {
-        Badge(text = item.badges.techBadge, color = item.badges.techColor.resolve())
-        Badge(text = item.badges.privacyBadge, color = MaterialTheme.colorScheme.outline)
-
-        item.badges.watchlistBadge?.let {
-            Badge(text = it, color = item.badges.watchlistColor.resolve())
-        }
-        item.badges.statusBadge?.let {
-            Badge(text = it, color = item.badges.statusColor.resolve())
-        }
-        item.badges.calibrationBadge?.let {
-            Badge(text = it, color = item.badges.calibrationColor.resolve())
-        }
-        item.badges.batteryText?.let { Badge(text = it) }
-        item.badges.temperatureText?.let { Badge(text = it) }
-    }
-}
-
-@Composable
-private fun RadarDeviceActions(
+private fun RadarPrimaryRow(
     item: RadarUiItem,
-    onClick: (Device) -> Unit,
     onWatchlistClick: (Device) -> Unit,
-    onCalibrationClick: (Device, DeviceCalibrationLabel) -> Unit,
 ) {
     Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(top = Dimens.PaddingSmall),
-        horizontalArrangement = Arrangement.End,
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = { onClick(item.device) }) {
-            Icon(
-                imageVector = Icons.Default.Info,
-                contentDescription = "Details",
-                tint = MaterialTheme.colorScheme.outline,
-            )
-        }
-
-        RadarCalibrationMenuButton(
-            selectedLabel = item.device.calibrationLabel,
-            onSelectLabel = { label -> onCalibrationClick(item.device, label) },
+        Text(
+            text = item.displayName,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = item.nameColor.resolve(),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
         )
 
-        IconButton(onClick = { onWatchlistClick(item.device) }) {
-            androidx.compose.material3.Icon(
+        Spacer(modifier = Modifier.width(Dimens.PaddingSmall))
+
+        Text(
+            text = item.signalInfo.rssiText,
+            color = item.signalInfo.signalColor.resolve(),
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+        )
+
+        IconButton(
+            onClick = { onWatchlistClick(item.device) },
+            modifier = Modifier.size(40.dp),
+        ) {
+            Icon(
                 painter =
                     painterResource(
                         id =
@@ -243,103 +148,65 @@ private fun RadarDeviceActions(
                         MaterialTheme.colorScheme.primary
                     } else {
                         MaterialTheme.colorScheme.outline
-                    }
+                    },
             )
         }
     }
 }
 
 @Composable
-fun RadarEvidenceSummary(
-    evidenceInfo: RadarEvidenceInfo,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier = modifier) {
-        EvidenceConfidencePill(evidenceInfo)
-
-        Text(
-            text = evidenceInfo.primarySourceText,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.outline,
-            minLines = 1,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = Dimens.PaddingExtraSmall),
+private fun DeviceIcon(item: RadarUiItem) {
+    Box(modifier = Modifier.size(Dimens.IconHuge)) {
+        Image(
+            painter = painterResource(id = item.icons.mainIconRes),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+            modifier = Modifier.fillMaxSize(),
         )
-
-        Text(
-            text = evidenceInfo.primaryReasonText,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            minLines = 3,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = Dimens.PaddingExtraSmall),
-        )
-
-        Text(
-            text = evidenceInfo.primaryValueText.orEmpty(),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            minLines = 2,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = Dimens.PaddingExtraSmall),
-        )
-
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = Dimens.PaddingExtraSmall)
-                    .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(Dimens.PaddingExtraSmall),
-        ) {
-            evidenceInfo.chips.forEach { chip ->
-                EvidenceChip(chip)
-            }
+        if (item.isProbing) {
+            androidx.compose.material3.CircularProgressIndicator(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(2.dp),
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.tertiary,
+            )
         }
     }
 }
 
 @Composable
-fun EvidenceConfidencePill(evidenceInfo: RadarEvidenceInfo) {
-    val color = evidenceInfo.confidenceColor.resolve()
-    Text(
-        text = evidenceInfo.confidenceText,
-        style = MaterialTheme.typography.labelSmall,
-        color = color,
+private fun RadarDecisionBadges(item: RadarUiItem) {
+    Row(
         modifier =
             Modifier
-                .background(color.copy(alpha = 0.1f), RoundedCornerShape(Dimens.PaddingExtraSmall))
-                .padding(horizontal = Dimens.PaddingSmall, vertical = Dimens.PaddingExtraSmall),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        softWrap = false,
-    )
-}
+                .fillMaxWidth()
+                .heightIn(min = 24.dp)
+                .padding(top = Dimens.PaddingExtraSmall),
+        horizontalArrangement = Arrangement.spacedBy(Dimens.PaddingExtraSmall),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (item.statusInfo.text != "SAFE") {
+            Badge(
+                text = item.statusInfo.text,
+                color = item.statusInfo.textColor.resolve(),
+            )
+        }
 
-@Composable
-fun EvidenceChip(chip: RadarEvidenceChipInfo) {
-    val color = chip.color.resolve()
-    Text(
-        text = chip.text,
-        style = MaterialTheme.typography.labelSmall,
-        color = color,
-        modifier =
-            Modifier
-                .background(color.copy(alpha = 0.1f), RoundedCornerShape(Dimens.PaddingExtraSmall))
-                .padding(horizontal = Dimens.PaddingSmall, vertical = Dimens.PaddingExtraSmall),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        softWrap = false,
-    )
+        if (item.isInWatchlist) {
+            Badge(
+                text = "WATCHLIST",
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
 }
 
 @Composable
 fun Badge(
     text: String,
-    color: Color = MaterialTheme.colorScheme.onSurface
+    color: Color = MaterialTheme.colorScheme.onSurface,
 ) {
     Text(
         text = text,
@@ -376,29 +243,5 @@ fun RadarUiColorToken.resolve(): Color {
         RadarUiColorToken.WHITE -> Color.White
         RadarUiColorToken.GRAY -> MaterialTheme.colorScheme.outline
         RadarUiColorToken.TRANSPARENT -> Color.Transparent
-    }
-}
-
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
-@Composable
-fun RadarEvidenceSummaryPreview() {
-    io.blueeye.core.ui.theme.BlueEyeTheme {
-        RadarEvidenceSummary(
-            evidenceInfo =
-                RadarEvidenceInfo(
-                    confidenceText = "High confidence",
-                    confidenceColor = RadarUiColorToken.SUSPICIOUS,
-                    primarySourceText = "Source: Service - BLE ad",
-                    primaryReasonText = "Service UUID is consistent with Axon Body Camera.",
-                    primaryValueText = "Value: 0000fd8e-0000-1000-8000-00805f9b34fb -> BODY_CAMERA",
-                    chips =
-                        listOf(
-                            RadarEvidenceChipInfo("Service BLE ad", RadarUiColorToken.SUSPICIOUS),
-                            RadarEvidenceChipInfo("OUI registry", RadarUiColorToken.SUSPICIOUS),
-                            RadarEvidenceChipInfo("GATT active", RadarUiColorToken.WARNING),
-                        ),
-                ),
-            modifier = Modifier.padding(Dimens.PaddingMedium),
-        )
     }
 }
