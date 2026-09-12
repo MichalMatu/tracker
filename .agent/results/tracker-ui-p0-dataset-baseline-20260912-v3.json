@@ -1,0 +1,60 @@
+{
+  "id": "tracker-ui-p0-dataset-baseline-20260912-v3",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "started_at": "2026-09-12T04:12:16.420770+00:00",
+  "command_timeout": 180,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; ADB=adb; SERIAL=$($ADB devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$SERIAL\"; test \"$($ADB -s \"$SERIAL\" shell getprop ro.product.model | tr -d '\\r')\" = 'SM-S906B'; OUT=\"$HOME/agent-workspace/repos/tracker/checkpoints/ui-p0-baseline-20260912\"; mkdir -p \"$OUT\"; cleanup(){ rm -f \"$OUT/p0-room.sqlite\"; $ADB -s \"$SERIAL\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || true; }; trap cleanup EXIT; $ADB -s \"$SERIAL\" shell am force-stop io.blueeye; sleep 1; echo DB_FILES_BEGIN; $ADB -s \"$SERIAL\" shell run-as io.blueeye sh -c 'ls -l databases' | sed -E 's/[0-9]{4,}/N/g'; echo DB_FILES_END; MAGIC=$($ADB -s \"$SERIAL\" exec-out run-as io.blueeye sh -c 'dd if=databases/tracker_database bs=16 count=1 2>/dev/null' | xxd -p -c 32); echo TRACKER_DATABASE_MAGIC=$MAGIC; test \"$MAGIC\" = '53514c69746520666f726d6174203300'; $ADB -s \"$SERIAL\" exec-out run-as io.blueeye sh -c 'cat databases/tracker_database' > \"$OUT/p0-room.sqlite\"; python3 - <<'PY'\nfrom pathlib import Path\nimport sqlite3, hashlib\np=Path.home()/\"agent-workspace/repos/tracker/checkpoints/ui-p0-baseline-20260912/p0-room.sqlite\"\nassert p.read_bytes()[:16] == b'SQLite format 3\\x00'\ncon=sqlite3.connect(f'file:{p}?mode=ro', uri=True)\ntables={r[0] for r in con.execute(\"select name from sqlite_master where type='table'\")}\nassert 'devices' in tables\ntotal=con.execute('select count(*) from devices').fetchone()[0]\nmax_seen=con.execute('select max(lastSeenAt) from devices').fetchone()[0]\nrecent=con.execute('select count(*) from devices where lastSeenAt >= ?', ((max_seen or 0)-180000,)).fetchone()[0] if max_seen is not None else 0\nprint('DEVICE_TOTAL', total)\nprint('DENSE_180S_WINDOW_AT_DATASET_TAIL', recent)\nif 'signal_samples' in tables:\n    print('SIGNAL_SAMPLE_TOTAL', con.execute('select count(*) from signal_samples').fetchone()[0])\nprint('DB_TABLE_COUNT', len(tables))\nprint('DB_BASELINE_SHA256', hashlib.sha256(p.read_bytes()).hexdigest())\ncon.close()\nPY\necho DATASET_BASELINE_CAPTURE_PASS; test -z \"$(git status --porcelain)\"",
+      "exit_code": 0,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\nDB_FILES_BEGIN\ncache\ncode_cache\ndatabases\nfiles\nshared_prefs\nDB_FILES_END\nTRACKER_DATABASE_MAGIC=53514c69746520666f726d6174203300\nDEVICE_TOTAL 967\nDENSE_180S_WINDOW_AT_DATASET_TAIL 16\nSIGNAL_SAMPLE_TOTAL 43705\nDB_TABLE_COUNT 9\nDB_BASELINE_SHA256 abb747827a118014b136c70ef803971c3c935cfc2dab20c1f4bad8fd8158e6f6\nDATASET_BASELINE_CAPTURE_PASS\n",
+      "elapsed_seconds": 7.114,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 9.53,
+      "output_policy": "stream",
+      "captured_output_chars": 418,
+      "output_truncated": false,
+      "current_rss_mb": 9.53,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 7.114
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.121
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.077
+  },
+  "finished_at": "2026-09-12T04:12:25.369212+00:00",
+  "task_digest": "bd6273f10a9c6239a3e9de73799798b655f3bb205b47df0c69b4d5c1378a2bc4",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "attempt_id": "1cd62cbf136e636cf7f29aeb",
+  "daemon_version": "4.18.20"
+}
