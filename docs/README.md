@@ -7,17 +7,25 @@ This index is the entry point for repository documentation. It distinguishes **a
 For current work, use this order:
 
 1. [`PRODUCT_GOAL.md`](PRODUCT_GOAL.md) — what the product is trying to achieve and what it must not claim.
-2. [`UI_UX_REDESIGN_PLAN.md`](UI_UX_REDESIGN_PLAN.md) — **active execution checklist** for the current Radar/Details redesign and the following local-reducer / optional AI-analysis milestone.
-3. [`ARCHITECTURE_CURRENT.md`](ARCHITECTURE_CURRENT.md) — current module/dependency picture.
-4. [`QUALITY_GATE.md`](QUALITY_GATE.md) — repository acceptance gates.
-5. [`SANDBOX_EXECUTION_FLOW.md`](SANDBOX_EXECUTION_FLOW.md) — where source, CI, sandbox and physical-device work belong.
+2. [`UI_UX_PHASE2_HANDOFF_2026-09-12.md`](UI_UX_PHASE2_HANDOFF_2026-09-12.md) — **current continuation handoff** with exact branch/SHA/test state and the next P2C action.
+3. [`UI_UX_REDESIGN_PLAN.md`](UI_UX_REDESIGN_PLAN.md) — **active execution checklist** for the Radar/Details redesign and the following local-reducer / optional AI-analysis milestone.
+4. [`ARCHITECTURE_CURRENT.md`](ARCHITECTURE_CURRENT.md) — current module/dependency picture.
+5. [`QUALITY_GATE.md`](QUALITY_GATE.md) — repository acceptance gates.
+6. [`SANDBOX_EXECUTION_FLOW.md`](SANDBOX_EXECUTION_FLOW.md) — where source, CI, sandbox and physical-device work belong.
 
 ## Current project status
 
 - Phase 3 field reacceptance: **ACCEPTED / CLOSED**.
-- Phase 4: **UNBLOCKED**.
+- Phase 4: **IN PROGRESS** on `ui/radar-details-redesign`.
+- UI/UX Phase 0: **CLOSED**.
+- UI/UX Phase 1 compact Radar: **CLOSED / ACCEPTED**.
+- UI/UX Phase 2 Radar data-path/performance: **IN PROGRESS**.
+- P2A (`flowOn(Dispatchers.Default)` for Radar transformation): **ACCEPTED** after real-device measurement.
+- P2B (remove dead Radar presentation work): **ACCEPTED / GREEN** at code checkpoint `0d40dd1418456f42008a35222ae30c0a2498d41d`.
+- Next action: **P2C upstream Radar data-path audit and lightweight projection design**, before moving to Details.
+- Draft PR: **#7** (`ui/radar-details-redesign` -> `main`).
 - Final authoritative Phase 3 record: [`PHASE3_FIELD_REACCEPTANCE_CLOSURE_2026-09-11.md`](PHASE3_FIELD_REACCEPTANCE_CLOSURE_2026-09-11.md).
-- Current product work: Radar + Details UX/performance redesign on `ui/radar-details-redesign`.
+- Current continuation handoff: [`UI_UX_PHASE2_HANDOFF_2026-09-12.md`](UI_UX_PHASE2_HANDOFF_2026-09-12.md).
 - Current accepted `main` baseline at plan creation: `093b4257859abdbcc683f1620969b06195ade7a6`.
 
 Do not use an older Phase 3 handoff, pre-field golden manifest or recovery-guide `NEXT ACTION` as current instructions.
@@ -43,6 +51,23 @@ Canonical checklist for:
 - field-data feedback loop.
 
 Update its checkboxes/gates as implementation progresses.
+
+## Current handoff
+
+### [`UI_UX_PHASE2_HANDOFF_2026-09-12.md`](UI_UX_PHASE2_HANDOFF_2026-09-12.md)
+
+Use this when opening a new ChatGPT window. It records:
+
+- immutable repository/Local Agent binding;
+- accepted `main` baseline;
+- exact P2B code checkpoint;
+- P0/P1 closure state;
+- P2A physical performance evidence;
+- P2B verification/CI status;
+- remaining upstream performance cost;
+- the exact P2C continuation procedure and continuation prompt.
+
+The handoff is current task state; the redesign plan remains the canonical long-term checklist.
 
 ## Current technical references
 
@@ -86,8 +111,9 @@ The files below are intentionally retained because they explain why specific cod
 ## Documentation maintenance rules
 
 - Keep exactly one clearly named **active execution plan** per major current workstream.
+- Keep one clearly named **current continuation handoff** when work is expected to move across chat windows.
 - When a handoff/plan is superseded, retain it only when it provides useful provenance and add an explicit historical/superseded banner.
 - Final closure documents outrank earlier handoffs and interim status text.
 - Never commit private field telemetry: exact GPS, MAC addresses, raw HCI/bugreport/Room databases or other sensitive captures.
-- Update this index when a new canonical plan or final closure is created.
+- Update this index when a new canonical plan, current handoff or final closure is created.
 - Prefer linking historical records from here instead of keeping stale `NEXT ACTION` instructions in the root `README.md`.
