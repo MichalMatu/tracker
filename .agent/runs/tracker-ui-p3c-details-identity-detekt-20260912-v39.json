@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p3c-details-identity-detekt-20260912-v39",
+  "task_digest": "781548c288bec12e1623bbede40824ab3955a4b32bcc576135dd66ac6bd8b2fc",
+  "idle_timeout": 300,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T19:11:10.935531+00:00",
+  "attempt_id": "2cbafc5f0891411db30512c1",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 10913,
+  "updated_at": "2026-09-12T19:11:10.935800+00:00",
+  "pid": 10913
+}
