@@ -11,12 +11,14 @@ import io.blueeye.core.domain.scanner.ScannerRuntimeState
 import io.blueeye.core.domain.usecase.GetScannedDevicesUseCase
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -139,6 +141,7 @@ class RadarViewModel
                     }
                 )
             }
+                .flowOn(Dispatchers.Default)
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(5000),
