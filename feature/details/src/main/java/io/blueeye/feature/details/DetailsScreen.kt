@@ -73,8 +73,8 @@ fun DetailsScreen(
     val services by viewModel.discoveredServices.collectAsStateWithLifecycle(initialValue = emptyList())
     val sensorData by viewModel.sensorData.collectAsStateWithLifecycle(initialValue = null)
 
-    val showEditDialog = remember { mutableStateOf(false) }
-    val showRawDataDialog = remember { mutableStateOf(false) }
+    val showEditDialog = remember(fingerprint) { mutableStateOf(false) }
+    val showRawDataDialog = remember(fingerprint) { mutableStateOf(false) }
 
     if (showEditDialog.value && device != null) {
         EditDeviceDialog(
@@ -99,21 +99,10 @@ fun DetailsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(
-                            text = device?.getDisplayName() ?: "Unknown Device",
-                            style = MaterialTheme.typography.titleMedium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(
-                            text = fingerprint,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
+                    Text(
+                        text = "Details",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
@@ -167,26 +156,8 @@ fun DetailsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             device?.let { dev ->
-                // Header Info
+                // Decision-first content: summary, tracking/signal, key evidence, identity, then review/actions.
                 HeaderCard(dev)
-
-                DetailsEvidenceSection(evidence = dev.evidence)
-
-                if (alertEvidenceEvents.isNotEmpty()) {
-                    DetailsAlertHistoryCard(events = alertEvidenceEvents)
-                }
-
-                CalibrationCard(
-                    device = dev,
-                    onSelectLabel = { viewModel.updateCalibrationLabel(it) },
-                )
-
-                // Connection Control
-                ConnectionCard(
-                    connectionState = connectionState,
-                    onConnect = { viewModel.connect() },
-                    onDisconnect = { viewModel.disconnect() }
-                )
 
                 if (signalSamples.isNotEmpty()) {
                     DetailsSignalHistoryCard(samples = signalSamples)
@@ -196,12 +167,8 @@ fun DetailsScreen(
                     DetailsFollowMeHistoryCard(samples = followMeHistory)
                 }
 
-                // Sensor Data
-                if (sensorData != null) {
-                    SensorDataCard(sensorData!!)
-                }
+                DetailsKeyEvidenceSection(evidence = dev.evidence)
 
-                // Info Sections
                 InfoSection("Identity",
                     listOf(
                         "Vendor" to (dev.vendorName ?: "Unknown"),
@@ -209,6 +176,26 @@ fun DetailsScreen(
                         "Type" to dev.deviceType.name
                     )
                 )
+
+                CalibrationCard(
+                    device = dev,
+                    onSelectLabel = { viewModel.updateCalibrationLabel(it) },
+                )
+
+                if (alertEvidenceEvents.isNotEmpty()) {
+                    DetailsAlertHistoryCard(events = alertEvidenceEvents)
+                }
+
+                // Technical and diagnostic actions stay available, but below decision content.
+                ConnectionCard(
+                    connectionState = connectionState,
+                    onConnect = { viewModel.connect() },
+                    onDisconnect = { viewModel.disconnect() }
+                )
+
+                if (sensorData != null) {
+                    SensorDataCard(sensorData!!)
+                }
 
                 InfoSection("Activity",
                     listOf(
@@ -242,6 +229,11 @@ fun DetailsScreen(
                 if (services.isNotEmpty()) {
                     InfoSection("Services (${services.size})", services.map { it.uuid to it.name })
                 }
+
+                DetailsEvidenceSection(
+                    evidence = dev.evidence,
+                    title = "All evidence",
+                )
 
                 Spacer(Modifier.height(Dimens.PaddingExtraLarge * 2)) // Spacing for FAB
             } ?: run {

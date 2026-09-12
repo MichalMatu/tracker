@@ -27,9 +27,64 @@ import io.blueeye.core.ui.theme.Dimens
 import io.blueeye.core.ui.theme.extendedColors
 
 @Composable
+fun DetailsKeyEvidenceSection(
+    evidence: List<DetectionEvidence>,
+    modifier: Modifier = Modifier,
+) {
+    val evidenceItems = remember(evidence) { DetailsEvidenceUiFormatter.formatKeyEvidence(evidence) }
+    if (evidenceItems.isEmpty()) return
+
+    Card(modifier = modifier.fillMaxWidth().stableLiveHeight()) {
+        Column(modifier = Modifier.padding(Dimens.PaddingMedium)) {
+            Text(
+                text = "Key evidence",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = Dimens.PaddingSmall))
+            Column(verticalArrangement = Arrangement.spacedBy(Dimens.PaddingMedium)) {
+                evidenceItems.forEach { item ->
+                    DetailsKeyEvidenceItem(item)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DetailsKeyEvidenceItem(item: DetailsEvidenceUiItem) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top,
+        ) {
+            Text(
+                text = item.sourceText,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            DetailsEvidenceConfidencePill(item)
+        }
+        Text(
+            text = item.reasonText,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            minLines = EvidenceLayout.REASON_TEXT_LINES,
+            maxLines = EvidenceLayout.REASON_TEXT_LINES,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
 fun DetailsEvidenceSection(
     evidence: List<DetectionEvidence>,
     modifier: Modifier = Modifier,
+    title: String = "Evidence",
 ) {
     val evidenceItems = remember(evidence) { DetailsEvidenceUiFormatter.format(evidence) }
     val emptyState = remember { DetailsEvidenceUiFormatter.emptyState() }
@@ -37,7 +92,7 @@ fun DetailsEvidenceSection(
     Card(modifier = modifier.fillMaxWidth().stableLiveHeight()) {
         Column(modifier = Modifier.padding(Dimens.PaddingMedium)) {
             Text(
-                text = "Evidence",
+                text = title,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary,
             )
