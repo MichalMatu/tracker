@@ -1,0 +1,16 @@
+{
+  "id": "tracker-ui-p2c-sqlite-diagnose-20260912-v27",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "repository": "MichalMatu/tracker",
+  "repo_id": "tracker",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 900,
+  "task_timeout": 1800,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; echo P2C_V27_BASELINE_OK",
+    "set -euo pipefail; log=\"$HOME/agent-private/tracker/ui-p2c-final-physical-20260912-v26/logcat.txt\"; test -f \"$log\"; echo SQLITE_EXCEPTION_COUNT=$(grep -c 'SQLiteException' \"$log\" || true); grep -n -B 4 -A 20 'SQLiteException' \"$log\" | grep -E 'SQLiteException|android\\.database|androidx\\.room|io\\.blueeye|FATAL EXCEPTION|Caused by| at ' | head -n 120; echo P2C_V27_SQLITE_CONTEXT_DONE",
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; echo P2C_V27_TREE_CLEAN"
+  ]
+}
