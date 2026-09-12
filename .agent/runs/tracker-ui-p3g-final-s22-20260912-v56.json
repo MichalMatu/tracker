@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 4,
-  "command": "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"e1e09df50caf7cf9939420d42bd48bfb21ea6823\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"e1e09df50caf7cf9939420d42bd48bfb21ea6823\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; serial=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$serial\"; test \"$(adb -s \"$serial\" shell getprop ro.product.model | tr -d '\\r')\" = \"SM-S906B\"; echo P3G_V56_BASELINE_DEVICE_OK",
-  "pid": 58765,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :app:installDebug --console=plain; echo P3G_V56_INSTALL_PASS",
+  "pid": 58859,
   "timeout": 3600,
   "idle_timeout": 900,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T21:49:25.142555+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-12T21:49:29.871761+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 4,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p3g-final-s22-20260912-v56",
@@ -18,5 +18,5 @@
   "task_digest": "dd73cd30f97d7bea7fc1c4d1af081bdaa477b427ca1cf016f81adf03359d65df",
   "daemon_version": "4.18.20",
   "daemon_pid": 58571,
-  "updated_at": "2026-09-12T21:49:25.142701+00:00"
+  "updated_at": "2026-09-12T21:49:29.944917+00:00"
 }
