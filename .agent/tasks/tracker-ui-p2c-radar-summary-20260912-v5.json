@@ -1,0 +1,21 @@
+{
+  "id": "tracker-ui-p2c-radar-summary-20260912-v5",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 6144,
+  "command_timeout": 1800,
+  "idle_timeout": 600,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign agent-control; git checkout ui/radar-details-redesign; git reset --hard origin/ui/radar-details-redesign; git clean -fd -- core feature; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"372ac629cf08f5b4d76f33210d04312034872881\"; git merge-base --is-ancestor 0d40dd1418456f42008a35222ae30c0a2498d41d HEAD; echo P2C_V5_BASELINE_CLEAN",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p2c-radar-summary-20260912-v3.py.gz.b64 | tr -d '\\n\\r ' | base64 -d | gzip -dc | python3; python3 - <<'PY'\nfrom pathlib import Path\np = Path('core/data/src/main/java/io/blueeye/core/data/mapper/RadarDeviceMapper.kt')\ns = p.read_text()\ncount = s.count('RssiNormalization')\nassert count >= 2, count\ns = s.replace('RssiNormalization', 'RadarRssiNormalization')\np.write_text(s)\nprint(f'P2C_V5_RENAMED_RSSI_HELPER occurrences={count}')\nPY\ngit diff --check; git status --short; echo P2C_V5_PATCH_READY",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :core:data:testDebugUnitTest --tests io.blueeye.core.data.evidence.DeviceEvidenceFactoryRadarSignalsTest; ./gradlew :feature:radar:testDebugUnitTest --tests io.blueeye.feature.radar.presentation.RadarUiSectionMapperTest --tests io.blueeye.feature.radar.presentation.RadarUiMapperTest --tests io.blueeye.feature.radar.presentation.RadarUiFormatterTest --tests io.blueeye.feature.radar.presentation.RadarUiCardOrderTest --tests io.blueeye.feature.radar.presentation.RadarSectionViewMapperTest; echo P2C_V5_FOCUSED_CONTRACTS_PASS",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :core:data:detekt :core:domain:detekt :feature:radar:detekt :feature:radar:compileDebugKotlin :app:assembleDebug; git diff --check; echo P2C_V5_LOCAL_GATES_PASS",
+    "set -euo pipefail; git add core feature; git diff --cached --check; git status --short; git commit -m 'perf: add lightweight radar device path'; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo P2C_V5_COMMIT_PUSH_PASS"
+  ]
+}
