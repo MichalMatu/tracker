@@ -1,0 +1,19 @@
+{
+  "id": "tracker-docs-audit-20260912-v2",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 120,
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin main ui/radar-details-redesign; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = 'f9b0e00977016bcd7fec92a18754ef144c686d44'; echo '=== DOC FILES ==='; find docs -maxdepth 1 -type f -name '*.md' -print | sort",
+    "set -euo pipefail; echo '=== FIRST HEADINGS ==='; for f in docs/*.md; do printf '%s: ' \"$f\"; sed -n '1p' \"$f\"; done | sort",
+    "set -euo pipefail; echo '=== STATUS MARKERS ==='; grep -HnEi 'status|superseded|canonical|closed|blocked|unblocked' docs/*.md | head -n 500 || true; test -z \"$(git status --porcelain)\""
+  ]
+}
