@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-12T14:25:52.524751+00:00",
+  "task_id": "tracker-ui-p2c-dense120-fixture-run-20260912-v22",
+  "daemon_version": "4.18.20",
+  "pid": 8522
+}
