@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 3,
-  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :app:installDebug --console=plain; echo P2C_V24_INSTALL_PASS",
-  "pid": 17156,
+  "command": "set -euo pipefail; serial=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); adb -s \"$serial\" shell pm path io.blueeye | grep '^package:'; adb -s \"$serial\" shell dumpsys package io.blueeye | grep -m1 -E 'versionName=|versionCode=' || true; test -z \"$(git status --porcelain)\"; echo P2C_V24_READY_FOR_FIELD_WALK",
+  "pid": 17429,
   "timeout": 1800,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T14:34:50.817847+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-12T14:35:06.512276+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 3,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p2c-install-final-s22-20260912-v24",
@@ -18,5 +18,5 @@
   "task_digest": "7929898cdf9142eba50ff55b185eafbda7b5cff10a7257d5a4672e5887662ee7",
   "daemon_version": "4.18.20",
   "daemon_pid": 16890,
-  "updated_at": "2026-09-12T14:34:50.895425+00:00"
+  "updated_at": "2026-09-12T14:35:06.594354+00:00"
 }
