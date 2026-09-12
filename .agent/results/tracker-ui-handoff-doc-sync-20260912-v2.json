@@ -1,0 +1,116 @@
+{
+  "id": "tracker-ui-handoff-doc-sync-20260912-v2",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "started_at": "2026-09-12T11:13:25.217514+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin ui/radar-details-redesign; git checkout ui/radar-details-redesign; git merge --ff-only origin/ui/radar-details-redesign; test \"$(git rev-parse HEAD)\" = '89e15e3926107be925b9a1bf75cca8425f0347ff'; echo HANDOFF_DOC_V2_HEAD_VERIFIED",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch              ui/radar-details-redesign -> FETCH_HEAD\nSwitched to branch 'ui/radar-details-redesign'\nYour branch is behind 'origin/ui/radar-details-redesign' by 2 commits, and can be fast-forwarded.\n  (use \"git pull\" to update your local branch)\nUpdating 0d40dd14..89e15e39\nFast-forward\n docs/README.md                          |  40 +++++--\n docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md | 204 ++++++++++++++++++++++++++++++++\n 2 files changed, 237 insertions(+), 7 deletions(-)\n create mode 100644 docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md\nHANDOFF_DOC_V2_HEAD_VERIFIED\n",
+      "elapsed_seconds": 1.036,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.41,
+      "output_policy": "stream",
+      "captured_output_chars": 615,
+      "output_truncated": false,
+      "current_rss_mb": 3.41,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "printf '%s' 'CmZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aAoKcCA9IFBhdGgoImRvY3MvVUlfVVhfUkVERVNJR05fUExBTi5tZCIpCnMgPSBwLnJlYWRfdGV4dCgpCgpzID0gcy5yZXBsYWNlKCItIFBoYXNlIDQ6ICoqVU5CTE9DS0VEKioiLCAiLSBQaGFzZSA0OiAqKklOIFBST0dSRVNTKioiKQpzID0gcy5yZXBsYWNlKAogICAgIi0gQ3VycmVudCBmb2N1czogUmFkYXIgKyBEZXRhaWxzIHVzYWJpbGl0eSwgc3RhYmlsaXR5IGFuZCBwcmVzZW50YXRpb24gcGVyZm9ybWFuY2UiLAogICAgIi0gQ3VycmVudCBmb2N1czogKipQaGFzZSAyIFJhZGFyIGRhdGEtcGF0aC9wZXJmb3JtYW5jZSBjbGVhbnVwIChQMkMgbmV4dCkqKiIsCikKCmRlZiBjaGVja19zZWN0aW9uKHRleHQsIHN0YXJ0LCBlbmQpOgogICAgYSA9IHRleHQuaW5kZXgoc3RhcnQpCiAgICBiID0gdGV4dC5pbmRleChlbmQsIGEpCiAgICBibG9jayA9IHRleHRbYTpiXS5yZXBsYWNlKCItIFsgXSIsICItIFt4XSIpCiAgICByZXR1cm4gdGV4dFs6YV0gKyBibG9jayArIHRleHRbYjpdCgpzID0gY2hlY2tfc2VjdGlvbihzLCAiIyMgUGhhc2UgMCDigJQgQmFzZWxpbmUgYW5kIGd1YXJkcmFpbHMiLCAiIyMgUGhhc2UgMSDigJQgQ29tcGFjdCBSYWRhciBjYXJkcyIpCnMgPSBzLnJlcGxhY2UoCiAgICAiKipHYXRlOioqIGJhc2VsaW5lIGNhcHR1cmVkIGFuZCBVSSB3b3JrIGNhbiBiZSBjb21wYXJlZCB3aXRob3V0IGNoYW5naW5nIGZpZWxkIHNlbWFudGljcy4iLAogICAgIioqU3RhdHVzOiBDTE9TRUQuKiogQmFzZWxpbmUgY2FwdHVyZWQ7IHByaXZhdGUgZmllbGQgYXJ0aWZhY3RzIHJlbWFpbiBvdXRzaWRlIHRoZSByZXBvc2l0b3J5LiAiCiAgICAiVGhlIGNvbnRyb2xsZWQgMTIwLWl0ZW0gc2NlbmFyaW8gaXMgdXNlZCBmb3IgZGVuc2UtbGlzdCBhY2NlcHRhbmNlIGJlY2F1c2UgdGhlIGNhcHR1cmVkIGZpbmFsICIKICAgICIxODAtc2Vjb25kIGxpdmUgd2luZG93IGNvbnRhaW5lZCBmZXdlciByZWNlbnQgZGV2aWNlcy5cblxuIgogICAgIioqR2F0ZToqKiBQQVNTIOKAlCBiYXNlbGluZSBjYXB0dXJlZCBhbmQgVUkgd29yayBjYW4gYmUgY29tcGFyZWQgd2l0aG91dCBjaGFuZ2luZyBmaWVsZCBzZW1hbnRpY3MuIiwKKQoKcyA9IGNoZWNrX3NlY3Rpb24ocywgIiMjIFBoYXNlIDEg4oCUIENvbXBhY3QgUmFkYXIgY2FyZHMiLCAiIyMgUGhhc2UgMiDigJQgUmFkYXIgZGF0YS1wYXRoIGFuZCBwZXJmb3JtYW5jZSBjbGVhbnVwIikKcyA9IHMucmVwbGFjZSgKICAgICIqKkdhdGU6Kiogd2l0aCAxMDArIGRldmljZXMgYW5kIGxpdmUgUlNTSSB1cGRhdGVzLCBjYXJkcyB1bmRlciB0aGUgdXNlcidzIGZpbmdlciBkbyBub3QgbW92ZSBiZWNhdXNlIHRoZWlyIG93biBoZWlnaHQgY2hhbmdlcy4iLAogICAgIioqU3RhdHVzOiBDTE9TRUQgLyBBQ0NFUFRFRC4qKiBTZWUgYFVJX1VYX1BIQVNFMV9BQ0NFUFRBTkNFXzIwMjYtMDktMTIubWRgLiAiCiAgICAiVGhlIDEyMC1jYXJkIGluc3RydW1lbnRhdGlvbiBzdGFiaWxpdHkgdGVzdCBwYXNzZWQgb24gUzIyKywgYW5kIHJlYWwgbGl2ZSB1cGRhdGVzIHByZXNlcnZlZCBjYXJkIGdlb21ldHJ5LlxuXG4iCiAgICAiKipHYXRlOioqIFBBU1Mg4oCUIHdpdGggMTAwKyBjb250cm9sbGVkIGRldmljZXMgYW5kIGxpdmUtdmFsdWUgdXBkYXRlcywgY2FyZCBoZWlnaHQgcmVtYWlucyBzdGFibGUuIiwKKQoKbWFya2VyID0gIlRoZSBSYWRhciBtdXN0IG5vdCBidWlsZCBvciB0cmFuc3BvcnQgZnVsbCB0ZWNobmljYWwgZGV2aWNlIHN0YXRlIG1lcmVseSB0byBkcmF3IGEgY29tcGFjdCBsaXN0LlxuIgppbnNlcnQgPSAiIiJUaGUgUmFkYXIgbXVzdCBub3QgYnVpbGQgb3IgdHJhbnNwb3J0IGZ1bGwgdGVjaG5pY2FsIGRldmljZSBzdGF0ZSBtZXJlbHkgdG8gZHJhdyBhIGNvbXBhY3QgbGlzdC4KCioqQ3VycmVudCBzdGF0dXM6IElOIFBST0dSRVNTLioqCgpDb21wbGV0ZWQgc2xpY2VzOgoKLSAqKlAyQSBhY2NlcHRlZDoqKiBtb3ZlIGNvbWJpbmVkIFJhZGFyIHByZXNlbnRhdGlvbiB0cmFuc2Zvcm1hdGlvbiBvZmYgdGhlIFVJIHRocmVhZCB3aXRoIGBmbG93T24oRGlzcGF0Y2hlcnMuRGVmYXVsdClgLiBDb3JyZWN0ZWQgUzIyKyBwaHlzaWNhbCBydW46IDgxMyBmcmFtZXMsIDMwIGphbmt5ID0gKiozLjY5JSoqLCBwOTUgMTEgbXMsIHA5OSAzNCBtcywgbG9nY2hlY2sgUEFTUy4gVGhpcyBydW4gaGFkIDUgZnJlc2ggbGl2ZSByb3dzLCBzbyBpdCBwcm92ZXMgZGlyZWN0aW9uIGJ1dCBpcyBub3QgYSAxMDArIGxpdmUtZGVuc2l0eSBjbG9zdXJlLgotICoqUDJCIGFjY2VwdGVkOioqIHJlbW92ZSBkZWFkIGNvbXBhY3QtY2FyZCBwcmVzZW50YXRpb24gd29yayAoYHNlbnNvckRhdGFgLCBgY29ubmVjdGlvbkluZm9gLCBsZWdhY3kgYmFkZ2UvZXZpZGVuY2UgcHJlc2VudGF0aW9uIG1vZGVscy9mb3JtYXR0ZXJzIGFuZCBSYWRhciBzZW5zb3IvZXZpZGVuY2UgZm9ybWF0dGluZyBwYXRocykgd2hpbGUgcmV0YWluaW5nIGZ1bGwgYERldmljZS5ldmlkZW5jZWAgZm9yIGN1cnJlbnQgc2VjdGlvbiBjbGFzc2lmaWNhdGlvbi4gQWNjZXB0ZWQgY29kZSBjaGVja3BvaW50OiBgMGQ0MGRkMTQxODQ1NmY0MjAwOGEzNTIyMmFlMzBjMGEyNDk4ZDQxZGAuIExvY2FsIGRldGVrdC91bml0L2NvbXBpbGUvYXNzZW1ibGUgUEFTUzsgR2l0SHViIFF1YWxpdHkgIzE3MCBQQVNTOyBTZWNyZXQgU2NhbiAjMjAwIFBBU1MuCi0gQ3VycmVudCBjb250aW51YXRpb24gaGFuZG9mZjogW2BVSV9VWF9QSEFTRTJfSEFORE9GRl8yMDI2LTA5LTEyLm1kYF0oVUlfVVhfUEhBU0UyX0hBTkRPRkZfMjAyNi0wOS0xMi5tZCkuCi0gKipOZXh0OiBQMkMqKiDigJQgYXVkaXQgYW5kIHJlcGxhY2UgdGhlIHVwc3RyZWFtIGBTRUxFQ1QgKiAtPiBEZXZpY2VFbnRpdHkgLT4gRGV2aWNlIC0+IERldmljZUV2aWRlbmNlRmFjdG9yeWAgUmFkYXIgcGF0aCB3aXRoIHRoZSBzbWFsbGVzdCBiZWhhdmlvci1wcmVzZXJ2aW5nIGxpZ2h0d2VpZ2h0IHByb2plY3Rpb24vY29udHJhY3QuIERvIG5vdCBtb3ZlIHRvIERldGFpbHMgYmVmb3JlIGEgUGhhc2UgMiBjbG9zdXJlIGRlY2lzaW9uLgoiIiIKaWYgbWFya2VyIG5vdCBpbiBzOgogICAgcmFpc2UgU3lzdGVtRXhpdCgicGhhc2UyIG1hcmtlciBub3QgZm91bmQiKQpzID0gcy5yZXBsYWNlKG1hcmtlciwgaW5zZXJ0LCAxKQoKcyA9IHMucmVwbGFjZSgKICAgICItIFsgXSBLZWVwIHN0YWJsZSBsaXN0IGtleXMgYmFzZWQgb24gZmluZ2VycHJpbnQvc3RhYmxlIGlkZW50aXR5LiIsCiAgICAiLSBbeF0gS2VlcCBzdGFibGUgbGlzdCBrZXlzIGJhc2VkIG9uIGZpbmdlcnByaW50L3N0YWJsZSBpZGVudGl0eS4iLAopCnMgPSBzLnJlcGxhY2UoCiAgICAiLSBbIF0gTWVhc3VyZSByZWNvbXBvc2l0aW9uL2phbmsgYW5kIFVJLXRocmVhZCB3b3JrIGJlZm9yZSBhbmQgYWZ0ZXIgdGhlIGNoYW5nZS4iLAogICAgIi0gW3hdIE1lYXN1cmUgcmVjb21wb3NpdGlvbi9qYW5rIGFuZCBVSS10aHJlYWQgd29yayBiZWZvcmUgYW5kIGFmdGVyIHRoZSBjaGFuZ2UuICIKICAgICIoUDAvUDEvUDJBIHBoeXNpY2FsIG1lYXN1cmVtZW50cyByZWNvcmRlZDsgcmVwZWF0IGFmdGVyIHN0cnVjdHVyYWwgUDJDIGNsZWFudXAuKSIsCikKCnAud3JpdGVfdGV4dChzKQo=' | base64 -d | python3; git diff -- docs/UI_UX_REDESIGN_PLAN.md; git diff --check; grep -nE 'Phase 0|Status: CLOSED|Phase 1|CLOSED / ACCEPTED|Phase 2|P2A accepted|P2B accepted|Next: P2C' docs/UI_UX_REDESIGN_PLAN.md; echo HANDOFF_PLAN_SYNC_READY",
+      "exit_code": 0,
+      "output": "diff --git a/docs/UI_UX_REDESIGN_PLAN.md b/docs/UI_UX_REDESIGN_PLAN.md\nindex 1aedfee4..23bf26e2 100644\n--- a/docs/UI_UX_REDESIGN_PLAN.md\n+++ b/docs/UI_UX_REDESIGN_PLAN.md\n@@ -6,8 +6,8 @@\n - Working branch: `ui/radar-details-redesign`\n - Baseline `main`: `093b4257859abdbcc683f1620969b06195ade7a6`\n - Phase 3: **CLOSED / ACCEPTED**\n-- Phase 4: **UNBLOCKED**\n-- Current focus: Radar + Details usability, stability and presentation performance\n+- Phase 4: **IN PROGRESS**\n+- Current focus: **Phase 2 Radar data-path/performance cleanup (P2C next)**\n \n This document is the execution checklist for the next product iteration. Keep the checkboxes and acceptance gates current as work lands. UI work must remain isolated from scanner/parser/scoring behavior until the UI redesign is accepted.\n \n@@ -29,14 +29,16 @@ This document is the execution checklist for the next product iteration. Keep th\n \n ## Phase 0 — Baseline and guardrails\n \n-- [ ] Capture baseline screenshots of current Radar and Details on a representative dataset.\n-- [ ] Record a baseline long-list scenario (100+ recent devices) for later performance comparison.\n-- [ ] Keep all redesign changes on `ui/radar-details-redesign` until acceptance.\n-- [ ] Do not change BLE collection, parser, identity carryover, Follow-Me scoring or persistence semantics as part of visual cleanup.\n-- [ ] Treat information in three levels: **summary -> evidence/context -> technical/raw**.\n-- [ ] Define reusable stable-height rules for live cards instead of using layout growth as a side effect of incoming data.\n+- [x] Capture baseline screenshots of current Radar and Details on a representative dataset.\n+- [x] Record a baseline long-list scenario (100+ recent devices) for later performance comparison.\n+- [x] Keep all redesign changes on `ui/radar-details-redesign` until acceptance.\n+- [x] Do not change BLE collection, parser, identity carryover, Follow-Me scoring or persistence semantics as part of visual cleanup.\n+- [x] Treat information in three levels: **summary -> evidence/context -> technical/raw**.\n+- [x] Define reusable stable-height rules for live cards instead of using layout growth as a side effect of incoming data.\n \n-**Gate:** baseline captured and UI work can be compared without changing field semantics.\n+**Status: CLOSED.** Baseline captured; private field artifacts remain outside the repository. The controlled 120-item scenario is used for dense-list acceptance because the captured final 180-second live window contained fewer recent devices.\n+\n+**Gate:** PASS — baseline captured and UI work can be compared without changing field semantics.\n \n ## Phase 1 — Compact Radar cards\n \n@@ -49,37 +51,48 @@ Seen now · BLE\n SUSPICIOUS   WATCHLIST\n ```\n \n-- [ ] Remove the redundant `Details` button; tapping the card already opens Details.\n-- [ ] Remove the full evidence summary from each Radar card.\n-- [ ] Remove default `Source`, `Reason`, `Value`, raw payload and evidence chips from Radar.\n-- [ ] Remove calibration controls from Radar.\n-- [ ] Keep display name / user alias as the primary label.\n-- [ ] Keep vendor + classified type as compact secondary identity.\n-- [ ] Keep RSSI prominent and in a fixed slot.\n-- [ ] Keep `Seen now / Xs ago` freshness.\n-- [ ] Keep BLE / Classic technology as low-priority context.\n-- [ ] Show at most 1-2 important status badges such as `SUSPICIOUS`, `WATCHLIST` or `PUBLIC SAFETY`.\n-- [ ] Evaluate whether `SAFE` should be omitted when it adds no decision value.\n-- [ ] If Watchlist remains a quick action, use one compact icon in a fixed position instead of a full action row.\n-- [ ] Limit name and identity lines to one line each with ellipsis.\n-- [ ] Prevent badge wrapping from changing card height.\n-- [ ] Give every normal Radar card the same structural slots so live values do not reflow the list.\n-\n-**Gate:** with 100+ devices and live RSSI updates, cards under the user's finger do not move because their own height changes.\n+- [x] Remove the redundant `Details` button; tapping the card already opens Details.\n+- [x] Remove the full evidence summary from each Radar card.\n+- [x] Remove default `Source`, `Reason`, `Value`, raw payload and evidence chips from Radar.\n+- [x] Remove calibration controls from Radar.\n+- [x] Keep display name / user alias as the primary label.\n+- [x] Keep vendor + classified type as compact secondary identity.\n+- [x] Keep RSSI prominent and in a fixed slot.\n+- [x] Keep `Seen now / Xs ago` freshness.\n+- [x] Keep BLE / Classic technology as low-priority context.\n+- [x] Show at most 1-2 important status badges such as `SUSPICIOUS`, `WATCHLIST` or `PUBLIC SAFETY`.\n+- [x] Evaluate whether `SAFE` should be omitted when it adds no decision value.\n+- [x] If Watchlist remains a quick action, use one compact icon in a fixed position instead of a full action row.\n+- [x] Limit name and identity lines to one line each with ellipsis.\n+- [x] Prevent badge wrapping from changing card height.\n+- [x] Give every normal Radar card the same structural slots so live values do not reflow the list.\n+\n+**Status: CLOSED / ACCEPTED.** See `UI_UX_PHASE1_ACCEPTANCE_2026-09-12.md`. The 120-card instrumentation stability test passed on S22+, and real live updates preserved card geometry.\n+\n+**Gate:** PASS — with 100+ controlled devices and live-value updates, card height remains stable.\n \n ## Phase 2 — Radar data-path and performance cleanup\n \n The Radar must not build or transport full technical device state merely to draw a compact list.\n \n+**Current status: IN PROGRESS.**\n+\n+Completed slices:\n+\n+- **P2A accepted:** move combined Radar presentation transformation off the UI thread with `flowOn(Dispatchers.Default)`. Corrected S22+ physical run: 813 frames, 30 janky = **3.69%**, p95 11 ms, p99 34 ms, logcheck PASS. This run had 5 fresh live rows, so it proves direction but is not a 100+ live-density closure.\n+- **P2B accepted:** remove dead compact-card presentation work (`sensorData`, `connectionInfo`, legacy badge/evidence presentation models/formatters and Radar sensor/evidence formatting paths) while retaining full `Device.evidence` for current section classification. Accepted code checkpoint: `0d40dd1418456f42008a35222ae30c0a2498d41d`. Local detekt/unit/compile/assemble PASS; GitHub Quality #170 PASS; Secret Scan #200 PASS.\n+- Current continuation handoff: [`UI_UX_PHASE2_HANDOFF_2026-09-12.md`](UI_UX_PHASE2_HANDOFF_2026-09-12.md).\n+- **Next: P2C** — audit and replace the upstream `SELECT * -> DeviceEntity -> Device -> DeviceEvidenceFactory` Radar path with the smallest behavior-preserving lightweight projection/contract. Do not move to Details before a Phase 2 closure decision.\n+\n - [ ] Introduce a lightweight Radar projection/model (for example `RadarDeviceSummary`) containing only fields required by the list and sectioning logic.\n - [ ] Avoid loading full GATT/characteristic/raw technical fields for the Radar list where possible.\n - [ ] Avoid building and sorting the complete `DeviceEvidenceFactory` output for every visible/recent device solely for Radar rendering.\n - [ ] Preserve only the small set of precomputed decision flags needed for Radar sectioning and badges.\n - [ ] Decouple frequently changing presentation fields (RSSI/last seen) from expensive classification/evidence work.\n - [ ] Review the current 750 ms presentation cadence; use the slowest refresh that still feels live.\n-- [ ] Keep stable list keys based on fingerprint/stable identity.\n+- [x] Keep stable list keys based on fingerprint/stable identity.\n - [ ] Verify that one device update does not unnecessarily rebuild the whole visible tree.\n-- [ ] Measure recomposition/jank and UI-thread work before and after the change.\n+- [x] Measure recomposition/jank and UI-thread work before and after the change. (P0/P1/P2A physical measurements recorded; repeat after structural P2C cleanup.)\n - [ ] Run a 30-60 minute dense-scan UI soak.\n \n **Gate:** scrolling remains responsive as the recent-device population grows; no progressive slowdown attributable to Radar presentation work.\n8:- Phase 3: **CLOSED / ACCEPTED**\n10:- Current focus: **Phase 2 Radar data-path/performance cleanup (P2C next)**\n30:## Phase 0 — Baseline and guardrails\n39:**Status: CLOSED.** Baseline captured; private field artifacts remain outside the repository. The controlled 120-item scenario is used for dense-list acceptance because the captured final 180-second live window contained fewer recent devices.\n43:## Phase 1 — Compact Radar cards\n70:**Status: CLOSED / ACCEPTED.** See `UI_UX_PHASE1_ACCEPTANCE_2026-09-12.md`. The 120-card instrumentation stability test passed on S22+, and real live updates preserved card geometry.\n74:## Phase 2 — Radar data-path and performance cleanup\n82:- **P2A accepted:** move combined Radar presentation transformation off the UI thread with `flowOn(Dispatchers.Default)`. Corrected S22+ physical run: 813 frames, 30 janky = **3.69%**, p95 11 ms, p99 34 ms, logcheck PASS. This run had 5 fresh live rows, so it proves direction but is not a 100+ live-density closure.\n83:- **P2B accepted:** remove dead compact-card presentation work (`sensorData`, `connectionInfo`, legacy badge/evidence presentation models/formatters and Radar sensor/evidence formatting paths) while retaining full `Device.evidence` for current section classification. Accepted code checkpoint: `0d40dd1418456f42008a35222ae30c0a2498d41d`. Local detekt/unit/compile/assemble PASS; GitHub Quality #170 PASS; Secret Scan #200 PASS.\n85:- **Next: P2C** — audit and replace the upstream `SELECT * -> DeviceEntity -> Device -> DeviceEvidenceFactory` Radar path with the smallest behavior-preserving lightweight projection/contract. Do not move to Details before a Phase 2 closure decision.\n243:## Phase 10 — Deterministic reducer\n262:## Phase 11 — Versioned Analysis Bundle\n281:## Phase 12 — Optional AI Analyst\n301:## Phase 13 — Field feedback loop\n330:1. Phase 0 baseline/guardrails.\n331:2. Phase 1 compact Radar card.\n332:3. Phase 2 Radar performance/data projection.\nHANDOFF_PLAN_SYNC_READY\n",
+      "elapsed_seconds": 0.208,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.8,
+      "output_policy": "stream",
+      "captured_output_chars": 10030,
+      "output_truncated": false,
+      "current_rss_mb": 2.8,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; git add docs/UI_UX_REDESIGN_PLAN.md; git commit -m 'docs: sync UI plan through P2B'; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo HANDOFF_DOC_SYNC_PASS",
+      "exit_code": 0,
+      "output": "[ui/radar-details-redesign 372ac629] docs: sync UI plan through P2B\n 1 file changed, 41 insertions(+), 28 deletions(-)\nTo https://github.com/MichalMatu/tracker.git\n   89e15e39..372ac629  HEAD -> ui/radar-details-redesign\nHANDOFF_DOC_SYNC_PASS\n",
+      "elapsed_seconds": 2.037,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.03,
+      "output_policy": "stream",
+      "captured_output_chars": 243,
+      "output_truncated": false,
+      "current_rss_mb": 2.03,
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.036
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.208
+    },
+    {
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 2.037
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.103
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.073
+  },
+  "finished_at": "2026-09-12T11:13:30.547030+00:00",
+  "task_digest": "1328f46079a06ecd22580b68775a1afe85d0e3bcdecda65d9be5ad25df76915f",
+  "idle_timeout": 120,
+  "task_timeout": 900,
+  "memory_limit_mb": 2048,
+  "attempt_id": "e953f4bff6edd49679668751",
+  "daemon_version": "4.18.20"
+}
