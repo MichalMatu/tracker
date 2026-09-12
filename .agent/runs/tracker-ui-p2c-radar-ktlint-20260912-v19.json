@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 3,
+  "index": 4,
   "total": 5,
-  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:radar:ktlintMainSourceSetCheck; echo P2C_V19_RADAR_KTLINT_PASS",
-  "pid": 52522,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew --parallel --max-workers=3 qualityCheck; ./gradlew :app:assembleDebug; git diff --check; echo P2C_V19_FULL_GATES_PASS",
+  "pid": 52955,
   "timeout": 3600,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T13:58:29.021414+00:00",
-  "stage_name": "command-3",
-  "stage_index": 3,
+  "started_at": "2026-09-12T13:58:45.670133+00:00",
+  "stage_name": "command-4",
+  "stage_index": 4,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p2c-radar-ktlint-20260912-v19",
@@ -18,5 +18,5 @@
   "task_digest": "c684aacede0683e9211d8dd889b3ff20af19be4459c09b6f98413d19aeb077ab",
   "daemon_version": "4.18.20",
   "daemon_pid": 52101,
-  "updated_at": "2026-09-12T13:58:29.059973+00:00"
+  "updated_at": "2026-09-12T13:58:45.745872+00:00"
 }
