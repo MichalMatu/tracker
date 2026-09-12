@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 4,
+  "index": 5,
   "total": 5,
-  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew --parallel --max-workers=3 qualityCheck --console=plain; git diff --check; echo P3D_V45_QUALITY_PASS",
-  "pid": 51115,
+  "command": "set -euo pipefail; git add feature/details/src/main/java/io/blueeye/feature/details/DetailsCalibrationCard.kt feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt; git diff --cached --check; test \"$(git diff --cached --name-only | wc -l | tr -d ' ')\" = \"2\"; git commit -m 'ui: fold calibration into review actions'; test \"$(git rev-parse HEAD^)\" = \"6900d575b6e935b8e9bbe4c2477b902915111260\"; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo P3D_V45_PUSHED_SHA=$(git rev-parse HEAD)",
+  "pid": 51489,
   "timeout": 3600,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T19:47:27.002610+00:00",
-  "stage_name": "command-4",
-  "stage_index": 4,
+  "started_at": "2026-09-12T19:47:48.068077+00:00",
+  "stage_name": "command-5",
+  "stage_index": 5,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p3d-actions-calibration-20260912-v45",
@@ -18,5 +18,5 @@
   "task_digest": "135530732201769be4f41fb9906a368d1880f2a00924b823b59a383f4e6d462d",
   "daemon_version": "4.18.20",
   "daemon_pid": 50180,
-  "updated_at": "2026-09-12T19:47:27.076690+00:00"
+  "updated_at": "2026-09-12T19:47:48.150044+00:00"
 }
