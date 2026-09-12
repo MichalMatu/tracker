@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p0-dataset-baseline-20260912-v3",
+  "task_digest": "bd6273f10a9c6239a3e9de73799798b655f3bb205b47df0c69b4d5c1378a2bc4",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-12T04:12:16.420676+00:00",
+  "attempt_id": "1cd62cbf136e636cf7f29aeb",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 27109,
+  "updated_at": "2026-09-12T04:12:16.420843+00:00",
+  "pid": 27109
+}
