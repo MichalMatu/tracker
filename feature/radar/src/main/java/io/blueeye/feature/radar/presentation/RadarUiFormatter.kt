@@ -10,8 +10,7 @@ import kotlin.math.min
 
 @Suppress("MagicNumber", "CyclomaticComplexMethod", "MaxLineLength")
 object RadarUiFormatter {
-    fun formatVendorAndType(device: Device): String =
-        formatVendorAndType(device.toRadarSummaryForUi())
+    fun formatVendorAndType(device: Device): String = formatVendorAndType(device.toRadarSummaryForUi())
 
     fun formatVendorAndType(device: RadarDeviceSummary): String {
         val vendor = RadarIdentityUiFormatter.knownVendorName(device)
@@ -21,8 +20,7 @@ object RadarUiFormatter {
         return listOfNotNull(vendor, type).joinToString(separator = " • ")
     }
 
-    fun formatSignalInfo(device: Device): RadarUiSignalInfo =
-        formatSignalInfo(device.toRadarSummaryForUi())
+    fun formatSignalInfo(device: Device): RadarUiSignalInfo = formatSignalInfo(device.toRadarSummaryForUi())
 
     fun formatSignalInfo(device: RadarDeviceSummary): RadarUiSignalInfo {
         val minRssi = -100
@@ -88,8 +86,7 @@ object RadarUiFormatter {
         )
     }
 
-    fun formatIcons(device: Device): RadarUiIcons =
-        formatIcons(device.toRadarSummaryForUi())
+    fun formatIcons(device: Device): RadarUiIcons = formatIcons(device.toRadarSummaryForUi())
 
     fun formatIcons(device: RadarDeviceSummary): RadarUiIcons =
         RadarUiIcons(

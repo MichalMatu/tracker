@@ -18,8 +18,7 @@ object RadarIdentityUiFormatter {
             device.predictedModel.isMeaningfulIdentityValue() ||
             device.vendorName.isKnownVendorName()
 
-    fun knownVendorName(device: RadarDeviceSummary): String? =
-        device.vendorName?.takeIf { it.isKnownVendorName() }
+    fun knownVendorName(device: RadarDeviceSummary): String? = device.vendorName?.takeIf { it.isKnownVendorName() }
 
     private fun fallbackDisplayName(device: RadarDeviceSummary): String =
         if (device.technology.contains(BLE_TECHNOLOGY, ignoreCase = true)) {

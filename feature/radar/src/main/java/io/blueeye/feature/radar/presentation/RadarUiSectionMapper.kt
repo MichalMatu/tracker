@@ -29,8 +29,7 @@ object RadarUiSectionMapper {
             else -> RadarUiSectionType.NEARBY
         }
 
-    private fun RadarUiItem.isWatchlistSignal(): Boolean =
-        isInWatchlist || evidenceSignals.hasWatchlistEvidence
+    private fun RadarUiItem.isWatchlistSignal(): Boolean = isInWatchlist || evidenceSignals.hasWatchlistEvidence
 
     private fun RadarUiItem.hasSuspiciousTrackingSignal(): Boolean =
         calibrationLabel == DeviceCalibrationLabel.SUSPICIOUS ||
