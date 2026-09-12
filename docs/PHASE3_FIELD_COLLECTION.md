@@ -1,3 +1,5 @@
+> **HISTORICAL STATUS NOTICE:** Phase 3 is ACCEPTED / CLOSED and Phase 4 is UNBLOCKED. This file is retained as stabilization provenance; do not use any older NEXT ACTION, pending-walk status, pre-field build, or blocked-phase statement below as current instructions. Current work starts from docs/README.md and docs/UI_UX_REDESIGN_PLAN.md.
+
 # Phase 3 Engineering Field Collection
 
 Status: **TARGETED PHYSICAL ACCEPTANCE + EXACT-BUILD PRE-SMOKE PASS; FINAL VARIED-DENSITY WALK/CAPTURE PENDING**

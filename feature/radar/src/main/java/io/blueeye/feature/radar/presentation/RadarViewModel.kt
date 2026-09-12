@@ -3,23 +3,22 @@ package io.blueeye.feature.radar.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.blueeye.core.domain.calibration.suppressesTracking
-import io.blueeye.core.domain.calibration.toCalibrationDeviceConfig
 import io.blueeye.core.domain.model.DeviceFilter
 import io.blueeye.core.domain.repository.ActiveCollectionRepository
 import io.blueeye.core.domain.repository.WatchlistRepository
 import io.blueeye.core.domain.scanner.ScannerRuntimeController
 import io.blueeye.core.domain.scanner.ScannerRuntimeState
-import io.blueeye.core.domain.usecase.GetScannedDevicesUseCase
-import io.blueeye.core.model.Device
-import io.blueeye.core.model.DeviceCalibrationLabel
+import io.blueeye.core.domain.usecase.GetRadarDevicesUseCase
 import io.blueeye.core.model.DeviceType
+import io.blueeye.core.model.RadarDeviceSummary
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -30,7 +29,7 @@ import javax.inject.Inject
 class RadarViewModel
     @Inject
     constructor(
-        getScannedDevicesUseCase: GetScannedDevicesUseCase,
+        getRadarDevicesUseCase: GetRadarDevicesUseCase,
         private val deviceRepository: io.blueeye.core.domain.repository.DeviceRepository,
         private val watchlistRepository: WatchlistRepository,
         private val scannerRuntimeController: ScannerRuntimeController,
@@ -74,7 +73,7 @@ class RadarViewModel
         // BLE room does not force Compose to rebuild the visible card tree dozens of times/second.
         @OptIn(FlowPreview::class)
         private val rawDevicesFlow =
-            getScannedDevicesUseCase(sinceSecondsAgo = 180)
+            getRadarDevicesUseCase(sinceSecondsAgo = 180)
                 .sample(UI_REFRESH_INTERVAL_MS)
 
         private val activeProbeFlow = deviceRepository.getActiveProbe()
@@ -142,6 +141,7 @@ class RadarViewModel
                     }
                 )
             }
+                .flowOn(Dispatchers.Default)
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(5000),
@@ -149,9 +149,9 @@ class RadarViewModel
                 )
 
         private fun applyFilter(
-            devices: List<Device>,
+            devices: List<RadarDeviceSummary>,
             filter: DeviceFilter,
-        ): List<Device> {
+        ): List<RadarDeviceSummary> {
             if (!filter.isActive()) return devices
 
             return devices.filter { device ->
@@ -181,7 +181,7 @@ class RadarViewModel
             }
         }
 
-        private fun updateAvailableVendors(devices: List<Device>) {
+        private fun updateAvailableVendors(devices: List<RadarDeviceSummary>) {
             val vendors =
                 devices
                     .mapNotNull { it.vendorName }
@@ -196,10 +196,10 @@ class RadarViewModel
             }
         }
 
-        fun toggleBaseline(currentDevices: List<Device>) {
+        fun toggleBaseline(currentFingerprints: List<String>) {
             baselineDevices.update { current ->
                 if (current == null) {
-                    currentDevices.map { it.fingerprint }.toSet()
+                    currentFingerprints.toSet()
                 } else {
                     null
                 }
@@ -222,26 +222,9 @@ class RadarViewModel
             }
         }
 
-        fun toggleWatchlist(device: Device) {
+        fun toggleWatchlist(fingerprint: String) {
             viewModelScope.launch {
-                watchlistRepository.toggleWatchlist(device.fingerprint)
-            }
-        }
-
-        fun updateCalibrationLabel(
-            device: Device,
-            label: DeviceCalibrationLabel,
-        ) {
-            viewModelScope.launch {
-                val result =
-                    deviceRepository.updateDeviceConfig(
-                        fingerprint = device.fingerprint,
-                        config = device.toCalibrationDeviceConfig(label),
-                    )
-                if (result.isSuccess) {
-                    deviceRepository.setIgnoredForTracking(device.fingerprint, label.suppressesTracking())
-                    deviceRepository.setCalibrationLabel(device.fingerprint, label)
-                }
+                watchlistRepository.toggleWatchlist(fingerprint)
             }
         }
 

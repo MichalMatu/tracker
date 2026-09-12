@@ -6,6 +6,7 @@ import io.blueeye.core.data.db.dao.SignalSampleDao
 import io.blueeye.core.data.db.entity.DeviceEntity
 import io.blueeye.core.data.db.entity.SignalSampleEntity
 import io.blueeye.core.data.db.entity.WatchlistEntity
+import io.blueeye.core.data.db.projection.RadarDeviceProjection
 import io.blueeye.core.data.repository.handler.classic.ClassicDevicePersister
 import io.blueeye.core.data.repository.handler.classic.ClassicScanDataContext
 import io.blueeye.core.data.repository.handler.common.DeviceTypePriorityHelper
@@ -533,6 +534,9 @@ class AppleDeduplicationScenariosTest {
         override suspend fun updateWatchlistForMerge(entry: WatchlistEntity) {}
         override suspend fun mergeDevices(targetFingerprint: String, duplicateFingerprint: String) {}
         override fun getRecentDevicesFlow(sinceTimestamp: Long): Flow<List<DeviceEntity>> = flowOf(emptyList())
+        override fun getRecentRadarDevicesFlow(
+            sinceTimestamp: Long,
+        ): Flow<List<RadarDeviceProjection>> = flowOf(emptyList())
         override fun getWatchlistDevicesFlow(): Flow<List<DeviceEntity>> = flowOf(emptyList())
         override suspend fun getSafeBeacons(): List<DeviceEntity> = emptyList()
         override fun getByTrackingStatus(status: TrackingStatus): Flow<List<DeviceEntity>> = flowOf(emptyList())

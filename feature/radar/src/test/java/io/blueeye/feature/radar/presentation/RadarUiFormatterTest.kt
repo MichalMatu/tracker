@@ -1,9 +1,7 @@
 package io.blueeye.feature.radar.presentation
 
 import io.blueeye.core.model.Device
-import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.DeviceType
-import io.blueeye.core.model.IdentityCarryoverVerdict
 import io.blueeye.core.model.MacAddressType
 import io.blueeye.core.model.TrackingStatus
 import org.junit.Assert.assertEquals
@@ -41,27 +39,6 @@ class RadarUiFormatterTest {
     }
 
     @Test
-    fun `connection labels are neutral text without alarm symbols`() {
-        val cases =
-            listOf(
-                device(connectionStatus = "FAILED", connectionAttempts = 2) to "RETRY 2",
-                device(connectionStatus = "FAILED_PERMANENT") to "FAILED",
-                device(connectionStatus = "PROBING") to "PROBING",
-                device(connectionStatus = "NONE", technology = "CLASSIC") to "CLASSIC",
-                device(connectionStatus = "UNKNOWN", isConnectable = false) to "BROADCAST",
-                device(connectionStatus = "UNKNOWN", rssi = -94) to "WEAK",
-                device(connectionStatus = "NONE") to "PENDING",
-            )
-
-        cases.forEach { (device, expectedText) ->
-            val info = RadarUiFormatter.formatConnectionInfo(device)
-
-            assertEquals(expectedText, info.text)
-            assertNeutral(info.text)
-        }
-    }
-
-    @Test
     fun `public safety type labels remain signal based instead of confirmed device claims`() {
         val cases =
             listOf(
@@ -94,84 +71,6 @@ class RadarUiFormatterTest {
             assertEquals(expectedLabel, text)
             assertNoConfirmedPublicSafetyClaim(text)
         }
-    }
-
-    @Test
-    fun `badges expose user calibration verdict`() {
-        val cases =
-            listOf(
-                DeviceCalibrationLabel.TRUE_POSITIVE to ("TRUE POSITIVE" to RadarUiColorToken.SUSPICIOUS),
-                DeviceCalibrationLabel.FALSE_POSITIVE to ("FALSE POSITIVE" to RadarUiColorToken.SAFE),
-                DeviceCalibrationLabel.KNOWN_SAFE to ("KNOWN SAFE" to RadarUiColorToken.SAFE),
-                DeviceCalibrationLabel.SUSPICIOUS to ("USER SUSPICIOUS" to RadarUiColorToken.SUSPICIOUS),
-                DeviceCalibrationLabel.UNKNOWN to (null to RadarUiColorToken.GRAY),
-            )
-
-        cases.forEach { (label, expected) ->
-            val badges =
-                RadarUiFormatter.formatBadges(
-                    device(
-                        DeviceSpec(
-                            connectionStatus = "UNKNOWN",
-                            calibrationLabel = label,
-                        ),
-                    ),
-                )
-
-            assertEquals(expected.first, badges.calibrationBadge)
-            assertEquals(expected.second, badges.calibrationColor)
-        }
-    }
-
-    @Test
-    fun `badges expose reviewed identity carryover verdict when calibration is unknown`() {
-        val badges =
-            RadarUiFormatter.formatBadges(
-                device(
-                    DeviceSpec(
-                        connectionStatus = "UNKNOWN",
-                        identityCarryoverVerdict = IdentityCarryoverVerdict.FALSE_MATCH,
-                    ),
-                ),
-            )
-
-        assertEquals("FALSE MATCH", badges.calibrationBadge)
-        assertEquals(RadarUiColorToken.WARNING, badges.calibrationColor)
-    }
-
-    @Test
-    fun `calibration badge takes priority over identity carryover verdict`() {
-        val badges =
-            RadarUiFormatter.formatBadges(
-                device(
-                    DeviceSpec(
-                        connectionStatus = "UNKNOWN",
-                        calibrationLabel = DeviceCalibrationLabel.KNOWN_SAFE,
-                        identityCarryoverVerdict = IdentityCarryoverVerdict.FALSE_MATCH,
-                    ),
-                ),
-            )
-
-        assertEquals("KNOWN SAFE", badges.calibrationBadge)
-        assertEquals(RadarUiColorToken.SAFE, badges.calibrationColor)
-    }
-
-    @Test
-    fun `watchlist paused badge does not replace connection status`() {
-        val badges =
-            RadarUiFormatter.formatBadges(
-                device(
-                    DeviceSpec(
-                        connectionStatus = "NONE",
-                        isInWatchlist = true,
-                        isTrackingEnabled = false,
-                    ),
-                ),
-            )
-
-        assertEquals("ALERTS PAUSED", badges.watchlistBadge)
-        assertEquals(RadarUiColorToken.WARNING, badges.watchlistColor)
-        assertEquals("PENDING", badges.statusBadge)
     }
 
     @Test
@@ -230,30 +129,18 @@ class RadarUiFormatterTest {
         }
     }
 
-    private fun assertNeutral(text: String) {
-        ALARM_SYMBOLS.forEach { symbol ->
-            assertFalse(text.contains(symbol))
-        }
-    }
-
     private data class DeviceSpec(
         val connectionStatus: String,
-        val connectionAttempts: Int = 0,
         val technology: String = "BLE",
         val isConnectable: Boolean? = true,
         val rssi: Int = -55,
         val vendorName: String? = "Unknown Vendor",
         val deviceType: DeviceType = DeviceType.UNKNOWN,
-        val calibrationLabel: DeviceCalibrationLabel = DeviceCalibrationLabel.UNKNOWN,
-        val identityCarryoverVerdict: IdentityCarryoverVerdict = IdentityCarryoverVerdict.UNREVIEWED,
         val trackingStatus: TrackingStatus = TrackingStatus.SAFE,
-        val isInWatchlist: Boolean = false,
-        val isTrackingEnabled: Boolean = true,
     )
 
     private fun device(
         connectionStatus: String,
-        connectionAttempts: Int = 0,
         technology: String = "BLE",
         isConnectable: Boolean? = true,
         rssi: Int = -55,
@@ -261,7 +148,6 @@ class RadarUiFormatterTest {
         device(
             DeviceSpec(
                 connectionStatus = connectionStatus,
-                connectionAttempts = connectionAttempts,
                 technology = technology,
                 isConnectable = isConnectable,
                 rssi = rssi,
@@ -281,26 +167,21 @@ class RadarUiFormatterTest {
             trackingStatus = spec.trackingStatus,
             followingScore = 0f,
             isSafeBeacon = false,
-            isInWatchlist = spec.isInWatchlist,
+            isInWatchlist = false,
             userAlias = null,
             userNotes = null,
             alertSound = false,
             alertVibration = false,
-            isTrackingEnabled = spec.isTrackingEnabled,
             firstSeenAt = NOW,
             lastSeenAt = NOW,
             rssi = spec.rssi,
             encounterCount = 1,
             isConnectable = spec.isConnectable,
             connectionStatus = spec.connectionStatus,
-            connectionAttempts = spec.connectionAttempts,
-            calibrationLabel = spec.calibrationLabel,
-            identityCarryoverVerdict = spec.identityCarryoverVerdict,
         )
 
     private companion object {
         private const val NOW = 1_789_000_000_000L
-        private val ALARM_SYMBOLS = listOf("\u26A0", "\u274C", "\u26A1", "\uD83D\uDEA8")
         private val PUBLIC_SAFETY_OVERCLAIMS =
             listOf(
                 "police",

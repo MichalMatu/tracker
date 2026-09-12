@@ -27,46 +27,59 @@ fun CalibrationCard(
     device: Device,
     onSelectLabel: (DeviceCalibrationLabel) -> Unit,
 ) {
-    val calibrationInfo = DetailsCalibrationUiFormatter.format(device)
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
     ) {
-        Column(
+        CalibrationContent(
+            device = device,
+            onSelectLabel = onSelectLabel,
             modifier = Modifier.padding(Dimens.PaddingMedium),
-            verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
-        ) {
-            Text(
-                text = "Calibration",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Text(
-                text = calibrationInfo.statusText,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = calibrationInfo.description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            CalibrationActionRow(
-                actions = calibrationInfo.actions.take(CalibrationActionLayout.FIRST_ROW_ACTION_COUNT),
-                onSelectLabel = onSelectLabel,
-            )
-            CalibrationActionRow(
-                actions =
-                    calibrationInfo.actions
-                        .drop(CalibrationActionLayout.FIRST_ROW_ACTION_COUNT)
-                        .take(CalibrationActionLayout.SECOND_ROW_ACTION_COUNT),
-                onSelectLabel = onSelectLabel,
-            )
-            CalibrationActionRow(
-                actions = calibrationInfo.actions.drop(CalibrationActionLayout.LAST_ROW_START_INDEX),
-                onSelectLabel = onSelectLabel,
-            )
-        }
+        )
+    }
+}
+
+@Composable
+internal fun CalibrationContent(
+    device: Device,
+    onSelectLabel: (DeviceCalibrationLabel) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val calibrationInfo = DetailsCalibrationUiFormatter.format(device)
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
+    ) {
+        Text(
+            text = "Calibration",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Text(
+            text = calibrationInfo.statusText,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            text = calibrationInfo.description,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        CalibrationActionRow(
+            actions = calibrationInfo.actions.take(CalibrationActionLayout.FIRST_ROW_ACTION_COUNT),
+            onSelectLabel = onSelectLabel,
+        )
+        CalibrationActionRow(
+            actions =
+                calibrationInfo.actions
+                    .drop(CalibrationActionLayout.FIRST_ROW_ACTION_COUNT)
+                    .take(CalibrationActionLayout.SECOND_ROW_ACTION_COUNT),
+            onSelectLabel = onSelectLabel,
+        )
+        CalibrationActionRow(
+            actions = calibrationInfo.actions.drop(CalibrationActionLayout.LAST_ROW_START_INDEX),
+            onSelectLabel = onSelectLabel,
+        )
     }
 }
 

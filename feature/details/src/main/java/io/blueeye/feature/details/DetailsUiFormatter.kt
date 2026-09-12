@@ -1,5 +1,7 @@
 package io.blueeye.feature.details
 
+import io.blueeye.core.model.Device
+import io.blueeye.core.model.MacAddressType
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -28,6 +30,24 @@ object DetailsUiFormatter {
             "${formatDate.format(time.time)} ${formatTime.format(time.time)}"
         }
     }
+
+    fun formatIdentity(device: Device): List<Pair<String, String>> =
+        buildList {
+            add("Vendor" to (device.vendorName ?: device.manufacturerName ?: "Unknown"))
+            (device.modelNumber ?: device.predictedModel)
+                ?.takeIf(String::isNotBlank)
+                ?.let { model -> add("Model" to model) }
+            add("Type" to device.deviceType.name)
+            add("Technology" to device.technology)
+            add("Address context" to formatAddressContext(device))
+        }
+
+    private fun formatAddressContext(device: Device): String =
+        when (device.macAddressType) {
+            MacAddressType.PUBLIC -> "${device.macAddress} (public)"
+            MacAddressType.RANDOM -> "Random / rotating address"
+            MacAddressType.UNKNOWN -> "Address type unknown"
+        }
 
     fun formatPhy(
         primary: Int?,

@@ -1,3 +1,5 @@
+> **HISTORICAL STATUS NOTICE:** This Phase 1 audit is retained as stabilization provenance. Phase 3 is now ACCEPTED / CLOSED; current work starts from `docs/README.md` and the active plan named there.
+
 # Stable Core Preimplementation Audit
 
 Date: 2026-09-06

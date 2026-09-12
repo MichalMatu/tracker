@@ -3,6 +3,7 @@ package io.blueeye.core.data.db.dao
 import androidx.room.Dao
 import androidx.room.Query
 import io.blueeye.core.data.db.entity.DeviceEntity
+import io.blueeye.core.data.db.projection.RadarDeviceProjection
 import io.blueeye.core.model.TrackingStatus
 import kotlinx.coroutines.flow.Flow
 
@@ -10,6 +11,41 @@ import kotlinx.coroutines.flow.Flow
 interface DeviceSearchDao {
     @Query("SELECT * FROM devices WHERE lastSeenAt > :sinceTimestamp ORDER BY lastRssi DESC")
     fun getRecentDevicesFlow(sinceTimestamp: Long): Flow<List<DeviceEntity>>
+
+    @Query(
+        """
+        SELECT
+            fingerprint,
+            lastMacAddress,
+            technology,
+            lastDeviceName,
+            deviceType,
+            vendorName,
+            manufacturerId,
+            predictedModel,
+            trackingStatus,
+            followingScore,
+            isSafeBeacon,
+            isInWatchlist,
+            userAlias,
+            isIgnoredForTracking,
+            calibrationLabel,
+            lastRssi,
+            firstSeenAt,
+            lastSeenAt,
+            txPower,
+            isConnectable,
+            classOfDevice,
+            beaconType,
+            connectionStatus,
+            gattServices,
+            lastRawData
+        FROM devices
+        WHERE lastSeenAt > :sinceTimestamp
+        ORDER BY lastRssi DESC
+        """,
+    )
+    fun getRecentRadarDevicesFlow(sinceTimestamp: Long): Flow<List<RadarDeviceProjection>>
 
     @Query("SELECT * FROM devices WHERE lastSeenAt > :sinceTimestamp ORDER BY lastRssi DESC")
     suspend fun getRecentDevicesSnapshot(sinceTimestamp: Long): List<DeviceEntity>
@@ -25,12 +61,12 @@ interface DeviceSearchDao {
 
     @Query(
         """
-        SELECT * FROM devices 
-        WHERE lastDeviceName LIKE '%' || :query || '%' 
+        SELECT * FROM devices
+        WHERE lastDeviceName LIKE '%' || :query || '%'
            OR userAlias LIKE '%' || :query || '%'
            OR vendorName LIKE '%' || :query || '%'
         ORDER BY lastSeenAt DESC
-    """,
+        """,
     )
     fun searchDevices(query: String): Flow<List<DeviceEntity>>
 
@@ -47,6 +83,4 @@ interface DeviceSearchDao {
         gattServices: String,
         excludeFingerprint: String,
     ): DeviceEntity?
-
-
 }

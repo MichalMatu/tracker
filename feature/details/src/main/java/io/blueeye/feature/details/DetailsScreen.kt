@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
@@ -26,7 +25,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -53,7 +50,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceConnectionState
 import io.blueeye.core.model.SensorData
-import io.blueeye.core.ui.R
 import io.blueeye.core.ui.stableLiveHeight
 import io.blueeye.core.ui.theme.BlueEyeTheme
 import io.blueeye.core.ui.theme.Dimens
@@ -73,8 +69,8 @@ fun DetailsScreen(
     val services by viewModel.discoveredServices.collectAsStateWithLifecycle(initialValue = emptyList())
     val sensorData by viewModel.sensorData.collectAsStateWithLifecycle(initialValue = null)
 
-    val showEditDialog = remember { mutableStateOf(false) }
-    val showRawDataDialog = remember { mutableStateOf(false) }
+    val showEditDialog = remember(fingerprint) { mutableStateOf(false) }
+    val showRawDataDialog = remember(fingerprint) { mutableStateOf(false) }
 
     if (showEditDialog.value && device != null) {
         EditDeviceDialog(
@@ -99,21 +95,10 @@ fun DetailsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(
-                            text = device?.getDisplayName() ?: "Unknown Device",
-                            style = MaterialTheme.typography.titleMedium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(
-                            text = fingerprint,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
+                    Text(
+                        text = "Details",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
@@ -124,38 +109,9 @@ fun DetailsScreen(
                     IconButton(onClick = { viewModel.refreshFocusedScan() }) {
                         Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh focused scan")
                     }
-                    IconButton(onClick = { showEditDialog.value = true }) {
-                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
-                    }
-                    IconButton(onClick = { showRawDataDialog.value = true }) {
-                        Icon(imageVector = Icons.Default.Info, contentDescription = "Raw Data")
-                    }
                 }
             )
         },
-        floatingActionButton = {
-            device?.let { dev ->
-                FloatingActionButton(onClick = { viewModel.toggleWatchlist() }) {
-                    Icon(
-                        painter =
-                            painterResource(
-                                id =
-                                    if (dev.isInWatchlist) {
-                                        R.drawable.ic_visibility_off
-                                    } else {
-                                        R.drawable.ic_visibility
-                                    },
-                            ),
-                        contentDescription =
-                            if (dev.isInWatchlist) {
-                                "Remove from watchlist"
-                            } else {
-                                "Watch device"
-                            },
-                    )
-                }
-            }
-        }
     ) { paddingValues ->
         Column(
             modifier =
@@ -167,26 +123,8 @@ fun DetailsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             device?.let { dev ->
-                // Header Info
+                // Decision-first content: summary, tracking/signal, key evidence, identity, then review/actions.
                 HeaderCard(dev)
-
-                DetailsEvidenceSection(evidence = dev.evidence)
-
-                if (alertEvidenceEvents.isNotEmpty()) {
-                    DetailsAlertHistoryCard(events = alertEvidenceEvents)
-                }
-
-                CalibrationCard(
-                    device = dev,
-                    onSelectLabel = { viewModel.updateCalibrationLabel(it) },
-                )
-
-                // Connection Control
-                ConnectionCard(
-                    connectionState = connectionState,
-                    onConnect = { viewModel.connect() },
-                    onDisconnect = { viewModel.disconnect() }
-                )
 
                 if (signalSamples.isNotEmpty()) {
                     DetailsSignalHistoryCard(samples = signalSamples)
@@ -196,51 +134,52 @@ fun DetailsScreen(
                     DetailsFollowMeHistoryCard(samples = followMeHistory)
                 }
 
-                // Sensor Data
-                if (sensorData != null) {
-                    SensorDataCard(sensorData!!)
+                DetailsKeyEvidenceSection(evidence = dev.evidence)
+
+                InfoSection(
+                    title = "Identity",
+                    items = DetailsUiFormatter.formatIdentity(dev),
+                )
+
+                DetailsActionsReviewCard(
+                    device = dev,
+                    onToggleWatchlist = { viewModel.toggleWatchlist() },
+                    onEdit = { showEditDialog.value = true },
+                    onSelectCalibrationLabel = { viewModel.updateCalibrationLabel(it) },
+                )
+
+                if (alertEvidenceEvents.isNotEmpty()) {
+                    DetailsAlertHistoryCard(events = alertEvidenceEvents)
                 }
 
-                // Info Sections
-                InfoSection("Identity",
-                    listOf(
-                        "Vendor" to (dev.vendorName ?: "Unknown"),
-                        "Technology" to dev.technology,
-                        "Type" to dev.deviceType.name
-                    )
+                InfoSection(
+                    title = "History",
+                    items =
+                        listOf(
+                            "First Seen" to DetailsUiFormatter.formatFriendlyTimestamp(dev.firstSeenAt),
+                            "Last Seen" to DetailsUiFormatter.formatFriendlyTimestamp(dev.lastSeenAt),
+                            "Encounters" to dev.encounterCount.toString(),
+                        ),
                 )
 
-                InfoSection("Activity",
-                    listOf(
-                        "First Seen" to DetailsUiFormatter.formatFriendlyTimestamp(dev.firstSeenAt),
-                        "Last Seen" to DetailsUiFormatter.formatFriendlyTimestamp(dev.lastSeenAt),
-                        "Encounters" to dev.encounterCount.toString()
-                    )
+                DetailsTechnicalSection(
+                    state =
+                        DetailsTechnicalState(
+                            device = dev,
+                            connectionState = connectionState,
+                            sensorData = sensorData,
+                            services = services,
+                        ),
+                    onConnect = { viewModel.connect() },
+                    onDisconnect = { viewModel.disconnect() },
+                    onOpenRawData = { showRawDataDialog.value = true },
                 )
 
-                InfoSection("Radio",
-                    listOf(
-                        "PHY" to DetailsUiFormatter.formatPhy(dev.primaryPhy, dev.secondaryPhy),
-                        "Interval" to (dev.advertisingIntervalMs?.let { "~${it}ms" } ?: "Unknown"),
-                        "Beacon Type" to (dev.beaconType ?: "N/A")
+                if (dev.evidence.isNotEmpty()) {
+                    DetailsEvidenceSection(
+                        evidence = dev.evidence,
+                        title = "All evidence",
                     )
-                )
-
-                // Extended Info (Conditional)
-                val extendedProps =
-                    listOfNotNull(
-                        dev.modelNumber?.let { "Model" to it },
-                        dev.serialNumber?.let { "Serial" to it },
-                        dev.firmwareRevision?.let { "Firmware" to it },
-                        dev.batteryLevel?.let { "Battery" to "$it%" }
-                    )
-                if (extendedProps.isNotEmpty()) {
-                    InfoSection("Extended Info", extendedProps)
-                }
-
-                // Services
-                if (services.isNotEmpty()) {
-                    InfoSection("Services (${services.size})", services.map { it.uuid to it.name })
                 }
 
                 Spacer(Modifier.height(Dimens.PaddingExtraLarge * 2)) // Spacing for FAB
@@ -288,8 +227,66 @@ fun HeaderCard(device: Device) {
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                 )
+                Text(
+                    text = "Last seen ${DetailsUiFormatter.formatFriendlyTimestamp(device.lastSeenAt)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
                 DetailsDecisionSummaryText(summary)
             }
+        }
+    }
+}
+
+@Composable
+fun DetailsActionsReviewCard(
+    device: Device,
+    onToggleWatchlist: () -> Unit,
+    onEdit: () -> Unit,
+    onSelectCalibrationLabel: (io.blueeye.core.model.DeviceCalibrationLabel) -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth().stableLiveHeight(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+        Column(
+            modifier = Modifier.padding(Dimens.PaddingMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
+        ) {
+            Text(
+                text = "Actions / Review",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = "Manage Watchlist status, profile, alert preferences and calibration for this device.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
+            ) {
+                OutlinedButton(
+                    onClick = onToggleWatchlist,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(if (device.isInWatchlist) "Remove Watchlist" else "Add Watchlist")
+                }
+                Button(
+                    onClick = onEdit,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Edit profile & alerts")
+                }
+            }
+            HorizontalDivider()
+            CalibrationContent(
+                device = device,
+                onSelectLabel = onSelectCalibrationLabel,
+            )
         }
     }
 }
