@@ -66,4 +66,6 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
 }
