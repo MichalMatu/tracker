@@ -1,0 +1,19 @@
+{
+  "id": "tracker-docs-final-audit-20260912-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 120,
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin main ui/radar-details-redesign; git checkout ui/radar-details-redesign; git merge --ff-only origin/ui/radar-details-redesign; test \"$(git rev-parse HEAD)\" = '72a7bb879e4537190eaca5298146acb6ecde25ca'; echo '=== DIFF CHECK ==='; git diff --check origin/main...HEAD; echo '=== CHANGED FILES ==='; git diff --name-status origin/main...HEAD; echo '=== DIFF STAT ==='; git diff --stat origin/main...HEAD",
+    "set -euo pipefail; echo '=== REQUIRED ENTRYPOINTS ==='; for f in README.md AGENTS.md CONTRIBUTING.md FIELD_SESSION_CHECKLIST.md .github/PULL_REQUEST_TEMPLATE.md docs/README.md docs/UI_UX_REDESIGN_PLAN.md docs/PRODUCT_GOAL.md docs/ARCHITECTURE_CURRENT.md docs/SANDBOX_EXECUTION_FLOW.md docs/PHASE3_FIELD_REACCEPTANCE_CLOSURE_2026-09-11.md; do test -f \"$f\"; echo \"OK $f\"; done; grep -q 'PHASE 3 ACCEPTED / CLOSED; PHASE 4 UNBLOCKED' docs/PHASE3_FIELD_REACCEPTANCE_CLOSURE_2026-09-11.md; grep -q 'Active plan' docs/UI_UX_REDESIGN_PLAN.md; grep -q 'Current project status' docs/README.md || grep -q 'Current project status' README.md",
+    "set -euo pipefail; echo '=== STALE ACTIVE POINTER CHECK ==='; active='README.md AGENTS.md CONTRIBUTING.md FIELD_SESSION_CHECKLIST.md .github/PULL_REQUEST_TEMPLATE.md docs/README.md docs/UI_UX_REDESIGN_PLAN.md docs/PRODUCT_GOAL.md docs/ARCHITECTURE_CURRENT.md docs/SANDBOX_EXECUTION_FLOW.md'; ! grep -nE 'physical field evidence pending|PAUSED until the recovery stability gate|Read `docs/STABILITY_RECOVERY_GUIDE.md` and its `NEXT ACTION`|Canonical product/recovery plan: `docs/STABILITY_RECOVERY_GUIDE.md`|Which phase from docs/STABILITY_RECOVERY_GUIDE.md' $active; grep -q 'HISTORICAL STATUS NOTICE' docs/STABILITY_RECOVERY_GUIDE.md; grep -q 'HISTORICAL STATUS NOTICE' docs/PHASE3_HANDOFF.md; grep -q 'HISTORICAL STATUS NOTICE' docs/PHASE3_FIELD_COLLECTION.md; grep -q 'HISTORICAL STATUS NOTICE' docs/PHASE3_PRE_FIELD_GOLDEN.md; grep -q 'HISTORICAL STATUS NOTICE' docs/PHASE3_TARGETED_PHYSICAL_ACCEPTANCE.md; echo DOC_STATUS_AUDIT_PASS; test -z \"$(git status --porcelain)\""
+  ]
+}
