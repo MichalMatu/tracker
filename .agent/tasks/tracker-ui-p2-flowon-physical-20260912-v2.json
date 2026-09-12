@@ -1,0 +1,19 @@
+{
+  "id": "tracker-ui-p2-flowon-physical-20260912-v2",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 4096,
+  "command_timeout": 900,
+  "idle_timeout": 180,
+  "task_timeout": 1800,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin ui/radar-details-redesign; git checkout ui/radar-details-redesign; git merge --ff-only origin/ui/radar-details-redesign; test \"$(git rev-parse HEAD)\" = 'ae35d7e218cd0efa983ff74570916ce50e0ac97f'; echo P2_FLOWON_V2_HEAD_VERIFIED",
+    "set -euo pipefail; ADB=adb; SERIAL=$($ADB devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$SERIAL\"; test \"$($ADB -s \"$SERIAL\" shell getprop ro.product.model | tr -d '\\r')\" = 'SM-S906B'; $ADB -s \"$SERIAL\" shell am force-stop io.blueeye; $ADB -s \"$SERIAL\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null; sleep 2; OUT=\"$HOME/agent-workspace/repos/tracker/checkpoints/ui-p2-flowon-v2-20260912\"; mkdir -p \"$OUT\"; FOUND=0; for i in 0 1 2 3 4; do $ADB -s \"$SERIAL\" shell uiautomator dump /sdcard/p2-v2-nav.xml >/dev/null; $ADB -s \"$SERIAL\" pull /sdcard/p2-v2-nav.xml \"$OUT/nav-$i.xml\" >/dev/null; if grep -q 'content-desc=\"Scan\"' \"$OUT/nav-$i.xml\"; then FOUND=1; cp \"$OUT/nav-$i.xml\" \"$OUT/radar.xml\"; break; fi; $ADB -s \"$SERIAL\" shell input keyevent 4; sleep 1; done; test \"$FOUND\" -eq 1; echo P2_FLOWON_RADAR_NAV_PASS; if grep -q 'text=\"Paused\"' \"$OUT/radar.xml\"; then python3 -c \"import re,subprocess,pathlib; s=pathlib.Path('$OUT/radar.xml').read_text(); m=re.search(r'content-desc=\\\"Scan\\\"[^>]*bounds=\\\"\\[([0-9]+),([0-9]+)\\]\\[([0-9]+),([0-9]+)\\]\\\"',s); assert m,'Scan button not found'; x=(int(m.group(1))+int(m.group(3)))//2; y=(int(m.group(2))+int(m.group(4)))//2; subprocess.check_call(['adb','-s','$SERIAL','shell','input','tap',str(x),str(y)])\"; echo P2_FLOWON_SCAN_STARTED; fi; sleep 20; $ADB -s \"$SERIAL\" shell uiautomator dump /sdcard/p2-v2-live.xml >/dev/null; $ADB -s \"$SERIAL\" pull /sdcard/p2-v2-live.xml \"$OUT/live.xml\" >/dev/null; SEEN=$(grep -o 'text=\"Seen ' \"$OUT/live.xml\" | wc -l | tr -d ' '); echo P2_FLOWON_LIVE_ROWS=$SEEN; test \"$SEEN\" -gt 0",
+    "set -euo pipefail; ADB=adb; SERIAL=$($ADB devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); OUT=\"$HOME/agent-workspace/repos/tracker/checkpoints/ui-p2-flowon-v2-20260912\"; $ADB -s \"$SERIAL\" shell dumpsys gfxinfo io.blueeye reset >/dev/null || true; SIZE=$($ADB -s \"$SERIAL\" shell wm size | tail -n1 | grep -oE '[0-9]+x[0-9]+' | tail -n1); W=${SIZE%x*}; H=${SIZE#*x}; X=$((W/2)); Y1=$((H*78/100)); Y2=$((H*32/100)); for i in $(seq 1 8); do $ADB -s \"$SERIAL\" shell input swipe $X $Y1 $X $Y2 240 >/dev/null; sleep 0.12; done; for i in $(seq 1 8); do $ADB -s \"$SERIAL\" shell input swipe $X $Y2 $X $Y1 240 >/dev/null; sleep 0.12; done; $ADB -s \"$SERIAL\" shell dumpsys gfxinfo io.blueeye > \"$OUT/gfxinfo.txt\"; grep -E 'Total frames rendered|Janky frames|50th percentile|90th percentile|95th percentile|99th percentile' \"$OUT/gfxinfo.txt\"; FRAMES=$(grep 'Total frames rendered:' \"$OUT/gfxinfo.txt\" | head -n1 | awk '{print $4}'); test \"${FRAMES:-0}\" -gt 0; PID=$($ADB -s \"$SERIAL\" shell pidof io.blueeye | tr -d '\\r'); test -n \"$PID\"; $ADB -s \"$SERIAL\" shell logcat -d --pid=\"$PID\" -t 1200 > \"$OUT/logcat-tail.txt\"; ! grep -Eq 'FATAL EXCEPTION|AndroidRuntime: FATAL|OutOfMemoryError|SQLiteException|SecurityException' \"$OUT/logcat-tail.txt\"; test -z \"$(git status --porcelain)\"; echo P2_FLOWON_V2_PHYSICAL_PASS"
+  ]
+}
