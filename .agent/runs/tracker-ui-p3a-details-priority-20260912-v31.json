@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p3a-details-priority-20260912-v31",
+  "task_digest": "f3a92ca8cd1f6ace3a55763d893793534833b653a2ef957b6a63121060ede552",
+  "idle_timeout": 300,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T18:15:07.435582+00:00",
+  "attempt_id": "193b567e34898f9f485e2813",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 57538,
+  "updated_at": "2026-09-12T18:15:07.435647+00:00",
+  "pid": 57538
+}
