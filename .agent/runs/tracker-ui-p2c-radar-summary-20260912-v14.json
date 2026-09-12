@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 3,
+  "index": 4,
   "total": 5,
-  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :core:data:testDebugUnitTest --tests io.blueeye.core.data.evidence.DeviceEvidenceFactoryRadarSignalsTest; ./gradlew :feature:radar:testDebugUnitTest --tests io.blueeye.feature.radar.presentation.RadarUiSectionMapperTest --tests io.blueeye.feature.radar.presentation.RadarUiMapperTest --tests io.blueeye.feature.radar.presentation.RadarUiFormatterTest --tests io.blueeye.feature.radar.presentation.RadarUiCardOrderTest --tests io.blueeye.feature.radar.presentation.RadarSectionViewMapperTest; echo P2C_V14_FOCUSED_CONTRACTS_PASS",
-  "pid": 5661,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :core:model:detekt :core:data:detekt :core:domain:detekt :feature:radar:detekt :feature:radar:compileDebugKotlin :app:assembleDebug; git diff --check; if grep -R --line-number --fixed-strings 'item.device' feature/radar/src/main/java; then echo 'stale item.device reference found' >&2; exit 1; fi; echo P2C_V14_LOCAL_GATES_PASS",
+  "pid": 5959,
   "timeout": 1800,
   "idle_timeout": 600,
   "memory_limit_mb": 6144,
-  "started_at": "2026-09-12T13:25:25.031290+00:00",
-  "stage_name": "command-3",
-  "stage_index": 3,
+  "started_at": "2026-09-12T13:25:37.931536+00:00",
+  "stage_name": "command-4",
+  "stage_index": 4,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p2c-radar-summary-20260912-v14",
@@ -18,5 +18,5 @@
   "task_digest": "e7eb70b9a179d0ef8636d065e36ac6ac290226c92eacfec7087ef0148befeec6",
   "daemon_version": "4.18.20",
   "daemon_pid": 5354,
-  "updated_at": "2026-09-12T13:25:25.049239+00:00"
+  "updated_at": "2026-09-12T13:25:38.004279+00:00"
 }
