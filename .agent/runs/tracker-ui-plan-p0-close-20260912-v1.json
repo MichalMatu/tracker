@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "tracker-ui-plan-p0-close-20260912-v1",
   "task_digest": "0c11de88df261795af565fb4affdd292f18c6fcb7ceea51292bf587d3fe1db47",
-  "idle_timeout": 60,
-  "task_timeout": 300,
-  "memory_limit_mb": 1024,
-  "started_at": "2026-09-12T04:22:30.096630+00:00",
+  "status": "failed",
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-12T04:22:32.971619+00:00",
   "attempt_id": "1dcf905fa4809ecd20883c4d",
   "daemon_version": "4.18.20",
   "daemon_pid": 41094,
-  "updated_at": "2026-09-12T04:22:30.096813+00:00",
+  "updated_at": "2026-09-12T04:22:33.276528+00:00",
   "pid": 41094
 }
