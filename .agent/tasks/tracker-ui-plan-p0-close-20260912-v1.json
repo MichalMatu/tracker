@@ -1,0 +1,19 @@
+{
+  "id": "tracker-ui-plan-p0-close-20260912-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 1024,
+  "command_timeout": 120,
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin ui/radar-details-redesign; git checkout ui/radar-details-redesign; git merge --ff-only origin/ui/radar-details-redesign; test \"$(git rev-parse HEAD)\" = '502bca5e36dd786c945e249001c46bc0578f71a2'",
+    "set -euo pipefail; python3 - <<'PY'\nfrom pathlib import Path\np=Path('docs/UI_UX_REDESIGN_PLAN.md')\ns=p.read_text()\ns=s.replace('- Current focus: Radar + Details usability, stability and presentation performance', '- Current focus: **P1 — compact Radar cards** (P0 baseline closed)')\nold='''- [ ] Capture baseline screenshots of current Radar and Details on a representative dataset.\n- [ ] Record a baseline long-list scenario (100+ recent devices) for later performance comparison.\n- [ ] Keep all redesign changes on `ui/radar-details-redesign` until acceptance.\n- [ ] Do not change BLE collection, parser, identity carryover, Follow-Me scoring or persistence semantics as part of visual cleanup.\n- [ ] Treat information in three levels: **summary -> evidence/context -> technical/raw**.\n- [ ] Define reusable stable-height rules for live cards instead of using layout growth as a side effect of incoming data.\n\n**Gate:** baseline captured and UI work can be compared without changing field semantics.'''\nnew='''- [x] Capture baseline screenshots of current Radar and Details on a representative dataset.\n- [x] Record a baseline long-list scenario for later performance comparison: physical DB density measured read-only, plus a controlled 120-item non-production dense-list scenario because the current 180 s window contains only 16 devices.\n- [x] Keep all redesign changes on `ui/radar-details-redesign` until acceptance.\n- [x] Do not change BLE collection, parser, identity carryover, Follow-Me scoring or persistence semantics as part of visual cleanup.\n- [x] Treat information in three levels: **summary -> evidence/context -> technical/raw**.\n- [x] Define reusable stable-height rules for live cards instead of using layout growth as a side effect of incoming data.\n\n**Gate: PASS.** Baseline screenshots, S22+ gfxinfo and read-only dataset counts are recorded in `UI_UX_BASELINE_P0_2026-09-12.md`; field semantics were not changed.'''\nif old not in s:\n    raise SystemExit('Phase 0 block did not match expected text')\ns=s.replace(old,new,1)\np.write_text(s)\nPY\ngit diff --check; git diff -- docs/UI_UX_REDESIGN_PLAN.md",
+    "set -euo pipefail; git add docs/UI_UX_REDESIGN_PLAN.md; git commit -m 'Close UI UX Phase 0 checklist'; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo UI_P0_PLAN_CLOSE_PASS; git rev-parse HEAD"
+  ]
+}
