@@ -1,0 +1,17 @@
+{
+  "id": "tracker-ui-phase2-closure-20260912-v28",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "repository": "MichalMatu/tracker",
+  "repo_id": "tracker",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 3600,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; echo P2C_V28_BASELINE_OK",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-phase2-closure-v28.py | python3; git diff --check; test -n \"$(git diff --name-only)\"; test -z \"$(git diff --name-only | grep -v '^docs/' || true)\"; test \"$(git diff --name-only | wc -l | tr -d ' ')\" = \"3\"; grep -q 'Phase 2 is CLOSED / ACCEPTED' docs/UI_UX_PHASE2_CLOSURE_2026-09-12.md; grep -q '## Phase 2 — CLOSED / ACCEPTED' docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md; grep -q 'Current status: CLOSED / ACCEPTED' docs/UI_UX_REDESIGN_PLAN.md; echo P2C_V28_DOCS_READY",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew --parallel --max-workers=3 qualityCheck --console=plain; git diff --check; echo P2C_V28_QUALITY_PASS",
+    "set -euo pipefail; git add docs/UI_UX_PHASE2_CLOSURE_2026-09-12.md docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md docs/UI_UX_REDESIGN_PLAN.md; git diff --cached --check; test -z \"$(git diff --cached --name-only | grep -v '^docs/' || true)\"; git commit -m 'docs: close UI UX phase 2'; new_sha=$(git rev-parse HEAD); test \"$(git rev-parse HEAD^)\" = \"47fe5306b0d5bfa4b3769ebd4353e4c2bfaf7ab4\"; git push origin HEAD:ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; echo P2C_V28_PUSHED_SHA=$new_sha"
+  ]
+}
