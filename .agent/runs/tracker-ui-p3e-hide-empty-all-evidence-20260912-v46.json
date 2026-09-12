@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 5,
-  "command": "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p3e-hide-empty-all-evidence-v46.py | python3; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:ktlintFormat --console=plain; git diff --check; test \"$(git status --porcelain | sed 's/^...//')\" = \"feature/details/src/main/java/io/blueeye/feature/details/DetailsScreen.kt\"; echo P3E_V46_PATCH_READY",
-  "pid": 60413,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:details:testDebugUnitTest --tests io.blueeye.feature.details.DetailsEvidenceUiFormatterTest :feature:details:ktlintCheck :feature:details:detekt :feature:details:compileDebugKotlin :app:assembleDebug --console=plain; echo P3E_V46_FOCUSED_PASS",
+  "pid": 60504,
   "timeout": 3600,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T19:58:15.375256+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-12T19:58:21.176071+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p3e-hide-empty-all-evidence-20260912-v46",
@@ -18,5 +18,5 @@
   "task_digest": "0fefd0fcf0685c7f0cdc1a5ad2ce4abf64667b6789ae467ee6e4b9d6a0ffc366",
   "daemon_version": "4.18.20",
   "daemon_pid": 60185,
-  "updated_at": "2026-09-12T19:58:15.467801+00:00"
+  "updated_at": "2026-09-12T19:58:21.205765+00:00"
 }
