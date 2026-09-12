@@ -109,9 +109,6 @@ fun DetailsScreen(
                     IconButton(onClick = { viewModel.refreshFocusedScan() }) {
                         Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh focused scan")
                     }
-                    IconButton(onClick = { showRawDataDialog.value = true }) {
-                        Icon(imageVector = Icons.Default.Info, contentDescription = "Raw Data")
-                    }
                 }
             )
         },
@@ -175,6 +172,7 @@ fun DetailsScreen(
                         ),
                     onConnect = { viewModel.connect() },
                     onDisconnect = { viewModel.disconnect() },
+                    onOpenRawData = { showRawDataDialog.value = true },
                 )
 
                 if (dev.evidence.isNotEmpty()) {
