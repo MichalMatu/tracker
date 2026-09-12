@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p2c-radar-ktlint-20260912-v19",
+  "task_digest": "c684aacede0683e9211d8dd889b3ff20af19be4459c09b6f98413d19aeb077ab",
+  "idle_timeout": 300,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T13:58:24.336556+00:00",
+  "attempt_id": "19777acba13b305c3556e98a",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 52101,
+  "updated_at": "2026-09-12T13:58:24.336663+00:00",
+  "pid": 52101
+}
