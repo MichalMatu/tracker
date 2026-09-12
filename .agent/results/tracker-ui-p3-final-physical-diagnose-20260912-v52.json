@@ -1,0 +1,9 @@
+{
+  "id": "tracker-ui-p3-final-physical-diagnose-20260912-v52",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "started_at": null,
+  "finished_at": "2026-09-12T21:04:06.177428+00:00",
+  "daemon_version": "4.18.20",
+  "error": "JSONDecodeError: Expecting ',' delimiter: line 12 column 632 (char 1595)"
+}
