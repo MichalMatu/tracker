@@ -138,7 +138,6 @@ class RadarSectionViewMapperTest {
             fingerprint = fingerprint,
             displayName = fingerprint,
             vendorAndType = "",
-            sensorData = null,
             signalInfo =
                 RadarUiSignalInfo(
                     rssi = -60,
@@ -158,39 +157,15 @@ class RadarSectionViewMapperTest {
                     isWarning = false,
                     cardBackgroundColor = null,
                 ),
-            connectionInfo =
-                RadarUiConnectionInfo(
-                    isVisible = false,
-                    text = "",
-                    textColor = RadarUiColorToken.TRANSPARENT,
-                ),
             icons =
                 RadarUiIcons(
                     mainIconRes = 0,
                     isConnectable = false,
                 ),
-            badges =
-                RadarBadgeInfo(
-                    techBadge = "BLE",
-                    techColor = RadarUiColorToken.PRIMARY,
-                    privacyBadge = "PUBLIC",
-                    watchlistBadge = null,
-                    watchlistColor = RadarUiColorToken.GRAY,
-                    statusBadge = null,
-                    statusColor = RadarUiColorToken.SAFE,
-                    calibrationBadge = null,
-                    calibrationColor = RadarUiColorToken.GRAY,
-                    batteryText = null,
-                    temperatureText = null,
-                    humidityText = null,
-                    voltageText = null,
-                    extraText = null,
-                ),
             isNew = false,
             isInWatchlist = false,
             isIgnored = false,
             nameColor = RadarUiColorToken.PRIMARY,
-            evidenceInfo = null,
         )
 
     private fun device(fingerprint: String): Device =
