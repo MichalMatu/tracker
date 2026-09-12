@@ -199,10 +199,12 @@ fun DetailsScreen(
                     InfoSection("Services (${services.size})", services.map { it.uuid to it.name })
                 }
 
-                DetailsEvidenceSection(
-                    evidence = dev.evidence,
-                    title = "All evidence",
-                )
+                if (dev.evidence.isNotEmpty()) {
+                    DetailsEvidenceSection(
+                        evidence = dev.evidence,
+                        title = "All evidence",
+                    )
+                }
 
                 Spacer(Modifier.height(Dimens.PaddingExtraLarge * 2)) // Spacing for FAB
             } ?: run {
