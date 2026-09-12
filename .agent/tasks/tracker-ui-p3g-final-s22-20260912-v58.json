@@ -1,0 +1,16 @@
+{
+  "id": "tracker-ui-p3g-final-s22-20260912-v58",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1800,
+  "idle_timeout": 900,
+  "task_timeout": 3600,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin ui/radar-details-redesign main agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"e1e09df50caf7cf9939420d42bd48bfb21ea6823\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"e1e09df50caf7cf9939420d42bd48bfb21ea6823\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; echo P3G_V58_BASELINE_OK",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p3g-final-s22-v58.sh > /tmp/tracker-ui-p3g-final-s22-v58.sh; chmod +x /tmp/tracker-ui-p3g-final-s22-v58.sh; /tmp/tracker-ui-p3g-final-s22-v58.sh",
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"e1e09df50caf7cf9939420d42bd48bfb21ea6823\"; test \"$(git rev-parse origin/ui/radar-details-redesign)\" = \"e1e09df50caf7cf9939420d42bd48bfb21ea6823\"; test \"$(git rev-parse origin/main)\" = \"093b4257859abdbcc683f1620969b06195ade7a6\"; echo P3G_V58_TREE_CLEAN_EXACT_SHA"
+  ]
+}
