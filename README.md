@@ -1,11 +1,11 @@
 # BlueEye Tracker
 
 <p align="center">
-  <strong>Android Bluetooth/BLE observation app focused on evidence, not hype.</strong>
+  <strong>Android Bluetooth/BLE situational-awareness app focused on evidence, local analysis and explainable decisions.</strong>
 </p>
 
 <p align="center">
-  Observe nearby Bluetooth devices, track known devices over time, and harden the scanning pipeline step by step.
+  Observe nearby Bluetooth devices, track meaningful patterns over time, keep raw evidence inspectable, and reduce RF noise before deeper analysis.
 </p>
 
 <p align="center">
@@ -16,7 +16,6 @@
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android-3DDC84">
   <img alt="Language" src="https://img.shields.io/badge/language-Kotlin-7F52FF">
   <img alt="Build JDK" src="https://img.shields.io/badge/JDK-21-blue">
-  <img alt="Status" src="https://img.shields.io/badge/status-stabilization-orange">
 </p>
 
 ---
@@ -26,102 +25,78 @@
 BlueEye Tracker is an Android app for:
 
 - passively observing nearby **Bluetooth / BLE** devices,
-- recording evidence and metadata about seen devices,
+- recording signal history and evidence about observations,
 - watching for reappearance of known devices,
-- presenting device details, RSSI history and decoded BLE data,
-- supporting a gradual, testable stabilization process.
+- detecting repeated presence across time and confirmed movement without claiming certainty about intent,
+- inspecting RSSI history, identity/evidence context and decoded Bluetooth data,
+- progressively reducing noisy field data into a small number of meaningful, explainable candidates.
 
-This project is currently in a **stability recovery phase**. The code works, but product trust depends on hardening runtime behavior before new feature expansion.
-
-> The app can surface Bluetooth evidence. It must not present unsupported claims about identity, intent, or real-world attribution from Bluetooth alone.
+> The app can surface Bluetooth evidence and behavioral patterns. It must not present unsupported claims about a person's identity, malicious intent, ownership, exact device location, or real-world attribution from Bluetooth alone.
 
 ## Current status
 
-- **Current branch policy:** work directly on `main`
-- **Current recovery phase:** **Phase 3 — ingest pressure, queueing and drop visibility**
-- **Last completed milestone:** **Phase 2 — deterministic scanner/service lifecycle (software + physical acceptance PASS)**
-- **Pre-field software gate:** **Phase 3 hardening + full Android emulator UI E2E PASS; physical field evidence pending**
-- **Immutable field candidate:** `v1.0.0-phase3-pre-field.1`
-- **Build/runtime standard:** **JDK 21** runtime/toolchain, **JVM 17** bytecode target
+- **Accepted baseline:** `main`
+- **Phase 3 field reacceptance:** **ACCEPTED / CLOSED**
+- **Phase 4:** **UNBLOCKED**
+- **Current workstream:** Radar + Details UX/performance redesign
+- **Current redesign branch:** `ui/radar-details-redesign`
+- **Build/runtime standard:** JDK 21 runtime/toolchain, JVM 17 bytecode target
 
-Core execution docs:
+The final authoritative Phase 3 closure is:
 
-- [Stability Recovery Guide](docs/STABILITY_RECOVERY_GUIDE.md)
-- [Phase 2 Closure Re-Audit](docs/PHASE2_CLOSURE_AUDIT.md)
-- [Phase 3 New-Chat Handoff](docs/PHASE3_HANDOFF.md)
-- [Phase 3 Pre-Field Golden Candidate](docs/PHASE3_PRE_FIELD_GOLDEN.md)
-- [Stable Core Preimplementation Audit](docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md)
-- [Sandbox Execution Flow](docs/SANDBOX_EXECUTION_FLOW.md)
-- [Quality Gate](docs/QUALITY_GATE.md)
+- [Phase 3 Final Field Reacceptance Closure](docs/PHASE3_FIELD_REACCEPTANCE_CLOSURE_2026-09-11.md)
 
-## Install BlueEye Tracker
+The active implementation roadmap is:
 
-### Phase 3 pre-field golden — use this for the next phone test
+- [UI/UX Redesign and Analysis Pipeline Plan](docs/UI_UX_REDESIGN_PLAN.md)
 
-For the next physical/ADB validation, use the immutable build `v1.0.0-phase3-pre-field.1`. Do not switch to a newer rolling tester during the same field session.
+For the complete current-vs-historical documentation map, start at:
 
-- [**Download the exact pre-field APK**](https://github.com/MichalMatu/tracker/releases/download/v1.0.0-phase3-pre-field.1/BlueEye-Tracker-v1.0.0-phase3-pre-field.1-debug.apk)
-- [SHA-256 checksum](https://github.com/MichalMatu/tracker/releases/download/v1.0.0-phase3-pre-field.1/BlueEye-Tracker-v1.0.0-phase3-pre-field.1-debug.apk.sha256)
-- [Immutable release notes](https://github.com/MichalMatu/tracker/releases/tag/v1.0.0-phase3-pre-field.1)
-- [Pre-field golden manifest](docs/PHASE3_PRE_FIELD_GOLDEN.md)
+- [Documentation Index](docs/README.md)
 
-The immutable release is a **debug-signed engineering build** intended for the Phase 3 phone/ADB validation. The release tag identifies the exact source used to build it.
+## Product direction
 
-### Tester build — persistent download
+The project is deliberately local-first:
 
-A rolling tester APK is refreshed automatically after every successful **Quality** run on `main` and does not expire like a CI artifact.
+```text
+Bluetooth observations
+  -> deterministic parsing
+  -> local noise reduction / identity / encounters / movement / RSSI summaries
+  -> explainable local candidates and verdict
+  -> optional compact Analysis Bundle
+  -> optional AI analyst for ambiguous multi-signal reasoning
+```
 
-- [Download the latest tester release](https://github.com/MichalMatu/tracker/releases/tag/latest-tester)
-- [Browse all releases](https://github.com/MichalMatu/tracker/releases)
+Collection, persistence, parsing and baseline detection must work without cloud or AI access. The intended future AI mode receives a reduced, versioned evidence bundle rather than an unrestricted raw database dump, and its assessment remains separate from the local verdict.
 
-The rolling release contains:
+See [Product Goal](docs/PRODUCT_GOAL.md) for the product and claim boundaries.
 
-- `BlueEye-Tracker-latest-tester-debug.apk`
-- matching `.sha256` checksum
+## Current UX work
 
-Version tags such as `v1.0.0-stable-core.1` can also create immutable versioned tester releases.
+The current redesign follows progressive disclosure:
 
-> Current releases are **debug-signed tester builds**, not production-signed Play Store releases. Installing over an APK signed with another debug key may require uninstalling the previous build first.
+- **Radar:** compact identity, RSSI/freshness and attention state; no default technical dump.
+- **Details:** decision summary first, then Tracking & Signal, key evidence and identity.
+- **Technical Peek:** UUIDs, manufacturer data, PHY/GATT and raw advertisement remain accessible but collapsed by default.
+- **RSSI history:** retained as a first-class Details visualization.
+- **Sightings map:** planned per-device view using observation GPS/accuracy; it represents where the phone observed a signal, not exact device location.
 
-### Latest CI build — exact commit snapshot
-
-Every successful `main` build also publishes short-lived GitHub Actions artifacts:
-
-1. Open [Quality workflow runs](https://github.com/MichalMatu/tracker/actions/workflows/quality.yml)
-2. Open the newest successful run on `main`
-3. Scroll to **Artifacts**
-4. Download:
-   - `tracker-debug-<SHA>` — debug APK
-   - `tracker-source-<SHA>` — exact source snapshot used by CI
-
-Use **Releases** for normal tester downloads and **Actions artifacts** when you need a build tied to one exact commit SHA.
+The detailed checklist and acceptance gates live in [docs/UI_UX_REDESIGN_PLAN.md](docs/UI_UX_REDESIGN_PLAN.md).
 
 ## Project flow
 
 ```mermaid
 flowchart LR
-    A[Passive BLE scan] --> B[Ingest and normalize observations]
-    B --> C[Persist evidence and session data]
-    C --> D[Classify and enrich safely]
-    D --> E[Radar / Device details / History]
+    A[Passive Bluetooth scan] --> B[Normalize and parse observations]
+    B --> C[Persist device and signal evidence]
+    C --> D[Local identity / classification / Follow-Me analysis]
+    D --> E[Radar / Details / History]
     C --> F[Watchlist matching]
     F --> G[User-facing alerts]
+    D --> H[Deterministic reducer - planned]
+    H --> I[Compact Analysis Bundle - planned]
+    I --> J[Optional AI analyst - planned]
 ```
-
-## Stabilization strategy
-
-The project is intentionally being recovered in phases.
-
-1. **Phase 1 — BLE-only Stable Core** ✅
-2. **Phase 2 — deterministic scanner/service lifecycle** ✅
-3. **Phase 3 — ingest pressure, queueing and drop visibility**
-4. **Phase 4 — alert ownership and cancellation**
-5. **Phase 5 — identity and deduplication hardening**
-6. **Phase 6 — Radar/history semantics and diagnostics**
-7. **Phase 7 — physical-device validation**
-8. **Phase 8 — controlled reintroduction of advanced features**
-
-The canonical checklist lives in [docs/STABILITY_RECOVERY_GUIDE.md](docs/STABILITY_RECOVERY_GUIDE.md).
 
 ## Architecture at a glance
 
@@ -136,6 +111,24 @@ feature:*      screens and feature ViewModels
 ```
 
 More detail: [docs/ARCHITECTURE_CURRENT.md](docs/ARCHITECTURE_CURRENT.md)
+
+## Install BlueEye Tracker
+
+### Tester build
+
+A rolling tester APK is refreshed after successful canonical build/release automation on `main`.
+
+- [Latest tester release](https://github.com/MichalMatu/tracker/releases/tag/latest-tester)
+- [All releases](https://github.com/MichalMatu/tracker/releases)
+- [Release and artifact conventions](docs/RELEASES_AND_ARTIFACTS.md)
+
+Current tester/recovery builds are engineering/debug builds unless a release explicitly states otherwise. APKs signed with different debug keys may not be installable over one another without preserving data and handling the signing mismatch deliberately.
+
+Historical Phase 3 pre-field releases are retained as test provenance; they are **not** the current source of truth for field acceptance.
+
+### Exact CI snapshot
+
+Successful canonical builds can publish commit-tied GitHub Actions artifacts such as a debug APK and exact source snapshot. Use those artifacts when reproducing one exact source SHA; use the tester release for ordinary testing.
 
 ## Local development
 
@@ -160,46 +153,41 @@ gitleaks git --config .gitleaks.toml --redact --verbose
 
 ## Engineering workflow
 
-During stabilization, workers are used by role:
+Repository work is stability- and evidence-first:
 
-- **ChatGPT sandbox** — static analysis, patch preparation, offline Android/JVM builds
-- **GitHub Actions** — canonical CI, APK publishing, source snapshots, dependency/network work
-- **Local Agent / Mac** — ADB, physical device testing, lock-screen/Bluetooth runtime evidence
+- `main` is the accepted baseline.
+- Substantial work happens on a dedicated branch and returns through review/CI.
+- GitHub Actions is the canonical networked CI/publication authority.
+- Local Agent / Mac is used for deterministic local commands, ADB and physical-device evidence.
+- Sensitive field telemetry (exact GPS, MACs, Room/WAL/SHM, HCI snoop, bugreports and raw private captures) must not be committed.
 
 Reference: [docs/SANDBOX_EXECUTION_FLOW.md](docs/SANDBOX_EXECUTION_FLOW.md)
 
-## Contributing
+## Documentation
 
-Contributions are welcome, but this repository is currently operated under a **stability-first** rule set.
+Start with [docs/README.md](docs/README.md). It explicitly separates active plans and current references from historical stabilization provenance.
 
-Before opening a PR, please read:
-
-- [CONTRIBUTING.md](CONTRIBUTING.md)
-- [docs/STABILITY_RECOVERY_GUIDE.md](docs/STABILITY_RECOVERY_GUIDE.md)
-- [docs/QUALITY_GATE.md](docs/QUALITY_GATE.md)
-
-Short version:
-
-- keep changes small and testable,
-- do not mix recovery phases,
-- do not broaden scope without updating the recovery guide,
-- keep claims evidence-based,
-- always leave the project in a buildable state.
-
-## Documentation index
+Key current documents:
 
 - [Product Goal](docs/PRODUCT_GOAL.md)
+- [UI/UX Redesign and Analysis Pipeline Plan](docs/UI_UX_REDESIGN_PLAN.md)
 - [Architecture](docs/ARCHITECTURE_CURRENT.md)
 - [Pipeline Audit](docs/PIPELINE_AUDIT.md)
-- [Detection Confidence](docs/DETECTION_CONFIDENCE.md)
 - [Evidence Model](docs/EVIDENCE_MODEL.md)
-- [Stability Recovery Guide](docs/STABILITY_RECOVERY_GUIDE.md)
-- [Phase 2 Closure Re-Audit](docs/PHASE2_CLOSURE_AUDIT.md)
-- [Phase 3 New-Chat Handoff](docs/PHASE3_HANDOFF.md)
-- [Phase 3 Pre-Field Golden Candidate](docs/PHASE3_PRE_FIELD_GOLDEN.md)
-- [Stable Core Preimplementation Audit](docs/STABLE_CORE_PREIMPLEMENTATION_AUDIT.md)
-- [Sandbox Execution Flow](docs/SANDBOX_EXECUTION_FLOW.md)
+- [Detection Confidence](docs/DETECTION_CONFIDENCE.md)
 - [Quality Gate](docs/QUALITY_GATE.md)
+- [Sandbox Execution Flow](docs/SANDBOX_EXECUTION_FLOW.md)
+- [Phase 3 Final Closure](docs/PHASE3_FIELD_REACCEPTANCE_CLOSURE_2026-09-11.md)
+
+## Contributing
+
+Contributions should remain small, testable and evidence-based. Do not broaden scanner/parser/scoring behavior as an incidental part of UI work, and do not make stronger user-facing claims than the collected evidence supports.
+
+Before a substantial change, read:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [docs/README.md](docs/README.md)
+- [docs/QUALITY_GATE.md](docs/QUALITY_GATE.md)
 
 ## License
 
