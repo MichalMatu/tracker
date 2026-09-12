@@ -148,11 +148,7 @@ fun DetailsScreen(
                     device = dev,
                     onToggleWatchlist = { viewModel.toggleWatchlist() },
                     onEdit = { showEditDialog.value = true },
-                )
-
-                CalibrationCard(
-                    device = dev,
-                    onSelectLabel = { viewModel.updateCalibrationLabel(it) },
+                    onSelectCalibrationLabel = { viewModel.updateCalibrationLabel(it) },
                 )
 
                 if (alertEvidenceEvents.isNotEmpty()) {
@@ -271,6 +267,7 @@ fun DetailsActionsReviewCard(
     device: Device,
     onToggleWatchlist: () -> Unit,
     onEdit: () -> Unit,
+    onSelectCalibrationLabel: (io.blueeye.core.model.DeviceCalibrationLabel) -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().stableLiveHeight(),
@@ -286,7 +283,7 @@ fun DetailsActionsReviewCard(
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = "Manage Watchlist status, alias, notes and alert preferences for this device.",
+                text = "Manage Watchlist status, profile, alert preferences and calibration for this device.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -307,6 +304,11 @@ fun DetailsActionsReviewCard(
                     Text("Edit profile & alerts")
                 }
             }
+            HorizontalDivider()
+            CalibrationContent(
+                device = device,
+                onSelectLabel = onSelectCalibrationLabel,
+            )
         }
     }
 }
