@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 4,
-  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :app:installDebug --console=plain; echo P3_V50_INSTALL_PASS",
-  "pid": 778,
+  "command": "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-ui-p3-final-physical-v50.sh > /tmp/tracker-ui-p3-final-physical-v50.sh; chmod +x /tmp/tracker-ui-p3-final-physical-v50.sh; /tmp/tracker-ui-p3-final-physical-v50.sh; echo P3_V50_PHYSICAL_AUDIT_DONE",
+  "pid": 1046,
   "timeout": 3600,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-12T20:43:39.355445+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-12T20:43:51.395985+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 4,
   "stage_phase": "commands",
   "task_id": "tracker-ui-p3-final-physical-20260912-v50",
@@ -18,5 +18,5 @@
   "task_digest": "246705bc8b788b43e5340dab6a58d2f13505180edfe51d7c4dc1f3ab45d00acb",
   "daemon_version": "4.18.20",
   "daemon_pid": 362,
-  "updated_at": "2026-09-12T20:43:39.438058+00:00"
+  "updated_at": "2026-09-12T20:43:51.481411+00:00"
 }
