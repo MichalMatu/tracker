@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p3g-final-s22-diagnose-20260912-v57",
+  "task_digest": "bfc1eeed959b4fb9a98c552dfd32b56f3f9ba32a9cb69083c086f41e76a0fc39",
+  "idle_timeout": 900,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T22:00:35.242230+00:00",
+  "attempt_id": "ae05a14105409066ee43cc8f",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 69668,
+  "updated_at": "2026-09-12T22:00:35.242280+00:00",
+  "pid": 69668
+}
