@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-docs-final-pointer-cleanup-20260912-v1",
+  "task_digest": "2751d82be901cdb1ed5e38b6dd3f22fa94e017e22b6fc518100a02d1ddaf5891",
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-12T03:33:14.693872+00:00",
+  "attempt_id": "79d9a2ae0633a218fdcf3a34",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 79797,
+  "updated_at": "2026-09-12T03:33:14.693933+00:00",
+  "pid": 79797
+}
