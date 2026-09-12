@@ -1,0 +1,18 @@
+{
+  "id": "tracker-ui-p2b-detekt-diagnose-20260912-v1",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 3072,
+  "command_timeout": 900,
+  "idle_timeout": 240,
+  "task_timeout": 1200,
+  "commands": [
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin ui/radar-details-redesign; git checkout ui/radar-details-redesign; git merge --ff-only origin/ui/radar-details-redesign; test \"$(git rev-parse HEAD)\" = '5137458115ab00975474629661e060cbd1c081ad'; echo P2B_DETEKT_HEAD_VERIFIED",
+    "set +e; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:radar:detekt --rerun-tasks --stacktrace > /tmp/tracker-p2b-detekt.log 2>&1; RC=$?; echo DETEKT_RC=$RC; grep -nE '(^|[ /])feature/radar/src/|:[0-9]+:[0-9]+:|weighted issues|Issue|Unused|Complex|Long|Magic|style|performance|potential-bugs' /tmp/tracker-p2b-detekt.log | tail -n 120 || true; for f in feature/radar/build/reports/detekt/detekt.txt feature/radar/build/reports/detekt/detekt.xml feature/radar/build/reports/detekt/detekt.html feature/radar/build/reports/detekt/detekt.sarif; do if test -f \"$f\"; then echo ===REPORT:$f===; if [[ \"$f\" == *.html ]]; then grep -nE 'RadarUi|RadarDense|RadarSection|RadarUiMapper|issue|Issue|code-smell' \"$f\" | head -n 100 || true; else cat \"$f\" | head -n 300; fi; fi; done; test -z \"$(git status --porcelain)\"; exit 0"
+  ]
+}
