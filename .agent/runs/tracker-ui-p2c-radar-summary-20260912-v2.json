@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p2c-radar-summary-20260912-v2",
+  "task_digest": "06d2995438b5f491f7cb9b6ee2bedd00b4dc876e0c8134ecff009815e9fbbebb",
+  "idle_timeout": 600,
+  "task_timeout": 7200,
+  "memory_limit_mb": 6144,
+  "started_at": "2026-09-12T11:36:02.347793+00:00",
+  "attempt_id": "ee6f24dc9b5fc91846d3973b",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 74605,
+  "updated_at": "2026-09-12T11:36:02.347863+00:00",
+  "pid": 74605
+}
