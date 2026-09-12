@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-branch-cleanup-20260912-v1",
+  "task_digest": "cfabd25787687d07ffccf589e2b4af8cb64a6b6912a395772fad9528c92bb818",
+  "idle_timeout": 60,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-12T02:50:22.696010+00:00",
+  "attempt_id": "f2a0c606f71e76131af7342d",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 36402,
+  "updated_at": "2026-09-12T02:50:22.696149+00:00",
+  "pid": 36402
+}
