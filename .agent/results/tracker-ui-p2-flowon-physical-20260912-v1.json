@@ -1,0 +1,117 @@
+{
+  "id": "tracker-ui-p2-flowon-physical-20260912-v1",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": false,
+  "started_at": "2026-09-12T04:54:08.440880+00:00",
+  "command_timeout": 1800,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -euo pipefail; test -z \"$(git status --porcelain)\"; git fetch --prune origin ui/radar-details-redesign; git checkout ui/radar-details-redesign; git merge --ff-only origin/ui/radar-details-redesign; test \"$(git rev-parse HEAD)\" = 'ae35d7e218cd0efa983ff74570916ce50e0ac97f'; echo P2_FLOWON_HEAD_VERIFIED",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch              ui/radar-details-redesign -> FETCH_HEAD\nSwitched to branch 'ui/radar-details-redesign'\nYour branch is behind 'origin/ui/radar-details-redesign' by 2 commits, and can be fast-forwarded.\n  (use \"git pull\" to update your local branch)\nUpdating f554b0d5..ae35d7e2\nFast-forward\n docs/UI_UX_PHASE1_ACCEPTANCE_2026-09-12.md         | 98 ++++++++++++++++++++++\n .../feature/radar/presentation/RadarViewModel.kt   |  3 +\n 2 files changed, 101 insertions(+)\n create mode 100644 docs/UI_UX_PHASE1_ACCEPTANCE_2026-09-12.md\nP2_FLOWON_HEAD_VERIFIED\n",
+      "elapsed_seconds": 1.09,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 4.41,
+      "output_policy": "stream",
+      "captured_output_chars": 601,
+      "output_truncated": false,
+      "current_rss_mb": 4.41,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew :feature:radar:testDebugUnitTest :feature:radar:compileDebugKotlin :app:assembleDebug --stacktrace; APK=app/build/outputs/apk/debug/app-debug.apk; test -f \"$APK\"; shasum -a 256 \"$APK\"; echo P2_FLOWON_BUILD_PASS",
+      "exit_code": 0,
+      "output": "Starting a Gradle Daemon (subsequent builds will be faster)\nCalculating task graph as no cached configuration is available for tasks: :feature:radar:testDebugUnitTest :feature:radar:compileDebugKotlin :app:assembleDebug\nWarning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.\n> Task :core:domain:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:domain:compileKotlin UP-TO-DATE\n> Task :core:domain:compileJava NO-SOURCE\n> Task :core:domain:processResources NO-SOURCE\n> Task :core:domain:classes UP-TO-DATE\n> Task :core:domain:jar UP-TO-DATE\n> Task :core:ui:checkKotlinGradlePluginConfigurationErrors\n> Task :core:ui:preBuild UP-TO-DATE\n> Task :core:ui:preDebugBuild UP-TO-DATE\n> Task :core:ui:generateDebugResValues UP-TO-DATE\n> Task :core:ui:generateDebugResources UP-TO-DATE\n> Task :core:ui:packageDebugResources UP-TO-DATE\n> Task :core:ui:parseDebugLocalResources UP-TO-DATE\n> Task :core:ui:generateDebugRFile UP-TO-DATE\n> Task :core:ui:compileDebugKotlin UP-TO-DATE\n> Task :core:ui:javaPreCompileDebug UP-TO-DATE\n> Task :core:ui:compileDebugJavaWithJavac NO-SOURCE\n> Task :core:ui:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:ui:processDebugJavaRes UP-TO-DATE\n> Task :feature:radar:preBuild UP-TO-DATE\n> Task :feature:radar:preDebugBuild UP-TO-DATE\n> Task :core:ui:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :feature:radar:checkKotlinGradlePluginConfigurationErrors\n> Task :feature:radar:generateDebugResValues UP-TO-DATE\n> Task :feature:radar:generateDebugResources UP-TO-DATE\n> Task :feature:radar:packageDebugResources UP-TO-DATE\n> Task :feature:radar:parseDebugLocalResources UP-TO-DATE\n> Task :feature:radar:generateDebugRFile UP-TO-DATE\n> Task :feature:radar:kaptGenerateStubsDebugKotlin\n> Task :feature:radar:kaptDebugKotlin UP-TO-DATE\n> Task :feature:radar:compileDebugKotlin\n> Task :feature:radar:javaPreCompileDebug UP-TO-DATE\n> Task :feature:radar:compileDebugJavaWithJavac\n> Task :feature:radar:transformDebugClassesWithAsm\n> Task :feature:radar:bundleLibRuntimeToJarDebug\n> Task :feature:radar:preDebugUnitTestBuild UP-TO-DATE\n> Task :feature:radar:generateDebugUnitTestStubRFile\n> Task :feature:radar:processDebugJavaRes UP-TO-DATE\n> Task :feature:radar:bundleLibCompileToJarDebug\n> Task :feature:radar:kaptGenerateStubsDebugUnitTestKotlin\n\n> Task :feature:radar:kaptDebugUnitTestKotlin\nwarning: The following options were not recognized by any processor: '[dagger.fastInit, dagger.hilt.android.internal.disableAndroidSuperclassValidation, dagger.hilt.android.internal.projectType, dagger.hilt.internal.useAggregatingRootProcessor, kapt.kotlin.generated]'\n\n> Task :feature:radar:compileDebugUnitTestKotlin\n> Task :feature:radar:javaPreCompileDebugUnitTest FROM-CACHE\n> Task :feature:radar:compileDebugUnitTestJavaWithJavac NO-SOURCE\n> Task :feature:radar:hiltAggregateDepsDebugUnitTest\n> Task :feature:radar:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :feature:radar:processDebugUnitTestJavaRes\n> Task :feature:radar:transformDebugUnitTestClassesWithAsm\n> Task :feature:radar:testDebugUnitTest\n> Task :app:preBuild UP-TO-DATE\n> Task :app:preDebugBuild UP-TO-DATE\n> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE\n> Task :app:checkKotlinGradlePluginConfigurationErrors\n> Task :core:data:preBuild UP-TO-DATE\n> Task :core:data:preDebugBuild UP-TO-DATE\n> Task :core:data:writeDebugAarMetadata UP-TO-DATE\n> Task :core:decoders:preBuild UP-TO-DATE\n> Task :core:decoders:preDebugBuild UP-TO-DATE\n> Task :core:decoders:writeDebugAarMetadata UP-TO-DATE\n> Task :core:ui:writeDebugAarMetadata UP-TO-DATE\n> Task :feature:details:preBuild UP-TO-DATE\n> Task :feature:details:preDebugBuild UP-TO-DATE\n> Task :feature:details:writeDebugAarMetadata UP-TO-DATE\n> Task :feature:radar:writeDebugAarMetadata UP-TO-DATE\n> Task :feature:settings:preBuild UP-TO-DATE\n> Task :feature:settings:preDebugBuild UP-TO-DATE\n> Task :feature:settings:writeDebugAarMetadata UP-TO-DATE\n> Task :feature:watchlist:preBuild UP-TO-DATE\n> Task :feature:watchlist:preDebugBuild UP-TO-DATE\n> Task :feature:watchlist:writeDebugAarMetadata UP-TO-DATE\n> Task :app:checkDebugAarMetadata UP-TO-DATE\n> Task :app:generateDebugResValues UP-TO-DATE\n> Task :core:data:generateDebugResValues UP-TO-DATE\n> Task :core:data:generateDebugResources UP-TO-DATE\n> Task :core:data:packageDebugResources UP-TO-DATE\n> Task :core:decoders:generateDebugResValues UP-TO-DATE\n> Task :core:decoders:generateDebugResources UP-TO-DATE\n> Task :core:decoders:packageDebugResources UP-TO-DATE\n> Task :feature:details:generateDebugResValues UP-TO-DATE\n> Task :feature:details:generateDebugResources UP-TO-DATE\n> Task :feature:details:packageDebugResources UP-TO-DATE\n> Task :feature:settings:generateDebugResValues UP-TO-DATE\n> Task :feature:settings:generateDebugResources UP-TO-DATE\n> Task :feature:settings:packageDebugResources UP-TO-DATE\n> Task :feature:watchlist:generateDebugResValues UP-TO-DATE\n> Task :feature:watchlist:generateDebugResources UP-TO-DATE\n> Task :feature:watchlist:packageDebugResources UP-TO-DATE\n> Task :app:mapDebugSourceSetPaths UP-TO-DATE\n> Task :app:generateDebugResources UP-TO-DATE\n> Task :app:mergeDebugResources UP-TO-DATE\n> Task :app:packageDebugResources UP-TO-DATE\n> Task :app:parseDebugLocalResources UP-TO-DATE\n> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE\n> Task :app:extractDeepLinksDebug UP-TO-DATE\n> Task :core:data:extractDeepLinksDebug UP-TO-DATE\n> Task :core:data:processDebugManifest UP-TO-DATE\n> Task :core:decoders:extractDeepLinksDebug UP-TO-DATE\n> Task :core:decoders:processDebugManifest UP-TO-DATE\n> Task :core:ui:extractDeepLinksDebug UP-TO-DATE\n> Task :core:ui:processDebugManifest UP-TO-DATE\n> Task :feature:details:extractDeepLinksDebug UP-TO-DATE\n> Task :feature:details:processDebugManifest UP-TO-DATE\n> Task :feature:radar:extractDeepLinksDebug UP-TO-DATE\n> Task :feature:radar:processDebugManifest UP-TO-DATE\n> Task :feature:settings:extractDeepLinksDebug UP-TO-DATE\n> Task :feature:settings:processDebugManifest UP-TO-DATE\n> Task :feature:watchlist:extractDeepLinksDebug UP-TO-DATE\n> Task :feature:watchlist:processDebugManifest UP-TO-DATE\n> Task :app:processDebugMainManifest UP-TO-DATE\n> Task :app:processDebugManifest UP-TO-DATE\n> Task :app:processDebugManifestForPackage UP-TO-DATE\n> Task :core:data:compileDebugLibraryResources UP-TO-DATE\n> Task :core:data:parseDebugLocalResources UP-TO-DATE\n> Task :core:data:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:compileDebugLibraryResources UP-TO-DATE\n> Task :core:decoders:parseDebugLocalResources UP-TO-DATE\n> Task :core:decoders:generateDebugRFile UP-TO-DATE\n> Task :core:ui:compileDebugLibraryResources UP-TO-DATE\n> Task :feature:details:compileDebugLibraryResources UP-TO-DATE\n> Task :feature:details:parseDebugLocalResources UP-TO-DATE\n> Task :feature:details:generateDebugRFile UP-TO-DATE\n> Task :feature:radar:compileDebugLibraryResources UP-TO-DATE\n> Task :feature:settings:compileDebugLibraryResources UP-TO-DATE\n> Task :feature:settings:parseDebugLocalResources UP-TO-DATE\n> Task :feature:settings:generateDebugRFile UP-TO-DATE\n> Task :feature:watchlist:compileDebugLibraryResources UP-TO-DATE\n> Task :feature:watchlist:parseDebugLocalResources UP-TO-DATE\n> Task :feature:watchlist:generateDebugRFile UP-TO-DATE\n> Task :app:processDebugResources UP-TO-DATE\n> Task :core:data:checkKotlinGradlePluginConfigurationErrors\n> Task :core:decoders:checkKotlinGradlePluginConfigurationErrors\n> Task :core:decoders:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :core:decoders:kaptDebugKotlin UP-TO-DATE\n> Task :core:decoders:compileDebugKotlin UP-TO-DATE\n> Task :core:decoders:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:transformDebugClassesWithAsm UP-TO-DATE\n> Task :core:decoders:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :core:data:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :core:data:kaptDebugKotlin UP-TO-DATE\n> Task :core:data:compileDebugKotlin UP-TO-DATE\n> Task :core:data:javaPreCompileDebug UP-TO-DATE\n> Task :core:data:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:data:transformDebugClassesWithAsm UP-TO-DATE\n> Task :core:data:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :feature:details:checkKotlinGradlePluginConfigurationErrors\n> Task :feature:details:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :feature:details:kaptDebugKotlin UP-TO-DATE\n> Task :feature:details:compileDebugKotlin UP-TO-DATE\n> Task :feature:details:javaPreCompileDebug UP-TO-DATE\n> Task :feature:details:compileDebugJavaWithJavac UP-TO-DATE\n> Task :feature:details:transformDebugClassesWithAsm UP-TO-DATE\n> Task :feature:details:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :feature:settings:checkKotlinGradlePluginConfigurationErrors\n> Task :feature:settings:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :feature:settings:kaptDebugKotlin UP-TO-DATE\n> Task :feature:settings:compileDebugKotlin UP-TO-DATE\n> Task :feature:settings:javaPreCompileDebug UP-TO-DATE\n> Task :feature:settings:compileDebugJavaWithJavac UP-TO-DATE\n> Task :feature:settings:transformDebugClassesWithAsm UP-TO-DATE\n> Task :feature:settings:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :feature:watchlist:checkKotlinGradlePluginConfigurationErrors\n> Task :feature:watchlist:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :feature:watchlist:kaptDebugKotlin UP-TO-DATE\n> Task :feature:watchlist:compileDebugKotlin UP-TO-DATE\n> Task :feature:watchlist:javaPreCompileDebug UP-TO-DATE\n> Task :feature:watchlist:compileDebugJavaWithJavac UP-TO-DATE\n> Task :feature:watchlist:transformDebugClassesWithAsm UP-TO-DATE\n> Task :feature:watchlist:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :app:kaptGenerateStubsDebugKotlin\n> Task :app:kaptDebugKotlin\n> Task :app:compileDebugKotlin\n> Task :app:javaPreCompileDebug UP-TO-DATE\n> Task :app:compileDebugJavaWithJavac UP-TO-DATE\n> Task :app:mergeDebugShaders UP-TO-DATE\n> Task :app:compileDebugShaders NO-SOURCE\n> Task :app:generateDebugAssets UP-TO-DATE\n> Task :core:data:mergeDebugShaders UP-TO-DATE\n> Task :core:data:compileDebugShaders NO-SOURCE\n> Task :core:data:generateDebugAssets UP-TO-DATE\n> Task :core:data:packageDebugAssets UP-TO-DATE\n> Task :core:decoders:mergeDebugShaders UP-TO-DATE\n> Task :core:decoders:compileDebugShaders NO-SOURCE\n> Task :core:decoders:generateDebugAssets UP-TO-DATE\n> Task :core:decoders:packageDebugAssets UP-TO-DATE\n> Task :core:ui:mergeDebugShaders UP-TO-DATE\n> Task :core:ui:compileDebugShaders NO-SOURCE\n> Task :core:ui:generateDebugAssets UP-TO-DATE\n> Task :core:ui:packageDebugAssets UP-TO-DATE\n> Task :feature:details:mergeDebugShaders UP-TO-DATE\n> Task :feature:details:compileDebugShaders NO-SOURCE\n> Task :feature:details:generateDebugAssets UP-TO-DATE\n> Task :feature:details:packageDebugAssets UP-TO-DATE\n> Task :feature:radar:mergeDebugShaders UP-TO-DATE\n> Task :feature:radar:compileDebugShaders NO-SOURCE\n> Task :feature:radar:generateDebugAssets UP-TO-DATE\n> Task :feature:radar:packageDebugAssets UP-TO-DATE\n> Task :feature:settings:mergeDebugShaders UP-TO-DATE\n> Task :feature:settings:compileDebugShaders NO-SOURCE\n> Task :feature:settings:generateDebugAssets UP-TO-DATE\n> Task :feature:settings:packageDebugAssets UP-TO-DATE\n> Task :feature:watchlist:mergeDebugShaders UP-TO-DATE\n> Task :feature:watchlist:compileDebugShaders NO-SOURCE\n> Task :feature:watchlist:generateDebugAssets UP-TO-DATE\n> Task :feature:watchlist:packageDebugAssets UP-TO-DATE\n> Task :app:mergeDebugAssets UP-TO-DATE\n> Task :app:compressDebugAssets UP-TO-DATE\n> Task :core:data:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :feature:details:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :feature:settings:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :feature:watchlist:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :app:desugarDebugFileDependencies UP-TO-DATE\n> Task :app:hiltAggregateDepsDebug UP-TO-DATE\n> Task :app:hiltJavaCompileDebug\n> Task :app:transformDebugClassesWithAsm\n> Task :app:dexBuilderDebug UP-TO-DATE\n> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE\n> Task :app:processDebugJavaRes UP-TO-DATE\n> Task :core:data:processDebugJavaRes UP-TO-DATE\n> Task :core:decoders:processDebugJavaRes UP-TO-DATE\n> Task :feature:details:processDebugJavaRes UP-TO-DATE\n> Task :feature:settings:processDebugJavaRes UP-TO-DATE\n> Task :feature:watchlist:processDebugJavaRes UP-TO-DATE\n> Task :app:mergeDebugJavaResource UP-TO-DATE\n> Task :app:checkDebugDuplicateClasses UP-TO-DATE\n> Task :app:mergeExtDexDebug UP-TO-DATE\n> Task :core:data:bundleLibRuntimeToDirDebug UP-TO-DATE\n> Task :core:decoders:bundleLibRuntimeToDirDebug UP-TO-DATE\n> Task :feature:radar:bundleLibRuntimeToDirDebug\n> Task :feature:details:bundleLibRuntimeToDirDebug UP-TO-DATE\n> Task :feature:settings:bundleLibRuntimeToDirDebug UP-TO-DATE\n> Task :feature:watchlist:bundleLibRuntimeToDirDebug UP-TO-DATE\n> Task :core:ui:bundleLibRuntimeToDirDebug UP-TO-DATE\n> Task :app:mergeLibDexDebug\n> Task :app:mergeProjectDexDebug UP-TO-DATE\n> Task :app:mergeDebugJniLibFolders UP-TO-DATE\n> Task :core:data:mergeDebugJniLibFolders UP-TO-DATE\n> Task :core:data:mergeDebugNativeLibs NO-SOURCE\n> Task :core:data:copyDebugJniLibsProjectOnly UP-TO-DATE\n> Task :core:decoders:mergeDebugJniLibFolders UP-TO-DATE\n> Task :core:decoders:mergeDebugNativeLibs NO-SOURCE\n> Task :core:decoders:copyDebugJniLibsProjectOnly UP-TO-DATE\n> Task :core:ui:mergeDebugJniLibFolders UP-TO-DATE\n> Task :core:ui:mergeDebugNativeLibs NO-SOURCE\n> Task :core:ui:copyDebugJniLibsProjectOnly UP-TO-DATE\n> Task :feature:details:mergeDebugJniLibFolders UP-TO-DATE\n> Task :feature:details:mergeDebugNativeLibs NO-SOURCE\n> Task :feature:details:copyDebugJniLibsProjectOnly UP-TO-DATE\n> Task :feature:radar:mergeDebugJniLibFolders UP-TO-DATE\n> Task :feature:radar:mergeDebugNativeLibs NO-SOURCE\n> Task :feature:radar:copyDebugJniLibsProjectOnly UP-TO-DATE\n> Task :feature:settings:mergeDebugJniLibFolders UP-TO-DATE\n> Task :feature:settings:mergeDebugNativeLibs NO-SOURCE\n> Task :feature:settings:copyDebugJniLibsProjectOnly UP-TO-DATE\n> Task :feature:watchlist:mergeDebugJniLibFolders UP-TO-DATE\n> Task :feature:watchlist:mergeDebugNativeLibs NO-SOURCE\n> Task :feature:watchlist:copyDebugJniLibsProjectOnly UP-TO-DATE\n> Task :app:mergeDebugNativeLibs UP-TO-DATE\n> Task :app:stripDebugDebugSymbols UP-TO-DATE\n> Task :app:validateSigningDebug UP-TO-DATE\n> Task :app:writeDebugAppMetadata UP-TO-DATE\n> Task :app:writeDebugSigningConfigVersions UP-TO-DATE\n> Task :app:packageDebug\n> Task :app:createDebugApkListingFileRedirect UP-TO-DATE\n> Task :app:assembleDebug\n\nDeprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.\n\nYou can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.\n\nFor more on this, please refer to https://docs.gradle.org/8.9/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.\n\nBUILD SUCCESSFUL in 35s\n221 actionable tasks: 32 executed, 1 from cache, 188 up-to-date\nConfiguration cache entry stored.\nb9a7fa8684c41ae077809c0e499acae0d7d289e1b9f17377084d7b5cdc53efae  app/build/outputs/apk/debug/app-debug.apk\nP2_FLOWON_BUILD_PASS\n",
+      "elapsed_seconds": 36.249,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 104.11,
+      "output_policy": "stream",
+      "captured_output_chars": 15643,
+      "output_truncated": false,
+      "current_rss_mb": 32.44,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -euo pipefail; ADB=adb; SERIAL=$($ADB devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$SERIAL\"; test \"$($ADB -s \"$SERIAL\" shell getprop ro.product.model | tr -d '\\r')\" = 'SM-S906B'; APK=app/build/outputs/apk/debug/app-debug.apk; $ADB -s \"$SERIAL\" install -r \"$APK\" >/dev/null; $ADB -s \"$SERIAL\" shell input keyevent 224 >/dev/null 2>&1 || true; $ADB -s \"$SERIAL\" shell wm dismiss-keyguard >/dev/null 2>&1 || true; $ADB -s \"$SERIAL\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null; sleep 3; OUT=\"$HOME/agent-workspace/repos/tracker/checkpoints/ui-p2-flowon-20260912\"; mkdir -p \"$OUT\"; $ADB -s \"$SERIAL\" shell uiautomator dump /sdcard/p2-flowon-initial.xml >/dev/null; $ADB -s \"$SERIAL\" pull /sdcard/p2-flowon-initial.xml \"$OUT/initial.xml\" >/dev/null; if grep -q 'text=\"Paused\"' \"$OUT/initial.xml\"; then python3 -c \"import re,subprocess,pathlib; s=pathlib.Path('$OUT/initial.xml').read_text(); m=re.search(r'content-desc=\\\"Scan\\\"[^>]*bounds=\\\"\\[([0-9]+),([0-9]+)\\]\\[([0-9]+),([0-9]+)\\]\\\"',s); assert m,'Scan button not found'; x=(int(m.group(1))+int(m.group(3)))//2; y=(int(m.group(2))+int(m.group(4)))//2; subprocess.check_call(['adb','-s','$SERIAL','shell','input','tap',str(x),str(y)])\"; fi; sleep 20; $ADB -s \"$SERIAL\" shell uiautomator dump /sdcard/p2-flowon-a.xml >/dev/null; $ADB -s \"$SERIAL\" pull /sdcard/p2-flowon-a.xml \"$OUT/a.xml\" >/dev/null; test \"$(grep -o 'text=\"Seen ' \"$OUT/a.xml\" | wc -l | tr -d ' ')\" -gt 0; $ADB -s \"$SERIAL\" shell dumpsys gfxinfo io.blueeye reset >/dev/null || true; SIZE=$($ADB -s \"$SERIAL\" shell wm size | tail -n1 | grep -oE '[0-9]+x[0-9]+' | tail -n1); W=${SIZE%x*}; H=${SIZE#*x}; X=$((W/2)); Y1=$((H*78/100)); Y2=$((H*32/100)); for i in $(seq 1 8); do $ADB -s \"$SERIAL\" shell input swipe $X $Y1 $X $Y2 240 >/dev/null; sleep 0.12; done; for i in $(seq 1 8); do $ADB -s \"$SERIAL\" shell input swipe $X $Y2 $X $Y1 240 >/dev/null; sleep 0.12; done; $ADB -s \"$SERIAL\" shell dumpsys gfxinfo io.blueeye > \"$OUT/gfxinfo.txt\"; grep -E 'Total frames rendered|Janky frames|50th percentile|90th percentile|95th percentile|99th percentile' \"$OUT/gfxinfo.txt\"; FRAMES=$(grep 'Total frames rendered:' \"$OUT/gfxinfo.txt\" | head -n1 | awk '{print $4}'); test \"${FRAMES:-0}\" -gt 0; PID=$($ADB -s \"$SERIAL\" shell pidof io.blueeye | tr -d '\\r'); test -n \"$PID\"; $ADB -s \"$SERIAL\" shell logcat -d --pid=\"$PID\" -t 1200 > \"$OUT/logcat-tail.txt\"; ! grep -Eq 'FATAL EXCEPTION|AndroidRuntime: FATAL|OutOfMemoryError|SQLiteException|SecurityException' \"$OUT/logcat-tail.txt\"; test -z \"$(git status --porcelain)\"; echo P2_FLOWON_PHYSICAL_PASS",
+      "exit_code": 1,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\nargs: [-p, io.blueeye, -c, android.intent.category.LAUNCHER, 1]\n arg: \"-p\"\n arg: \"io.blueeye\"\n arg: \"-c\"\n arg: \"android.intent.category.LAUNCHER\"\n arg: \"1\"\ndata=\"io.blueeye\"\ndata=\"android.intent.category.LAUNCHER\"\n/sdcard/p2-flowon-initial.xml: 1 file pulled, 0 skipped. 6.4 MB/s (32015 bytes in 0.005s)\n/sdcard/p2-flowon-a.xml: 1 file pulled, 0 skipped. 3.7 MB/s (13763 bytes in 0.004s)\n",
+      "elapsed_seconds": 33.314,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 12.34,
+      "output_policy": "stream",
+      "captured_output_chars": 465,
+      "output_truncated": false,
+      "current_rss_mb": 9.45,
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.09
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 36.249
+    },
+    {
+      "stage_name": "command-3",
+      "stage_index": 3,
+      "stage_total": 3,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 33.314
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.177
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.075
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-12T04:55:21.383433+00:00",
+  "task_digest": "a31cc60513c2235587934bd7062104d0da4012d3d54b7ac69ae927225b2fea71",
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "attempt_id": "720ec70b8662900dbbf48e51",
+  "daemon_version": "4.18.20"
+}
