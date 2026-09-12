@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-p3c-details-identity-fix-20260912-v38",
+  "task_digest": "611a8628f1276af6e87e669f042c1e56ace667253a2fd49c9aa8459c42d3f5a2",
+  "idle_timeout": 300,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-12T19:09:53.152798+00:00",
+  "attempt_id": "f7077dac8ebf8139fd02645e",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 7728,
+  "updated_at": "2026-09-12T19:09:53.152927+00:00",
+  "pid": 7728
+}
