@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 3,
   "total": 6,
-  "command": "set -euo pipefail; git fetch --prune origin main chore/preproduction-readiness-20260913 agent-control; git checkout chore/preproduction-readiness-20260913; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"11ab0f3b38c234477c3b8eb5a053710c9c32e059\"; test \"$(git rev-parse origin/chore/preproduction-readiness-20260913)\" = \"11ab0f3b38c234477c3b8eb5a053710c9c32e059\"; test \"$(git rev-parse origin/main)\" = \"565821f9dd46450a324907523c9ce1ad49349d75\"; echo PREPROD_V60_BASELINE_OK",
-  "pid": 94710,
+  "command": "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; java -version; ./gradlew --parallel --max-workers=3 qualityCheck --stacktrace",
+  "pid": 94790,
   "timeout": 2400,
   "idle_timeout": 900,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-13T06:35:40.732864+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-13T06:35:43.576195+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 6,
   "stage_phase": "commands",
   "task_id": "tracker-preprod-repo-hygiene-20260913-v60",
@@ -18,5 +18,5 @@
   "task_digest": "cb54ce20c12a77d371c78ccd03d9ce0e657cedfb3df64e244bcbecd0312fc182",
   "daemon_version": "4.18.20",
   "daemon_pid": 94502,
-  "updated_at": "2026-09-13T06:35:40.733017+00:00"
+  "updated_at": "2026-09-13T06:35:43.663237+00:00"
 }
