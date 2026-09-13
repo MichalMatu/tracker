@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-field-fix-radar-detekt-20260913-v86",
+  "task_digest": "3bc72e8d5502729bec9fde10fa3c4f7371660bce2e915d6289b0a2fc6e84f5ff",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-13T19:30:23.644885+00:00",
+  "attempt_id": "72d9203d1dd0070ee1547916",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 80579,
+  "updated_at": "2026-09-13T19:30:23.645243+00:00",
+  "pid": 80579
+}
