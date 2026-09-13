@@ -29,14 +29,34 @@ class RadarUiCardOrderTest {
     fun `last seen updates inside one recency bucket do not reorder cards`() {
         val initial =
             listOf(
-                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW, lastSeenAt = SORT_NOW - 5_000),
-                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 10_000),
+                item(
+                    fingerprint = "alpha",
+                    displayName = "Alpha",
+                    firstSeenAt = NOW,
+                    lastSeenAt = SORT_NOW - 5_000,
+                ),
+                item(
+                    fingerprint = "beta",
+                    displayName = "Beta",
+                    firstSeenAt = NOW + 2_000,
+                    lastSeenAt = SORT_NOW - 10_000,
+                ),
             ).sortedWith(RadarUiCardOrder.comparator(SORT_NOW))
 
         val afterLastSeenSwap =
             listOf(
-                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW, lastSeenAt = SORT_NOW - 12_000),
-                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 3_000),
+                item(
+                    fingerprint = "alpha",
+                    displayName = "Alpha",
+                    firstSeenAt = NOW,
+                    lastSeenAt = SORT_NOW - 12_000,
+                ),
+                item(
+                    fingerprint = "beta",
+                    displayName = "Beta",
+                    firstSeenAt = NOW + 2_000,
+                    lastSeenAt = SORT_NOW - 3_000,
+                ),
             ).sortedWith(RadarUiCardOrder.comparator(SORT_NOW))
 
         assertEquals(initial.map { it.fingerprint }, afterLastSeenSwap.map { it.fingerprint })
