@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-field-false-positive-fix-20260913-v78",
+  "task_digest": "3b9a576d8a13012af5f190d69cd5ccd43084db8b1983950011299d2ccad341fd",
+  "idle_timeout": 300,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-13T19:15:42.204274+00:00",
+  "attempt_id": "5e16f59c465aabba8dd19b32",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 55178,
+  "updated_at": "2026-09-13T19:15:42.204421+00:00",
+  "pid": 55178
+}
