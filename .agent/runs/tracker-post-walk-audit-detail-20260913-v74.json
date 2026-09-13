@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "tracker-post-walk-audit-detail-20260913-v74",
   "task_digest": "86e1a7c61b64ae5de3581a1cd2bbee67349ac36c03bff5cd6ae2b51de34bcc17",
-  "idle_timeout": 120,
-  "task_timeout": 600,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-13T18:57:39.966719+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-13T18:57:41.936481+00:00",
   "attempt_id": "6084d5a4e8f2be0073df4c83",
   "daemon_version": "4.18.20",
   "daemon_pid": 35183,
-  "updated_at": "2026-09-13T18:57:39.966779+00:00",
+  "updated_at": "2026-09-13T18:57:42.167156+00:00",
   "pid": 35183
 }
