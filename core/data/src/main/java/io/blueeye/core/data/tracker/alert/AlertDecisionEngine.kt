@@ -20,23 +20,23 @@ class AlertDecisionEngine @Inject constructor() {
      * 1. Device is ignored → NO alert (user whitelist)
      * 2. User hasn't moved → NO movement-pattern alert
      * 3. Device was seen before movement (zastane) → NO alert (baseline device)
-     * 4. Score indicates high or suspicious evidence → alert based on status
+     * 4. Suspicious score without tracker/rotating-identity corroboration → review in UI, NO notification
+     * 5. Score indicates high or suspicious evidence with corroboration → alert based on status
      *
-     * @param isIgnored User manually marked device as safe
-     * @param userHasMoved User moved >50m since session start
-     * @param isZastane Device was seen before user started moving
-     * @param trackingStatus Calculated tracking status from score
-     * @return true if alert should be triggered
+     * The default for [hasCorroboratingTrackingEvidence] preserves compatibility for focused unit
+     * tests and callers that do not yet carry the richer BLE identity context.
      */
     fun shouldAlert(
         isIgnored: Boolean,
         userHasMoved: Boolean,
         isZastane: Boolean,
-        trackingStatus: TrackingStatus
+        trackingStatus: TrackingStatus,
+        hasCorroboratingTrackingEvidence: Boolean = true,
     ): Boolean =
         !isIgnored &&
             userHasMoved &&
             !isZastane &&
+            hasCorroboratingTrackingEvidence &&
             (
                 trackingStatus == TrackingStatus.DANGEROUS ||
                     trackingStatus == TrackingStatus.SUSPICIOUS
@@ -50,7 +50,7 @@ class AlertDecisionEngine @Inject constructor() {
         isKnownTracker: Boolean,
         userHasMoved: Boolean,
         isZastane: Boolean,
-        trackingStatus: TrackingStatus
+        trackingStatus: TrackingStatus,
     ): String {
         return when {
             isIgnored -> "Device is manually ignored"
