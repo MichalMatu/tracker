@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 5,
-  "command": "set -euo pipefail; git fetch --prune origin main ui/radar-details-redesign agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; git reset --hard origin/ui/radar-details-redesign; echo SYNCED_BRANCH=$(git rev-parse HEAD)",
-  "pid": 55353,
+  "command": "set -euo pipefail; ./gradlew :feature:details:testDebugUnitTest :feature:details:compileDebugKotlin --no-daemon --max-workers=2",
+  "pid": 55401,
   "timeout": 2400,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-13T09:33:13.477671+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-13T09:33:14.511575+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-e2e-bootstrap-20260913-v63",
@@ -18,5 +18,5 @@
   "task_digest": "40031ee6aced78b77d637e35214f75d57fa2778ba4b2a1d7d37ce77d2cc5beba",
   "daemon_version": "4.18.20",
   "daemon_pid": 55178,
-  "updated_at": "2026-09-13T09:33:13.477832+00:00"
+  "updated_at": "2026-09-13T09:33:14.590607+00:00"
 }
