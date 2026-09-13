@@ -14,53 +14,74 @@ class RadarUiCardOrderTest {
             listOf(
                 item(fingerprint = "older", displayName = "Older", rssi = -45, firstSeenAt = NOW),
                 item(fingerprint = "newer", displayName = "Newer", rssi = -95, firstSeenAt = NOW + 2_000),
-            ).sortedWith(RadarUiCardOrder.comparator)
+            ).sortedWith(RadarUiCardOrder.comparator(SORT_NOW))
 
         val afterRssiSwap =
             listOf(
                 item(fingerprint = "older", displayName = "Older", rssi = -99, firstSeenAt = NOW),
                 item(fingerprint = "newer", displayName = "Newer", rssi = -35, firstSeenAt = NOW + 2_000),
-            ).sortedWith(RadarUiCardOrder.comparator)
+            ).sortedWith(RadarUiCardOrder.comparator(SORT_NOW))
 
         assertEquals(initial.map { it.fingerprint }, afterRssiSwap.map { it.fingerprint })
     }
 
     @Test
-    fun `last seen updates do not reorder existing cards`() {
+    fun `last seen updates inside one recency bucket do not reorder cards`() {
         val initial =
             listOf(
-                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW, lastSeenAt = NOW + 10_000),
-                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000, lastSeenAt = NOW),
-            ).sortedWith(RadarUiCardOrder.comparator)
+                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW, lastSeenAt = SORT_NOW - 5_000),
+                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 10_000),
+            ).sortedWith(RadarUiCardOrder.comparator(SORT_NOW))
 
         val afterLastSeenSwap =
             listOf(
-                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW, lastSeenAt = NOW),
-                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000, lastSeenAt = NOW + 20_000),
-            ).sortedWith(RadarUiCardOrder.comparator)
+                item(fingerprint = "alpha", displayName = "Alpha", firstSeenAt = NOW, lastSeenAt = SORT_NOW - 12_000),
+                item(fingerprint = "beta", displayName = "Beta", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 3_000),
+            ).sortedWith(RadarUiCardOrder.comparator(SORT_NOW))
 
         assertEquals(initial.map { it.fingerprint }, afterLastSeenSwap.map { it.fingerprint })
     }
 
     @Test
-    fun `newer discovery appears before older discovery regardless of signal`() {
+    fun `actively seen device appears before stale device`() {
+        val sorted =
+            listOf(
+                item(
+                    fingerprint = "stale-newer",
+                    displayName = "Stale",
+                    firstSeenAt = NOW + 10_000,
+                    lastSeenAt = SORT_NOW - 90_000,
+                ),
+                item(
+                    fingerprint = "active-older",
+                    displayName = "Active",
+                    firstSeenAt = NOW,
+                    lastSeenAt = SORT_NOW - 2_000,
+                ),
+            ).sortedWith(RadarUiCardOrder.comparator(SORT_NOW))
+
+        assertEquals(listOf("active-older", "stale-newer"), sorted.map { it.fingerprint })
+    }
+
+    @Test
+    fun `newer discovery appears before older discovery inside same recency bucket`() {
         val sorted =
             listOf(
                 item(fingerprint = "older-strong", displayName = "Older", rssi = -35, firstSeenAt = NOW),
                 item(fingerprint = "newer-weak", displayName = "Newer", rssi = -95, firstSeenAt = NOW + 2_000),
-            ).sortedWith(RadarUiCardOrder.comparator)
+            ).sortedWith(RadarUiCardOrder.comparator(SORT_NOW))
 
         assertEquals(listOf("newer-weak", "older-strong"), sorted.map { it.fingerprint })
     }
 
     @Test
-    fun `watchlist and new devices keep top priority`() {
+    fun `watchlist keeps top priority and new wins inside same recency bucket`() {
         val sorted =
             listOf(
                 item(fingerprint = "ordinary", displayName = "A ordinary"),
                 item(fingerprint = "new", displayName = "B new", priority = RadarItemPriority.NEW),
                 item(fingerprint = "watch", displayName = "C watch", priority = RadarItemPriority.WATCHLIST),
-            ).sortedWith(RadarUiCardOrder.comparator)
+            ).sortedWith(RadarUiCardOrder.comparator(SORT_NOW))
 
         assertEquals(listOf("watch", "new", "ordinary"), sorted.map { it.fingerprint })
     }
@@ -71,7 +92,7 @@ class RadarUiCardOrderTest {
         displayName: String,
         rssi: Int = -60,
         firstSeenAt: Long = NOW,
-        lastSeenAt: Long = NOW,
+        lastSeenAt: Long = SORT_NOW - 1_000,
         priority: RadarItemPriority = RadarItemPriority.ORDINARY,
     ): RadarUiItem =
         RadarUiMapper.mapToUi(
@@ -110,5 +131,6 @@ class RadarUiCardOrderTest {
 
     private companion object {
         private const val NOW = 1_789_000_000_000L
+        private const val SORT_NOW = NOW + 30_000L
     }
 }
