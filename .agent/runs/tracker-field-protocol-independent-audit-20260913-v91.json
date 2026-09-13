@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "tracker-field-protocol-independent-audit-20260913-v91",
   "task_digest": "9d40afe3c0a5b53cfea5b9daaeaceabbfd4e4efd348dc54901571049d92c7fc6",
-  "idle_timeout": 300,
-  "task_timeout": 1800,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-13T19:59:42.413683+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-13T19:59:44.428577+00:00",
   "attempt_id": "a0135a32af5704f96f40e5e4",
   "daemon_version": "4.18.20",
   "daemon_pid": 18301,
-  "updated_at": "2026-09-13T19:59:42.413740+00:00",
+  "updated_at": "2026-09-13T19:59:44.656087+00:00",
   "pid": 18301
 }
