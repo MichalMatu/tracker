@@ -241,16 +241,10 @@ class BleScanHandler @Inject constructor(
         val isBaselineDevice = sessionManager.isDeviceZastane(fingerprint)
 
         val deviceType = classifier.resolveType(ctx)
-        val isKnownTracker = deviceType in listOf(
-            DeviceType.AIRTAG,
-            DeviceType.TILE,
-            DeviceType.SAMSUNG_TAG,
-        )
+        val isKnownTracker = deviceType in KNOWN_TRACKER_TYPES
         val hasCorroboratingTrackingEvidence =
-            isKnownTracker ||
-                deviceType == DeviceType.TRACKER ||
-                deviceType == DeviceType.TAG ||
-                ctx.hasRotatingIdentityEvidence()
+            deviceType in CORROBORATING_TRACKER_TYPES ||
+                (ctx.macChangeCount >= MIN_CORROBORATING_MAC_CHANGES && ctx.hasStablePayloadEvidence())
 
         val encounterCount = sessionManager.getMovingEncounterCount(fingerprint)
         val rssiSamples = movingRssiSamples(fingerprint, ctx.validRssi, userIsMoving)
@@ -351,12 +345,13 @@ class BleScanHandler @Inject constructor(
                     manufacturerDataById.isNotEmpty()
             )
 
-    private fun ScanDataContext.hasRotatingIdentityEvidence(): Boolean =
-        macChangeCount >= MIN_CORROBORATING_MAC_CHANGES && hasStablePayloadEvidence()
-
     companion object {
         private const val TAG = "BleScanHandler"
         private const val MIN_CORROBORATING_MAC_CHANGES = 2
+        private val KNOWN_TRACKER_TYPES =
+            setOf(DeviceType.AIRTAG, DeviceType.TILE, DeviceType.SAMSUNG_TAG)
+        private val CORROBORATING_TRACKER_TYPES =
+            KNOWN_TRACKER_TYPES + setOf(DeviceType.TRACKER, DeviceType.TAG)
     }
 }
 
