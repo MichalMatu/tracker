@@ -1,0 +1,9 @@
+{
+  "event": "invalid_task_rejected",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "updated_at": "2026-09-13T19:14:23.434172+00:00",
+  "task_id": "tracker-field-false-positive-fix-20260913-v77",
+  "daemon_version": "4.18.20",
+  "pid": 53603
+}
