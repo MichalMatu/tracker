@@ -2,6 +2,23 @@
 
 > Phase 3 field reacceptance is **ACCEPTED / CLOSED**. This checklist is active again for repeatable engineering field sessions and dataset collection. It is not, by itself, a release-readiness verdict. See `docs/README.md` for the current plan and `docs/PHASE3_FIELD_REACCEPTANCE_CLOSURE_2026-09-11.md` for the final Phase 3 acceptance record.
 
+## Next session focus — Details / UX verification
+
+Test the current `main` build on the Samsung S22+ without changing app configuration during the comparison:
+
+1. Open Radar and enter Details for a device with ordinary evidence.
+2. Confirm the first viewport prioritizes summary, current RSSI/last-seen context, signal history and key evidence before technical Bluetooth data.
+3. Confirm `Actions / Review`, `History`, `Technical details` and `All evidence` appear in the intended lower-priority order.
+4. Confirm **Technical details is collapsed by default** and expands/collapses without losing the surrounding Details state.
+5. While scanning continues, expand Technical details and verify connection state, sensor data, radio metadata, services and `Raw Data` remain usable.
+6. Open `Raw Data`, copy/export the payload, close it, and return to the same Details position.
+7. Change RSSI/live state while scrolling through Details; watch for jumps, unexpected section insertion or layout instability.
+8. Repeat with a device that has extensive evidence and one with little/no evidence.
+9. Check dark mode and a larger Android font scale before treating the UX slice as accepted.
+10. Record any crash, ANR, unexpected scroll jump, broken collapse state, missing technical field or export/copy failure as a concrete defect rather than tuning heuristics live.
+
+This session is **validation**, not permission to alter scanner/parser/identity/scoring behavior in the field.
+
 ## Before walking
 
 1. Record the exact app/source SHA being tested.
