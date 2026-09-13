@@ -5,17 +5,21 @@ import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.IdentityCarryoverVerdict
 import io.blueeye.core.model.IdentityContinuityCandidate
+import io.blueeye.core.model.RadarDeviceSummary
 import kotlinx.coroutines.flow.Flow
 
 /**
  * Interface for querying devices.
  */
+@Suppress("TooManyFunctions")
 interface DeviceQueryRepository {
     fun getAllDevices(): Flow<Result<List<Device>>>
 
     suspend fun getAllDevicesSync(): Result<List<Device>>
 
     fun getRecentDevices(sinceTimestamp: Long): Flow<Result<List<Device>>>
+
+    fun getRecentRadarDevices(sinceTimestamp: Long): Flow<Result<List<RadarDeviceSummary>>>
 
     fun getWatchlistDevices(): Flow<Result<List<Device>>>
 

@@ -14,6 +14,15 @@ object DetailsEvidenceUiFormatter {
             modeText = "Passive scan review",
         )
 
+    fun formatKeyEvidence(
+        evidence: List<DetectionEvidence>,
+        timestampFormatter: (Long) -> String = DetailsUiFormatter::formatFriendlyTimestamp,
+    ): List<DetailsEvidenceUiItem> =
+        format(
+            evidence = evidence.filter(DetectionEvidenceClassifier::isAttentionEvidence),
+            timestampFormatter = timestampFormatter,
+        ).take(KEY_EVIDENCE_LIMIT)
+
     fun format(
         evidence: List<DetectionEvidence>,
         timestampFormatter: (Long) -> String = DetailsUiFormatter::formatFriendlyTimestamp,
@@ -108,6 +117,7 @@ object DetailsEvidenceUiFormatter {
     private const val ACTIVE_MODE_TEXT = "Active probe"
     private const val USER_VERDICT_MODE_TEXT = "User verdict"
     private const val EMPTY_TECHNICAL_VALUE = "None"
+    private const val KEY_EVIDENCE_LIMIT = 3
 }
 
 data class DetailsEvidenceUiItem(

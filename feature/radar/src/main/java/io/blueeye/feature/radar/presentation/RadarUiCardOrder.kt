@@ -12,7 +12,7 @@ internal object RadarUiCardOrder {
     val comparator: Comparator<RadarUiItem> =
         compareByDescending<RadarUiItem> { it.isInWatchlist }
             .thenByDescending { it.isNew }
-            .thenByDescending { it.device.firstSeenAt }
+            .thenByDescending { it.firstSeenAt }
             .thenBy { it.displayName.lowercase() }
             .thenBy { it.fingerprint }
 }

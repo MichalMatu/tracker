@@ -1,3 +1,5 @@
+> **HISTORICAL STATUS NOTICE:** Phase 3 is ACCEPTED / CLOSED and Phase 4 is UNBLOCKED. This file is retained as stabilization provenance; do not use any older NEXT ACTION, pending-walk status, pre-field build, or blocked-phase statement below as current instructions. Current work starts from docs/README.md and docs/UI_UX_REDESIGN_PLAN.md.
+
 # Phase 3 Targeted Physical Acceptance — 2026-09-10
 
 Status: **PASS for targeted physical regressions and ingest accounting; varied-density field walk still pending**

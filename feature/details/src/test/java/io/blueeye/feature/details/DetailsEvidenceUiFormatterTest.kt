@@ -211,6 +211,27 @@ class DetailsEvidenceUiFormatterTest {
         assertEquals("None", item.parsedValueText)
     }
 
+    @Test
+    fun `key evidence keeps only attention evidence and caps default list at three`() {
+        val items =
+            DetailsEvidenceUiFormatter.formatKeyEvidence(
+                evidence =
+                    listOf(
+                        evidence(EvidenceSource.MODEL, DetectionConfidence.LOW, "Low model context"),
+                        evidence(EvidenceSource.NAME, DetectionConfidence.MEDIUM, "Medium name match"),
+                        evidence(EvidenceSource.SERVICE_UUID, DetectionConfidence.HIGH, "High service match"),
+                        evidence(EvidenceSource.WATCHLIST, DetectionConfidence.CRITICAL, "Watchlist match"),
+                        evidence(EvidenceSource.GATT_PROBE, DetectionConfidence.MEDIUM, "Probe result"),
+                    ),
+                timestampFormatter = { it.toString() },
+            )
+
+        assertEquals(3, items.size)
+        assertEquals("Watchlist", items[0].sourceText)
+        assertEquals("Service UUID", items[1].sourceText)
+        assertFalse(items.any { item -> item.sourceText == "Model" })
+    }
+
     private fun evidence(
         source: EvidenceSource,
         confidence: DetectionConfidence,

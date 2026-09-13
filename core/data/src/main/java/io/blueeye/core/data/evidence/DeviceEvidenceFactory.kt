@@ -7,14 +7,58 @@ import io.blueeye.core.data.classifier.vendor.TacticalOuiRegistry
 import io.blueeye.core.data.classifier.vendor.tactical.ConfidenceLevel
 import io.blueeye.core.data.classifier.vendor.tactical.TacticalNameMatcher
 import io.blueeye.core.data.db.entity.DeviceEntity
+import io.blueeye.core.domain.evidence.DetectionEvidenceClassifier
 import io.blueeye.core.model.DetectionConfidence
 import io.blueeye.core.model.DetectionEvidence
+import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.DeviceType
 import io.blueeye.core.model.EvidenceProvenance
 import io.blueeye.core.model.EvidenceSource
+import io.blueeye.core.model.RadarEvidenceSignals
 import io.blueeye.core.model.TrackingStatus
 
+@Suppress("TooManyFunctions")
 object DeviceEvidenceFactory {
+
+    /**
+     * Builds only the evidence-derived decision flags consumed by Radar.
+     *
+     * This intentionally skips identity-only LOW-confidence evidence, complete evidence sorting and
+     * Details-only probe payload construction while preserving the sectioning decisions.
+     */
+    fun buildRadarSignals(device: DeviceEntity): RadarEvidenceSignals {
+        val classificationEvidence = mutableListOf<DetectionEvidence>()
+        val advertisementEvidence = AdvertisementEvidenceParser.parse(device.lastRawData)
+
+        device.knownTrackerEvidence()?.let(classificationEvidence::add)
+        addNameEvidence(device, classificationEvidence)
+        addOuiEvidence(device, classificationEvidence)
+        addManufacturerEvidence(device, advertisementEvidence, classificationEvidence)
+        addServiceUuidEvidence(device, advertisementEvidence, classificationEvidence)
+
+        val hasAttentionClassification =
+            classificationEvidence.any(DetectionEvidenceClassifier::isAttentionEvidence)
+        val hasAttentionFromCalibration =
+            device.calibrationLabel in RADAR_ATTENTION_CALIBRATION_LABELS
+        val hasAttentionFromTracking = device.trackingStatus != TrackingStatus.SAFE
+        val hasAttentionFromProbe = device.connectionStatus in RADAR_ATTENTION_PROBE_STATUSES
+
+        return RadarEvidenceSignals(
+            hasWatchlistEvidence = device.isInWatchlist,
+            hasTrackerLikeEvidence =
+                classificationEvidence.any(DetectionEvidenceClassifier::isTrackerLikeEvidence),
+            hasPublicSafetyLikeEvidence =
+                classificationEvidence.any(DetectionEvidenceClassifier::isPublicSafetyLikeEvidence),
+            hasAttentionEvidence =
+                device.isInWatchlist ||
+                    hasAttentionFromCalibration ||
+                    hasAttentionFromTracking ||
+                    hasAttentionFromProbe ||
+                    hasAttentionClassification,
+            hasAttentionFollowMeEvidence = hasAttentionFromTracking,
+        )
+    }
+
     fun build(device: DeviceEntity): List<DetectionEvidence> {
         val evidence = mutableListOf<DetectionEvidence>()
         val advertisementEvidence = AdvertisementEvidenceParser.parse(device.lastRawData)
@@ -380,6 +424,21 @@ object DeviceEvidenceFactory {
                 .ifBlank { null },
             isPassive = false,
             provenance = provenance,
+        )
+
+    private val RADAR_ATTENTION_CALIBRATION_LABELS =
+        setOf(
+            DeviceCalibrationLabel.TRUE_POSITIVE,
+            DeviceCalibrationLabel.SUSPICIOUS,
+        )
+
+    private val RADAR_ATTENTION_PROBE_STATUSES =
+        setOf(
+            "PROBED",
+            "RFCOMM_OK",
+            "RFCOMM_FAIL",
+            "FAILED",
+            "FAILED_PERMANENT",
         )
 
     private const val MILLIS_PER_SECOND = 1_000L

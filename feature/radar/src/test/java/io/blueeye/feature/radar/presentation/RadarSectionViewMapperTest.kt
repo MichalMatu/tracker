@@ -133,64 +133,10 @@ class RadarSectionViewMapperTest {
         )
 
     private fun item(fingerprint: String): RadarUiItem =
-        RadarUiItem(
+        RadarUiMapper.mapToUi(
             device = device(fingerprint),
-            fingerprint = fingerprint,
-            displayName = fingerprint,
-            vendorAndType = "",
-            sensorData = null,
-            signalInfo =
-                RadarUiSignalInfo(
-                    rssi = -60,
-                    rssiText = "-60 dBm",
-                    signalColor = RadarUiColorToken.PRIMARY,
-                    signalProgress = 50,
-                    distanceText = "Unknown",
-                    techBadge = "BLE",
-                    techBadgeColor = RadarUiColorToken.PRIMARY,
-                    timeSinceSeen = "now",
-                ),
-            statusInfo =
-                RadarUiStatusInfo(
-                    text = "SAFE",
-                    textColor = RadarUiColorToken.SAFE,
-                    backgroundTint = RadarUiColorToken.SAFE_CONTAINER,
-                    isWarning = false,
-                    cardBackgroundColor = null,
-                ),
-            connectionInfo =
-                RadarUiConnectionInfo(
-                    isVisible = false,
-                    text = "",
-                    textColor = RadarUiColorToken.TRANSPARENT,
-                ),
-            icons =
-                RadarUiIcons(
-                    mainIconRes = 0,
-                    isConnectable = false,
-                ),
-            badges =
-                RadarBadgeInfo(
-                    techBadge = "BLE",
-                    techColor = RadarUiColorToken.PRIMARY,
-                    privacyBadge = "PUBLIC",
-                    watchlistBadge = null,
-                    watchlistColor = RadarUiColorToken.GRAY,
-                    statusBadge = null,
-                    statusColor = RadarUiColorToken.SAFE,
-                    calibrationBadge = null,
-                    calibrationColor = RadarUiColorToken.GRAY,
-                    batteryText = null,
-                    temperatureText = null,
-                    humidityText = null,
-                    voltageText = null,
-                    extraText = null,
-                ),
             isNew = false,
-            isInWatchlist = false,
-            isIgnored = false,
-            nameColor = RadarUiColorToken.PRIMARY,
-            evidenceInfo = null,
+            activeProbeMac = null,
         )
 
     private fun device(fingerprint: String): Device =

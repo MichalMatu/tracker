@@ -2,6 +2,7 @@ package io.blueeye.core.data.repository
 
 import io.blueeye.core.data.db.dao.DeviceDao
 import io.blueeye.core.data.mapper.toDomain
+import io.blueeye.core.data.mapper.toRadarDomain
 import io.blueeye.core.data.repository.handler.ble.BleScanHandler
 import io.blueeye.core.data.repository.handler.ble.SignalSamplePersistenceOutcome
 import io.blueeye.core.data.repository.handler.classic.ClassicScanHandler
@@ -13,6 +14,7 @@ import io.blueeye.core.domain.repository.DeviceRepository
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.IdentityCarryoverVerdict
+import io.blueeye.core.model.RadarDeviceSummary
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -44,6 +46,12 @@ constructor(
     override fun getRecentDevices(sinceTimestamp: Long): Flow<Result<List<Device>>> {
         return deviceDao.getRecentDevicesFlow(sinceTimestamp)
             .map { entities -> entities.toDomain() }
+            .asResult()
+    }
+
+    override fun getRecentRadarDevices(sinceTimestamp: Long): Flow<Result<List<RadarDeviceSummary>>> {
+        return deviceDao.getRecentRadarDevicesFlow(sinceTimestamp)
+            .map { projections -> projections.toRadarDomain() }
             .asResult()
     }
 
