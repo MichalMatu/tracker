@@ -1,0 +1,60 @@
+{
+  "id": "tracker-post-walk-audit-detail-20260913-v74",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-13T18:57:39.966746+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; DB=\"$HOME/tracker-field-captures/2026-09-13-post-walk-v68/tracker_database\"; echo PUBLIC_SAFETY_REASONS; sqlite3 -header -column \"$DB\" \"SELECT COALESCE(d.lastDeviceName,'(none)') AS name, d.deviceType, a.evidenceSource, a.confidence, a.reasonText, a.parsedValue, COUNT(*) AS events FROM alert_evidence_events a LEFT JOIN devices d ON d.fingerprint=a.deviceFingerprint WHERE a.eventType='PUBLIC_SAFETY_SIGNAL' GROUP BY a.deviceFingerprint,a.evidenceSource,a.confidence,a.reasonText,a.parsedValue ORDER BY events DESC,name;\"; echo FOLLOW_ME_UNIQUE; sqlite3 -header -column \"$DB\" \"SELECT COUNT(*) AS events, COUNT(DISTINCT deviceFingerprint) AS unique_devices FROM alert_evidence_events WHERE eventType='FOLLOW_ME_ALERT';\"; echo FOLLOW_ME_DEVICES; sqlite3 -header -column \"$DB\" \"SELECT COALESCE(d.lastDeviceName,'(none)') AS name, d.deviceType, d.trackingStatus AS current_status, ROUND(d.followingScore,1) AS current_score, COUNT(a.id) AS alert_events, MAX(a.timestamp) AS last_alert_ms FROM alert_evidence_events a JOIN devices d ON d.fingerprint=a.deviceFingerprint WHERE a.eventType='FOLLOW_ME_ALERT' GROUP BY a.deviceFingerprint ORDER BY alert_events DESC,last_alert_ms DESC LIMIT 30;\"; echo APPLE_FRAGMENTATION; sqlite3 -header -column \"$DB\" \"WITH a AS (SELECT d.fingerprint,d.firstSeenAt,d.lastSeenAt,COUNT(s.id) AS samples FROM devices d LEFT JOIN signal_samples s ON s.deviceFingerprint=d.fingerprint WHERE d.manufacturerId=76 AND (d.deviceType IN ('TRACKER','AIRTAG','TAG') OR d.beaconType LIKE '%Find%' OR d.sensorData LIKE '%Find%') GROUP BY d.fingerprint) SELECT COUNT(*) AS rows, SUM(CASE WHEN samples=0 THEN 1 ELSE 0 END) AS no_samples, SUM(CASE WHEN samples=1 THEN 1 ELSE 0 END) AS one_sample, SUM(CASE WHEN samples<=2 THEN 1 ELSE 0 END) AS at_most_2_samples, SUM(CASE WHEN lastSeenAt-firstSeenAt<=10000 THEN 1 ELSE 0 END) AS lifetime_le_10s, ROUND(AVG(samples),2) AS avg_samples, MAX(samples) AS max_samples FROM a;\"; echo APPLE_SAMPLE_BUCKETS; sqlite3 -header -column \"$DB\" \"WITH a AS (SELECT d.fingerprint,COUNT(s.id) AS samples FROM devices d LEFT JOIN signal_samples s ON s.deviceFingerprint=d.fingerprint WHERE d.manufacturerId=76 AND (d.deviceType IN ('TRACKER','AIRTAG','TAG') OR d.beaconType LIKE '%Find%' OR d.sensorData LIKE '%Find%') GROUP BY d.fingerprint) SELECT CASE WHEN samples=0 THEN '0' WHEN samples=1 THEN '1' WHEN samples<=2 THEN '2' WHEN samples<=5 THEN '3-5' WHEN samples<=10 THEN '6-10' ELSE '11+' END AS bucket, COUNT(*) AS devices FROM a GROUP BY bucket ORDER BY CASE bucket WHEN '0' THEN 0 WHEN '1' THEN 1 WHEN '2' THEN 2 WHEN '3-5' THEN 3 WHEN '6-10' THEN 4 ELSE 5 END;\"; echo APPLE_IDENTITY_CANDIDATES; sqlite3 -header -column \"$DB\" \"SELECT COUNT(*) AS candidates FROM identity_continuity_candidates c WHERE c.deviceFingerprint IN (SELECT fingerprint FROM devices WHERE manufacturerId=76 AND (deviceType IN ('TRACKER','AIRTAG','TAG') OR beaconType LIKE '%Find%' OR sensorData LIKE '%Find%')) OR c.candidateFingerprint IN (SELECT fingerprint FROM devices WHERE manufacturerId=76 AND (deviceType IN ('TRACKER','AIRTAG','TAG') OR beaconType LIKE '%Find%' OR sensorData LIKE '%Find%'));\"",
+      "exit_code": 0,
+      "output": "PUBLIC_SAFETY_REASONS\nname                    deviceType      evidenceSource  confidence  reasonText                                                                                                     parsedValue                                 events\n----------------------  --------------  --------------  ----------  -------------------------------------------------------------------------------------------------------------  ------------------------------------------  ------\nZD411-DFJ233300037      BODY_CAMERA     NAME            MEDIUM      Device name is consistent with Reveal Media BWC (UK). Name-only signals are capped at medium confidence.       BODY_CAMERA: Reveal Media BWC (UK)          7     \nGovee_H80C4_6D43        SMART_HOME      NAME            MEDIUM      Device name is consistent with Reveal Media BWC (UK). Name-only signals are capped at medium confidence.       BODY_CAMERA: Reveal Media BWC (UK)          2     \n81HB-X                  SMART_WEAPON    SERVICE_UUID    HIGH        Service UUID is consistent with Kestrel Ballistics: Kestrel Ballistics.                                        SMART_WEAPON: Kestrel Ballistics            1     \nDIGIT_442d37            BODY_CAMERA     NAME            MEDIUM      Device name is consistent with Reveal Media BWC (UK). Name-only signals are capped at medium confidence.       BODY_CAMERA: Reveal Media BWC (UK)          1     \nDYWPRO80CB6EE1D5308A    BODY_CAMERA     NAME            MEDIUM      Device name is consistent with Reveal Media BWC (UK). Name-only signals are capped at medium confidence.       BODY_CAMERA: Reveal Media BWC (UK)          1     \nGovee_H61D5_4474        SMART_HOME      NAME            MEDIUM      Device name is consistent with Reveal Media BWC (UK). Name-only signals are capped at medium confidence.       BODY_CAMERA: Reveal Media BWC (UK)          1     \nHUAWEI WATCH FIT 4-D50  WEARABLE        NAME            MEDIUM      Device name is consistent with Reveal Media BWC (UK). Name-only signals are capped at medium confidence.       BODY_CAMERA: Reveal Media BWC (UK)          1     \nK65                     BODY_CAMERA     NAME            MEDIUM      Device name is consistent with Reveal Media BWC (UK). Name-only signals are capped at medium confidence.       BODY_CAMERA: Reveal Media BWC (UK)          1     \nLEDCAR-01-a757          SMART_WEAPON    SERVICE_UUID    HIGH        Service UUID is consistent with Kestrel Ballistics: Kestrel Ballistics.                                        SMART_WEAPON: Kestrel Ballistics            1     \nOBDeleven 3             SMART_WEAPON    SERVICE_UUID    HIGH        Service UUID is consistent with Kestrel Ballistics: Kestrel Ballistics.                                        SMART_WEAPON: Kestrel Ballistics            1     \nS41 0D3A LE             BODY_CAMERA     NAME            MEDIUM      Device name is consistent with Reveal Media BWC (UK). Name-only signals are capped at medium confidence.       BODY_CAMERA: Reveal Media BWC (UK)          1     \nS91e02bf7ddf375d5C      BODY_CAMERA     NAME            MEDIUM      Device name is consistent with Reveal Media BWC (UK). Name-only signals are capped at medium confidence.       BODY_CAMERA: Reveal Media BWC (UK)          1     \nSP13SC005OR30A          TACTICAL_AUDIO  NAME            MEDIUM      Device name is consistent with Invisio professional audio. Name-only signals are capped at medium confidence.  TACTICAL_AUDIO: Invisio professional audio  1     \nFOLLOW_ME_UNIQUE\nevents  unique_devices\n------  --------------\n51      28            \nFOLLOW_ME_DEVICES\nname                           deviceType  current_status  current_score  alert_events  last_alert_ms\n-----------------------------  ----------  --------------  -------------  ------------  -------------\nLE_WF-1000XM5                  HEADPHONES  SUSPICIOUS      65.0           10            1789321578720\nEddystone Beacon               BEACON      SUSPICIOUS      65.0           3             1789321695296\nSamsung/Android (Quick Share)  PHONE       SUSPICIOUS      65.0           3             1789321681145\nEDIFIER BLE                    UNKNOWN     SAFE            50.0           3             1789321578567\nEddystone Beacon               BEACON      SUSPICIOUS      65.0           3             1789321161938\nFMDN                           BEACON      SUSPICIOUS      70.0           3             1789320576592\nJBL TUNE520BT-LE               HEADPHONES  SUSPICIOUS      60.0           2             1789321679315\nGFPS_ADV                       UNKNOWN     SUSPICIOUS      55.0           2             1789321677116\n(none)                         UNKNOWN     SAFE            35.0           2             1789321673637\nApple Device                   UNKNOWN     SUSPICIOUS      55.0           2             1789321580395\n(none)                         UNKNOWN     SAFE            32.0           1             1789321804890\nEddystone Beacon               BEACON      SUSPICIOUS      62.0           1             1789321802557\nJabra Elite 4                  HEADPHONES  SUSPICIOUS      65.0           1             1789321738878\n(none)                         UNKNOWN     SAFE            29.0           1             1789321124683\n(none)                         UNKNOWN     SUSPICIOUS      55.0           1             1789321119158\nSony Audio Device              HEADPHONES  SUSPICIOUS      55.0           1             1789321107799\nWH-CH720N                      HEADPHONES  SUSPICIOUS      55.0           1             1789321082186\n(none)                         UNKNOWN     SUSPICIOUS      55.0           1             1789320554915\nSamsung SmartTag               TAG         SAFE            0.0            1             1789319873147\nEddystone Beacon               BEACON      SAFE            10.0           1             1789319594060\nEddystone Beacon               BEACON      SAFE            10.0           1             1789318125428\nFMDN                           BEACON      SUSPICIOUS      60.0           1             1789317989714\nShellyPlugSG3-E4B063D7F530     UNKNOWN     SAFE            0.0            1             1789135412019\nMacBook Air                    LAPTOP      SAFE            0.0            1             1789135405593\nLE-Bose QC Ultra Headphones    HEADPHONES  SAFE            0.0            1             1789135405331\nTY                             SMART_HOME  SAFE            0.0            1             1789135403704\n[TV] Samsung Q60 Series (65)   TV          SAFE            0.0            1             1789135402034\nGFPS_ADV                       UNKNOWN     SUSPICIOUS      52.0           1             1789126659478\nAPPLE_FRAGMENTATION\nrows  no_samples  one_sample  at_most_2_samples  lifetime_le_10s  avg_samples  max_samples\n----  ----------  ----------  -----------------  ---------------  -----------  -----------\n1257  0           647         851                701              3.79         99         \nAPPLE_SAMPLE_BUCKETS\nbucket  devices\n------  -------\n1       647    \n2       204    \n3-5     251    \n6-10    80     \n11+     75     \nAPPLE_IDENTITY_CANDIDATES\ncandidates\n----------\n0         \n",
+      "elapsed_seconds": 0.464,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.14,
+      "output_policy": "stream",
+      "captured_output_chars": 7121,
+      "output_truncated": false,
+      "current_rss_mb": 2.14,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.464
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.081
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.068
+  },
+  "finished_at": "2026-09-13T18:57:41.936481+00:00",
+  "task_digest": "86e1a7c61b64ae5de3581a1cd2bbee67349ac36c03bff5cd6ae2b51de34bcc17",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "attempt_id": "6084d5a4e8f2be0073df4c83",
+  "daemon_version": "4.18.20"
+}
