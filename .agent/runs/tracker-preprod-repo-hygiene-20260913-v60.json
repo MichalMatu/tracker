@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 5,
+  "index": 6,
   "total": 6,
-  "command": "set -euo pipefail; if command -v gitleaks >/dev/null 2>&1; then gitleaks git --config .gitleaks.toml --redact --verbose; else echo GITLEAKS_LOCAL_SKIPPED_NOT_INSTALLED; fi; git diff --check; git status --short; git add docs/UI_UX_REDESIGN_PLAN.md docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md docs/PHASE3_HANDOFF.md docs/PHASE3_FINAL_HANDOFF_2026-09-11.md docs/PHASE3_CAPTURED_DATA_ANALYSIS_HANDOFF_2026-09-11.md docs/PHASE3_FIELD_REACCEPTANCE_HANDOFF_2026-09-11.md; git diff --cached --check; git commit -m \"docs: close superseded handoffs and UX phase state\"; git push origin HEAD:chore/preproduction-readiness-20260913; echo PREPROD_V60_PUSHED=$(git rev-parse HEAD)",
-  "pid": 98273,
+  "command": "set -euo pipefail; git fetch origin main chore/preproduction-readiness-20260913; test \"$(git rev-parse HEAD)\" = \"$(git rev-parse origin/chore/preproduction-readiness-20260913)\"; test \"$(git rev-parse origin/main)\" = \"565821f9dd46450a324907523c9ce1ad49349d75\"; test -z \"$(git status --porcelain)\"; echo PREPROD_V60_FINAL_CLEAN",
+  "pid": 98469,
   "timeout": 2400,
   "idle_timeout": 900,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-13T06:39:04.370491+00:00",
-  "stage_name": "command-5",
-  "stage_index": 5,
+  "started_at": "2026-09-13T06:39:17.438156+00:00",
+  "stage_name": "command-6",
+  "stage_index": 6,
   "stage_total": 6,
   "stage_phase": "commands",
   "task_id": "tracker-preprod-repo-hygiene-20260913-v60",
@@ -18,5 +18,5 @@
   "task_digest": "cb54ce20c12a77d371c78ccd03d9ce0e657cedfb3df64e244bcbecd0312fc182",
   "daemon_version": "4.18.20",
   "daemon_pid": 94502,
-  "updated_at": "2026-09-13T06:39:04.449081+00:00"
+  "updated_at": "2026-09-13T06:39:17.516501+00:00"
 }
