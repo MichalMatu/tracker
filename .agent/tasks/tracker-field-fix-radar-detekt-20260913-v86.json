@@ -1,0 +1,15 @@
+{
+  "id": "tracker-field-fix-radar-detekt-20260913-v86",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1200,
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "commands": [
+    "set -eu; git fetch --prune origin main; git checkout main; git reset --hard origin/main; test \"$(git rev-parse HEAD)\" = \"3a8b8b2bcc711a498188f8656f34cd1b4b67657a\"; test -z \"$(git status --porcelain)\"; echo V86_BASELINE_OK",
+    "set -u; JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export JAVA_HOME; PATH=\"$JAVA_HOME/bin:$PATH\"; export PATH; set +e; ./gradlew :feature:radar:detekt --no-daemon >/tmp/tracker-radar-detekt-console.txt 2>&1; rc=$?; set -e; echo DETEKT_RC=$rc; python3 - <<'PY'\nfrom pathlib import Path\nimport json, xml.etree.ElementTree as ET\nroot=Path('feature/radar/build')\nfiles=[p for p in root.rglob('*') if p.is_file() and ('detekt' in p.name.lower() or p.suffix.lower()=='.sarif')]\nprint('REPORT_FILES', [str(p) for p in files])\nfound=0\nfor p in files:\n    try:\n        if p.suffix.lower()=='.sarif':\n            data=json.loads(p.read_text())\n            for run in data.get('runs',[]):\n                for r in run.get('results',[]):\n                    loc=(r.get('locations') or [{}])[0].get('physicalLocation',{})\n                    art=loc.get('artifactLocation',{}).get('uri','')\n                    line=loc.get('region',{}).get('startLine','')\n                    msg=r.get('message',{}).get('text','')\n                    print('DETEKT_ISSUE',r.get('ruleId',''),art,line,msg)\n                    found+=1\n        elif p.suffix.lower()=='.xml':\n            tree=ET.parse(p)\n            for f in tree.getroot().findall('.//file'):\n                for e in f.findall('error'):\n                    print('DETEKT_ISSUE',e.get('source',''),f.get('name',''),e.get('line',''),e.get('message',''))\n                    found+=1\n        elif p.suffix.lower()=='.txt':\n            for line in p.read_text(errors='replace').splitlines():\n                if line.strip(): print('DETEKT_TEXT',line)\n    except Exception as exc:\n        print('REPORT_PARSE_ERROR',str(p),type(exc).__name__,str(exc))\nprint('ISSUE_COUNT',found)\nPY\necho CONSOLE_TAIL; tail -60 /tmp/tracker-radar-detekt-console.txt; exit 0"
+  ]
+}
