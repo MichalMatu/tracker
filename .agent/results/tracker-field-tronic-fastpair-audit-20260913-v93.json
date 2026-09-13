@@ -1,0 +1,60 @@
+{
+  "id": "tracker-field-tronic-fastpair-audit-20260913-v93",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-13T20:15:23.109812+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; CAP=/Users/michal/tracker-field-captures/2026-09-13-post-walk-v68; DB=$(find \"$CAP\" -maxdepth 3 -type f -name 'tracker_database' -print -quit); test -n \"$DB\"; export TRACKER_FIELD_DB=\"$DB\"; python3 - <<'PY'\nimport os, sqlite3, re, statistics, json\ncon=sqlite3.connect(f\"file:{os.environ['TRACKER_FIELD_DB']}?mode=ro\",uri=True); con.row_factory=sqlite3.Row\nmx=con.execute('select max(timestamp) from signal_samples').fetchone()[0]; start=mx-3*60*60*1000\nts=[int(r[0]) for r in con.execute('select timestamp from follow_me_observations where userMoved=1 and timestamp>=? order by timestamp',(start,))]\nsegs=[]\nif ts:\n a=p=ts[0]\n for x in ts[1:]:\n  if x-p>180000: segs.append((a,p)); a=x\n  p=x\n segs.append((a,p))\nwa,wb=max([s for s in segs if s[1]-s[0]>=300000],key=lambda s:s[1]-s[0]); total=max(1,int((wb-wa)//30000)+1)\nrows=list(con.execute('select timestamp,rssi,deviceFingerprint,deviceName,deviceType,beaconType,serviceDataByUuidHex,serviceUuids from signal_samples where timestamp between ? and ? order by timestamp',(wa,wb)))\ndef entries(s):\n out={}\n if not s:return out\n for part in str(s).split(';'):\n  if '=' not in part: continue\n  k,v=part.split('=',1); out[k.lower()]=re.sub(r'[^0-9a-fA-F]','',v)\n return out\ndef val_for(m, needle):\n for k,v in m.items():\n  if needle in k.replace('-',''): return v\n return None\nfhn=[]; fp=[]\nfor r in rows:\n m=entries(r['serviceDataByUuidHex']); feaa=val_for(m,'feaa'); fe2c=val_for(m,'fe2c')\n if feaa and len(feaa)>=2 and feaa[:2].lower() in ('40','41'): fhn.append(r)\n if fe2c and len(fe2c)>=6: fp.append((r,fe2c[:6].upper()))\nprint('WALK_MIN',round((wb-wa)/60000,1),'FHN_SAMPLES',len(fhn),'FAST_PAIR_SAMPLES',len(fp))\n# group fast pair model ids and summarize only safe metadata\ng={}\nfor r,mid in fp: g.setdefault(mid,[]).append(r)\nfor i,(mid,rs) in enumerate(sorted(g.items(),key=lambda kv:len(kv[1]),reverse=True)[:20],1):\n t=[int(r['timestamp']) for r in rs]; rr=[int(r['rssi']) for r in rs]; bins={int((x-wa)//30000) for x in t}\n print('FASTPAIR',json.dumps({'id':f'M{i:02d}','modelId':mid,'samples':len(rs),'coverage':round(len(bins)/total,3),'spanMin':round((max(t)-min(t))/60000,2),'medianRssi':round(statistics.median(rr),1),'name':str(rs[-1]['deviceName'] or ''),'type':str(rs[-1]['deviceType'] or ''),'beacon':str(rs[-1]['beaconType'] or '')},sort_keys=True))\n# time-nearest Fast Pair model ids around every FHN observation; aggregate within +/-2 seconds\nnear={}\nfor fr in fhn:\n ft=int(fr['timestamp'])\n for r,mid in fp:\n  dt=abs(int(r['timestamp'])-ft)\n  if dt<=2000:\n   near.setdefault(mid,[]).append((dt,int(fr['rssi']),int(r['rssi'])))\nfor i,(mid,xs) in enumerate(sorted(near.items(),key=lambda kv:len(kv[1]),reverse=True)[:12],1):\n print('FHN_NEAR_FASTPAIR',json.dumps({'id':f'N{i:02d}','modelId':mid,'pairs':len(xs),'medianDtMs':round(statistics.median([x[0] for x in xs]),1),'medianRssiDelta':round(statistics.median([abs(x[1]-x[2]) for x in xs]),1)},sort_keys=True))\nPY",
+      "exit_code": 0,
+      "output": "WALK_MIN 27.0 FHN_SAMPLES 314 FAST_PAIR_SAMPLES 875\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.6, \"id\": \"M01\", \"medianRssi\": -58.0, \"modelId\": \"10402A\", \"name\": \"GFPS_ADV\", \"samples\": 204, \"spanMin\": 18.71, \"type\": \"UNKNOWN\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.636, \"id\": \"M02\", \"medianRssi\": -82, \"modelId\": \"00502D\", \"name\": \"Jabra Elite 4\", \"samples\": 127, \"spanMin\": 20.23, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.291, \"id\": \"M03\", \"medianRssi\": -53, \"modelId\": \"004021\", \"name\": \"\", \"samples\": 79, \"spanMin\": 7.54, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.273, \"id\": \"M04\", \"medianRssi\": -53.0, \"modelId\": \"00409A\", \"name\": \"\", \"samples\": 76, \"spanMin\": 7.21, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.327, \"id\": \"M05\", \"medianRssi\": -63, \"modelId\": \"104000\", \"name\": \"LE_WF-1000XM5\", \"samples\": 55, \"spanMin\": 8.93, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.164, \"id\": \"M06\", \"medianRssi\": -64.5, \"modelId\": \"104062\", \"name\": \"LE_WF-1000XM5\", \"samples\": 24, \"spanMin\": 3.66, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.2, \"id\": \"M07\", \"medianRssi\": -88, \"modelId\": \"003000\", \"name\": \"ACTON III [LE]\", \"samples\": 19, \"spanMin\": 20.85, \"type\": \"UNKNOWN\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.055, \"id\": \"M08\", \"medianRssi\": -67, \"modelId\": \"10400B\", \"name\": \"LE_WF-1000XM5\", \"samples\": 17, \"spanMin\": 1.05, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.127, \"id\": \"M09\", \"medianRssi\": -88, \"modelId\": \"000033\", \"name\": \"WF-C510-GFP\", \"samples\": 17, \"spanMin\": 7.22, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.055, \"id\": \"M10\", \"medianRssi\": -71, \"modelId\": \"1040A0\", \"name\": \"GFPS_ADV\", \"samples\": 17, \"spanMin\": 1.12, \"type\": \"UNKNOWN\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.127, \"id\": \"M11\", \"medianRssi\": -87.5, \"modelId\": \"103000\", \"name\": \"\", \"samples\": 16, \"spanMin\": 18.31, \"type\": \"UNKNOWN\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.091, \"id\": \"M12\", \"medianRssi\": -65.0, \"modelId\": \"104010\", \"name\": \"LE_WF-1000XM5\", \"samples\": 16, \"spanMin\": 2.0, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.091, \"id\": \"M13\", \"medianRssi\": -84, \"modelId\": \"004043\", \"name\": \"\", \"samples\": 13, \"spanMin\": 7.24, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.073, \"id\": \"M14\", \"medianRssi\": -56.0, \"modelId\": \"104012\", \"name\": \"LE_WF-1000XM5\", \"samples\": 10, \"spanMin\": 1.14, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.036, \"id\": \"M15\", \"medianRssi\": -74, \"modelId\": \"104081\", \"name\": \"JBL Tune720BT\", \"samples\": 9, \"spanMin\": 0.35, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.036, \"id\": \"M16\", \"medianRssi\": -77, \"modelId\": \"004020\", \"name\": \"OPPO Enco Air4\", \"samples\": 9, \"spanMin\": 0.36, \"type\": \"UNKNOWN\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.036, \"id\": \"M17\", \"medianRssi\": -73.5, \"modelId\": \"009005\", \"name\": \"\", \"samples\": 8, \"spanMin\": 0.78, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.091, \"id\": \"M18\", \"medianRssi\": -58, \"modelId\": \"104088\", \"name\": \"LE_WF-1000XM5\", \"samples\": 7, \"spanMin\": 4.99, \"type\": \"HEADPHONES\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.073, \"id\": \"M19\", \"medianRssi\": -86, \"modelId\": \"005004\", \"name\": \"\", \"samples\": 7, \"spanMin\": 5.74, \"type\": \"BEACON\"}\nFASTPAIR {\"beacon\": \"Fast Pair\", \"coverage\": 0.073, \"id\": \"M20\", \"medianRssi\": -85.5, \"modelId\": \"004004\", \"name\": \"\", \"samples\": 6, \"spanMin\": 20.46, \"type\": \"HEADPHONES\"}\nFHN_NEAR_FASTPAIR {\"id\": \"N01\", \"medianDtMs\": 934, \"medianRssiDelta\": 9, \"modelId\": \"10402A\", \"pairs\": 213}\nFHN_NEAR_FASTPAIR {\"id\": \"N02\", \"medianDtMs\": 1002.5, \"medianRssiDelta\": 24.0, \"modelId\": \"00502D\", \"pairs\": 116}\nFHN_NEAR_FASTPAIR {\"id\": \"N03\", \"medianDtMs\": 835, \"medianRssiDelta\": 9, \"modelId\": \"00409A\", \"pairs\": 73}\nFHN_NEAR_FASTPAIR {\"id\": \"N04\", \"medianDtMs\": 1023.0, \"medianRssiDelta\": 7.0, \"modelId\": \"004021\", \"pairs\": 66}\nFHN_NEAR_FASTPAIR {\"id\": \"N05\", \"medianDtMs\": 1094, \"medianRssiDelta\": 8, \"modelId\": \"104000\", \"pairs\": 57}\nFHN_NEAR_FASTPAIR {\"id\": \"N06\", \"medianDtMs\": 939, \"medianRssiDelta\": 15, \"modelId\": \"104062\", \"pairs\": 25}\nFHN_NEAR_FASTPAIR {\"id\": \"N07\", \"medianDtMs\": 972, \"medianRssiDelta\": 10, \"modelId\": \"104010\", \"pairs\": 23}\nFHN_NEAR_FASTPAIR {\"id\": \"N08\", \"medianDtMs\": 1001.0, \"medianRssiDelta\": 25.5, \"modelId\": \"004043\", \"pairs\": 18}\nFHN_NEAR_FASTPAIR {\"id\": \"N09\", \"medianDtMs\": 1007, \"medianRssiDelta\": 7, \"modelId\": \"10400B\", \"pairs\": 17}\nFHN_NEAR_FASTPAIR {\"id\": \"N10\", \"medianDtMs\": 1166.0, \"medianRssiDelta\": 27.5, \"modelId\": \"103000\", \"pairs\": 16}\nFHN_NEAR_FASTPAIR {\"id\": \"N11\", \"medianDtMs\": 1360, \"medianRssiDelta\": 13, \"modelId\": \"1040A0\", \"pairs\": 13}\nFHN_NEAR_FASTPAIR {\"id\": \"N12\", \"medianDtMs\": 994.5, \"medianRssiDelta\": 27.0, \"modelId\": \"000033\", \"pairs\": 12}\n",
+      "elapsed_seconds": 0.43,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 4.59,
+      "output_policy": "stream",
+      "captured_output_chars": 4944,
+      "output_truncated": false,
+      "current_rss_mb": 4.59,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.43
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.088
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.068
+  },
+  "finished_at": "2026-09-13T20:15:25.133358+00:00",
+  "task_digest": "6d23bc7c3e485d5206b5f0b3551e16b4a4a331eeac5a64a541f05156420aef75",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "8e3d2fc3d0dce9c18836cd46",
+  "daemon_version": "4.18.20"
+}
