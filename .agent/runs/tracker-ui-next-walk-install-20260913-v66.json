@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-ui-next-walk-install-20260913-v66",
+  "task_digest": "a1e615552aa7cf9e0e8a135203891ae8333cbbbee0deac43b57c6102af63a4b2",
+  "idle_timeout": 900,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-13T10:22:29.074102+00:00",
+  "attempt_id": "76087c1aa758cf1955087fd9",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 87982,
+  "updated_at": "2026-09-13T10:22:29.074214+00:00",
+  "pid": 87982
+}
