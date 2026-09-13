@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-field-chain-audit-20260913-v90",
+  "task_digest": "9068d32d29afbcc66d6254b2559f8701d7e65b92fe34b2de1e8469c2b3c641f8",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-13T19:57:21.979905+00:00",
+  "attempt_id": "05872510e6ca0ebf0621a09f",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 15150,
+  "updated_at": "2026-09-13T19:57:21.980024+00:00",
+  "pid": 15150
+}
