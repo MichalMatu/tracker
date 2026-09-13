@@ -1,0 +1,15 @@
+{
+  "id": "tracker-field-fix-quality-diagnose-20260913-v79",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1800,
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "commands": [
+    "set -eu; git fetch --prune origin main; git checkout main; git reset --hard origin/main; test \"$(git rev-parse HEAD)\" = \"a932b4cef4827f7e6a6ddf49b8265fd266b21c67\"; test -z \"$(git status --porcelain)\"; echo V79_BASELINE_OK",
+    "set -eu; ./gradlew --parallel --max-workers=3 qualityCheck --stacktrace --no-daemon"
+  ]
+}
