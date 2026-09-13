@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-preprod-api36-20260913-v61",
+  "task_digest": "e4cc8df6c999629620af41ecd2790c9af73d401449064fa95e2efd6e5415150d",
+  "idle_timeout": 900,
+  "task_timeout": 7200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-13T08:04:53.600008+00:00",
+  "attempt_id": "1195fd28f110c15fb5580970",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 21503,
+  "updated_at": "2026-09-13T08:04:53.600159+00:00",
+  "pid": 21503
+}
