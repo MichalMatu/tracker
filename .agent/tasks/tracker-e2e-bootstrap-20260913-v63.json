@@ -1,0 +1,18 @@
+{
+  "id": "tracker-e2e-bootstrap-20260913-v63",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "ui/radar-details-redesign",
+  "allow_write": true,
+  "resources": ["machine"],
+  "command_timeout": 2400,
+  "task_timeout": 4200,
+  "memory_limit_mb": 4096,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin main ui/radar-details-redesign agent-control; git checkout ui/radar-details-redesign; test -z \"$(git status --porcelain)\"; git reset --hard origin/ui/radar-details-redesign; echo SYNCED_BRANCH=$(git rev-parse HEAD)",
+    "set -euo pipefail; ./gradlew :feature:details:testDebugUnitTest :feature:details:compileDebugKotlin --no-daemon --max-workers=2",
+    "set -euo pipefail; ./gradlew :app:assembleDebug --no-daemon --max-workers=2",
+    "set -euo pipefail; adb devices; test -s feature/app/build/outputs/apk/debug/app-debug.apk || test -s app/build/outputs/apk/debug/app-debug.apk; APK=app/build/outputs/apk/debug/app-debug.apk; if test -s feature/app/build/outputs/apk/debug/app-debug.apk; then APK=feature/app/build/outputs/apk/debug/app-debug.apk; fi; adb install -r \"$APK\"; echo APK_INSTALLED=$APK; adb shell pm path io.blueeye",
+    "set -euo pipefail; git status --short; git rev-parse HEAD; echo E2E_BOOTSTRAP_PASS"
+  ]
+}
