@@ -1,0 +1,20 @@
+{
+  "id": "tracker-preprod-api36-20260913-v61",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "chore/preproduction-readiness-20260913",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 2400,
+  "idle_timeout": 900,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin main chore/preproduction-readiness-20260913 agent-control; git checkout chore/preproduction-readiness-20260913; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"a468a0b2cac0df4f8dbad7b42956a0a22879a512\"; test \"$(git rev-parse origin/chore/preproduction-readiness-20260913)\" = \"a468a0b2cac0df4f8dbad7b42956a0a22879a512\"; test \"$(git rev-parse origin/main)\" = \"565821f9dd46450a324907523c9ce1ad49349d75\"; echo PREPROD_V61_BASELINE_OK",
+    "set -euo pipefail; SDK_ROOT=\"${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$HOME/Library/Android/sdk}}\"; echo SDK_ROOT=$SDK_ROOT; if [ ! -d \"$SDK_ROOT/platforms/android-36\" ]; then SDKMANAGER=\"$(command -v sdkmanager || true)\"; if [ -z \"$SDKMANAGER\" ] && [ -x \"$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager\" ]; then SDKMANAGER=\"$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager\"; fi; test -n \"$SDKMANAGER\"; yes | \"$SDKMANAGER\" --licenses >/dev/null 2>&1 || true; \"$SDKMANAGER\" \"platforms;android-36\"; fi; test -d \"$SDK_ROOT/platforms/android-36\"; echo PREPROD_V61_ANDROID36_SDK_OK",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-preprod-api36-v61.sh > /tmp/tracker-preprod-api36-v61.sh; chmod +x /tmp/tracker-preprod-api36-v61.sh; /tmp/tracker-preprod-api36-v61.sh",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew --stop || true; ./gradlew --version; ./gradlew --parallel --max-workers=3 qualityCheck --stacktrace",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew --parallel --max-workers=3 :app:assembleDebug :app:lintRelease :app:bundleRelease --stacktrace",
+    "set -euo pipefail; printf '%s\n' app/build.gradle.kts app/src/main/AndroidManifest.xml core/data/build.gradle.kts core/decoders/build.gradle.kts core/ui/build.gradle.kts feature/details/build.gradle.kts feature/radar/build.gradle.kts feature/settings/build.gradle.kts feature/watchlist/build.gradle.kts gradle/libs.versions.toml gradle/wrapper/gradle-wrapper.properties | sort > /tmp/expected-v61-files; git diff --name-only | sort > /tmp/actual-v61-files; diff -u /tmp/expected-v61-files /tmp/actual-v61-files; git diff --check; git add app/build.gradle.kts app/src/main/AndroidManifest.xml core/data/build.gradle.kts core/decoders/build.gradle.kts core/ui/build.gradle.kts feature/details/build.gradle.kts feature/radar/build.gradle.kts feature/settings/build.gradle.kts feature/watchlist/build.gradle.kts gradle/libs.versions.toml gradle/wrapper/gradle-wrapper.properties; git diff --cached --check; git commit -m \"build: target Android 16 API 36\"; git push origin HEAD:chore/preproduction-readiness-20260913; echo PREPROD_V61_PUSHED=$(git rev-parse HEAD)",
+    "set -euo pipefail; git fetch origin main chore/preproduction-readiness-20260913; test \"$(git rev-parse HEAD)\" = \"$(git rev-parse origin/chore/preproduction-readiness-20260913)\"; test \"$(git rev-parse origin/main)\" = \"565821f9dd46450a324907523c9ce1ad49349d75\"; test -z \"$(git status --porcelain)\"; echo PREPROD_V61_FINAL_CLEAN"
+  ]
+}
