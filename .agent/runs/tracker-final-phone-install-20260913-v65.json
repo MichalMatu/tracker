@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 4,
+  "index": 5,
   "total": 5,
-  "command": "set -euo pipefail; serial=\"$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}')\"; adb -s \"$serial\" install -r -d app/build/outputs/apk/debug/app-debug.apk; adb -s \"$serial\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null; sleep 5; echo APP_INSTALLED_AND_LAUNCHED",
-  "pid": 63726,
+  "command": "set -euo pipefail; serial=\"$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}')\"; errors=\"$(adb -s \"$serial\" logcat -d -v brief -t 500 | grep -E 'FATAL EXCEPTION|AndroidRuntime: FATAL' || true)\"; test -z \"$errors\"; test -z \"$(git status --porcelain)\"; echo FIELD_WALK_READY",
+  "pid": 63813,
   "timeout": 2400,
   "idle_timeout": 900,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-13T09:41:26.726272+00:00",
-  "stage_name": "command-4",
-  "stage_index": 4,
+  "started_at": "2026-09-13T09:41:33.648490+00:00",
+  "stage_name": "command-5",
+  "stage_index": 5,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-final-phone-install-20260913-v65",
@@ -18,5 +18,5 @@
   "task_digest": "c4bcdbd2b9a57049afce3b8420c1332026b01860a2d2341f57a721ba304b04df",
   "daemon_version": "4.18.20",
   "daemon_pid": 63250,
-  "updated_at": "2026-09-13T09:41:26.806954+00:00"
+  "updated_at": "2026-09-13T09:41:33.741743+00:00"
 }
