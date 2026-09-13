@@ -1,0 +1,60 @@
+{
+  "id": "tracker-post-walk-locate-db-20260913-v69",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-13T18:45:04.355371+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; serial=\"$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}')\"; test -n \"$serial\"; echo RUN_AS_PWD_BEGIN; adb -s \"$serial\" shell run-as io.blueeye pwd; echo RUN_AS_PWD_END; echo TOP_LEVEL_BEGIN; adb -s \"$serial\" shell run-as io.blueeye ls -1; echo TOP_LEVEL_END; echo DATABASES_BEGIN; adb -s \"$serial\" shell run-as io.blueeye ls -la databases 2>&1 || true; echo DATABASES_END; echo DB_FIND_BEGIN; adb -s \"$serial\" shell run-as io.blueeye find . -maxdepth 3 -type f -name 'tracker_database*' -print 2>/dev/null || true; echo DB_FIND_END",
+      "exit_code": 0,
+      "output": "RUN_AS_PWD_BEGIN\n/data/user/0/io.blueeye\nRUN_AS_PWD_END\nTOP_LEVEL_BEGIN\ncache\ncode_cache\ndatabases\nfiles\nno_backup\nshared_prefs\nTOP_LEVEL_END\nDATABASES_BEGIN\ntotal 44738\ndrwxrwx--x 2 u0_a639 u0_a639     3452 2026-09-11 10:17 .\ndrwx------ 8 u0_a639 u0_a639     3452 2026-09-13 09:24 ..\n-rw-rw---- 1 u0_a639 u0_a639 45203456 2026-09-13 20:31 tracker_database\n-rw-rw---- 1 u0_a639 u0_a639    32768 2026-09-13 20:31 tracker_database-shm\n-rw-rw---- 1 u0_a639 u0_a639   524288 2026-09-13 20:31 tracker_database-wal\nDATABASES_END\nDB_FIND_BEGIN\n./cache/tracker_database.lck\n./cache/phase3_field_room/tracker_database\n./cache/phase3_field_room/tracker_database-wal\n./cache/phase3_field_room/tracker_database-shm\n./databases/tracker_database\n./databases/tracker_database-wal\n./databases/tracker_database-shm\nDB_FIND_END\n",
+      "elapsed_seconds": 0.583,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 4.61,
+      "output_policy": "stream",
+      "captured_output_chars": 810,
+      "output_truncated": false,
+      "current_rss_mb": 4.61,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.583
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.081
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.07
+  },
+  "finished_at": "2026-09-13T18:45:06.481446+00:00",
+  "task_digest": "69ccd9c7b6390f6cc77fe1251214e48387b0c5b436253db0adcd0196ec6ab994",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "attempt_id": "b7edb7450aad221c669c1a13",
+  "daemon_version": "4.18.20"
+}
