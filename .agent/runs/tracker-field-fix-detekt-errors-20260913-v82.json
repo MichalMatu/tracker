@@ -1,14 +1,13 @@
 {
-  "event": "task_started",
+  "event": "task_finished",
   "task_id": "tracker-field-fix-detekt-errors-20260913-v82",
   "task_digest": "bad6801cea7c2af6fe0ed322734bd8ebe2706f34ba6369f8c27995f8e35a6e96",
-  "idle_timeout": 120,
-  "task_timeout": 600,
-  "memory_limit_mb": 4096,
-  "started_at": "2026-09-13T19:22:40.444152+00:00",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-13T19:22:42.261823+00:00",
   "attempt_id": "012834eea62b1bfd7fff3e01",
   "daemon_version": "4.18.20",
   "daemon_pid": 69244,
-  "updated_at": "2026-09-13T19:22:40.444205+00:00",
+  "updated_at": "2026-09-13T19:22:42.488628+00:00",
   "pid": 69244
 }
