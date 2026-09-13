@@ -196,7 +196,13 @@ constructor(
             metrics.movementTrackingAvailable && metrics.userHasMoved && !metrics.isBaselineDevice
 
         return metrics.isKnownTracker ||
-            metrics.deviceType in listOf(DeviceType.AIRTAG, DeviceType.TILE, DeviceType.SAMSUNG_TAG) ||
+            metrics.deviceType in listOf(
+                DeviceType.AIRTAG,
+                DeviceType.TILE,
+                DeviceType.SAMSUNG_TAG,
+                DeviceType.TRACKER,
+                DeviceType.TAG,
+            ) ||
             (canMonitorFollowSignals && isLongDuration) ||
             (canMonitorFollowSignals && metrics.macChangeCount >= 2 && metrics.hasStablePayload)
     }
@@ -243,6 +249,8 @@ constructor(
             metrics.deviceType == DeviceType.AIRTAG -> SCORE_TYPE_KNOWN_TRACKER
             metrics.deviceType == DeviceType.TILE -> SCORE_TYPE_KNOWN_TRACKER
             metrics.deviceType == DeviceType.SAMSUNG_TAG -> SCORE_TYPE_KNOWN_TRACKER
+            metrics.deviceType == DeviceType.TRACKER -> SCORE_TYPE_KNOWN_TRACKER
+            metrics.deviceType == DeviceType.TAG -> SCORE_TYPE_KNOWN_TRACKER
             metrics.deviceType == DeviceType.BEACON -> SCORE_TYPE_BEACON
             else -> 0
         }

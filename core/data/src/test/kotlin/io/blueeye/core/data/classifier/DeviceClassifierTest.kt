@@ -33,6 +33,23 @@ class DeviceClassifierTest {
     }
 
     @Test
+    fun `classifyBle classifies Find Hub FEAA frame as tracker before generic Eddystone`() {
+        val result =
+            classifier.classifyBle(
+                BleClassificationInput(
+                    manufacturerRecords = emptyMap(),
+                    serviceUuids = listOf(FIND_HUB_UUID),
+                    serviceDataByUuid = mapOf(FIND_HUB_UUID to byteArrayOf(0x40, 0x01, 0x02)),
+                    appearance = null,
+                    deviceName = "FMDN",
+                    vendorName = null,
+                )
+            )
+
+        assertEquals(DeviceType.TRACKER, result)
+    }
+
+    @Test
     fun `classifyBle uses apple manufacturer record even when it is not primary`() {
         whenever(appleContinuityParser.parse(APPLE_PAYLOAD))
             .thenReturn(AppleDeviceData(deviceModel = "AirPods"))
@@ -98,6 +115,7 @@ class DeviceClassifierTest {
 
     private companion object {
         private const val FAST_PAIR_UUID = ServiceUuids.UUID_GOOGLE_FAST_PAIR
+        private const val FIND_HUB_UUID = ServiceUuids.UUID_EDDYSTONE
         private val SONY_XM5_FAST_PAIR_PAYLOAD = byteArrayOf(0xD4.toByte(), 0x46, 0xA7.toByte())
         private val APPLE_PAYLOAD = byteArrayOf(0x10, 0x02, 0x01, 0x02)
     }

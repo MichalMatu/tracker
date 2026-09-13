@@ -277,13 +277,12 @@ class BleScanHandlerWatchlistReturnTest {
                     userHasMoved = true,
                     isZastane = false,
                     trackingStatus = TrackingStatus.SUSPICIOUS,
-                    hasCorroboratingTrackingEvidence = true,
                 ),
             ).thenReturn(true)
             whenever(
                 alertDecisionEngine.getDecisionExplanation(
                     isIgnored = false,
-                    isKnownTracker = false,
+                    isKnownTracker = true,
                     userHasMoved = true,
                     isZastane = false,
                     trackingStatus = TrackingStatus.SUSPICIOUS,
@@ -315,7 +314,7 @@ class BleScanHandlerWatchlistReturnTest {
                 score = 64,
                 status = TrackingStatus.SUSPICIOUS,
                 evidenceReason = "Observed while moving with repeated encounters",
-                isKnownTracker = false,
+                isKnownTracker = true,
             )
         }
 
@@ -461,7 +460,6 @@ class BleScanHandlerWatchlistReturnTest {
             userHasMoved = any(),
             isZastane = any(),
             trackingStatus = any(),
-            hasCorroboratingTrackingEvidence = any(),
         )
 
         val contextCaptor = argumentCaptor<ScanDataContext>()

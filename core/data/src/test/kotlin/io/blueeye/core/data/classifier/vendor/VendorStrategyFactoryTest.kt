@@ -63,6 +63,34 @@ class VendorStrategyFactoryTest {
         )
 
     @Test
+    fun `manufacturer id 0087 resolves to Garmin instead of JBL`() {
+        val result =
+            factory.decode(
+                manufacturerRecords = mapOf(ManufacturerIds.GARMIN to byteArrayOf(0x01)),
+                serviceUuids = emptyList(),
+                name = null,
+            )
+
+        assertNotNull(result)
+        assertEquals(DeviceType.WATCH, result?.deviceType)
+        assertEquals("Garmin Device", result?.modelName)
+    }
+
+    @Test
+    fun `manufacturer id 0057 resolves to JBL Harman`() {
+        val result =
+            factory.decode(
+                manufacturerRecords = mapOf(ManufacturerIds.JBL to byteArrayOf(0x01)),
+                serviceUuids = emptyList(),
+                name = null,
+            )
+
+        assertNotNull(result)
+        assertEquals(DeviceType.SPEAKER, result?.deviceType)
+        assertEquals("JBL Audio", result?.modelName)
+    }
+
+    @Test
     fun `decode uses service uuid strategy without manufacturer records`() {
         val result =
             factory.decode(

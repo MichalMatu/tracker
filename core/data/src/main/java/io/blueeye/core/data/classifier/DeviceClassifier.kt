@@ -65,8 +65,8 @@ class DeviceClassifier @Inject constructor(
      * Priority order:
      * 1. Apple family names when Apple payload decoding conflicts with the visible identity
      * 2. Apple Continuity Protocol (AirTag, AirPods detection)
-     * 3. Service UUIDs (Tile, beacons, fitness)
-     * 4. Service/manufacturer-data fingerprints
+     * 3. Precise service/manufacturer-data fingerprints
+     * 4. Service UUIDs (Tile, beacons, fitness)
      * 5. BLE Appearance
      * 6. Device Name heuristics
      * 7. Vendor Name fallback
@@ -88,17 +88,18 @@ class DeviceClassifier @Inject constructor(
                 ?.let { result = it }
         }
 
-        // 2. Service UUIDs (trackers, fitness, beacons)
-        if (result == DeviceType.UNKNOWN) {
-            result = ServiceUuidClassifier.classify(input.serviceUuids).deviceType
-        }
-
-        // 3. Precise service/manufacturer-data fingerprints
+        // 2. Precise service/manufacturer-data fingerprints. This must run before generic
+        // service UUID classification because Google Find Hub frames share FEAA with Eddystone.
         if (result == DeviceType.UNKNOWN) {
             result = classifyKnownFingerprint(input)
             AppleIdentityConflictGuard
                 .preferredNameTypeForConflict(input.deviceName, result)
                 ?.let { result = it }
+        }
+
+        // 3. Service UUIDs (trackers, fitness, beacons)
+        if (result == DeviceType.UNKNOWN) {
+            result = ServiceUuidClassifier.classify(input.serviceUuids).deviceType
         }
 
         // 4. BLE Appearance
@@ -136,6 +137,7 @@ class DeviceClassifier @Inject constructor(
                 FingerprintTypeRule(listOf("sony", "bose", "buds", "airpods"), DeviceType.HEADPHONES),
                 FingerprintTypeRule(listOf("tile"), DeviceType.TILE),
                 FingerprintTypeRule(listOf("chipolo"), DeviceType.TAG),
+                FingerprintTypeRule(listOf("find hub", "fmdn"), DeviceType.TRACKER),
                 FingerprintTypeRule(listOf("eddystone", "exposure notification", "altbeacon"), DeviceType.BEACON),
                 FingerprintTypeRule(listOf("tesla"), DeviceType.CAR),
                 FingerprintTypeRule(listOf("fitbit"), DeviceType.WEARABLE),

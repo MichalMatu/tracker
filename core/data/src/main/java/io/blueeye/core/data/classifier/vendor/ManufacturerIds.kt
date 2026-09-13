@@ -37,7 +37,7 @@ object ManufacturerIds {
     // === AUDIO ===
     const val BOSE = 0x009E
     const val SONY = 0x012D
-    const val JBL = 0x0087 // Harman
+    const val JBL = 0x0057 // Harman International Industries, Inc.
 
     // === AUTOMOTIVE ===
     const val CONTINENTAL = 0x0066

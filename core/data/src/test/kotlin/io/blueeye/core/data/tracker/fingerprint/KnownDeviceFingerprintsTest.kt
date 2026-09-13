@@ -1,6 +1,7 @@
 package io.blueeye.core.data.tracker.fingerprint
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class KnownDeviceFingerprintsTest {
@@ -25,6 +26,28 @@ class KnownDeviceFingerprintsTest {
             )
 
         assertEquals("Eddystone Beacon (UID)", result)
+    }
+
+    @Test
+    fun `identify distinguishes Google Find Hub frame from Eddystone on shared FEAA uuid`() {
+        val result =
+            KnownDeviceFingerprints.identify(
+                serviceDataMap = mapOf(EDDYSTONE_UUID to byteArrayOf(0x40, 0x01, 0x02)),
+                manufacturerSpecificData = emptyMap(),
+            )
+
+        assertEquals("Google Find Hub Tracker", result)
+    }
+
+    @Test
+    fun `identify does not treat non-discovery Fast Pair payload as a model id`() {
+        val result =
+            KnownDeviceFingerprints.identify(
+                serviceDataMap = mapOf(FAST_PAIR_UUID to byteArrayOf(0xD4.toByte(), 0x46, 0xA7.toByte(), 0x01)),
+                manufacturerSpecificData = emptyMap(),
+            )
+
+        assertNull(result)
     }
 
     @Test

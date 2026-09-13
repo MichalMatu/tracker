@@ -49,6 +49,10 @@ object FingerprintDefinitions {
     const val EDDYSTONE_FRAME_TLM = 0x20
     const val EDDYSTONE_FRAME_EID = 0x30
 
+    // Google Find Hub Network (FHN/FMDN) also uses FEAA service data.
+    const val FIND_HUB_FRAME = 0x40
+    const val FIND_HUB_FRAME_WITH_FLAGS = 0x41
+
     // --- AltBeacon ---
     const val ALTBEACON_PREAMBLE = 0xBEAC
 

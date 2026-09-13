@@ -24,25 +24,24 @@ internal object FingerprintMatcher {
     private fun checkTile(map: Map<String, ByteArray>): String? =
         if (map.containsUuid(Defs.TILE_SERVICE_UUID)) "Tile Device" else null
 
+    @Suppress("ReturnCount")
     private fun checkEddystone(map: Map<String, ByteArray>): String? {
-        val eddystoneData = map.valueForUuid(Defs.EDDYSTONE_SERVICE_UUID) ?: return null
+        val serviceData = map.valueForUuid(Defs.EDDYSTONE_SERVICE_UUID) ?: return null
+        val frameType = serviceData.firstOrNull()?.toInt()?.and(BleBinaryConstants.MASK_BYTE) ?: return null
 
-        return if (eddystoneData.isEmpty()) {
-            "Eddystone Beacon"
-        } else {
-            when (eddystoneData[0].toInt() and BleBinaryConstants.MASK_BYTE) {
-                Defs.EDDYSTONE_FRAME_UID -> "Eddystone Beacon (UID)"
-                Defs.EDDYSTONE_FRAME_URL -> "Eddystone Beacon (URL)"
-                Defs.EDDYSTONE_FRAME_TLM -> "Eddystone Beacon (TLM)"
-                Defs.EDDYSTONE_FRAME_EID -> "Eddystone Beacon (EID)"
-                else -> "Eddystone Beacon"
-            }
+        return when (frameType) {
+            Defs.EDDYSTONE_FRAME_UID -> "Eddystone Beacon (UID)"
+            Defs.EDDYSTONE_FRAME_URL -> "Eddystone Beacon (URL)"
+            Defs.EDDYSTONE_FRAME_TLM -> "Eddystone Beacon (TLM)"
+            Defs.EDDYSTONE_FRAME_EID -> "Eddystone Beacon (EID)"
+            Defs.FIND_HUB_FRAME, Defs.FIND_HUB_FRAME_WITH_FLAGS -> "Google Find Hub Tracker"
+            else -> null
         }
     }
 
     private fun checkFastPair(map: Map<String, ByteArray>): String? {
         val fastPairMatch = map.entries.firstOrNull { (uuid, data) ->
-            uuid.contains(Defs.FAST_PAIR_SERVICE_UUID_SHORT, ignoreCase = true) && data.size >= FAST_PAIR_ID_LEN
+            uuid.contains(Defs.FAST_PAIR_SERVICE_UUID_SHORT, ignoreCase = true) && data.size == FAST_PAIR_ID_LEN
         } ?: return null
 
         val prefix = fastPairMatch.value.joinToString("") { "%02x".format(it) }

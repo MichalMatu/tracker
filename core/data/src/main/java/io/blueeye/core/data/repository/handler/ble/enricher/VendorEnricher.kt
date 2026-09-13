@@ -51,13 +51,25 @@ class VendorEnricher @Inject constructor(
         }
     }
 
+    @Suppress("MagicNumber")
     private fun detectBeaconTypeFallback(ctx: ScanDataContext) {
-        // Fallback logic for Eddystone
-        if (ctx.beaconType == null) {
-            if (ctx.serviceUuids.contains("0000feaa-0000-1000-8000-00805f9b34fb")) {
-                ctx.beaconType = "Eddystone"
+        if (ctx.beaconType != null) return
+
+        val feaaFrameType =
+            ctx.serviceDataRecords()
+                .entries
+                .firstOrNull { (uuid, _) -> uuid.contains("feaa", ignoreCase = true) }
+                ?.value
+                ?.firstOrNull()
+                ?.toInt()
+                ?.and(0xFF)
+
+        ctx.beaconType =
+            when (feaaFrameType) {
+                0x00, 0x10, 0x20, 0x30 -> "Eddystone"
+                0x40, 0x41 -> "Google Find Hub"
+                else -> null
             }
-        }
     }
 
     private companion object {

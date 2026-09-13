@@ -23,9 +23,11 @@ The practical goal is to help a user answer:
    - App alerts when the same stable identity/fingerprint is observed again.
    - This remains one of the highest-value deterministic workflows.
 
-3. **Possible tracker detection**
-   - App correlates repeated presence, confirmed user movement, encounter timing, RSSI behavior, address behavior, manufacturer/service data and other bounded evidence.
-   - App shows suspicion/attention level, not certainty about intent or ownership.
+3. **Possible follower / tracker detection**
+   - App correlates repeated Bluetooth presence with confirmed user movement, encounter timing, RSSI behavior, reacquisition/identity behavior, manufacturer/service data and other bounded evidence.
+   - A suspicious follow pattern does not require a dedicated tracker type: a phone, watch, headset or other Bluetooth device carried by the same person can provide useful co-movement evidence.
+   - Tracker-specific identity is supporting evidence and can raise confidence, but it is not a prerequisite for a Follow-Me alert.
+   - App shows suspicion/attention level, not certainty about intent, ownership, identity of a person, or physical distance.
 
 4. **Device recognition and evidence**
    - App parses supported BLE/Bluetooth formats and vendor signals.
