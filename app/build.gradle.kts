@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "io.blueeye"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "io.blueeye"
         minSdk = 26 // Zgodnie z README dla BLE 5.0
-        targetSdk = 33
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 

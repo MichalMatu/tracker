@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "io.blueeye.feature.radar"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26

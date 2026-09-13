@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "io.blueeye.feature.watchlist"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
