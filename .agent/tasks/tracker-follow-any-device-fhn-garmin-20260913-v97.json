@@ -1,0 +1,16 @@
+{
+  "id": "tracker-follow-any-device-fhn-garmin-20260913-v97",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 1800,
+  "idle_timeout": 600,
+  "task_timeout": 3600,
+  "commands": [
+    "set -eu; git fetch origin; git checkout main; git pull --ff-only origin main; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"9f9ac5346b8cf9fa63ee63c951987063562c08f1\"; PATCH=/Users/michal/agent-workspace/repos/tracker/checkpoints/tracker-follow-any-device-fhn-garmin-20260913-v96a/1789331181411610000-task-exit/tracked.patch; test -f \"$PATCH\"; git apply --check \"$PATCH\"; git apply \"$PATCH\"; git diff --check",
+    "set -eu; export JAVA_HOME=$(/usr/libexec/java_home -v 21); export PATH=\"$JAVA_HOME/bin:$PATH\"; java -version; ./gradlew --no-daemon :core:data:testDebugUnitTest :core:data:detekt",
+    "set -eu; git fetch origin; test \"$(git rev-parse origin/main)\" = \"9f9ac5346b8cf9fa63ee63c951987063562c08f1\"; git diff --check; git add core/data docs/PRODUCT_GOAL.md; git commit -m 'Fix generic Follow-Me and Find Hub classification'; git push origin main; echo PUSHED_HEAD=$(git rev-parse HEAD)"
+  ]
+}
