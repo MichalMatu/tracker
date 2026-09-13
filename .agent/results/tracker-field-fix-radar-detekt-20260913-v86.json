@@ -1,0 +1,88 @@
+{
+  "id": "tracker-field-fix-radar-detekt-20260913-v86",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-13T19:30:23.644959+00:00",
+  "command_timeout": 1200,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; git fetch --prune origin main; git checkout main; git reset --hard origin/main; test \"$(git rev-parse HEAD)\" = \"3a8b8b2bcc711a498188f8656f34cd1b4b67657a\"; test -z \"$(git status --porcelain)\"; echo V86_BASELINE_OK",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch              main       -> FETCH_HEAD\nSwitched to branch 'main'\nYour branch is up to date with 'origin/main'.\nHEAD is now at 3a8b8b2b refactor: keep follow me gate within quality limits\nV86_BASELINE_OK\n",
+      "elapsed_seconds": 0.91,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 8.14,
+      "output_policy": "stream",
+      "captured_output_chars": 255,
+      "output_truncated": false,
+      "current_rss_mb": 8.14,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 2,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -u; JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export JAVA_HOME; PATH=\"$JAVA_HOME/bin:$PATH\"; export PATH; set +e; ./gradlew :feature:radar:detekt --no-daemon >/tmp/tracker-radar-detekt-console.txt 2>&1; rc=$?; set -e; echo DETEKT_RC=$rc; python3 - <<'PY'\nfrom pathlib import Path\nimport json, xml.etree.ElementTree as ET\nroot=Path('feature/radar/build')\nfiles=[p for p in root.rglob('*') if p.is_file() and ('detekt' in p.name.lower() or p.suffix.lower()=='.sarif')]\nprint('REPORT_FILES', [str(p) for p in files])\nfound=0\nfor p in files:\n    try:\n        if p.suffix.lower()=='.sarif':\n            data=json.loads(p.read_text())\n            for run in data.get('runs',[]):\n                for r in run.get('results',[]):\n                    loc=(r.get('locations') or [{}])[0].get('physicalLocation',{})\n                    art=loc.get('artifactLocation',{}).get('uri','')\n                    line=loc.get('region',{}).get('startLine','')\n                    msg=r.get('message',{}).get('text','')\n                    print('DETEKT_ISSUE',r.get('ruleId',''),art,line,msg)\n                    found+=1\n        elif p.suffix.lower()=='.xml':\n            tree=ET.parse(p)\n            for f in tree.getroot().findall('.//file'):\n                for e in f.findall('error'):\n                    print('DETEKT_ISSUE',e.get('source',''),f.get('name',''),e.get('line',''),e.get('message',''))\n                    found+=1\n        elif p.suffix.lower()=='.txt':\n            for line in p.read_text(errors='replace').splitlines():\n                if line.strip(): print('DETEKT_TEXT',line)\n    except Exception as exc:\n        print('REPORT_PARSE_ERROR',str(p),type(exc).__name__,str(exc))\nprint('ISSUE_COUNT',found)\nPY\necho CONSOLE_TAIL; tail -60 /tmp/tracker-radar-detekt-console.txt; exit 0",
+      "exit_code": 0,
+      "output": "DETEKT_RC=1\nREPORT_FILES ['feature/radar/build/reports/detekt/detekt.sarif', 'feature/radar/build/reports/detekt/detekt.txt']\nDETEKT_ISSUE detekt.formatting.ArgumentListWrapping file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 33 Argument should be on a separate line (unless all arguments can fit a single line)\nDETEKT_ISSUE detekt.formatting.ArgumentListWrapping file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 33 Argument should be on a separate line (unless all arguments can fit a single line)\nDETEKT_ISSUE detekt.formatting.ArgumentListWrapping file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 33 Argument should be on a separate line (unless all arguments can fit a single line)\nDETEKT_ISSUE detekt.formatting.ArgumentListWrapping file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 33 Argument should be on a separate line (unless all arguments can fit a single line)\nDETEKT_ISSUE detekt.formatting.ArgumentListWrapping file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 33 Missing newline before \")\"\nDETEKT_ISSUE detekt.formatting.ArgumentListWrapping file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 39 Argument should be on a separate line (unless all arguments can fit a single line)\nDETEKT_ISSUE detekt.formatting.ArgumentListWrapping file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 39 Argument should be on a separate line (unless all arguments can fit a single line)\nDETEKT_ISSUE detekt.formatting.ArgumentListWrapping file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 39 Argument should be on a separate line (unless all arguments can fit a single line)\nDETEKT_ISSUE detekt.formatting.ArgumentListWrapping file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 39 Argument should be on a separate line (unless all arguments can fit a single line)\nDETEKT_ISSUE detekt.formatting.ArgumentListWrapping file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 39 Missing newline before \")\"\nDETEKT_ISSUE detekt.formatting.MaximumLineLength file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 33 Exceeded max line length (120)\nDETEKT_ISSUE detekt.formatting.MaximumLineLength file:///Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt 39 Exceeded max line length (120)\nDETEKT_TEXT ArgumentListWrapping - [initial] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:33:22 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$(fingerprint = \"beta\", displayName = \"Beta\", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 10_000)\nDETEKT_TEXT ArgumentListWrapping - [initial] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:33:44 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$(fingerprint = \"beta\", displayName = \"Beta\", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 10_000)\nDETEKT_TEXT ArgumentListWrapping - [initial] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:33:66 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$(fingerprint = \"beta\", displayName = \"Beta\", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 10_000)\nDETEKT_TEXT ArgumentListWrapping - [initial] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:33:93 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$(fingerprint = \"beta\", displayName = \"Beta\", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 10_000)\nDETEKT_TEXT ArgumentListWrapping - [initial] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:33:123 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$(fingerprint = \"beta\", displayName = \"Beta\", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 10_000)\nDETEKT_TEXT ArgumentListWrapping - [afterLastSeenSwap] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:39:22 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$(fingerprint = \"beta\", displayName = \"Beta\", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 3_000)\nDETEKT_TEXT ArgumentListWrapping - [afterLastSeenSwap] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:39:44 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$(fingerprint = \"beta\", displayName = \"Beta\", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 3_000)\nDETEKT_TEXT ArgumentListWrapping - [afterLastSeenSwap] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:39:66 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$(fingerprint = \"beta\", displayName = \"Beta\", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 3_000)\nDETEKT_TEXT ArgumentListWrapping - [afterLastSeenSwap] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:39:93 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$(fingerprint = \"beta\", displayName = \"Beta\", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 3_000)\nDETEKT_TEXT ArgumentListWrapping - [afterLastSeenSwap] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:39:122 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$(fingerprint = \"beta\", displayName = \"Beta\", firstSeenAt = NOW + 2_000, lastSeenAt = SORT_NOW - 3_000)\nDETEKT_TEXT MaximumLineLength - [initial] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:33:1 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$ \nDETEKT_TEXT MaximumLineLength - [afterLastSeenSwap] at /Users/michal/agent-workspace/repos/tracker/work/feature/radar/src/test/java/io/blueeye/feature/radar/presentation/RadarUiCardOrderTest.kt:39:1 - Signature=RadarUiCardOrderTest.kt$RadarUiCardOrderTest$ \nISSUE_COUNT 12\nCONSOLE_TAIL\nTo honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.9/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \nReusing configuration cache.\n\n> Task :feature:radar:detekt\n\n\n24 kotlin files were analyzed.\n\n> Task :feature:radar:detekt FAILED\n\nFAILURE: Build failed with an exception.\n\n* What went wrong:\nExecution failed for task ':feature:radar:detekt'.\n> Analysis failed with 12 weighted issues.\n\n* Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights.\n> Get more help at https://help.gradle.org.\n\nBUILD FAILED in 7s\n1 actionable task: 1 executed\nConfiguration cache entry reused.\n",
+      "elapsed_seconds": 8.655,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 111.11,
+      "output_policy": "stream",
+      "captured_output_chars": 8288,
+      "output_truncated": false,
+      "current_rss_mb": 58.7,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 2,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 2,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.91
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 2,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 8.655
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.099
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.086
+  },
+  "finished_at": "2026-09-13T19:30:34.703696+00:00",
+  "task_digest": "3bc72e8d5502729bec9fde10fa3c4f7371660bce2e915d6289b0a2fc6e84f5ff",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "72d9203d1dd0070ee1547916",
+  "daemon_version": "4.18.20"
+}
