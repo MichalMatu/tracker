@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-follow-any-device-fhn-garmin-20260913-v97",
+  "task_digest": "22d52cc263db21bf2b7819a20b0f5f3060169bb87bfa51fadb6abf517c2b4f05",
+  "idle_timeout": 600,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-13T20:27:15.756054+00:00",
+  "attempt_id": "ce02fb4b6757e5ea5f66bd18",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 56026,
+  "updated_at": "2026-09-13T20:27:15.756174+00:00",
+  "pid": 56026
+}
