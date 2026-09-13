@@ -1,0 +1,88 @@
+{
+  "id": "tracker-field-fix-final-verify-20260913-v87",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-13T19:34:45.492874+00:00",
+  "command_timeout": 1800,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; git fetch --prune origin main; git checkout main; git reset --hard origin/main; test \"$(git rev-parse HEAD)\" = \"9f9ac5346b8cf9fa63ee63c951987063562c08f1\"; test -z \"$(git status --porcelain)\"; echo FINAL_SHA_OK",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch              main       -> FETCH_HEAD\nSwitched to branch 'main'\nYour branch is behind 'origin/main' by 1 commit, and can be fast-forwarded.\n  (use \"git pull\" to update your local branch)\nHEAD is now at 9f9ac534 style: fix radar card order test formatting\nFINAL_SHA_OK\n",
+      "elapsed_seconds": 0.871,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.03,
+      "output_policy": "stream",
+      "captured_output_chars": 321,
+      "output_truncated": false,
+      "current_rss_mb": 3.03,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 2,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -eu; JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export JAVA_HOME; PATH=\"$JAVA_HOME/bin:$PATH\"; export PATH; ./gradlew :feature:radar:detekt :core:data:detekt :feature:radar:testDebugUnitTest :core:data:testDebugUnitTest --no-daemon; echo FINAL_VERIFY_OK",
+      "exit_code": 0,
+      "output": "To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.9/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \nCalculating task graph as no cached configuration is available for tasks: :feature:radar:detekt :core:data:detekt :feature:radar:testDebugUnitTest :core:data:testDebugUnitTest\nWarning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.\n\n> Task :feature:radar:detekt\n\n\n24 kotlin files were analyzed.\n\n> Task :core:data:detekt UP-TO-DATE\n> Task :core:domain:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:domain:compileKotlin UP-TO-DATE\n> Task :core:domain:compileJava NO-SOURCE\n> Task :core:domain:processResources NO-SOURCE\n> Task :core:domain:classes UP-TO-DATE\n> Task :core:domain:jar UP-TO-DATE\n> Task :core:ui:checkKotlinGradlePluginConfigurationErrors\n> Task :core:ui:preBuild UP-TO-DATE\n> Task :core:ui:preDebugBuild UP-TO-DATE\n> Task :core:ui:generateDebugResValues UP-TO-DATE\n> Task :core:ui:generateDebugResources UP-TO-DATE\n> Task :core:ui:packageDebugResources UP-TO-DATE\n> Task :core:ui:parseDebugLocalResources UP-TO-DATE\n> Task :core:ui:generateDebugRFile UP-TO-DATE\n> Task :core:ui:compileDebugKotlin UP-TO-DATE\n> Task :core:ui:javaPreCompileDebug UP-TO-DATE\n> Task :core:ui:compileDebugJavaWithJavac NO-SOURCE\n> Task :core:ui:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:ui:processDebugJavaRes UP-TO-DATE\n> Task :feature:radar:preBuild UP-TO-DATE\n> Task :feature:radar:preDebugBuild UP-TO-DATE\n> Task :core:ui:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :feature:radar:checkKotlinGradlePluginConfigurationErrors\n> Task :feature:radar:generateDebugResValues UP-TO-DATE\n> Task :feature:radar:generateDebugResources UP-TO-DATE\n> Task :feature:radar:packageDebugResources UP-TO-DATE\n> Task :feature:radar:parseDebugLocalResources UP-TO-DATE\n> Task :feature:radar:generateDebugRFile UP-TO-DATE\n> Task :feature:radar:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :feature:radar:kaptDebugKotlin UP-TO-DATE\n> Task :feature:radar:compileDebugKotlin UP-TO-DATE\n> Task :feature:radar:javaPreCompileDebug UP-TO-DATE\n> Task :feature:radar:compileDebugJavaWithJavac UP-TO-DATE\n> Task :feature:radar:transformDebugClassesWithAsm UP-TO-DATE\n> Task :feature:radar:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :feature:radar:preDebugUnitTestBuild UP-TO-DATE\n> Task :feature:radar:generateDebugUnitTestStubRFile UP-TO-DATE\n> Task :feature:radar:processDebugJavaRes UP-TO-DATE\n> Task :feature:radar:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :feature:radar:kaptGenerateStubsDebugUnitTestKotlin\n> Task :feature:radar:kaptDebugUnitTestKotlin UP-TO-DATE\n> Task :feature:radar:compileDebugUnitTestKotlin\n> Task :feature:radar:javaPreCompileDebugUnitTest UP-TO-DATE\n> Task :feature:radar:compileDebugUnitTestJavaWithJavac NO-SOURCE\n> Task :feature:radar:hiltAggregateDepsDebugUnitTest UP-TO-DATE\n> Task :feature:radar:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :feature:radar:processDebugUnitTestJavaRes UP-TO-DATE\n> Task :feature:radar:transformDebugUnitTestClassesWithAsm\n> Task :feature:radar:testDebugUnitTest\n> Task :core:data:preBuild UP-TO-DATE\n> Task :core:data:preDebugBuild UP-TO-DATE\n> Task :core:data:checkKotlinGradlePluginConfigurationErrors\n> Task :core:data:generateDebugResValues UP-TO-DATE\n> Task :core:data:generateDebugResources UP-TO-DATE\n> Task :core:data:packageDebugResources UP-TO-DATE\n> Task :core:data:parseDebugLocalResources UP-TO-DATE\n> Task :core:data:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:preBuild UP-TO-DATE\n> Task :core:decoders:preDebugBuild UP-TO-DATE\n> Task :core:decoders:generateDebugResValues UP-TO-DATE\n> Task :core:decoders:generateDebugResources UP-TO-DATE\n> Task :core:decoders:packageDebugResources UP-TO-DATE\n> Task :core:decoders:parseDebugLocalResources UP-TO-DATE\n> Task :core:decoders:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:checkKotlinGradlePluginConfigurationErrors\n> Task :core:decoders:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :core:decoders:kaptDebugKotlin UP-TO-DATE\n> Task :core:decoders:compileDebugKotlin UP-TO-DATE\n> Task :core:decoders:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:transformDebugClassesWithAsm UP-TO-DATE\n> Task :core:decoders:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :core:data:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :core:data:kaptDebugKotlin UP-TO-DATE\n> Task :core:data:compileDebugKotlin UP-TO-DATE\n> Task :core:data:javaPreCompileDebug UP-TO-DATE\n> Task :core:data:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:data:transformDebugClassesWithAsm UP-TO-DATE\n> Task :core:data:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:data:preDebugUnitTestBuild UP-TO-DATE\n> Task :core:data:generateDebugUnitTestStubRFile UP-TO-DATE\n> Task :core:data:processDebugJavaRes UP-TO-DATE\n> Task :core:data:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :core:data:kaptGenerateStubsDebugUnitTestKotlin UP-TO-DATE\n> Task :core:data:kaptDebugUnitTestKotlin UP-TO-DATE\n> Task :core:data:compileDebugUnitTestKotlin UP-TO-DATE\n> Task :core:data:javaPreCompileDebugUnitTest UP-TO-DATE\n> Task :core:data:compileDebugUnitTestJavaWithJavac UP-TO-DATE\n> Task :core:data:hiltAggregateDepsDebugUnitTest UP-TO-DATE\n> Task :core:data:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :core:data:processDebugUnitTestJavaRes UP-TO-DATE\n> Task :core:data:transformDebugUnitTestClassesWithAsm UP-TO-DATE\n> Task :core:decoders:processDebugJavaRes UP-TO-DATE\n> Task :core:data:testDebugUnitTest UP-TO-DATE\n\nDeprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.\n\nYou can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.\n\nFor more on this, please refer to https://docs.gradle.org/8.9/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.\n\nBUILD SUCCESSFUL in 22s\n83 actionable tasks: 11 executed, 72 up-to-date\nConfiguration cache entry stored.\nFINAL_VERIFY_OK\n",
+      "elapsed_seconds": 23.338,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 114.97,
+      "output_policy": "stream",
+      "captured_output_chars": 6679,
+      "output_truncated": false,
+      "current_rss_mb": 46.11,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 2,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 2,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.871
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 2,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 23.338
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.098
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.069
+  },
+  "finished_at": "2026-09-13T19:35:11.468359+00:00",
+  "task_digest": "03f86c216056369e2cfa1f196a3b878aa5f3f96e233525b32323a868ceeab68e",
+  "idle_timeout": 300,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "attempt_id": "8943a08e703c07dd2d2e51a0",
+  "daemon_version": "4.18.20"
+}
