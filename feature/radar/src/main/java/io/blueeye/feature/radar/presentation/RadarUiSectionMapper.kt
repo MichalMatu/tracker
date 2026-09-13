@@ -33,7 +33,6 @@ object RadarUiSectionMapper {
 
     private fun RadarUiItem.hasSuspiciousTrackingSignal(): Boolean =
         calibrationLabel == DeviceCalibrationLabel.SUSPICIOUS ||
-            evidenceSignals.hasTrackerLikeEvidence ||
             trackingStatus != TrackingStatus.SAFE ||
             followingScore >= SUSPICIOUS_SCORE_THRESHOLD ||
             evidenceSignals.hasAttentionFollowMeEvidence
