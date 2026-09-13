@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 4,
+  "index": 5,
   "total": 5,
-  "command": "set -euo pipefail; adb devices; test -s feature/app/build/outputs/apk/debug/app-debug.apk || test -s app/build/outputs/apk/debug/app-debug.apk; APK=app/build/outputs/apk/debug/app-debug.apk; if test -s feature/app/build/outputs/apk/debug/app-debug.apk; then APK=feature/app/build/outputs/apk/debug/app-debug.apk; fi; adb install -r \"$APK\"; echo APK_INSTALLED=$APK; adb shell pm path io.blueeye",
-  "pid": 57405,
+  "command": "set -euo pipefail; git status --short; git rev-parse HEAD; echo E2E_BOOTSTRAP_PASS",
+  "pid": 57517,
   "timeout": 2400,
   "idle_timeout": 300,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-13T09:35:06.223093+00:00",
-  "stage_name": "command-4",
-  "stage_index": 4,
+  "started_at": "2026-09-13T09:35:10.785587+00:00",
+  "stage_name": "command-5",
+  "stage_index": 5,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-e2e-bootstrap-20260913-v63",
@@ -18,5 +18,5 @@
   "task_digest": "40031ee6aced78b77d637e35214f75d57fa2778ba4b2a1d7d37ce77d2cc5beba",
   "daemon_version": "4.18.20",
   "daemon_pid": 55178,
-  "updated_at": "2026-09-13T09:35:06.269580+00:00"
+  "updated_at": "2026-09-13T09:35:10.855554+00:00"
 }
