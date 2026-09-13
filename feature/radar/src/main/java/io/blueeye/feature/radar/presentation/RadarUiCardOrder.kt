@@ -8,7 +8,10 @@ package io.blueeye.feature.radar.presentation
  * stale rows without continuously reshuffling the list.
  */
 internal object RadarUiCardOrder {
-    fun comparator(nowMs: Long = System.currentTimeMillis()): Comparator<RadarUiItem> =
+    val comparator: Comparator<RadarUiItem>
+        get() = comparator(System.currentTimeMillis())
+
+    fun comparator(nowMs: Long): Comparator<RadarUiItem> =
         compareByDescending<RadarUiItem> { it.isInWatchlist }
             .thenByDescending { recencyPriority(it.lastSeenAt, nowMs) }
             .thenByDescending { it.isNew }
