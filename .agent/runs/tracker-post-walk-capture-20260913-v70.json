@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-post-walk-capture-20260913-v70",
+  "task_digest": "ca24249f14149898ab44697874b55819b2888c0713fcbc2d0deb45f2b07e89ee",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-13T18:45:48.298483+00:00",
+  "attempt_id": "b0d4fa337bc3857c28990e3b",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 23961,
+  "updated_at": "2026-09-13T18:45:48.298699+00:00",
+  "pid": 23961
+}
