@@ -253,6 +253,7 @@ class BleScanHandlerWatchlistReturnTest {
                 observedMovingMs = 360_000L,
                 movingEncounters = 20,
             )
+            whenever(classifier.resolveType(any())).thenReturn(DeviceType.TRACKER)
             whenever(
                 followMeScoreCalculator.calculateScore(
                     metrics = any(),
@@ -276,6 +277,7 @@ class BleScanHandlerWatchlistReturnTest {
                     userHasMoved = true,
                     isZastane = false,
                     trackingStatus = TrackingStatus.SUSPICIOUS,
+                    hasCorroboratingTrackingEvidence = true,
                 ),
             ).thenReturn(true)
             whenever(
@@ -459,6 +461,7 @@ class BleScanHandlerWatchlistReturnTest {
             userHasMoved = any(),
             isZastane = any(),
             trackingStatus = any(),
+            hasCorroboratingTrackingEvidence = any(),
         )
 
         val contextCaptor = argumentCaptor<ScanDataContext>()

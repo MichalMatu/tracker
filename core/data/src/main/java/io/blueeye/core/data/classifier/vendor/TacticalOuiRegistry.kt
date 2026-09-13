@@ -108,7 +108,8 @@ object TacticalOuiRegistry {
             p.MESHTASTIC_SERVICE.lowercase() in uLower -> TacticalCategory.TACTICAL_EUD to "Meshtastic Public Mesh"
             p.YARDARM_SERVICE.lowercase() in uLower -> TacticalCategory.HOLSTER_SENSOR to "Yardarm Safety Sensor"
             p.HARRIS_MSA_G1_SERVICE.lowercase() in uLower -> TacticalCategory.FIREFIGHTER to "Harris XL-200P / MSA G1"
-            p.KESTREL_LINK_SERVICE.lowercase() in uLower -> TacticalCategory.SMART_WEAPON to "Kestrel Ballistics"
+            // FFE0 is a generic vendor UART-style service used by many consumer BLE devices.
+            // Kestrel requires corroborating name or payload evidence, never FFE0 alone.
             else -> null
         }
     }

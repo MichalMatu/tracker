@@ -246,6 +246,11 @@ class BleScanHandler @Inject constructor(
             DeviceType.TILE,
             DeviceType.SAMSUNG_TAG,
         )
+        val hasCorroboratingTrackingEvidence =
+            isKnownTracker ||
+                deviceType == DeviceType.TRACKER ||
+                deviceType == DeviceType.TAG ||
+                ctx.hasRotatingIdentityEvidence()
 
         val encounterCount = sessionManager.getMovingEncounterCount(fingerprint)
         val rssiSamples = movingRssiSamples(fingerprint, ctx.validRssi, userIsMoving)
@@ -289,6 +294,7 @@ class BleScanHandler @Inject constructor(
             userHasMoved = userIsMoving,
             isZastane = isBaselineDevice,
             trackingStatus = result.status,
+            hasCorroboratingTrackingEvidence = hasCorroboratingTrackingEvidence,
         )
 
         if (shouldAlert) {
@@ -345,8 +351,12 @@ class BleScanHandler @Inject constructor(
                     manufacturerDataById.isNotEmpty()
             )
 
+    private fun ScanDataContext.hasRotatingIdentityEvidence(): Boolean =
+        macChangeCount >= MIN_CORROBORATING_MAC_CHANGES && hasStablePayloadEvidence()
+
     companion object {
         private const val TAG = "BleScanHandler"
+        private const val MIN_CORROBORATING_MAC_CHANGES = 2
     }
 }
 

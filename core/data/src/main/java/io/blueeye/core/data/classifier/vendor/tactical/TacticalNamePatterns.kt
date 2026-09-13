@@ -45,7 +45,7 @@ object TacticalNamePatterns {
         Regex("INVISIO", RegexOption.IGNORE_CASE),
         Regex("INVISIO.*V60|V60.*INVISIO", RegexOption.IGNORE_CASE), // V60 controller with brand context
         Regex("INVISIO.*V50|V50.*INVISIO", RegexOption.IGNORE_CASE), // V50 controller with brand context
-        Regex("R30", RegexOption.IGNORE_CASE), // R30 Wireless PTT
+        Regex("(?<![A-Za-z0-9])R30(?![A-Za-z0-9])", RegexOption.IGNORE_CASE), // R30 Wireless PTT
         Regex("ASM11374", RegexOption.IGNORE_CASE) // FCC ID
     )
 
@@ -235,10 +235,10 @@ object TacticalNamePatterns {
     // UK body-camera vendor family also used in healthcare and retail settings.
     // Characteristic: Front-facing screen design
     val REVEAL_MEDIA_PATTERNS = listOf(
-        Regex("Reveal", RegexOption.IGNORE_CASE), // Main brand
-        Regex("D[345]", RegexOption.IGNORE_CASE), // D-Series (D3, D4, D5)
-        Regex("K[567]", RegexOption.IGNORE_CASE), // K-Series (K5, K6, K7 Live)
-        Regex("RS[23]", RegexOption.IGNORE_CASE) // RS2, RS3 retail security
+        Regex("Reveal(?:[ _-]+Media)?", RegexOption.IGNORE_CASE),
+        Regex("Reveal(?:[ _-]+Media)?[ _-]+D[345]", RegexOption.IGNORE_CASE),
+        Regex("Reveal(?:[ _-]+Media)?[ _-]+K[567]", RegexOption.IGNORE_CASE),
+        Regex("Reveal(?:[ _-]+Media)?[ _-]+RS[23]", RegexOption.IGNORE_CASE),
     )
 
     // === NETHERLANDS: ZEPCAM ===

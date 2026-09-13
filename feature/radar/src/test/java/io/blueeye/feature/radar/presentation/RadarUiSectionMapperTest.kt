@@ -205,7 +205,7 @@ class RadarUiSectionMapperTest {
     }
 
     @Test
-    fun `known tracker evidence is routed to suspicious review section`() {
+    fun `known tracker evidence alone remains nearby until follow me evidence appears`() {
         val item =
             item(
                 device(
@@ -230,7 +230,7 @@ class RadarUiSectionMapperTest {
 
         val section = RadarUiSectionMapper.map(listOf(item)).single()
 
-        assertEquals(RadarUiSectionType.SUSPICIOUS, section.type)
+        assertEquals(RadarUiSectionType.NEARBY, section.type)
     }
 
     @Test
@@ -253,7 +253,7 @@ class RadarUiSectionMapperTest {
     }
 
     @Test
-    fun `tracker evidence is routed to suspicious review section when device type is misleading`() {
+    fun `tracker evidence with misleading device type remains nearby without follow me evidence`() {
         val item =
             item(
                 device(
@@ -278,7 +278,7 @@ class RadarUiSectionMapperTest {
 
         val section = RadarUiSectionMapper.map(listOf(item)).single()
 
-        assertEquals(RadarUiSectionType.SUSPICIOUS, section.type)
+        assertEquals(RadarUiSectionType.NEARBY, section.type)
     }
 
     @Test
