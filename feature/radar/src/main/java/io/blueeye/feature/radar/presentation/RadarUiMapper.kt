@@ -43,6 +43,7 @@ object RadarUiMapper {
                 },
             isProbing = isProbing,
             firstSeenAt = device.firstSeenAt,
+            lastSeenAt = device.lastSeenAt,
             trackingStatus = device.trackingStatus,
             followingScore = device.followingScore,
             isSafeBeacon = device.isSafeBeacon,
