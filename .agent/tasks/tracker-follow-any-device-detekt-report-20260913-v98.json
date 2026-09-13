@@ -1,0 +1,15 @@
+{
+  "id": "tracker-follow-any-device-detekt-report-20260913-v98",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 1800,
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "commands": [
+    "set -eu; git fetch origin; git checkout main; git pull --ff-only origin main; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"9f9ac5346b8cf9fa63ee63c951987063562c08f1\"; PATCH=/Users/michal/agent-workspace/repos/tracker/checkpoints/tracker-follow-any-device-fhn-garmin-20260913-v97/1789331312129989000-task-exit/tracked.patch; git apply --check \"$PATCH\"; git apply \"$PATCH\"",
+    "set -u; export JAVA_HOME=$(/usr/libexec/java_home -v 21); export PATH=\"$JAVA_HOME/bin:$PATH\"; set +e; ./gradlew --no-daemon :core:data:detekt >/tmp/tracker-v98-detekt.log 2>&1; CODE=$?; set -e; echo DETEKT_EXIT=$CODE; for f in core/data/build/reports/detekt/detekt.txt core/data/build/reports/detekt/detekt.xml core/data/build/reports/detekt/detekt.html; do if [ -f \"$f\" ]; then echo REPORT=$f; if [[ \"$f\" == *.txt ]]; then cat \"$f\"; fi; fi; done; grep -E '(^|/)(DeviceClassifier|ManufacturerIds|BleScanHandler|VendorEnricher|FollowMeScoreCalculator|AlertDecisionEngine|FingerprintDefinitions|FingerprintMatcher|AlertDecisionCorroborationTest|DeviceClassifierTest|VendorStrategyFactoryTest|BleScanHandlerWatchlistReturnTest|KnownDeviceFingerprintsTest).*:[0-9]+:[0-9]+:' /tmp/tracker-v98-detekt.log || true; exit 0"
+  ]
+}
