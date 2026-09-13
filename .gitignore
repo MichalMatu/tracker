@@ -19,17 +19,18 @@ local.properties
 *~
 .tmp/
 
-# Android Studio
+# Android build artifacts
 *.apk
+*.aab
 *.ap_
 *.dex
 captures/
 db_dump/
 datasets/
 exports/
-db_dump/
 matching_engine/
 
+# Local databases / private field captures
 *.db
 *.db-shm
 *.db-wal
@@ -39,6 +40,20 @@ lock.mdb
 *.sqlite-shm
 *.sqlite-wal
 verification_logs*.txt
+
+# Android signing / release secrets
+*.jks
+*.keystore
+*.p12
+*.pfx
+keystore.properties
+signing.properties
+release-key.properties
+
+# Local environment secrets
+.env
+.env.*
+!.env.example
 
 # Secret scanning reports
 gitleaks-report.*
