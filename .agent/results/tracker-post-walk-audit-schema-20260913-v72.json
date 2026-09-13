@@ -1,0 +1,60 @@
+{
+  "id": "tracker-post-walk-audit-schema-20260913-v72",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-13T18:55:45.114005+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; DB=\"$HOME/tracker-field-captures/2026-09-13-post-walk-v68/tracker_database\"; test -s \"$DB\"; echo DEVICES_SCHEMA_BEGIN; sqlite3 \"$DB\" \"PRAGMA table_info('devices');\"; echo DEVICES_SCHEMA_END; echo SIGNAL_SCHEMA_BEGIN; sqlite3 \"$DB\" \"PRAGMA table_info('signal_samples');\"; echo SIGNAL_SCHEMA_END; echo ALERT_SCHEMA_BEGIN; sqlite3 \"$DB\" \"PRAGMA table_info('alert_evidence_events');\"; echo ALERT_SCHEMA_END; echo IDENTITY_SCHEMA_BEGIN; sqlite3 \"$DB\" \"PRAGMA table_info('identity_continuity_candidates');\"; echo IDENTITY_SCHEMA_END; echo FOLLOW_SCHEMA_BEGIN; sqlite3 \"$DB\" \"PRAGMA table_info('follow_me_observations');\"; echo FOLLOW_SCHEMA_END",
+      "exit_code": 0,
+      "output": "DEVICES_SCHEMA_BEGIN\n0|fingerprint|TEXT|1||1\n1|lastMacAddress|TEXT|0||0\n2|macAddressType|TEXT|1||0\n3|carryoverReasonCode|TEXT|0||0\n4|carryoverConfidence|REAL|1||0\n5|carryoverFeatures|TEXT|0||0\n6|technology|TEXT|1||0\n7|lastDeviceName|TEXT|0||0\n8|deviceType|TEXT|1||0\n9|vendorName|TEXT|0||0\n10|manufacturerId|INTEGER|0||0\n11|predictedModel|TEXT|0||0\n12|classOfDevice|INTEGER|0||0\n13|isCarAudio|INTEGER|1||0\n14|trackingStatus|TEXT|1||0\n15|followingScore|REAL|1||0\n16|followMeExplanation|TEXT|0||0\n17|followMeDurationScore|INTEGER|1||0\n18|followMeRssiStabilityScore|INTEGER|1||0\n19|followMeDeviceTypeScore|INTEGER|1||0\n20|followMeMacBehaviorScore|INTEGER|1||0\n21|followMeEncounterScore|INTEGER|1||0\n22|followMeUserMoved|INTEGER|0||0\n23|followMeBaselineDevice|INTEGER|0||0\n24|totalSeenDurationSeconds|INTEGER|1||0\n25|isInWatchlist|INTEGER|1||0\n26|isSafeBeacon|INTEGER|1||0\n27|userAlias|TEXT|0||0\n28|userNotes|TEXT|0||0\n29|alertSound|INTEGER|1||0\n30|alertVibration|INTEGER|1||0\n31|isTrackingEnabled|INTEGER|1||0\n32|isIgnoredForTracking|INTEGER|1||0\n33|calibrationLabel|TEXT|1||0\n34|identityCarryoverVerdict|TEXT|1||0\n35|lastWatchlistReturnAlertAt|INTEGER|1||0\n36|lastWatchlistReturnOfflineDurationMs|INTEGER|1||0\n37|lastRssi|INTEGER|1||0\n38|firstSeenAt|INTEGER|1||0\n39|lastSeenAt|INTEGER|1||0\n40|encounterCount|INTEGER|1||0\n41|sensorData|TEXT|0||0\n42|txPower|INTEGER|0||0\n43|isConnectable|INTEGER|0||0\n44|primaryPhy|INTEGER|0||0\n45|secondaryPhy|INTEGER|0||0\n46|advertisingIntervalMs|INTEGER|0||0\n47|beaconType|TEXT|0||0\n48|connectionStatus|TEXT|1||0\n49|connectionAttempts|INTEGER|1||0\n50|lastProbeTimestamp|INTEGER|1||0\n51|modelNumber|TEXT|0||0\n52|serialNumber|TEXT|0||0\n53|firmwareRevision|TEXT|0||0\n54|hardwareRevision|TEXT|0||0\n55|softwareRevision|TEXT|0||0\n56|manufacturerName|TEXT|0||0\n57|batteryLevel|INTEGER|0||0\n58|gattServices|TEXT|0||0\n59|characteristicData|TEXT|0||0\n60|lastRawData|TEXT|0||0\n61|probeError|TEXT|0||0\n62|isPaired|INTEGER|1||0\nDEVICES_SCHEMA_END\nSIGNAL_SCHEMA_BEGIN\n0|id|INTEGER|1||1\n1|deviceFingerprint|TEXT|1||0\n2|observedMac|TEXT|0||0\n3|technology|TEXT|0||0\n4|deviceName|TEXT|0||0\n5|deviceType|TEXT|0||0\n6|vendorName|TEXT|0||0\n7|rssi|INTEGER|1||0\n8|latitude|REAL|0||0\n9|longitude|REAL|0||0\n10|locationAccuracy|REAL|0||0\n11|timestamp|INTEGER|1||0\n12|manufacturerId|INTEGER|0||0\n13|manufacturerDataHex|TEXT|0||0\n14|manufacturerDataByIdHex|TEXT|0||0\n15|serviceUuids|TEXT|0||0\n16|serviceDataByUuidHex|TEXT|0||0\n17|appearance|INTEGER|0||0\n18|txPower|INTEGER|0||0\n19|isConnectable|INTEGER|0||0\n20|primaryPhy|INTEGER|0||0\n21|secondaryPhy|INTEGER|0||0\n22|advertisingIntervalMs|INTEGER|0||0\n23|beaconType|TEXT|0||0\n24|rawDataHex|TEXT|0||0\n25|sensorData|TEXT|0||0\n26|classOfDevice|INTEGER|0||0\n27|trackingStatus|TEXT|0||0\n28|followingScore|REAL|0||0\n29|isTactical|INTEGER|0||0\n30|tacticalCategory|TEXT|0||0\n31|probeError|TEXT|0||0\nSIGNAL_SCHEMA_END\nALERT_SCHEMA_BEGIN\n0|id|INTEGER|1||1\n1|deviceFingerprint|TEXT|1||0\n2|observedMac|TEXT|1||0\n3|eventType|TEXT|1||0\n4|timestamp|INTEGER|1||0\n5|evidenceSource|TEXT|1||0\n6|confidence|TEXT|1||0\n7|reasonText|TEXT|1||0\n8|rawValue|TEXT|0||0\n9|parsedValue|TEXT|0||0\n10|isPassive|INTEGER|1||0\n11|evidenceProvenance|TEXT|1||0\nALERT_SCHEMA_END\nIDENTITY_SCHEMA_BEGIN\n0|id|INTEGER|1||1\n1|deviceFingerprint|TEXT|1||0\n2|candidateFingerprint|TEXT|1||0\n3|timestamp|INTEGER|1||0\n4|reasonCode|TEXT|1||0\n5|confidence|REAL|1||0\n6|featureSummary|TEXT|1||0\n7|verdict|TEXT|1||0\nIDENTITY_SCHEMA_END\nFOLLOW_SCHEMA_BEGIN\n0|id|INTEGER|1||1\n1|deviceFingerprint|TEXT|1||0\n2|observedMac|TEXT|1||0\n3|timestamp|INTEGER|1||0\n4|trackingStatus|TEXT|1||0\n5|score|REAL|1||0\n6|explanation|TEXT|0||0\n7|rssi|INTEGER|1||0\n8|encounterCount|INTEGER|1||0\n9|durationScore|INTEGER|1||0\n10|rssiStabilityScore|INTEGER|1||0\n11|deviceTypeScore|INTEGER|1||0\n12|macBehaviorScore|INTEGER|1||0\n13|encounterScore|INTEGER|1||0\n14|userMoved|INTEGER|0||0\n15|baselineDevice|INTEGER|0||0\nFOLLOW_SCHEMA_END\n",
+      "elapsed_seconds": 0.407,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.11,
+      "output_policy": "stream",
+      "captured_output_chars": 3904,
+      "output_truncated": false,
+      "current_rss_mb": 2.11,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.407
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.078
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.066
+  },
+  "finished_at": "2026-09-13T18:55:47.299082+00:00",
+  "task_digest": "42718c6a56a2ae36e0279332f107ee10f05d9b8249ec263ae375df2ed88f3341",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "attempt_id": "8a5175d5bfd85147ba58d449",
+  "daemon_version": "4.18.20"
+}
