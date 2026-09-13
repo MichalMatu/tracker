@@ -16,6 +16,7 @@ data class RadarUiItem(
     val isIgnored: Boolean,
     val nameColor: RadarUiColorToken,
     val firstSeenAt: Long,
+    val lastSeenAt: Long,
     val trackingStatus: TrackingStatus,
     val followingScore: Float,
     val isSafeBeacon: Boolean,
@@ -63,7 +64,7 @@ enum class RadarUiSectionType(
     ),
     SUSPICIOUS(
         title = "Suspicious",
-        description = "Tracker-like, follow-me, or RSSI-pattern signals that need review.",
+        description = "Follow-me or manually suspicious signals that need review.",
         statusText = "Review",
         tone = RadarUiColorToken.SUSPICIOUS,
     ),
@@ -75,7 +76,7 @@ enum class RadarUiSectionType(
     ),
     NEARBY(
         title = "Nearby",
-        description = "Identified devices without attention evidence.",
+        description = "Identified devices without active attention evidence.",
         statusText = "No attention",
         tone = RadarUiColorToken.SAFE,
     ),
