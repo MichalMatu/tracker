@@ -33,6 +33,8 @@ matching_engine/
 *.db
 *.db-shm
 *.db-wal
+data.mdb
+lock.mdb
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
