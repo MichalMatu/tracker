@@ -1,0 +1,19 @@
+{
+  "id": "tracker-ui-next-walk-install-20260913-v66",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 2400,
+  "idle_timeout": 900,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin main agent-control; git checkout main; test -z \"$(git status --porcelain)\"; git reset --hard origin/main; test \"$(git rev-parse HEAD)\" = \"dfd2ceb703d74fb667916073ccd4a0f75eb1c0e8\"; echo V66_BASELINE_OK",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew --stop || true; ./gradlew :app:assembleDebug --no-daemon --max-workers=3 --stacktrace",
+    "set -euo pipefail; test -f app/build/outputs/apk/debug/app-debug.apk; adb start-server >/dev/null; mapfile -t devices < <(adb devices | awk 'NR>1 && $2==\"device\" {print $1}'); test \"${#devices[@]}\" -eq 1; serial=\"${devices[0]}\"; model=\"$(adb -s \"$serial\" shell getprop ro.product.model | tr -d '\\r')\"; test \"$model\" = \"SM-S906B\"; echo DEVICE_OK=$serial:$model",
+    "set -euo pipefail; serial=\"$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}')\"; adb -s \"$serial\" install -r -d app/build/outputs/apk/debug/app-debug.apk; adb -s \"$serial\" shell am force-stop io.blueeye; adb -s \"$serial\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null; sleep 5; echo INSTALL_AND_LAUNCH_OK",
+    "set -euo pipefail; serial=\"$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}')\"; errors=\"$(adb -s \"$serial\" logcat -d -v brief -t 500 | grep -E 'FATAL EXCEPTION|AndroidRuntime: FATAL' || true)\"; test -z \"$errors\"; echo DEVICE_SMOKE_OK",
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"dfd2ceb703d74fb667916073ccd4a0f75eb1c0e8\"; echo V66_READY_FOR_FIELD_WALK"
+  ]
+}
