@@ -16,7 +16,7 @@ data class RadarUiItem(
     val isIgnored: Boolean,
     val nameColor: RadarUiColorToken,
     val firstSeenAt: Long,
-    val lastSeenAt: Long,
+    val lastSeenAt: Long = firstSeenAt,
     val trackingStatus: TrackingStatus,
     val followingScore: Float,
     val isSafeBeacon: Boolean,
