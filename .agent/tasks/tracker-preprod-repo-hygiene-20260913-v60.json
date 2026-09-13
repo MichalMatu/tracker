@@ -1,0 +1,19 @@
+{
+  "id": "tracker-preprod-repo-hygiene-20260913-v60",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "chore/preproduction-readiness-20260913",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 2400,
+  "idle_timeout": 900,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin main chore/preproduction-readiness-20260913 agent-control; git checkout chore/preproduction-readiness-20260913; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"11ab0f3b38c234477c3b8eb5a053710c9c32e059\"; test \"$(git rev-parse origin/chore/preproduction-readiness-20260913)\" = \"11ab0f3b38c234477c3b8eb5a053710c9c32e059\"; test \"$(git rev-parse origin/main)\" = \"565821f9dd46450a324907523c9ce1ad49349d75\"; echo PREPROD_V60_BASELINE_OK",
+    "set -euo pipefail; git show origin/agent-control:.agent/payloads/tracker-preprod-doc-sync-v60.sh > /tmp/tracker-preprod-doc-sync-v60.sh; chmod +x /tmp/tracker-preprod-doc-sync-v60.sh; /tmp/tracker-preprod-doc-sync-v60.sh",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; java -version; ./gradlew --parallel --max-workers=3 qualityCheck --stacktrace",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew --parallel --max-workers=3 :app:assembleDebug :app:lintRelease :app:bundleRelease --stacktrace",
+    "set -euo pipefail; if command -v gitleaks >/dev/null 2>&1; then gitleaks git --config .gitleaks.toml --redact --verbose; else echo GITLEAKS_LOCAL_SKIPPED_NOT_INSTALLED; fi; git diff --check; git status --short; git add docs/UI_UX_REDESIGN_PLAN.md docs/UI_UX_PHASE2_HANDOFF_2026-09-12.md docs/PHASE3_HANDOFF.md docs/PHASE3_FINAL_HANDOFF_2026-09-11.md docs/PHASE3_CAPTURED_DATA_ANALYSIS_HANDOFF_2026-09-11.md docs/PHASE3_FIELD_REACCEPTANCE_HANDOFF_2026-09-11.md; git diff --cached --check; git commit -m \"docs: close superseded handoffs and UX phase state\"; git push origin HEAD:chore/preproduction-readiness-20260913; echo PREPROD_V60_PUSHED=$(git rev-parse HEAD)",
+    "set -euo pipefail; git fetch origin main chore/preproduction-readiness-20260913; test \"$(git rev-parse HEAD)\" = \"$(git rev-parse origin/chore/preproduction-readiness-20260913)\"; test \"$(git rev-parse origin/main)\" = \"565821f9dd46450a324907523c9ce1ad49349d75\"; test -z \"$(git status --porcelain)\"; echo PREPROD_V60_FINAL_CLEAN"
+  ]
+}
