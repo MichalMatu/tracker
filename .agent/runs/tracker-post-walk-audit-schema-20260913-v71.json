@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-post-walk-audit-schema-20260913-v71",
+  "task_digest": "27998f0ee516574e0c130db31bab1af67fca0227aa8b378c93326deebb066472",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-13T18:55:01.842401+00:00",
+  "attempt_id": "32348d890165394d645b17c7",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 32555,
+  "updated_at": "2026-09-13T18:55:01.842535+00:00",
+  "pid": 32555
+}
