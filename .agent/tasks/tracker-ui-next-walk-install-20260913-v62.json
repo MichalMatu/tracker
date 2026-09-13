@@ -1,0 +1,19 @@
+{
+  "id": "tracker-ui-next-walk-install-20260913-v62",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 2400,
+  "idle_timeout": 900,
+  "task_timeout": 7200,
+  "commands": [
+    "set -euo pipefail; git fetch --prune origin main agent-control; git checkout main; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"9b447207a5daafe6b653f394d35856e7e9361948\"; test \"$(git rev-parse origin/main)\" = \"9b447207a5daafe6b653f394d35856e7e9361948\"; echo NEXT_WALK_V62_BASELINE_OK",
+    "set -euo pipefail; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew --stop || true; ./gradlew --version; ./gradlew --parallel --max-workers=3 :app:assembleDebug --stacktrace",
+    "set -euo pipefail; test -f app/build/outputs/apk/debug/app-debug.apk; adb start-server >/dev/null; mapfile -t devices < <(adb devices | awk 'NR>1 && $2==\"device\" {print $1}'); test \"${#devices[@]}\" -eq 1; serial=\"${devices[0]}\"; model=\"$(adb -s \"$serial\" shell getprop ro.product.model | tr -d '\\r')\"; test \"$model\" = \"SM-S906B\"; echo DEVICE_SERIAL=$serial; echo DEVICE_MODEL=$model",
+    "set -euo pipefail; serial=\"$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}')\"; adb -s \"$serial\" install -r -d app/build/outputs/apk/debug/app-debug.apk; adb -s \"$serial\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null; sleep 8; echo APP_LAUNCH_OK",
+    "set -euo pipefail; serial=\"$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}')\"; errors=\"$(adb -s \"$serial\" logcat -d -v brief -t 800 | grep -E 'FATAL EXCEPTION|AndroidRuntime: FATAL|io\\.blueeye.*FATAL' || true)\"; test -z \"$errors\"; echo DEVICE_SMOKE_FATAL_SCAN_OK",
+    "set -euo pipefail; test -z \"$(git status --porcelain)\"; echo NEXT_WALK_V62_FINAL_CLEAN"
+  ]
+}
