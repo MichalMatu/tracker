@@ -1,0 +1,14 @@
+{
+  "id": "tracker-field-fix-detekt-errors-20260913-v82",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -eu; test \"$(git rev-parse HEAD)\" = \"a932b4cef4827f7e6a6ddf49b8265fd266b21c67\"; python3 - <<'PY'\nfrom pathlib import Path\nimport xml.etree.ElementTree as ET\np=Path('core/data/build/reports/detekt/detekt.xml')\nprint('REPORT_EXISTS', p.exists())\nif p.exists():\n    root=ET.parse(p).getroot()\n    for f in root.findall('.//file'):\n        for e in f.findall('error'):\n            print('DETEKT_ISSUE', f.get('name'), 'line='+str(e.get('line')), 'source='+str(e.get('source')), 'message='+str(e.get('message')))\nPY"
+  ]
+}
