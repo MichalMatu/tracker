@@ -1,0 +1,60 @@
+{
+  "id": "tracker-field-fix-detekt-errors-20260913-v82",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-13T19:22:40.444178+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; test \"$(git rev-parse HEAD)\" = \"a932b4cef4827f7e6a6ddf49b8265fd266b21c67\"; python3 - <<'PY'\nfrom pathlib import Path\nimport xml.etree.ElementTree as ET\np=Path('core/data/build/reports/detekt/detekt.xml')\nprint('REPORT_EXISTS', p.exists())\nif p.exists():\n    root=ET.parse(p).getroot()\n    for f in root.findall('.//file'):\n        for e in f.findall('error'):\n            print('DETEKT_ISSUE', f.get('name'), 'line='+str(e.get('line')), 'source='+str(e.get('source')), 'message='+str(e.get('message')))\nPY",
+      "exit_code": 0,
+      "output": "REPORT_EXISTS False\n",
+      "elapsed_seconds": 0.38,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.3,
+      "output_policy": "stream",
+      "captured_output_chars": 20,
+      "output_truncated": false,
+      "current_rss_mb": 3.3,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.38
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.078
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.068
+  },
+  "finished_at": "2026-09-13T19:22:42.261823+00:00",
+  "task_digest": "bad6801cea7c2af6fe0ed322734bd8ebe2706f34ba6369f8c27995f8e35a6e96",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 4096,
+  "attempt_id": "012834eea62b1bfd7fff3e01",
+  "daemon_version": "4.18.20"
+}
