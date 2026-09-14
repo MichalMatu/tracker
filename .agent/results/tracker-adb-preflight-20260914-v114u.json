@@ -1,0 +1,60 @@
+{
+  "id": "tracker-adb-preflight-20260914-v114u",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "started_at": "2026-09-14T14:54:29.283636+00:00",
+  "command_timeout": 120,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -u; adb devices -l; echo '---'; adb get-state 2>&1 || true",
+      "exit_code": 0,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\nList of devices attached\n\n---\nerror: no devices/emulators found\n",
+      "elapsed_seconds": 3.357,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 9.48,
+      "output_policy": "stream",
+      "captured_output_chars": 141,
+      "output_truncated": false,
+      "current_rss_mb": 9.48,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 3.357
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.077
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.07
+  },
+  "finished_at": "2026-09-14T14:54:34.107342+00:00",
+  "task_digest": "fc1d0d207bc6149bcdfe0552e4a39125b6c90eb32c5cbff727827f7bc6913f2a",
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "attempt_id": "1e696375318c323dd1dda703",
+  "daemon_version": "4.18.20"
+}
