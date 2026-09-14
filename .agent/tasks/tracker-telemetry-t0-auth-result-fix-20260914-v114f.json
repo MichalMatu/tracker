@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-t0-auth-result-fix-20260914-v114f",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": true,
+  "resources": [],
+  "memory_limit_mb": 4096,
+  "command_timeout": 2400,
+  "idle_timeout": 900,
+  "task_timeout": 3600,
+  "commands": [
+    "set -eu; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; test \"$(git rev-parse HEAD)\" = \"0fe28cc50c0cb2aab19af31aaf4a40a76aff3205\"; python3 - <<'PY'\nfrom pathlib import Path\np=Path('feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt')\ns=p.read_text()\nold='''        rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { activityResult ->\n            if (activityResult.resultCode != Activity.RESULT_OK || activityResult.data == null) {\n                viewModel.onAuthorizationFailed(\"Google authorization was cancelled\")\n                return@rememberLauncherForActivityResult\n            }\n            try {\n                consumeAuthorizationResult(\n                    authorizationClient.getAuthorizationResultFromIntent(activityResult.data!!),\n                )\n            } catch (error: ApiException) {\n                viewModel.onAuthorizationFailed(error.message ?: \"Google authorization failed\")\n            }\n        }\n'''\nnew='''        rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { activityResult ->\n            val resultData = activityResult.data\n            if (resultData == null) {\n                val message =\n                    if (activityResult.resultCode == Activity.RESULT_CANCELED) {\n                        \"Google authorization was cancelled\"\n                    } else {\n                        \"Google authorization returned no result\"\n                    }\n                viewModel.onAuthorizationFailed(message)\n                return@rememberLauncherForActivityResult\n            }\n            try {\n                consumeAuthorizationResult(\n                    authorizationClient.getAuthorizationResultFromIntent(resultData),\n                )\n            } catch (error: ApiException) {\n                viewModel.onAuthorizationFailed(error.message ?: \"Google authorization failed\")\n            }\n        }\n'''\nassert old in s, 'expected authorization launcher block not found'\np.write_text(s.replace(old,new,1))\nPY\n./gradlew :feature:telemetry:compileDebugKotlin :feature:telemetry:ktlintCheck :feature:telemetry:detekt :app:compileDebugKotlin --stacktrace; git diff --check; git diff -- feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt; git add feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt; git commit -m 'fix: parse Google authorization result'; git rev-parse HEAD"
+  ]
+}
