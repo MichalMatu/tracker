@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 4,
-  "command": "set -eu; test \"$(git rev-parse HEAD)\" = \"eb48b7c3cea379db3d215464efae4dff61ff54c0\"; SERIALS=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}'); COUNT=$(printf '%s\\n' \"$SERIALS\" | sed '/^$/d' | wc -l | tr -d ' '); test \"$COUNT\" = \"1\"; SERIAL=$(printf '%s\\n' \"$SERIALS\" | sed -n '1p'); APK=app/build/outputs/apk/debug/app-debug.apk; test -f \"$APK\"; adb -s \"$SERIAL\" install -r \"$APK\"; echo SERIAL=$SERIAL",
-  "pid": 24724,
+  "command": "set -eu; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | sed -n '1p'); adb -s \"$SERIAL\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null; sleep 1; adb -s \"$SERIAL\" shell input tap 75 160 || true; sleep 1; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/drawer.xml >/dev/null 2>&1 || true; B=$(adb -s \"$SERIAL\" shell cat /sdcard/drawer.xml 2>/dev/null | python3 -c 'import sys,xml.etree.ElementTree as ET; s=sys.stdin.read(); r=ET.fromstring(s); n=next((x for x in r.iter() if x.attrib.get(\"text\")==\"Telemetry & AI Bridge\"),None); print(n.attrib[\"bounds\"] if n is not None else \"\")' || true); if [ -n \"$B\" ]; then XY=$(printf '%s' \"$B\" | python3 -c 'import sys,re; a=list(map(int,re.findall(r\"\\d+\",sys.stdin.read()))); print((a[0]+a[2])//2,(a[1]+a[3])//2)'); set -- $XY; adb -s \"$SERIAL\" shell input tap \"$1\" \"$2\"; sleep 2; fi; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/auth.xml >/dev/null 2>&1 || true; echo '--- INITIAL AUTH UI ---'; adb -s \"$SERIAL\" shell cat /sdcard/auth.xml 2>/dev/null | sed 's/></>\\n</g' | grep -E 'meehow939|Drive file scope|Gmail send scope|Granted|Not granted|Connect Google account|Change Google account|Restoring Google authorization|reconnection' | head -160 || true",
+  "pid": 24803,
   "timeout": 1200,
   "idle_timeout": 300,
   "memory_limit_mb": 2048,
-  "started_at": "2026-09-14T15:01:56.666825+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-14T15:02:01.136453+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 4,
   "stage_phase": "commands",
   "task_id": "tracker-telemetry-auth-restore-device-final-20260914-v114v",
@@ -18,5 +18,5 @@
   "task_digest": "cb0378cf9056229f73aa5716c5f46c8220952af23ff05c889de8cdb32ec478b7",
   "daemon_version": "4.18.20",
   "daemon_pid": 24561,
-  "updated_at": "2026-09-14T15:01:56.667099+00:00"
+  "updated_at": "2026-09-14T15:02:01.220620+00:00"
 }
