@@ -1,0 +1,60 @@
+{
+  "id": "tracker-telemetry-t0-open-bridge-20260914-v114c",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "started_at": "2026-09-14T11:54:15.868285+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; test \"$(git rev-parse HEAD)\" = \"0fe28cc50c0cb2aab19af31aaf4a40a76aff3205\"; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -1); test -n \"$SERIAL\"; adb -s \"$SERIAL\" shell input tap 75 160; sleep 1; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/blueeye-drawer.xml >/dev/null; BOUNDS=$(adb -s \"$SERIAL\" shell cat /sdcard/blueeye-drawer.xml | python3 -c 'import sys,xml.etree.ElementTree as ET,re; r=ET.fromstring(sys.stdin.read()); n=next((x for x in r.iter() if x.attrib.get(\"text\")==\"Telemetry & AI Bridge\"),None); assert n is not None, \"Telemetry drawer item not found\"; print(n.attrib[\"bounds\"])'); echo \"telemetry_bounds=$BOUNDS\"; XY=$(printf '%s' \"$BOUNDS\" | python3 -c 'import sys,re; s=sys.stdin.read(); a=list(map(int,re.findall(r\"\\d+\",s))); print((a[0]+a[2])//2,(a[1]+a[3])//2)'); set -- $XY; adb -s \"$SERIAL\" shell input tap \"$1\" \"$2\"; sleep 1; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/blueeye-telemetry.xml >/dev/null; adb -s \"$SERIAL\" shell cat /sdcard/blueeye-telemetry.xml | sed 's/></>\\n</g' | grep -E 'Telemetry|Google|Drive|Gmail|Connect|Disconnect|Run test|account|authorize|scope|bridge' | head -120",
+      "exit_code": 0,
+      "output": "telemetry_bounds=[169,877][595,940]\n<node index=\"0\" text=\"Developer bridge\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,326][415,389]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"1\" text=\"Use a dedicated secondary Google account. The prototype requests only email identity, Drive file access, and Gmail send access.\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,410][996,569]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"2\" text=\"No telemetry is collected automatically in T0. This screen only validates Google authorization, one Drive JSON upload, and one self-addressed Gmail trigger.\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,590][996,716]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"0\" text=\"Connection\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,842][307,905]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"3\" text=\"Drive file scope\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,1000][529,1042]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"5\" text=\"Gmail send scope\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,1074][529,1116]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"0\" text=\"Connect Google account\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[340,1322][741,1375]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"0\" text=\"Run Drive + Gmail test\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[358,1490][722,1543]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"0\" text=\"Revoke Google access\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[356,1658][725,1711]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"1\" text=\"Telemetry &amp; AI Bridge\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[259,121][820,195]\" drawing-order=\"0\" hint=\"\" />\n",
+      "elapsed_seconds": 7.203,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 9.67,
+      "output_policy": "stream",
+      "captured_output_chars": 3890,
+      "output_truncated": false,
+      "current_rss_mb": 9.67,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 7.203
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.093
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.072
+  },
+  "finished_at": "2026-09-14T11:54:24.591981+00:00",
+  "task_digest": "fe420f6fd4df1e1954d9c2e651af521059a4b80ab924e891a80c669b3e02bcab",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "attempt_id": "6d28e06531aee27e74f4274d",
+  "daemon_version": "4.18.20"
+}
