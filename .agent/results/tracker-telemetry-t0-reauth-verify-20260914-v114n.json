@@ -1,0 +1,60 @@
+{
+  "id": "tracker-telemetry-t0-reauth-verify-20260914-v114n",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "started_at": "2026-09-14T14:00:37.453637+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; test \"$(git rev-parse HEAD)\" = \"e3b3ec837b9c78cc6b79b06f6d9e874faf6e0b01\"; SERIALS=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}'); COUNT=$(printf '%s\\n' \"$SERIALS\" | sed '/^$/d' | wc -l | tr -d ' '); test \"$COUNT\" = \"1\"; SERIAL=$(printf '%s\\n' \"$SERIALS\" | sed -n '1p'); adb -s \"$SERIAL\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null; sleep 1; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/t0-reauth.xml >/dev/null 2>&1 || true; if ! adb -s \"$SERIAL\" shell cat /sdcard/t0-reauth.xml 2>/dev/null | grep -q 'Telemetry &amp; AI Bridge'; then adb -s \"$SERIAL\" shell input tap 75 160; sleep 1; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/t0-drawer.xml >/dev/null 2>&1 || true; B=$(adb -s \"$SERIAL\" shell cat /sdcard/t0-drawer.xml | python3 -c 'import sys,xml.etree.ElementTree as ET; r=ET.fromstring(sys.stdin.read()); n=next(x for x in r.iter() if x.attrib.get(\"text\")==\"Telemetry & AI Bridge\"); print(n.attrib[\"bounds\"])'); XY=$(printf '%s' \"$B\" | python3 -c 'import sys,re; a=list(map(int,re.findall(r\"\\d+\",sys.stdin.read()))); print((a[0]+a[2])//2,(a[1]+a[3])//2)'); set -- $XY; adb -s \"$SERIAL\" shell input tap \"$1\" \"$2\"; sleep 1; fi; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/t0-reauth-final.xml >/dev/null 2>&1 || true; echo '--- reauth UI ---'; adb -s \"$SERIAL\" shell cat /sdcard/t0-reauth-final.xml 2>/dev/null | sed 's/></>\\n</g' | grep -E 'Account|Drive file scope|Gmail send scope|Granted|Not granted|Connect Google account|Change Google account|Run Drive \\+ Gmail test|meehow939|Authorization failed|T0 API test' | head -240 || true",
+      "exit_code": 0,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\nargs: [-p, io.blueeye, -c, android.intent.category.LAUNCHER, 1]\n arg: \"-p\"\n arg: \"io.blueeye\"\n arg: \"-c\"\n arg: \"android.intent.category.LAUNCHER\"\n arg: \"1\"\ndata=\"io.blueeye\"\ndata=\"android.intent.category.LAUNCHER\"\n--- reauth UI ---\n<node index=\"1\" text=\"Account\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,926][529,968]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"2\" text=\"meehow939@gmail.com\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[550,926][996,979]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"3\" text=\"Drive file scope\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,1000][529,1042]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"4\" text=\"Granted\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[550,1000][996,1053]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"5\" text=\"Gmail send scope\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,1074][529,1116]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"6\" text=\"Granted\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[550,1074][996,1127]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"7\" text=\"Connected to meehow939@gmail.com\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[84,1148][727,1201]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"0\" text=\"Change Google account\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[346,1322][735,1375]\" drawing-order=\"0\" hint=\"\" />\n<node index=\"0\" text=\"Run Drive + Gmail test\" resource-id=\"\" class=\"android.widget.TextView\" package=\"io.blueeye\" content-desc=\"\" checkable=\"false\" checked=\"false\" clickable=\"false\" enabled=\"true\" focusable=\"false\" focused=\"false\" scrollable=\"false\" long-clickable=\"false\" password=\"false\" selected=\"false\" bounds=\"[358,1490][722,1543]\" drawing-order=\"0\" hint=\"\" />\n",
+      "elapsed_seconds": 10.251,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 12.31,
+      "output_policy": "stream",
+      "captured_output_chars": 3544,
+      "output_truncated": false,
+      "current_rss_mb": 7.25,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 10.251
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.13
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.068
+  },
+  "finished_at": "2026-09-14T14:00:49.289323+00:00",
+  "task_digest": "d6a3ed73c7c95cdf48ed5d0af6ddb1e8f9c12bd7f8c47636f484bdd132d59ca7",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 2048,
+  "attempt_id": "9de86484e5483376a4db90b8",
+  "daemon_version": "4.18.20"
+}
