@@ -1,0 +1,61 @@
+{
+  "id": "tracker-live-nearby-device-validate-20260914-v108a",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "started_at": "2026-09-14T06:54:42.875618+00:00",
+  "command_timeout": 1200,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; git fetch origin agent-control; git show origin/agent-control:.agent/scripts/tracker-live-nearby-device-validate-v108a.sh > /tmp/tracker-live-nearby-device-validate-v108a.sh; chmod +x /tmp/tracker-live-nearby-device-validate-v108a.sh; bash /tmp/tracker-live-nearby-device-validate-v108a.sh",
+      "exit_code": 127,
+      "output": "From https://github.com/MichalMatu/tracker\n * branch              agent-control -> FETCH_HEAD\n   a6f74e6c..0109ef2f  agent-control -> origin/agent-control\nSwitched to branch 'main'\nYour branch is behind 'origin/main' by 2 commits, and can be fast-forwarded.\n  (use \"git pull\" to update your local branch)\nFrom https://github.com/MichalMatu/tracker\n * branch              main       -> FETCH_HEAD\nUpdating 454e01d5..69a30bf0\nFast-forward\n docs/README.md                            |  19 +-\n docs/TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md | 607 ++++++++++++++++++++++--------\n 2 files changed, 451 insertions(+), 175 deletions(-)\n/tmp/tracker-live-nearby-device-validate-v108a.sh: line 91: mapfile: command not found\n",
+      "elapsed_seconds": 2.419,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.03,
+      "output_policy": "stream",
+      "captured_output_chars": 710,
+      "output_truncated": false,
+      "current_rss_mb": 3.03,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 2.419
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.086
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.073
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-14T06:54:47.197264+00:00",
+  "task_digest": "b31ba3cb858a0b3b61af852c39947f003b217fa587ff73fc8022963a0dc91b00",
+  "idle_timeout": 900,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "3930e1622b6cfabb7590ecf4",
+  "daemon_version": "4.18.20"
+}
