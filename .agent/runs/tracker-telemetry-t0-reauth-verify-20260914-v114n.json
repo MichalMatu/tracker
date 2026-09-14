@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-telemetry-t0-reauth-verify-20260914-v114n",
+  "task_digest": "d6a3ed73c7c95cdf48ed5d0af6ddb1e8f9c12bd7f8c47636f484bdd132d59ca7",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-14T14:00:37.453588+00:00",
+  "attempt_id": "9de86484e5483376a4db90b8",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 85284,
+  "updated_at": "2026-09-14T14:00:37.453715+00:00",
+  "pid": 85284
+}
