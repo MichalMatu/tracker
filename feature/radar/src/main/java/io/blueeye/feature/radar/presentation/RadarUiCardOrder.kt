@@ -19,7 +19,10 @@ internal object RadarUiCardOrder {
             .thenBy { it.displayName.lowercase() }
             .thenBy { it.fingerprint }
 
-    private fun recencyPriority(lastSeenAt: Long, nowMs: Long): Int {
+    private fun recencyPriority(
+        lastSeenAt: Long,
+        nowMs: Long
+    ): Int {
         val ageMs = (nowMs - lastSeenAt).coerceAtLeast(0L)
         return when {
             ageMs <= ACTIVE_WINDOW_MS -> 2

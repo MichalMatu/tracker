@@ -7,7 +7,10 @@ internal class LiveNearbySignalHistory {
 
     private val samplesByFingerprint = mutableMapOf<String, MutableList<Sample>>()
 
-    fun observe(devices: List<RadarDeviceSummary>, nowMs: Long) {
+    fun observe(
+        devices: List<RadarDeviceSummary>,
+        nowMs: Long
+    ) {
         devices.forEach { device ->
             val samples = samplesByFingerprint.getOrPut(device.fingerprint) { mutableListOf() }
             if (samples.lastOrNull()?.timestamp != device.lastSeenAt) {
@@ -26,7 +29,10 @@ internal class LiveNearbySignalHistory {
         return median(values).takeIf { values.isNotEmpty() } ?: device.rssi
     }
 
-    fun trend(fingerprint: String, nowMs: Long): LiveSignalTrend {
+    fun trend(
+        fingerprint: String,
+        nowMs: Long
+    ): LiveSignalTrend {
         val cutoff = nowMs - TREND_WINDOW_MS
         val values =
             samplesByFingerprint[fingerprint]

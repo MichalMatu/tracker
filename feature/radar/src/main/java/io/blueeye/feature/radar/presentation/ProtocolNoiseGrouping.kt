@@ -9,7 +9,10 @@ enum class ProtocolNoiseFamily(val title: String) {
 }
 
 object ProtocolNoiseClassifier {
-    fun family(beaconType: String?, displayName: String): ProtocolNoiseFamily? {
+    fun family(
+        beaconType: String?,
+        displayName: String
+    ): ProtocolNoiseFamily? {
         val beacon = beaconType.orEmpty().lowercase()
         val name = displayName.trim().lowercase()
         val isFindHub =
@@ -71,7 +74,10 @@ sealed interface RadarProtocolEntry {
 
 object RadarProtocolGroupMapper {
     @Suppress("ReturnCount")
-    fun map(section: RadarUiSection, nowMs: Long = System.currentTimeMillis()): List<RadarProtocolEntry> {
+    fun map(
+        section: RadarUiSection,
+        nowMs: Long = System.currentTimeMillis()
+    ): List<RadarProtocolEntry> {
         if (section.type !in GROUPABLE_SECTIONS) return section.items.map(RadarProtocolEntry::Device)
 
         val groups =
@@ -89,11 +95,12 @@ object RadarProtocolGroupMapper {
                 if (members == null || !ProtocolNoiseClassifier.canGroup(item)) {
                     add(RadarProtocolEntry.Device(item))
                 } else if (emitted.add(family)) {
-                    val ordered = members.sortedWith(
-                        compareByDescending<RadarUiItem> { it.isActive(nowMs) }
-                            .thenByDescending { it.signalInfo.rssi }
-                            .thenByDescending { it.lastSeenAt },
-                    )
+                    val ordered =
+                        members.sortedWith(
+                            compareByDescending<RadarUiItem> { it.isActive(nowMs) }
+                                .thenByDescending { it.signalInfo.rssi }
+                                .thenByDescending { it.lastSeenAt },
+                        )
                     val active = ordered.filter { it.isActive(nowMs) }
                     add(
                         RadarProtocolEntry.Group(
@@ -108,8 +115,7 @@ object RadarProtocolGroupMapper {
         }
     }
 
-    private fun RadarUiItem.isActive(nowMs: Long): Boolean =
-        (nowMs - lastSeenAt).coerceAtLeast(0L) <= ACTIVE_WINDOW_MS
+    private fun RadarUiItem.isActive(nowMs: Long): Boolean = (nowMs - lastSeenAt).coerceAtLeast(0L) <= ACTIVE_WINDOW_MS
 
     private const val ACTIVE_WINDOW_MS = 15_000L
     private const val MIN_GROUP_SIZE = 2

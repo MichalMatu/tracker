@@ -258,10 +258,10 @@ fun RadarScreen(
                                                     onToggle = {
                                                         expandedProtocolGroups =
                                                             if (groupKey in expandedProtocolGroups) {
-                                                            expandedProtocolGroups - groupKey
-                                                        } else {
-                                                            expandedProtocolGroups + groupKey
-                                                        }
+                                                                expandedProtocolGroups - groupKey
+                                                            } else {
+                                                                expandedProtocolGroups + groupKey
+                                                            }
                                                     },
                                                 )
                                             }

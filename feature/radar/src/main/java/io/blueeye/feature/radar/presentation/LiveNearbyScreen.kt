@@ -236,10 +236,11 @@ private fun LiveNearbySummary(
 private fun LiveNearbySectionHeader(title: String) {
     Text(
         title,
-        modifier = Modifier.padding(
-            horizontal = Dimens.PaddingMedium,
-            vertical = Dimens.PaddingSmall,
-        ),
+        modifier =
+            Modifier.padding(
+                horizontal = Dimens.PaddingMedium,
+                vertical = Dimens.PaddingSmall,
+            ),
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.SemiBold,
     )

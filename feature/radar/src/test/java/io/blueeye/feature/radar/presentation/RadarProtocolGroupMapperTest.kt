@@ -50,10 +50,11 @@ class RadarProtocolGroupMapperTest {
         val suspicious = item("suspicious", -50, now, "Google Find Hub", TrackingStatus.SUSPICIOUS)
         val ordinaryA = item("a", -60, now, "Google Find Hub")
         val ordinaryB = item("b", -70, now, "Google Find Hub")
-        val entries = RadarProtocolGroupMapper.map(
-            RadarUiSection(RadarUiSectionType.NEARBY, listOf(suspicious, ordinaryA, ordinaryB)),
-            now
-        )
+        val entries =
+            RadarProtocolGroupMapper.map(
+                RadarUiSection(RadarUiSectionType.NEARBY, listOf(suspicious, ordinaryA, ordinaryB)),
+                now
+            )
 
         assertTrue(entries.any { it is RadarProtocolEntry.Device && it.item.fingerprint == "suspicious" })
         assertEquals(2, entries.filterIsInstance<RadarProtocolEntry.Group>().single().members.size)
@@ -70,23 +71,25 @@ class RadarProtocolGroupMapperTest {
             fingerprint = fingerprint,
             displayName = fingerprint,
             vendorAndType = "Tracker",
-            signalInfo = RadarUiSignalInfo(
-                rssi,
-                "$rssi dBm",
-                RadarUiColorToken.PRIMARY,
-                0,
-                "",
-                "BLE",
-                RadarUiColorToken.PRIMARY,
-                ""
-            ),
-            statusInfo = RadarUiStatusInfo(
-                "",
-                RadarUiColorToken.PRIMARY,
-                RadarUiColorToken.PRIMARY,
-                status != TrackingStatus.SAFE,
-                null
-            ),
+            signalInfo =
+                RadarUiSignalInfo(
+                    rssi,
+                    "$rssi dBm",
+                    RadarUiColorToken.PRIMARY,
+                    0,
+                    "",
+                    "BLE",
+                    RadarUiColorToken.PRIMARY,
+                    ""
+                ),
+            statusInfo =
+                RadarUiStatusInfo(
+                    "",
+                    RadarUiColorToken.PRIMARY,
+                    RadarUiColorToken.PRIMARY,
+                    status != TrackingStatus.SAFE,
+                    null
+                ),
             icons = RadarUiIcons(0, false),
             isNew = false,
             isInWatchlist = false,

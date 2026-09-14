@@ -16,12 +16,17 @@ import androidx.compose.ui.unit.dp
 import io.blueeye.core.ui.theme.Dimens
 
 @Composable
-fun RadarProtocolGroupCard(group: RadarProtocolEntry.Group, expanded: Boolean, onToggle: () -> Unit) {
+fun RadarProtocolGroupCard(
+    group: RadarProtocolEntry.Group,
+    expanded: Boolean,
+    onToggle: () -> Unit
+) {
     Surface(
-        modifier = Modifier.fillMaxWidth().padding(
-            horizontal = Dimens.PaddingMedium,
-            vertical = Dimens.PaddingExtraSmall
-        ).clickable(onClick = onToggle),
+        modifier =
+            Modifier.fillMaxWidth().padding(
+                horizontal = Dimens.PaddingMedium,
+                vertical = Dimens.PaddingExtraSmall
+            ).clickable(onClick = onToggle),
         shape = MaterialTheme.shapes.medium,
         tonalElevation = 1.dp,
     ) {

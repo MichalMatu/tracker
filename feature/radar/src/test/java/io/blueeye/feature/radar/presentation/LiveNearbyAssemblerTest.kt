@@ -37,10 +37,11 @@ class LiveNearbyAssemblerTest {
                 status = TrackingStatus.SUSPICIOUS,
             )
 
-        val snapshot = LiveNearbyAssembler.assemble(
-            listOf(ordinaryA, ordinaryB, suspicious),
-            pinnedFingerprint = null,
-        )
+        val snapshot =
+            LiveNearbyAssembler.assemble(
+                listOf(ordinaryA, ordinaryB, suspicious),
+                pinnedFingerprint = null,
+            )
 
         val group = snapshot.active.filterIsInstance<LiveNearbyEntry.ProtocolGroup>().single()
         assertEquals(2, group.activeCount)
@@ -58,10 +59,11 @@ class LiveNearbyAssemblerTest {
         val otherA = device("a", -60, LiveNearbyFreshness.ACTIVE, 10_000L, "Apple Find My")
         val otherB = device("b", -65, LiveNearbyFreshness.ACTIVE, 9_000L, "Apple Find My")
 
-        val snapshot = LiveNearbyAssembler.assemble(
-            listOf(pinned, otherA, otherB),
-            pinnedFingerprint = "pinned",
-        )
+        val snapshot =
+            LiveNearbyAssembler.assemble(
+                listOf(pinned, otherA, otherB),
+                pinnedFingerprint = "pinned",
+            )
 
         assertEquals("pinned", snapshot.pinned?.item?.fingerprint)
         val group = snapshot.active.filterIsInstance<LiveNearbyEntry.ProtocolGroup>().single()
@@ -120,28 +122,31 @@ class LiveNearbyAssemblerTest {
                     fingerprint = fingerprint,
                     displayName = fingerprint,
                     vendorAndType = "BLE device",
-                    signalInfo = RadarUiSignalInfo(
-                rssi = rssi,
-                rssiText = "$rssi dBm",
-                signalColor = RadarUiColorToken.PRIMARY,
-                signalProgress = 0,
-                distanceText = "",
-                techBadge = "BLE",
-                techBadgeColor = RadarUiColorToken.PRIMARY,
-                timeSinceSeen = "",
-            ),
-            statusInfo = RadarUiStatusInfo(
-                text = "Safe",
-                textColor = RadarUiColorToken.SAFE,
-                backgroundTint = RadarUiColorToken.SAFE,
-                isWarning = status != TrackingStatus.SAFE,
-                cardBackgroundColor = null,
-            ),
-            icons = RadarUiIcons(
-                mainIconRes = 0,
-                isConnectable = false,
-            ),
-            isNew = false,
+                    signalInfo =
+                        RadarUiSignalInfo(
+                            rssi = rssi,
+                            rssiText = "$rssi dBm",
+                            signalColor = RadarUiColorToken.PRIMARY,
+                            signalProgress = 0,
+                            distanceText = "",
+                            techBadge = "BLE",
+                            techBadgeColor = RadarUiColorToken.PRIMARY,
+                            timeSinceSeen = "",
+                        ),
+                    statusInfo =
+                        RadarUiStatusInfo(
+                            text = "Safe",
+                            textColor = RadarUiColorToken.SAFE,
+                            backgroundTint = RadarUiColorToken.SAFE,
+                            isWarning = status != TrackingStatus.SAFE,
+                            cardBackgroundColor = null,
+                        ),
+                    icons =
+                        RadarUiIcons(
+                            mainIconRes = 0,
+                            isConnectable = false,
+                        ),
+                    isNew = false,
                     isInWatchlist = false,
                     isIgnored = false,
                     nameColor = RadarUiColorToken.PRIMARY,
