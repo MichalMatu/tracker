@@ -8,10 +8,11 @@ For current work, use this order:
 
 1. [`PRODUCT_GOAL.md`](PRODUCT_GOAL.md) — what the product is trying to achieve and what it must not claim.
 2. [`UI_UX_REDESIGN_PLAN.md`](UI_UX_REDESIGN_PLAN.md) — active execution checklist for the current Radar/Details redesign and later analysis work.
-3. [`UI_UX_NEXT_WALK_HANDOFF_2026-09-13.md`](UI_UX_NEXT_WALK_HANDOFF_2026-09-13.md) — current continuation handoff for the next S22+ field/UX walk.
-4. [`ARCHITECTURE_CURRENT.md`](ARCHITECTURE_CURRENT.md) — current module/dependency picture.
-5. [`QUALITY_GATE.md`](QUALITY_GATE.md) — repository acceptance gates.
-6. [`SANDBOX_EXECUTION_FLOW.md`](SANDBOX_EXECUTION_FLOW.md) — where source, CI, sandbox and physical-device work belong.
+3. [`TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md`](TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md) — active implementation plan for the optional telemetry, trigger, ChatGPT analysis and operator feedback bridge.
+4. [`UI_UX_NEXT_WALK_HANDOFF_2026-09-13.md`](UI_UX_NEXT_WALK_HANDOFF_2026-09-13.md) — current continuation handoff for the next S22+ field/UX walk.
+5. [`ARCHITECTURE_CURRENT.md`](ARCHITECTURE_CURRENT.md) — current module/dependency picture.
+6. [`QUALITY_GATE.md`](QUALITY_GATE.md) — repository acceptance gates.
+7. [`SANDBOX_EXECUTION_FLOW.md`](SANDBOX_EXECUTION_FLOW.md) — where source, CI, sandbox and physical-device work belong.
 
 ## Current project status
 
@@ -20,11 +21,12 @@ For current work, use this order:
 - Technical Details progressive disclosure: **implemented**; technical content is collapsed by default and expands explicitly.
 - `Raw Data` remains available from the expanded Technical Details section rather than the top app bar.
 - Previous accepted Radar performance work remains preserved; do not reopen without a concrete regression.
+- Telemetry/AI feedback bridge: **ACTIVE PLAN**, implementation not yet started; first slice is a dedicated screen plus secondary Google account and send-only test email.
 - Next action: install the current `main` build on Samsung SM-S906B, run the next controlled field/UX walk, and capture only the evidence needed for UI/field acceptance.
 
 Do not use older Phase 2 handoffs as current execution instructions. The dated next-walk handoff below is now the current continuation record.
 
-## Active plan
+## Active plans
 
 ### [`UI_UX_REDESIGN_PLAN.md`](UI_UX_REDESIGN_PLAN.md)
 
@@ -45,6 +47,22 @@ Canonical checklist for:
 - field-data feedback loop.
 
 Update its checkboxes/gates as implementation progresses.
+
+### [`TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md`](TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md)
+
+Canonical implementation plan for the optional continuous analysis bridge:
+
+- dedicated secondary Google account;
+- least-privilege send-only Gmail authorization;
+- dedicated `Telemetry & AI Bridge` screen and ViewModel;
+- compact versioned telemetry deltas and checkpoints;
+- durable local outbox and replaceable HTTPS transport;
+- Gmail as trigger/control and operator-feedback channel, not telemetry storage;
+- event-trigger validation with scheduler watchdog fallback;
+- ChatGPT analysis, Gmail feedback and traceable GitHub/Local Agent engineering loop;
+- privacy, retention, battery and productization gates.
+
+Keep this work isolated from normal local scanning and alerts; disabling it must leave Tracker fully functional.
 
 ## Current handoff
 
