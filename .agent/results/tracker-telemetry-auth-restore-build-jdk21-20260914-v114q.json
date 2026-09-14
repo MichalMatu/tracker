@@ -1,0 +1,61 @@
+{
+  "id": "tracker-telemetry-auth-restore-build-jdk21-20260914-v114q",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "started_at": "2026-09-14T14:44:20.071684+00:00",
+  "command_timeout": 1200,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; test \"$(git rev-parse HEAD)\" = \"4298788b081fb16c4237f7655b32f7a81c279723\"; export JAVA_HOME=$(/usr/libexec/java_home -v 21); export PATH=\"$JAVA_HOME/bin:$PATH\"; java -version; ./gradlew :feature:telemetry:compileDebugKotlin :feature:telemetry:ktlintCheck :feature:telemetry:detekt :feature:telemetry:testDebugUnitTest :app:assembleDebug",
+      "exit_code": 1,
+      "output": "openjdk version \"21.0.2\" 2024-01-16 LTS\nOpenJDK Runtime Environment Temurin-21.0.2+13 (build 21.0.2+13-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.2+13 (build 21.0.2+13-LTS, mixed mode)\nStarting a Gradle Daemon (subsequent builds will be faster)\nCalculating task graph as configuration cache cannot be reused because JVM has changed.\nWarning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.\n> Task :core:domain:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:domain:compileKotlin UP-TO-DATE\n> Task :core:domain:compileJava NO-SOURCE\n> Task :core:domain:processResources NO-SOURCE\n> Task :core:domain:classes UP-TO-DATE\n> Task :core:domain:jar UP-TO-DATE\n> Task :core:ui:checkKotlinGradlePluginConfigurationErrors\n> Task :core:ui:preBuild UP-TO-DATE\n> Task :core:ui:preDebugBuild UP-TO-DATE\n> Task :core:ui:generateDebugResValues UP-TO-DATE\n> Task :core:ui:generateDebugResources UP-TO-DATE\n> Task :core:ui:packageDebugResources UP-TO-DATE\n> Task :core:ui:parseDebugLocalResources UP-TO-DATE\n> Task :core:ui:generateDebugRFile UP-TO-DATE\n> Task :core:ui:compileDebugKotlin FROM-CACHE\n> Task :core:ui:javaPreCompileDebug UP-TO-DATE\n> Task :core:ui:compileDebugJavaWithJavac NO-SOURCE\n> Task :core:ui:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :feature:telemetry:checkKotlinGradlePluginConfigurationErrors\n> Task :feature:telemetry:preBuild UP-TO-DATE\n> Task :feature:telemetry:preDebugBuild UP-TO-DATE\n> Task :feature:telemetry:generateDebugResValues UP-TO-DATE\n> Task :feature:telemetry:generateDebugResources UP-TO-DATE\n> Task :feature:telemetry:packageDebugResources UP-TO-DATE\n> Task :feature:telemetry:parseDebugLocalResources UP-TO-DATE\n> Task :feature:telemetry:generateDebugRFile UP-TO-DATE\n> Task :feature:telemetry:kaptGenerateStubsDebugKotlin\n> Task :feature:telemetry:kaptDebugKotlin\n> Task :feature:telemetry:compileDebugKotlin\n> Task :feature:telemetry:loadKtlintReporters UP-TO-DATE\n> Task :feature:telemetry:runKtlintCheckOverAndroidTestDebugSourceSet NO-SOURCE\n> Task :feature:telemetry:ktlintAndroidTestDebugSourceSetCheck SKIPPED\n> Task :feature:telemetry:runKtlintCheckOverAndroidTestReleaseSourceSet NO-SOURCE\n> Task :feature:telemetry:ktlintAndroidTestReleaseSourceSetCheck SKIPPED\n> Task :feature:telemetry:runKtlintCheckOverAndroidTestSourceSet NO-SOURCE\n> Task :feature:telemetry:ktlintAndroidTestSourceSetCheck SKIPPED\n> Task :feature:telemetry:runKtlintCheckOverDebugSourceSet NO-SOURCE\n> Task :feature:telemetry:ktlintDebugSourceSetCheck SKIPPED\n> Task :feature:telemetry:runKtlintCheckOverKotlinScripts UP-TO-DATE\n> Task :feature:telemetry:ktlintKotlinScriptCheck UP-TO-DATE\n> Task :feature:telemetry:runKtlintCheckOverMainSourceSet UP-TO-DATE\n> Task :feature:telemetry:ktlintMainSourceSetCheck UP-TO-DATE\n> Task :feature:telemetry:runKtlintCheckOverReleaseSourceSet NO-SOURCE\n> Task :feature:telemetry:ktlintReleaseSourceSetCheck SKIPPED\n> Task :feature:telemetry:runKtlintCheckOverTestDebugSourceSet NO-SOURCE\n> Task :feature:telemetry:ktlintTestDebugSourceSetCheck SKIPPED\n> Task :feature:telemetry:runKtlintCheckOverTestFixturesDebugSourceSet NO-SOURCE\n> Task :feature:telemetry:ktlintTestFixturesDebugSourceSetCheck SKIPPED\n> Task :feature:telemetry:runKtlintCheckOverTestFixturesReleaseSourceSet NO-SOURCE\n> Task :feature:telemetry:ktlintTestFixturesReleaseSourceSetCheck SKIPPED\n> Task :feature:telemetry:runKtlintCheckOverTestFixturesSourceSet NO-SOURCE\n> Task :feature:telemetry:ktlintTestFixturesSourceSetCheck SKIPPED\n> Task :feature:telemetry:runKtlintCheckOverTestReleaseSourceSet NO-SOURCE\n> Task :feature:telemetry:ktlintTestReleaseSourceSetCheck SKIPPED\n> Task :feature:telemetry:runKtlintCheckOverTestSourceSet NO-SOURCE\n> Task :feature:telemetry:ktlintTestSourceSetCheck SKIPPED\n> Task :feature:telemetry:ktlintCheck UP-TO-DATE\n\n> Task :feature:telemetry:detekt FAILED\n\n\n4 kotlin files were analyzed.\n[Incubating] Problems report is available at: file:///Users/michal/agent-workspace/repos/tracker/work/build/reports/problems/problems-report.html\n\nFAILURE: Build failed with an exception.\n\n* What went wrong:\nExecution failed for task ':feature:telemetry:detekt'.\n> Analysis failed with 2 weighted issues.\n\n* Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights.\n> Get more help at https://help.gradle.org.\n\nDeprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.\n\nYou can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.\n\nFor more on this, please refer to https://docs.gradle.org/8.11.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.\n\nBUILD FAILED in 20s\n30 actionable tasks: 8 executed, 1 from cache, 21 up-to-date\nConfiguration cache entry stored.\n",
+      "elapsed_seconds": 21.675,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 114.88,
+      "output_policy": "stream",
+      "captured_output_chars": 5332,
+      "output_truncated": false,
+      "current_rss_mb": 36.05,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 21.675
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.093
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.068
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-14T14:44:43.357237+00:00",
+  "task_digest": "1b87f0f6fbcbc967852c268050d5eae885fb23ea3a6ba13625e62446136a0162",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "32952184b551087e6415e4e9",
+  "daemon_version": "4.18.20"
+}
