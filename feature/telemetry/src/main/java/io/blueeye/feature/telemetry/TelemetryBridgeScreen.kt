@@ -75,13 +75,20 @@ fun TelemetryBridgeScreen(
 
     val authorizationLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { activityResult ->
-            if (activityResult.resultCode != Activity.RESULT_OK || activityResult.data == null) {
-                viewModel.onAuthorizationFailed("Google authorization was cancelled")
+            val resultData = activityResult.data
+            if (resultData == null) {
+                val message =
+                    if (activityResult.resultCode == Activity.RESULT_CANCELED) {
+                        "Google authorization was cancelled"
+                    } else {
+                        "Google authorization returned no result"
+                    }
+                viewModel.onAuthorizationFailed(message)
                 return@rememberLauncherForActivityResult
             }
             try {
                 consumeAuthorizationResult(
-                    authorizationClient.getAuthorizationResultFromIntent(activityResult.data!!),
+                    authorizationClient.getAuthorizationResultFromIntent(resultData),
                 )
             } catch (error: ApiException) {
                 viewModel.onAuthorizationFailed(error.message ?: "Google authorization failed")
