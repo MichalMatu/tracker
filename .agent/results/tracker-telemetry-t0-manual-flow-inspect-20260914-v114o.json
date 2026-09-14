@@ -1,0 +1,9 @@
+{
+  "id": "tracker-telemetry-t0-manual-flow-inspect-20260914-v114o",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "started_at": null,
+  "finished_at": "2026-09-14T14:11:50.146212+00:00",
+  "daemon_version": "4.18.20",
+  "error": "JSONDecodeError: Invalid control character at: line 13 column 1970 (char 2326)"
+}
