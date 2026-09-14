@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-telemetry-auth-restore-build-jdk21-20260914-v114q",
+  "task_digest": "1b87f0f6fbcbc967852c268050d5eae885fb23ea3a6ba13625e62446136a0162",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-14T14:44:20.071636+00:00",
+  "attempt_id": "32952184b551087e6415e4e9",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 11489,
+  "updated_at": "2026-09-14T14:44:20.071728+00:00",
+  "pid": 11489
+}
