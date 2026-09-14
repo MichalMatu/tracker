@@ -1,0 +1,9 @@
+{
+  "id": "tracker-preproduction-harden-20260914-v111a",
+  "status": "failed",
+  "failure_reason": "invalid_task_file",
+  "started_at": null,
+  "finished_at": "2026-09-14T07:38:15.934499+00:00",
+  "daemon_version": "4.18.20",
+  "error": "JSONDecodeError: Invalid control character at: line 12 column 1717 (char 2011)"
+}
