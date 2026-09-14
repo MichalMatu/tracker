@@ -1,9 +1,0 @@
-{
-  "id": "tracker-radar-protocol-grouping-finalize-20260914-v106g",
-  "status": "failed",
-  "failure_reason": "invalid_task_file",
-  "started_at": null,
-  "finished_at": "2026-09-14T06:25:53.223232+00:00",
-  "daemon_version": "4.18.20",
-  "error": "JSONDecodeError: Invalid control character at: line 13 column 1322 (char 2060)"
-}
