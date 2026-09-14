@@ -1,0 +1,20 @@
+{
+  "id": "tracker-preproduction-harden-20260914-v111a",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 1800,
+  "idle_timeout": 900,
+  "task_timeout": 2400,
+  "commands": [
+    "set -eu; git fetch origin main chore/preproduction-readiness-20260913; git checkout main; git pull --ff-only origin main; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"def523abd7951958174b58ad5bb4bd885b40881c\"; git cherry-pick 2d0c3a79605d34816459b8f272a25e9cff9bb8c4 464bc97b11dd06fed0befc1574014c82fa846ff9 94992224ae63be8c5e2d78f9d1624ecff3596b63; test ! -e .github/dependabot.yml; python3 - <<'PY'\nfrom pathlib import Path\np=Path('docs/QUALITY_GATE.md')\ns=p.read_text()\nanchor='## Physical validation\\n'\ninsert='''## Production and privacy release gate\\n\\nBefore calling any artifact production-ready, verify the exact candidate SHA with the normal quality/build gates plus all of the following:\\n\\n- build a release artifact deliberately; tester/debug APKs are not production artifacts;\\n- keep production signing keys and signing properties outside Git;\\n- use a monotonically increasing `versionCode` and an intentional `versionName`;\\n- verify current Play/Android target-SDK and build-tool requirements before release;\\n- review Bluetooth/location/notification permissions and Play Data safety against actual runtime behavior;\\n- keep local BLE/location observation data out of Android backup and repository history;\\n- review global cleartext-network allowance before production distribution;\\n- run release-variant checks plus physical-device BLE/background acceptance on the exact release candidate.\\n\\nRepository hardening rules: `.gitignore` must cover signing material, local environment secrets and private capture/database artifacts; `CODEOWNERS` may define default review ownership. Dependency-update bots are intentionally not enabled.\\n\\n'''
+if insert not in s:
+    if anchor not in s: raise SystemExit('quality gate anchor missing')
+    s=s.replace(anchor, insert+anchor)
+    p.write_text(s)
+PY
+ git diff --check; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; ./gradlew --no-daemon qualityCheck :app:assembleDebug; git add docs/QUALITY_GATE.md; if ! git diff --cached --quiet; then git commit -m \"Document production privacy gate\"; fi; test ! -e .github/dependabot.yml; git status --short; git push origin main; echo PUSHED_HEAD=$(git rev-parse HEAD); echo DEPENDABOT_ENABLED=no"
+  ]
+}
