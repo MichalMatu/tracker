@@ -36,6 +36,13 @@ data class TelemetryBridgeUiState(
 
     val hasGmailSendAccess: Boolean
         get() = GoogleBridgeScopes.GMAIL_SEND in grantedScopes
+
+    val canRunTest: Boolean
+        get() =
+            isAuthorized &&
+                selectedAccountEmail != null &&
+                hasDriveAccess &&
+                hasGmailSendAccess
 }
 
 @HiltViewModel
@@ -54,7 +61,12 @@ class TelemetryBridgeViewModel
                 state.copy(
                     authorizationState = TelemetryAuthorizationState.AUTHORIZING,
                     isBusy = true,
-                    statusMessage = if (forTest) "Refreshing Google authorization..." else "Connecting Google account...",
+                    statusMessage =
+                        if (forTest) {
+                            "Refreshing Google authorization..."
+                        } else {
+                            "Connecting Google account..."
+                        },
                     errorMessage = null,
                 )
             }
@@ -83,6 +95,20 @@ class TelemetryBridgeViewModel
         ) {
             if (token.isNullOrBlank()) {
                 onAuthorizationFailed("Google authorization returned no access token")
+                return
+            }
+
+            if (!GoogleBridgeScopes.requiredForTest.all(grantedScopes::contains)) {
+                accessToken = null
+                _uiState.update { state ->
+                    state.copy(
+                        authorizationState = TelemetryAuthorizationState.DISCONNECTED,
+                        grantedScopes = grantedScopes,
+                        isBusy = false,
+                        statusMessage = "Required Google access was not granted",
+                        errorMessage = "Drive file and Gmail send access are both required for the T0 bridge test.",
+                    )
+                }
                 return
             }
 
