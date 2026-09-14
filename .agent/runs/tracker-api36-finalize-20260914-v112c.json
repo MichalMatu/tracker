@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-api36-finalize-20260914-v112c",
+  "task_digest": "eb4249b99219fdfed4f130f11c05314c55f50b71c180cc09980a29b7101fb20c",
+  "idle_timeout": 1200,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-14T08:34:34.052207+00:00",
+  "attempt_id": "dc43279bd55619fdda3c2240",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 53173,
+  "updated_at": "2026-09-14T08:34:34.052298+00:00",
+  "pid": 53173
+}
