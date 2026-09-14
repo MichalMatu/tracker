@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.18.20",
   "state": "idle",
-  "pid": 80648,
-  "updated_at": "2026-09-14T07:27:20.274404+00:00",
+  "pid": 90672,
+  "updated_at": "2026-09-14T07:33:12.992496+00:00",
   "self_revision": "4255bd0ba13b7f14dec67f0bfe8d1def78f8a3c9",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 80648,
+  "worker_pid": 90672,
   "supervisor_pid": 49829,
-  "last_task_id": "tracker-branch-cleanup-20260914-v110a",
   "execution_variant": "parallel"
 }
