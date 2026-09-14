@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-adb-preflight-20260914-v114u",
+  "task_digest": "fc1d0d207bc6149bcdfe0552e4a39125b6c90eb32c5cbff727827f7bc6913f2a",
+  "idle_timeout": 120,
+  "task_timeout": 300,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-14T14:54:29.283610+00:00",
+  "attempt_id": "1e696375318c323dd1dda703",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 19684,
+  "updated_at": "2026-09-14T14:54:29.283657+00:00",
+  "pid": 19684
+}
