@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 3,
+  "index": 4,
   "total": 4,
-  "command": "set -eu; export JAVA_HOME=$(/usr/libexec/java_home -v 21); export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew --no-daemon :core:data:testDebugUnitTest :feature:radar:testDebugUnitTest :feature:radar:detekt :app:assembleDebug",
-  "pid": 11869,
+  "command": "set -eu; git fetch origin; test \"$(git rev-parse origin/main)\" = \"def384c0503400c86e19cf860ed21002f7c1f815\"; git diff --check; git add core/data/src/main/java/io/blueeye/core/data/mapper/RadarDeviceMapper.kt core/model/src/main/kotlin/io/blueeye/core/model/RadarDeviceSummary.kt feature/radar/src/main/java/io/blueeye/feature/radar/presentation feature/radar/src/test/java/io/blueeye/feature/radar/presentation; git commit -m \"Group protocol noise in radar\"; git push origin main; test -z \"$(git status --porcelain)\"; echo PUSHED_HEAD=$(git rev-parse HEAD)",
+  "pid": 12081,
   "timeout": 1800,
   "idle_timeout": 600,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-14T06:33:57.900296+00:00",
-  "stage_name": "command-3",
-  "stage_index": 3,
+  "started_at": "2026-09-14T06:34:07.237123+00:00",
+  "stage_name": "command-4",
+  "stage_index": 4,
   "stage_total": 4,
   "stage_phase": "commands",
   "task_id": "tracker-radar-protocol-grouping-rebase-20260914-v106i",
@@ -18,5 +18,5 @@
   "task_digest": "561ff915667467b68e545459058ab78dffb99c2281cf095a22fd9735b2c98f1f",
   "daemon_version": "4.18.20",
   "daemon_pid": 11594,
-  "updated_at": "2026-09-14T06:33:57.972158+00:00"
+  "updated_at": "2026-09-14T06:34:07.328434+00:00"
 }
