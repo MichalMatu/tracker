@@ -1,8 +1,10 @@
 package io.blueeye.feature.telemetry
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,8 +52,22 @@ class TelemetryBridgeViewModel
     @Inject
     internal constructor(
         private val bridgeApi: GoogleWorkspaceBridgeApi,
+        @ApplicationContext context: Context,
     ) : ViewModel() {
-        private val _uiState = MutableStateFlow(TelemetryBridgeUiState())
+        private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+        private val persistedAccountEmail = preferences.getString(KEY_ACCOUNT_EMAIL, null)
+        private val _uiState =
+            MutableStateFlow(
+                TelemetryBridgeUiState(
+                    selectedAccountEmail = persistedAccountEmail,
+                    statusMessage =
+                        if (persistedAccountEmail == null) {
+                            "Not connected"
+                        } else {
+                            "Restoring Google authorization..."
+                        },
+                ),
+            )
         val uiState: StateFlow<TelemetryBridgeUiState> = _uiState.asStateFlow()
 
         private var accessToken: String? = null
@@ -68,6 +84,44 @@ class TelemetryBridgeViewModel
                             "Connecting Google account..."
                         },
                     errorMessage = null,
+                )
+            }
+        }
+
+        fun onAuthorizationRestoreStarted() {
+            _uiState.update { state ->
+                state.copy(
+                    authorizationState = TelemetryAuthorizationState.AUTHORIZING,
+                    grantedScopes = emptySet(),
+                    isBusy = true,
+                    statusMessage = "Restoring Google authorization...",
+                    errorMessage = null,
+                )
+            }
+        }
+
+        fun onAuthorizationRestoreRequiresInteraction() {
+            accessToken = null
+            _uiState.update { state ->
+                state.copy(
+                    authorizationState = TelemetryAuthorizationState.DISCONNECTED,
+                    grantedScopes = emptySet(),
+                    isBusy = false,
+                    statusMessage = "Google access needs reconnection",
+                    errorMessage = "Tap Connect Google account to continue.",
+                )
+            }
+        }
+
+        fun onAuthorizationRestoreFailed(message: String) {
+            accessToken = null
+            _uiState.update { state ->
+                state.copy(
+                    authorizationState = TelemetryAuthorizationState.DISCONNECTED,
+                    grantedScopes = emptySet(),
+                    isBusy = false,
+                    statusMessage = "Unable to restore Google authorization",
+                    errorMessage = message,
                 )
             }
         }
@@ -126,6 +180,7 @@ class TelemetryBridgeViewModel
             viewModelScope.launch {
                 bridgeApi.fetchAccountEmail(token)
                     .onSuccess { email ->
+                        persistAccountEmail(email)
                         _uiState.update { state ->
                             state.copy(
                                 selectedAccountEmail = email,
@@ -173,7 +228,12 @@ class TelemetryBridgeViewModel
 
         fun onRevoked() {
             accessToken = null
+            preferences.edit().remove(KEY_ACCOUNT_EMAIL).apply()
             _uiState.value = TelemetryBridgeUiState(statusMessage = "Google access revoked")
+        }
+
+        private fun persistAccountEmail(email: String) {
+            preferences.edit().putString(KEY_ACCOUNT_EMAIL, email).apply()
         }
 
         private fun runBridgeTest(
@@ -211,5 +271,10 @@ class TelemetryBridgeViewModel
                         }
                     }
             }
+        }
+
+        private companion object {
+            const val PREFERENCES_NAME = "telemetry_bridge"
+            const val KEY_ACCOUNT_EMAIL = "google_account_email"
         }
     }
