@@ -1,0 +1,14 @@
+{
+  "id": "tracker-telemetry-t0-signing-report-20260914-v114j",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "mode": "commands",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 600,
+  "commands": [
+    "set -eu; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; test \"$(git rev-parse HEAD)\" = \"a9e89bef5cf6cb3ec7300eeedb27803397ac1f78\"; ./gradlew :app:signingReport --console=plain | awk 'BEGIN{p=0} /Variant: debug/{p=1} p{print} p && /Valid until:/{exit}'"
+  ]
+}
