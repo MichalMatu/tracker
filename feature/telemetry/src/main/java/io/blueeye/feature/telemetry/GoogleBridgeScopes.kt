@@ -13,4 +13,6 @@ internal object GoogleBridgeScopes {
             Scope(DRIVE_FILE),
             Scope(GMAIL_SEND),
         )
+
+    val requiredForTest: Set<String> = setOf(DRIVE_FILE, GMAIL_SEND)
 }
