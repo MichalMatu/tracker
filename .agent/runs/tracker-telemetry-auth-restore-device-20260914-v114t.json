@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-telemetry-auth-restore-device-20260914-v114t",
+  "task_digest": "751183997ff33acaef32732dc12751c3cc947b59f04c0a0f41afd4c80595b087",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-14T14:53:00.117412+00:00",
+  "attempt_id": "fa31737e04dc44721a3eb391",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 18447,
+  "updated_at": "2026-09-14T14:53:00.117499+00:00",
+  "pid": 18447
+}
