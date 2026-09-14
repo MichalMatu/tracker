@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-t0-select-secondary-20260914-v114e",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 2048,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -eu; test \"$(git rev-parse HEAD)\" = \"0fe28cc50c0cb2aab19af31aaf4a40a76aff3205\"; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -1); test -n \"$SERIAL\"; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/blueeye-auth.xml >/dev/null; BOUNDS=$(adb -s \"$SERIAL\" shell cat /sdcard/blueeye-auth.xml | python3 -c 'import sys,xml.etree.ElementTree as ET; r=ET.fromstring(sys.stdin.read()); ns=[x for x in r.iter() if x.attrib.get(\"resource-id\")==\"com.google.android.gms:id/account_name\"]; assert len(ns)>=2, f\"expected >=2 accounts, got {len(ns)}\"; print(ns[1].attrib[\"bounds\"])'); XY=$(printf '%s' \"$BOUNDS\" | python3 -c 'import sys,re; a=list(map(int,re.findall(r\"\\d+\",sys.stdin.read()))); print((a[0]+a[2])//2,(a[1]+a[3])//2)'); set -- $XY; echo \"secondary_bounds=$BOUNDS tap=$1,$2\"; adb -s \"$SERIAL\" shell input tap \"$1\" \"$2\"; sleep 2; echo '--- resumed ---'; adb -s \"$SERIAL\" shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' | head -5 || true; echo '--- next UI ---'; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/blueeye-consent.xml >/dev/null 2>&1 || true; adb -s \"$SERIAL\" shell cat /sdcard/blueeye-consent.xml 2>/dev/null | sed 's/></>\\n</g' | grep -E 'text=|content-desc=' | head -140 || true"
+  ]
+}
