@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +53,7 @@ import io.blueeye.core.ui.theme.Dimens
 private enum class AuthorizationUiAction {
     CONNECT,
     RUN_TEST,
+    RESTORE,
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,7 +102,12 @@ fun TelemetryBridgeScreen(
         forceAccountPicker: Boolean,
     ) {
         pendingAction = action
-        viewModel.onAuthorizationStarted(forTest = action == AuthorizationUiAction.RUN_TEST)
+        if (action == AuthorizationUiAction.RESTORE) {
+            viewModel.onAuthorizationRestoreStarted()
+        } else {
+            viewModel.onAuthorizationStarted(forTest = action == AuthorizationUiAction.RUN_TEST)
+        }
+
         val requestBuilder =
             AuthorizationRequest.builder()
                 .setRequestedScopes(GoogleBridgeScopes.requested)
@@ -116,19 +123,28 @@ fun TelemetryBridgeScreen(
         authorizationClient.authorize(requestBuilder.build())
             .addOnSuccessListener { result ->
                 if (result.hasResolution()) {
-                    val pendingIntent = result.pendingIntent
-                    if (pendingIntent == null) {
-                        viewModel.onAuthorizationFailed("Google authorization requires a missing resolution")
+                    if (action == AuthorizationUiAction.RESTORE) {
+                        viewModel.onAuthorizationRestoreRequiresInteraction()
                     } else {
-                        authorizationLauncher.launch(
-                            IntentSenderRequest.Builder(pendingIntent.intentSender).build(),
-                        )
+                        val pendingIntent = result.pendingIntent
+                        if (pendingIntent == null) {
+                            viewModel.onAuthorizationFailed("Google authorization requires a missing resolution")
+                        } else {
+                            authorizationLauncher.launch(
+                                IntentSenderRequest.Builder(pendingIntent.intentSender).build(),
+                            )
+                        }
                     }
                 } else {
                     consumeAuthorizationResult(result)
                 }
             }.addOnFailureListener { error ->
-                viewModel.onAuthorizationFailed(error.message ?: "Google authorization failed")
+                val message = error.message ?: "Google authorization failed"
+                if (action == AuthorizationUiAction.RESTORE) {
+                    viewModel.onAuthorizationRestoreFailed(message)
+                } else {
+                    viewModel.onAuthorizationFailed(message)
+                }
             }
     }
 
@@ -143,6 +159,15 @@ fun TelemetryBridgeScreen(
             .addOnFailureListener { error ->
                 viewModel.onRevocationFailed(error.message ?: "Google access revocation failed")
             }
+    }
+
+    LaunchedEffect(Unit) {
+        if (uiState.selectedAccountEmail != null && !uiState.isAuthorized) {
+            requestAuthorization(
+                action = AuthorizationUiAction.RESTORE,
+                forceAccountPicker = false,
+            )
+        }
     }
 
     Scaffold(
