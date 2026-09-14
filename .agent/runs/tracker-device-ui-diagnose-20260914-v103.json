@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-device-ui-diagnose-20260914-v103",
+  "task_digest": "9cec41d49188f2b1bfdc891b8ad643db3629e5baa0c6d8a7003e8a6ad99bbd0a",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-14T04:48:19.109896+00:00",
+  "attempt_id": "b312d876323a21387de573e2",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 82431,
+  "updated_at": "2026-09-14T04:48:19.110008+00:00",
+  "pid": 82431
+}
