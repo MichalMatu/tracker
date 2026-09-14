@@ -8,7 +8,7 @@ For current work, use this order:
 
 1. [`PRODUCT_GOAL.md`](PRODUCT_GOAL.md) — what the product is trying to achieve and what it must not claim.
 2. [`UI_UX_REDESIGN_PLAN.md`](UI_UX_REDESIGN_PLAN.md) — active execution checklist for the current Radar/Details redesign and later analysis work.
-3. [`TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md`](TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md) — active implementation plan for the optional telemetry, trigger, ChatGPT analysis and operator feedback bridge.
+3. [`TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md`](TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md) — active implementation plan for the optional Drive + Gmail telemetry, trigger, ChatGPT analysis and operator feedback bridge.
 4. [`UI_UX_NEXT_WALK_HANDOFF_2026-09-13.md`](UI_UX_NEXT_WALK_HANDOFF_2026-09-13.md) — current continuation handoff for the next S22+ field/UX walk.
 5. [`ARCHITECTURE_CURRENT.md`](ARCHITECTURE_CURRENT.md) — current module/dependency picture.
 6. [`QUALITY_GATE.md`](QUALITY_GATE.md) — repository acceptance gates.
@@ -21,7 +21,7 @@ For current work, use this order:
 - Technical Details progressive disclosure: **implemented**; technical content is collapsed by default and expands explicitly.
 - `Raw Data` remains available from the expanded Technical Details section rather than the top app bar.
 - Previous accepted Radar performance work remains preserved; do not reopen without a concrete regression.
-- Telemetry/AI feedback bridge: **ACTIVE PLAN**, implementation not yet started; first slice is a dedicated screen plus secondary Google account and send-only test email.
+- Telemetry/AI feedback bridge: **ACTIVE PLAN**, implementation not yet started; selected prototype is Google Drive (`drive.file`) for telemetry + Gmail (`gmail.send`) for trigger/feedback, using one dedicated secondary Google account. A plan/code/Google-capability audit is mandatory before implementation.
 - Next action: install the current `main` build on Samsung SM-S906B, run the next controlled field/UX walk, and capture only the evidence needed for UI/field acceptance.
 
 Do not use older Phase 2 handoffs as current execution instructions. The dated next-walk handoff below is now the current continuation record.
@@ -52,15 +52,18 @@ Update its checkboxes/gates as implementation progresses.
 
 Canonical implementation plan for the optional continuous analysis bridge:
 
-- dedicated secondary Google account;
-- least-privilege send-only Gmail authorization;
+- dedicated secondary Google account isolated from the normal account;
+- Google Drive `drive.file` as the v1 data plane, using ordinary app-created JSON files;
+- Gmail `gmail.send` as the v1 trigger/control and operator-feedback plane, never as telemetry storage;
 - dedicated `Telemetry & AI Bridge` screen and ViewModel;
-- compact versioned telemetry deltas and checkpoints;
-- durable local outbox and replaceable HTTPS transport;
-- Gmail as trigger/control and operator-feedback channel, not telemetry storage;
+- compact versioned one-minute telemetry deltas, broader checkpoints and roughly five-minute analysis windows;
+- durable local outbox, deterministic sequence/idempotency and bounded retry;
+- replaceable `TelemetryTransport` abstraction so Drive can later be swapped without changing the reducer/domain model;
 - event-trigger validation with scheduler watchdog fallback;
+- ChatGPT Drive/Gmail integration and end-to-end feasibility test before minute-level telemetry implementation;
 - ChatGPT analysis, Gmail feedback and traceable GitHub/Local Agent engineering loop;
-- privacy, retention, battery and productization gates.
+- explicit retention, quota, privacy, battery and OAuth/productization gates;
+- mandatory preimplementation audit across plan assumptions, current Tracker code and current Google/Android capabilities/limits.
 
 Keep this work isolated from normal local scanning and alerts; disabling it must leave Tracker fully functional.
 
