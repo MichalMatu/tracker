@@ -1,0 +1,88 @@
+{
+  "id": "tracker-device-ui-diagnose-20260914-v103",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-14T04:48:19.109939+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; git fetch origin; git checkout main; git pull --ff-only origin main; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"c67752483b07ba88399c6e1e6940c33dd3a2f51f\"; SERIALS=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}'); COUNT=$(printf '%s\\n' \"$SERIALS\" | sed '/^$/d' | wc -l | tr -d ' '); test \"$COUNT\" = \"1\"; MODEL=$(adb shell getprop ro.product.model | tr -d '\\r'); echo DEVICE_MODEL=$MODEL; test \"$MODEL\" = \"SM-S906B\"",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n   17244db0..5bfe5194  agent-control -> origin/agent-control\nSwitched to branch 'main'\nYour branch is up to date with 'origin/main'.\nFrom https://github.com/MichalMatu/tracker\n * branch              main       -> FETCH_HEAD\nAlready up to date.\nDEVICE_MODEL=SM-S906B\n",
+      "elapsed_seconds": 2.075,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 2.52,
+      "output_policy": "stream",
+      "captured_output_chars": 309,
+      "output_truncated": false,
+      "current_rss_mb": 2.52,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 2,
+      "stage_phase": "commands"
+    },
+    {
+      "command": "set -eu; TMP=$(mktemp -d); trap 'rm -rf \"$TMP\"' EXIT; adb shell am start -W -n io.blueeye/.MainActivity; sleep 4; adb shell uiautomator dump /sdcard/tracker-ui.xml >/dev/null; adb pull /sdcard/tracker-ui.xml \"$TMP/ui.xml\" >/dev/null; echo UI_NODES; python3 -c 'import sys,xml.etree.ElementTree as ET; r=ET.parse(sys.argv[1]).getroot(); [print(\"text=%r desc=%r clickable=%s bounds=%s class=%s\"%(n.attrib.get(\"text\",\"\"),n.attrib.get(\"content-desc\",\"\"),n.attrib.get(\"clickable\",\"\"),n.attrib.get(\"bounds\",\"\"),n.attrib.get(\"class\",\"\"))) for n in r.iter() if n.attrib.get(\"text\") or n.attrib.get(\"content-desc\") or n.attrib.get(\"clickable\")==\"true\"]' \"$TMP/ui.xml\"; echo SERVICE_STATE; adb shell dumpsys activity services io.blueeye | grep -E 'ScannerService|ServiceRecord' || true; echo PERMISSIONS; adb shell dumpsys package io.blueeye | grep -E 'android.permission.(BLUETOOTH_SCAN|BLUETOOTH_CONNECT|ACCESS_FINE_LOCATION|POST_NOTIFICATIONS)|granted=' | tail -n 80 || true",
+      "exit_code": 0,
+      "output": "Starting: Intent { cmp=io.blueeye/.MainActivity }\nStatus: ok\nLaunchState: WARM\nActivity: io.blueeye/.MainActivity\nTotalTime: 127\nWaitTime: 133\nComplete\n/sdcard/tracker-ui.xml: 1 file pulled, 0 skipped. 8.1 MB/s (32287 bytes in 0.004s)\nUI_NODES\ntext='All 25' desc='' clickable=false bounds=[92,278][186,331] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[257,242][524,368] class=android.view.View\ntext='Watchlist 0' desc='' clickable=false bounds=[299,278][482,331] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[524,242][818,368] class=android.view.View\ntext='Suspicious 0' desc='' clickable=false bounds=[566,278][776,331] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[818,242][1080,368] class=android.view.View\ntext='Public Safety Signals 0' desc='' clickable=false bounds=[860,278][1080,331] class=android.widget.TextView\ntext='Nearby' desc='' clickable=false bounds=[42,389][159,442] class=android.widget.TextView\ntext='Identified devices without active attention evidence.' desc='' clickable=false bounds=[42,442][727,518] class=android.widget.TextView\ntext='No attention' desc='' clickable=false bounds=[769,437][939,471] class=android.widget.TextView\ntext='21' desc='' clickable=false bounds=[992,433][1027,475] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[42,550][1038,858] class=android.view.View\ntext='Google Find Hub Tracker' desc='' clickable=false bounds=[211,603][736,666] class=android.widget.TextView\ntext='-67 dBm' desc='' clickable=false bounds=[757,608][892,661] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[892,573][1018,699] class=android.view.View\ntext='' desc='Watch device' clickable=false bounds=[923,604][986,667] class=android.view.View\ntext='TRACKER' desc='' clickable=false bounds=[211,687][353,729] class=android.widget.TextView\ntext='Seen 3s • BLE' desc='' clickable=false bounds=[211,729][401,763] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[42,880][1038,1188] class=android.view.View\ntext='Apple Device' desc='' clickable=false bounds=[211,933][736,996] class=android.widget.TextView\ntext='-72 dBm' desc='' clickable=false bounds=[757,938][892,991] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[892,903][1018,1029] class=android.view.View\ntext='' desc='Watch device' clickable=false bounds=[923,934][986,997] class=android.view.View\ntext=' ' desc='' clickable=false bounds=[211,1017][220,1059] class=android.widget.TextView\ntext='Seen now • BLE' desc='' clickable=false bounds=[211,1059][425,1093] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[42,1210][1038,1518] class=android.view.View\ntext='Find My' desc='' clickable=false bounds=[211,1263][736,1326] class=android.widget.TextView\ntext='-72 dBm' desc='' clickable=false bounds=[757,1268][892,1321] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[892,1233][1018,1359] class=android.view.View\ntext='' desc='Watch device' clickable=false bounds=[923,1264][986,1327] class=android.view.View\ntext='TRACKER' desc='' clickable=false bounds=[211,1347][353,1389] class=android.widget.TextView\ntext='Seen 2s • BLE' desc='' clickable=false bounds=[211,1389][401,1423] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[42,1540][1038,1848] class=android.view.View\ntext='Google Find Hub Tracker' desc='' clickable=false bounds=[211,1593][736,1656] class=android.widget.TextView\ntext='-85 dBm' desc='' clickable=false bounds=[757,1598][892,1651] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[892,1563][1018,1689] class=android.view.View\ntext='' desc='Watch device' clickable=false bounds=[923,1594][986,1657] class=android.view.View\ntext='TRACKER' desc='' clickable=false bounds=[211,1677][353,1719] class=android.widget.TextView\ntext='Seen now • BLE' desc='' clickable=false bounds=[211,1719][425,1753] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[42,1870][1038,2178] class=android.view.View\ntext='Apple Device' desc='' clickable=false bounds=[211,1923][736,1986] class=android.widget.TextView\ntext='-63 dBm' desc='' clickable=false bounds=[757,1928][892,1981] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[892,1893][1018,2019] class=android.view.View\ntext='' desc='Watch device' clickable=false bounds=[923,1924][986,1987] class=android.view.View\ntext=' ' desc='' clickable=false bounds=[211,2007][220,2049] class=android.widget.TextView\ntext='Seen now • BLE' desc='' clickable=false bounds=[211,2049][425,2083] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[42,2200][1038,2301] class=android.view.View\ntext='Apple Device' desc='' clickable=false bounds=[211,2253][736,2301] class=android.widget.TextView\ntext='-63 dBm' desc='' clickable=false bounds=[757,2258][892,2301] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[892,2223][1018,2301] class=android.view.View\ntext='' desc='Watch device' clickable=false bounds=[923,2254][986,2301] class=android.view.View\ntext='' desc='' clickable=true bounds=[12,96][138,222] class=android.view.View\ntext='' desc='Menu' clickable=false bounds=[43,127][106,190] class=android.view.View\ntext='25 seen / none need review' desc='' clickable=false bounds=[148,116][428,165] class=android.widget.TextView\ntext='No attention signals - 21 nearby / 4 noise' desc='' clickable=false bounds=[148,165][428,199] class=android.widget.TextView\ntext='' desc='' clickable=true bounds=[440,96][566,222] class=android.view.View\ntext='' desc='Scan' clickable=false bounds=[471,127][534,190] class=android.view.View\ntext='' desc='' clickable=true bounds=[566,96][692,222] class=android.view.View\ntext='' desc='Baseline' clickable=false bounds=[597,127][660,190] class=android.view.View\ntext='' desc='' clickable=true bounds=[692,96][818,222] class=android.view.View\ntext='' desc='Start active GATT collection' clickable=false bounds=[723,127][786,190] class=android.view.View\ntext='' desc='' clickable=true bounds=[818,96][944,222] class=android.view.View\ntext='' desc='Filter' clickable=false bounds=[849,127][912,190] class=android.view.View\ntext='' desc='' clickable=true bounds=[944,96][1070,222] class=android.view.View\ntext='' desc='Clear' clickable=false bounds=[975,127][1038,190] class=android.view.View\nSERVICE_STATE\n  * ServiceRecord{99b7f04 u0 io.blueeye/.service.ScannerService c:io.blueeye}\n    intent={act=ACTION_START cmp=io.blueeye/.service.ScannerService}\n    infoAllowStartForeground=[callingPackage: io.blueeye; callingUid: 10639; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { act=ACTION_START xflg=0x4 cmp=io.blueeye/.service.ScannerService }; code:PROC_STATE_TOP; tempAllowListReason:<null>; allowWiu:12; targetSdkVersion:33; callerTargetSdkVersion:33; startForegroundCount:0; bindFromPackage:null: isBindService:false]\nPERMISSIONS\n      android.permission.POST_NOTIFICATIONS\n      android.permission.ACCESS_FINE_LOCATION\n      android.permission.BLUETOOTH_CONNECT\n      android.permission.BLUETOOTH_SCAN\n      android.permission.FOREGROUND_SERVICE: granted=true\n      android.permission.FOREGROUND_SERVICE_LOCATION: granted=true\n      android.permission.INTERNET: granted=true\n      io.blueeye.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: granted=true\n      android.permission.VIBRATE: granted=true\n      android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE: granted=true\n      android.permission.WAKE_LOCK: granted=true\n        android.permission.POST_NOTIFICATIONS: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n        android.permission.ACCESS_FINE_LOCATION: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|524288]\n        android.permission.BLUETOOTH_CONNECT: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n        android.permission.ACCESS_COARSE_LOCATION: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n        android.permission.BLUETOOTH_SCAN: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]\n",
+      "elapsed_seconds": 7.469,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 9.67,
+      "output_policy": "stream",
+      "captured_output_chars": 8157,
+      "output_truncated": false,
+      "current_rss_mb": 9.67,
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 2,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 2,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 2.075
+    },
+    {
+      "stage_name": "command-2",
+      "stage_index": 2,
+      "stage_total": 2,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 7.469
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.128
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.115
+  },
+  "finished_at": "2026-09-14T04:48:30.542539+00:00",
+  "task_digest": "9cec41d49188f2b1bfdc891b8ad643db3629e5baa0c6d8a7003e8a6ad99bbd0a",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "b312d876323a21387de573e2",
+  "daemon_version": "4.18.20"
+}
