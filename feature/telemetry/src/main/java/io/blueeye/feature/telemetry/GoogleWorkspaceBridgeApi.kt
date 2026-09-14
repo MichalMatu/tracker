@@ -40,11 +40,12 @@ internal class GoogleWorkspaceBridgeApi
         suspend fun fetchAccountEmail(accessToken: String): Result<String> =
             runCatching {
                 withContext(Dispatchers.IO) {
-                    val response = executeJsonRequest(
-                        method = "GET",
-                        url = GOOGLE_USERINFO_URL,
-                        accessToken = accessToken,
-                    )
+                    val response =
+                        executeJsonRequest(
+                            method = "GET",
+                            url = GOOGLE_USERINFO_URL,
+                            accessToken = accessToken,
+                        )
                     json.parseToJsonElement(response)
                         .jsonObject["email"]
                         ?.jsonPrimitive
@@ -60,27 +61,31 @@ internal class GoogleWorkspaceBridgeApi
         ): Result<BridgeTestResult> =
             runCatching {
                 withContext(Dispatchers.IO) {
-                    val rootFolderId = findOrCreateFolder(
-                        accessToken = accessToken,
-                        parentId = null,
-                        name = "BlueEye",
-                        role = ROOT_ROLE,
-                    )
-                    val testFolderId = findOrCreateFolder(
-                        accessToken = accessToken,
-                        parentId = rootFolderId,
-                        name = "test",
-                        role = TEST_FOLDER_ROLE,
-                    )
-                    val artifact = createBridgeTestArtifact(
-                        accessToken = accessToken,
-                        parentId = testFolderId,
-                    )
-                    val gmailMessageId = sendBatchReadyMessage(
-                        accessToken = accessToken,
-                        accountEmail = accountEmail,
-                        artifact = artifact,
-                    )
+                    val rootFolderId =
+                        findOrCreateFolder(
+                            accessToken = accessToken,
+                            parentId = null,
+                            name = "BlueEye",
+                            role = ROOT_ROLE,
+                        )
+                    val testFolderId =
+                        findOrCreateFolder(
+                            accessToken = accessToken,
+                            parentId = rootFolderId,
+                            name = "test",
+                            role = TEST_FOLDER_ROLE,
+                        )
+                    val artifact =
+                        createBridgeTestArtifact(
+                            accessToken = accessToken,
+                            parentId = testFolderId,
+                        )
+                    val gmailMessageId =
+                        sendBatchReadyMessage(
+                            accessToken = accessToken,
+                            accountEmail = accountEmail,
+                            artifact = artifact,
+                        )
                     BridgeTestResult(
                         driveFileId = artifact.id,
                         driveFileName = artifact.name,
@@ -109,13 +114,14 @@ internal class GoogleWorkspaceBridgeApi
                         put("parents", buildJsonArray { add(JsonPrimitive(parentId)) })
                     }
                 }
-            val response = executeJsonRequest(
-                method = "POST",
-                url = "$DRIVE_FILES_URL?fields=id,name",
-                accessToken = accessToken,
-                body = metadata.toString().toByteArray(StandardCharsets.UTF_8),
-                contentType = JSON_CONTENT_TYPE,
-            )
+            val response =
+                executeJsonRequest(
+                    method = "POST",
+                    url = "$DRIVE_FILES_URL?fields=id,name",
+                    accessToken = accessToken,
+                    body = metadata.toString().toByteArray(StandardCharsets.UTF_8),
+                    contentType = JSON_CONTENT_TYPE,
+                )
             return json.parseToJsonElement(response).jsonObject.requireString("id")
         }
 
@@ -143,11 +149,12 @@ internal class GoogleWorkspaceBridgeApi
                 }
             val encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.name())
             val encodedFields = URLEncoder.encode("files(id,name)", StandardCharsets.UTF_8.name())
-            val response = executeJsonRequest(
-                method = "GET",
-                url = "$DRIVE_FILES_URL?q=$encodedQuery&spaces=drive&pageSize=10&fields=$encodedFields",
-                accessToken = accessToken,
-            )
+            val response =
+                executeJsonRequest(
+                    method = "GET",
+                    url = "$DRIVE_FILES_URL?q=$encodedQuery&spaces=drive&pageSize=10&fields=$encodedFields",
+                    accessToken = accessToken,
+                )
             return json.parseToJsonElement(response)
                 .jsonObject["files"]
                 ?.jsonArray
@@ -187,13 +194,14 @@ internal class GoogleWorkspaceBridgeApi
 
             val boundary = "blueeye_${UUID.randomUUID()}"
             val multipartBody = multipartBody(boundary, metadata, payload)
-            val response = executeJsonRequest(
-                method = "POST",
-                url = "$DRIVE_UPLOAD_URL?uploadType=multipart&fields=id,name",
-                accessToken = accessToken,
-                body = multipartBody,
-                contentType = "multipart/related; boundary=$boundary",
-            )
+            val response =
+                executeJsonRequest(
+                    method = "POST",
+                    url = "$DRIVE_UPLOAD_URL?uploadType=multipart&fields=id,name",
+                    accessToken = accessToken,
+                    body = multipartBody,
+                    contentType = "multipart/related; boundary=$boundary",
+                )
             val responseObject = json.parseToJsonElement(response).jsonObject
             return DriveArtifact(
                 id = responseObject.requireString("id"),
@@ -229,18 +237,20 @@ internal class GoogleWorkspaceBridgeApi
                     append("\r\n")
                     append(body)
                 }
-            val encoded = Base64.encodeToString(
-                mime.toByteArray(StandardCharsets.UTF_8),
-                Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING,
-            )
+            val encoded =
+                Base64.encodeToString(
+                    mime.toByteArray(StandardCharsets.UTF_8),
+                    Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING,
+                )
             val requestBody = buildJsonObject { put("raw", encoded) }.toString()
-            val response = executeJsonRequest(
-                method = "POST",
-                url = GMAIL_SEND_URL,
-                accessToken = accessToken,
-                body = requestBody.toByteArray(StandardCharsets.UTF_8),
-                contentType = JSON_CONTENT_TYPE,
-            )
+            val response =
+                executeJsonRequest(
+                    method = "POST",
+                    url = GMAIL_SEND_URL,
+                    accessToken = accessToken,
+                    body = requestBody.toByteArray(StandardCharsets.UTF_8),
+                    contentType = JSON_CONTENT_TYPE,
+                )
             return json.parseToJsonElement(response).jsonObject.requireString("id")
         }
 
