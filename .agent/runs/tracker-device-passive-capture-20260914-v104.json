@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-device-passive-capture-20260914-v104",
+  "task_digest": "07e8871b402f98ad88edbe3eed1fc9d80bba751c99ad99da5a183ae1ebf68404",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-14T04:51:19.687915+00:00",
+  "attempt_id": "b04728cea41e01dc34884760",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 85896,
+  "updated_at": "2026-09-14T04:51:19.688183+00:00",
+  "pid": 85896
+}
