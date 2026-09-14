@@ -1,0 +1,60 @@
+{
+  "id": "tracker-telemetry-t0-revoke-button-verify-20260914-v114n",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "started_at": "2026-09-14T13:44:06.863780+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; test \"$(git rev-parse HEAD)\" = \"a9e89bef5cf6cb3ec7300eeedb27803397ac1f78\"; SERIALS=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}'); COUNT=$(printf '%s\\n' \"$SERIALS\" | sed '/^$/d' | wc -l | tr -d ' '); test \"$COUNT\" = \"1\"; SERIAL=$(printf '%s\\n' \"$SERIALS\" | sed -n '1p'); adb -s \"$SERIAL\" shell uiautomator dump /sdcard/t0-revoke-button.xml >/dev/null 2>&1 || true; adb -s \"$SERIAL\" shell cat /sdcard/t0-revoke-button.xml | python3 -c 'import sys,xml.etree.ElementTree as ET; r=ET.fromstring(sys.stdin.read()); target=next(x for x in r.iter() if x.attrib.get(\"text\")==\"Run Drive + Gmail test\"); pm={c:p for p in r.iter() for c in p}; cur=target; chain=[];\nwhile True:\n chain.append(cur.attrib);\n if cur not in pm: break\n cur=pm[cur]\nfor a in chain: print({k:a.get(k) for k in (\"class\",\"text\",\"clickable\",\"enabled\",\"bounds\")})'",
+      "exit_code": 1,
+      "output": "",
+      "elapsed_seconds": 0.38,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": null,
+      "output_policy": "stream",
+      "captured_output_chars": 0,
+      "output_truncated": false,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 0.38
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.077
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.066
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-14T13:44:09.038387+00:00",
+  "task_digest": "100c0f6e628ca52d88ec148f1fab767c410dee4faa30a52957615a255aac289b",
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 2048,
+  "attempt_id": "6430876af662ff8453d6764a",
+  "daemon_version": "4.18.20"
+}
