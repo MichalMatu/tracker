@@ -1,0 +1,60 @@
+{
+  "id": "tracker-telemetry-t0-publish-auth-fix-20260914-v114h",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "started_at": "2026-09-14T12:00:27.957870+00:00",
+  "command_timeout": 300,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; test \"$(git rev-parse HEAD)\" = \"0fe28cc50c0cb2aab19af31aaf4a40a76aff3205\"; git cat-file -e a9e89bef5cf6cb3ec7300eeedb27803397ac1f78^{commit}; test \"$(git rev-parse a9e89bef5cf6cb3ec7300eeedb27803397ac1f78^)\" = \"0fe28cc50c0cb2aab19af31aaf4a40a76aff3205\"; git merge-base --is-ancestor 0fe28cc50c0cb2aab19af31aaf4a40a76aff3205 a9e89bef5cf6cb3ec7300eeedb27803397ac1f78; git show --stat --oneline --no-renames a9e89bef5cf6cb3ec7300eeedb27803397ac1f78; git push origin a9e89bef5cf6cb3ec7300eeedb27803397ac1f78:refs/heads/feature/telemetry-ai-bridge",
+      "exit_code": 0,
+      "output": "a9e89bef fix: parse Google authorization result\n .../io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt   | 13 ++++++++++---\n 1 file changed, 10 insertions(+), 3 deletions(-)\nTo https://github.com/MichalMatu/tracker.git\n   0fe28cc5..a9e89bef  a9e89bef5cf6cb3ec7300eeedb27803397ac1f78 -> feature/telemetry-ai-bridge\n",
+      "elapsed_seconds": 1.893,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 3.28,
+      "output_policy": "stream",
+      "captured_output_chars": 318,
+      "output_truncated": false,
+      "current_rss_mb": 3.28,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 1.893
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.081
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.069
+  },
+  "finished_at": "2026-09-14T12:00:31.328878+00:00",
+  "task_digest": "b98167e8c1332aa62fcb18c4200bedbb9a7af16c41389eb1887808ee36876c02",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "attempt_id": "dd934a587b6469344d0fce27",
+  "daemon_version": "4.18.20"
+}
