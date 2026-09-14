@@ -56,6 +56,21 @@ For documentation-only cleanup, verify at minimum:
 - canonical docs index and root README agree;
 - normal CI may still run automatically, but an Android rebuild is not required solely to prove prose correctness unless the change also touches workflow/build configuration.
 
+## Production and privacy release gate
+
+Before calling any artifact production-ready, verify the exact candidate SHA with the normal quality/build gates plus all of the following:
+
+- build a release artifact deliberately; tester/debug APKs are not production artifacts;
+- keep production signing keys and signing properties outside Git;
+- use a monotonically increasing `versionCode` and an intentional `versionName`;
+- verify current Play/Android target-SDK and build-tool requirements before release;
+- review Bluetooth/location/notification permissions and Play Data safety against actual runtime behavior;
+- keep local BLE/location observation data out of Android backup and repository history;
+- review global cleartext-network allowance before production distribution;
+- run release-variant checks plus physical-device BLE/background acceptance on the exact release candidate.
+
+Repository hardening rules: `.gitignore` must cover signing material, local environment secrets and private capture/database artifacts; `CODEOWNERS` may define default review ownership. Dependency-update bots are intentionally not enabled.
+
 ## Physical validation
 
 Use a real phone for BLE, permission, background/screen-off, alert, location and device-specific runtime behavior. Record exact app/source SHA separately from the field observations.
