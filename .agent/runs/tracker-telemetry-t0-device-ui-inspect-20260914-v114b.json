@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-telemetry-t0-device-ui-inspect-20260914-v114b",
+  "task_digest": "ab2780d7f916e3bb9fa6f2d16ea917a29c5bda50cfced55acb6644eb658c21c6",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-14T11:53:26.634631+00:00",
+  "attempt_id": "3c45b23123a98d60b1b91c1d",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 57103,
+  "updated_at": "2026-09-14T11:53:26.634703+00:00",
+  "pid": 57103
+}
