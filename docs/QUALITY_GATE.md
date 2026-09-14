@@ -4,6 +4,7 @@
 
 - Gradle/compiler runtime: **JDK 21**.
 - Generated Android/JVM bytecode target: **JVM 17**.
+- Android build baseline: **compileSdk 36 / targetSdk 36**, Android Gradle Plugin **8.9.1**, Gradle **8.11.1**.
 - On macOS use `export JAVA_HOME="$(/usr/libexec/java_home -v 21)"` before Gradle when the shell default differs.
 
 ## Standard gate
