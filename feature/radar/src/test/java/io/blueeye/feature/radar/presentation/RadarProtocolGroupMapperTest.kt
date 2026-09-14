@@ -23,6 +23,28 @@ class RadarProtocolGroupMapperTest {
     }
 
     @Test
+    fun `tracker classification attention alone does not escape protocol group`() {
+        val now = 550_000L
+        val first = item("first", -55, now, "Google Find Hub")
+        val second = item("second", -65, now, "Google Find Hub")
+        val trackerAttention = RadarEvidenceSignals(false, true, false, true, false)
+        val entries =
+            RadarProtocolGroupMapper.map(
+                RadarUiSection(
+                    RadarUiSectionType.NEARBY,
+                    listOf(
+                        first.copy(evidenceSignals = trackerAttention),
+                        second.copy(evidenceSignals = trackerAttention),
+                    ),
+                ),
+                now,
+            )
+
+        assertEquals(1, entries.filterIsInstance<RadarProtocolEntry.Group>().size)
+        assertEquals(0, entries.filterIsInstance<RadarProtocolEntry.Device>().size)
+    }
+
+    @Test
     fun `suspicious identity stays standalone instead of being hidden in group`() {
         val now = 600_000L
         val suspicious = item("suspicious", -50, now, "Google Find Hub", TrackingStatus.SUSPICIOUS)

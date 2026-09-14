@@ -34,13 +34,19 @@ object ProtocolNoiseClassifier {
 
     fun canGroup(item: RadarUiItem): Boolean = family(item) != null && !mustStayStandalone(item)
 
-    fun mustStayStandalone(item: RadarUiItem): Boolean =
-        item.isInWatchlist ||
+    fun mustStayStandalone(item: RadarUiItem): Boolean {
+        val hasNonTrackerAttentionEvidence =
+            item.evidenceSignals.hasAttentionFollowMeEvidence ||
+                item.evidenceSignals.hasPublicSafetyLikeEvidence ||
+                (item.evidenceSignals.hasAttentionEvidence && !item.evidenceSignals.hasTrackerLikeEvidence)
+
+        return item.isInWatchlist ||
             item.hasUserAlias ||
             item.trackingStatus != TrackingStatus.SAFE ||
             item.followingScore >= ATTENTION_SCORE_THRESHOLD ||
             item.calibrationLabel in ATTENTION_LABELS ||
-            item.evidenceSignals.hasAttentionEvidence
+            hasNonTrackerAttentionEvidence
+    }
 
     private const val ATTENTION_SCORE_THRESHOLD = 51f
     private val ATTENTION_LABELS = setOf(DeviceCalibrationLabel.TRUE_POSITIVE, DeviceCalibrationLabel.SUSPICIOUS)
