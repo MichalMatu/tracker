@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-live-nearby-device-validate-20260914-v108d",
+  "task_digest": "9d8d0f01b9f2ec7b1c56f173ee48221c54f086138bd4473ef087619ff2cc45e2",
+  "idle_timeout": 900,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-14T07:02:29.279605+00:00",
+  "attempt_id": "fe7e89554b0eabcfd153c233",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 52239,
+  "updated_at": "2026-09-14T07:02:29.286165+00:00",
+  "pid": 52239
+}
