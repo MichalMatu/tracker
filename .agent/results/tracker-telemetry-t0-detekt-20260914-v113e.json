@@ -1,0 +1,61 @@
+{
+  "id": "tracker-telemetry-t0-detekt-20260914-v113e",
+  "status": "failed",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "started_at": "2026-09-14T09:23:58.304073+00:00",
+  "command_timeout": 1200,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; test \"$(git rev-parse HEAD)\" = \"fec4987cf9080ee806157ae2d102a6d33753048d\"; set +e; ./gradlew :feature:telemetry:detekt --console=plain; rc=$?; echo '--- DETEKT REPORT ---'; cat feature/telemetry/build/reports/detekt/detekt.txt 2>/dev/null || true; exit $rc",
+      "exit_code": 1,
+      "output": "Starting a Gradle Daemon, 1 incompatible Daemon could not be reused, use --status for details\nCalculating task graph as no cached configuration is available for tasks: :feature:telemetry:detekt\n\n> Task :feature:telemetry:detekt FAILED\n\n\n4 kotlin files were analyzed.\n[Incubating] Problems report is available at: file:///Users/michal/agent-workspace/repos/tracker/work/build/reports/problems/problems-report.html\n\nFAILURE: Build failed with an exception.\n\n* What went wrong:\nExecution failed for task ':feature:telemetry:detekt'.\n> Analysis failed with 9 weighted issues.\n\n* Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights.\n> Get more help at https://help.gradle.org.\n\nDeprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.\n\nYou can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.\n\nFor more on this, please refer to https://docs.gradle.org/8.11.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.\n\nBUILD FAILED in 9s\n1 actionable task: 1 executed\nConfiguration cache entry stored.\n--- DETEKT REPORT ---\nCyclomaticComplexMethod - 15/15 - [TelemetryBridgeContent] at /Users/michal/agent-workspace/repos/tracker/work/feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt:157:13 - Signature=TelemetryBridgeScreen.kt$@Composable private fun TelemetryBridgeContent( state: TelemetryBridgeUiState, onConnect: () -> Unit, onRunTest: () -> Unit, onDisconnect: () -> Unit, modifier: Modifier = Modifier, )\nMaximumLineLength - [<anonymous>] at /Users/michal/agent-workspace/repos/tracker/work/feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeViewModel.kt:57:1 - Signature=TelemetryBridgeViewModel.kt$TelemetryBridgeViewModel$ \nMaximumLineLength - [<anonymous>] at /Users/michal/agent-workspace/repos/tracker/work/feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt:182:1 - Signature=TelemetryBridgeScreen.kt$ \nMaximumLineLength - [<anonymous>] at /Users/michal/agent-workspace/repos/tracker/work/feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt:186:1 - Signature=TelemetryBridgeScreen.kt$ \nMaxLineLength - [<anonymous>] at /Users/michal/agent-workspace/repos/tracker/work/feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt:182:1 - Signature=TelemetryBridgeScreen.kt$\"Use a dedicated secondary Google account. The prototype requests only email identity, Drive file access, and Gmail send access.\"\nMaxLineLength - [<anonymous>] at /Users/michal/agent-workspace/repos/tracker/work/feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt:186:1 - Signature=TelemetryBridgeScreen.kt$\"No telemetry is collected automatically in T0. This screen only validates Google authorization, one Drive JSON upload, and one self-addressed Gmail trigger.\"\nMagicNumber - [<anonymous>] at /Users/michal/agent-workspace/repos/tracker/work/feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt:276:40 - Signature=TelemetryBridgeScreen.kt$0.38f\nMagicNumber - [<anonymous>] at /Users/michal/agent-workspace/repos/tracker/work/feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt:281:40 - Signature=TelemetryBridgeScreen.kt$0.62f\nUnusedPrivateMember - [TelemetryBridgeContentPreview] at /Users/michal/agent-workspace/repos/tracker/work/feature/telemetry/src/main/java/io/blueeye/feature/telemetry/TelemetryBridgeScreen.kt:288:13 - Signature=TelemetryBridgeScreen.kt$@Preview(showBackground = true) @Composable private fun TelemetryBridgeContentPreview()\n",
+      "elapsed_seconds": 10.263,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 116.42,
+      "output_policy": "stream",
+      "captured_output_chars": 3849,
+      "output_truncated": false,
+      "current_rss_mb": 116.42,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "failed",
+      "elapsed_seconds": 10.263
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.085
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.071
+  },
+  "failure_reason": "command_failed",
+  "finished_at": "2026-09-14T09:24:10.083960+00:00",
+  "task_digest": "cc73a345328105c90e2504b02fd4ef3c555facf7dcbe00254a14c2c38ed65164",
+  "idle_timeout": 600,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "972589fb03770ad74eef50d2",
+  "daemon_version": "4.18.20"
+}
