@@ -44,6 +44,7 @@ import io.blueeye.core.ui.theme.BlueEyeTheme
 import io.blueeye.core.ui.theme.Dimens
 import io.blueeye.core.ui.theme.extendedColors
 
+@Suppress("CyclomaticComplexMethod", "LongMethod")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RadarScreen(
@@ -64,6 +65,7 @@ fun RadarScreen(
     val showFilterDialog = remember { mutableStateOf(false) }
     val showActiveCollectionDialog = remember { mutableStateOf(false) }
     var selectedSectionView by rememberSaveable { mutableStateOf(RadarSectionViewType.ALL) }
+    var expandedProtocolGroups by remember { mutableStateOf(emptySet<String>()) }
 
     if (showClearDialog.value) {
         AlertDialog(
@@ -236,15 +238,49 @@ fun RadarScreen(
                                 item(key = "section-${section.type.name}") {
                                     RadarSectionHeader(section = section)
                                 }
-                                items(
-                                    items = section.items,
-                                    key = { it.fingerprint },
-                                ) { item ->
-                                    RadarDeviceItem(
-                                        item = item,
-                                        onClick = onDeviceClick,
-                                        onWatchlistClick = viewModel::toggleWatchlist,
-                                    )
+                                RadarProtocolGroupMapper.map(section).forEach { entry ->
+                                    when (entry) {
+                                        is RadarProtocolEntry.Device -> {
+                                            item(key = entry.key) {
+                                                RadarDeviceItem(
+                                                    item = entry.item,
+                                                    onClick = onDeviceClick,
+                                                    onWatchlistClick = viewModel::toggleWatchlist,
+                                                )
+                                            }
+                                        }
+                                        is RadarProtocolEntry.Group -> {
+                                            val groupKey = "${section.type.name}:${entry.key}"
+                                            item(key = "group:$groupKey") {
+                                                RadarProtocolGroupCard(
+                                                    group = entry,
+                                                    expanded = groupKey in expandedProtocolGroups,
+                                                    onToggle = {
+                                                        expandedProtocolGroups =
+                                                            if (groupKey in expandedProtocolGroups) {
+                                                            expandedProtocolGroups - groupKey
+                                                        } else {
+                                                            expandedProtocolGroups + groupKey
+                                                        }
+                                                    },
+                                                )
+                                            }
+                                            if (groupKey in expandedProtocolGroups) {
+                                                items(
+                                                    items = entry.members,
+                                                    key = { member ->
+                                                        "group-member:$groupKey:${member.fingerprint}"
+                                                    },
+                                                ) { item ->
+                                                    RadarDeviceItem(
+                                                        item = item,
+                                                        onClick = onDeviceClick,
+                                                        onWatchlistClick = viewModel::toggleWatchlist,
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

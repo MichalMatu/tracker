@@ -36,7 +36,7 @@ class RadarSectionViewMapperTest {
                 "Watchlist 0",
                 "Suspicious 2",
                 "Public Safety Signals 0",
-                "Nearby 4",
+                "Identified 4",
                 "Unknown / Noise 3",
             ),
             options.map { it.label },

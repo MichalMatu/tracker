@@ -50,6 +50,8 @@ object RadarUiMapper {
             calibrationLabel = device.calibrationLabel,
             hasIdentitySignal = RadarIdentityUiFormatter.hasIdentitySignal(device),
             evidenceSignals = device.evidenceSignals,
+            beaconType = device.beaconType,
+            hasUserAlias = !device.userAlias.isNullOrBlank(),
         )
     }
 
@@ -81,6 +83,7 @@ internal fun Device.toRadarSummaryForUi(): RadarDeviceSummary =
         rssi = rssi,
         txPower = txPower,
         isConnectable = isConnectable,
+        beaconType = beaconType,
         evidenceSignals =
             RadarEvidenceSignals(
                 hasWatchlistEvidence = evidence.any { it.source == EvidenceSource.WATCHLIST },

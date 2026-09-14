@@ -27,6 +27,7 @@ data class RadarDeviceSummary(
     val txPower: Int?,
     val isConnectable: Boolean?,
     val evidenceSignals: RadarEvidenceSignals,
+    val beaconType: String? = null,
 )
 
 data class RadarEvidenceSignals(

@@ -29,6 +29,7 @@ fun RadarDeviceProjection.toRadarDomain(): RadarDeviceSummary {
         txPower = txPower,
         isConnectable = isConnectable,
         evidenceSignals = DeviceEvidenceFactory.buildRadarSignals(evidenceDevice),
+        beaconType = beaconType,
     )
 }
 

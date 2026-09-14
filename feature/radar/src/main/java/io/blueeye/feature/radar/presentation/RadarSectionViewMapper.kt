@@ -5,7 +5,7 @@ enum class RadarSectionViewType(
     val sectionType: RadarUiSectionType?,
 ) {
     ALL(title = "All", sectionType = null),
-    NEARBY(title = "Nearby", sectionType = RadarUiSectionType.NEARBY),
+    NEARBY(title = "Identified", sectionType = RadarUiSectionType.NEARBY),
     WATCHLIST(title = "Watchlist", sectionType = RadarUiSectionType.WATCHLIST),
     SUSPICIOUS(title = "Suspicious", sectionType = RadarUiSectionType.SUSPICIOUS),
     PUBLIC_SAFETY(title = "Public Safety Signals", sectionType = RadarUiSectionType.PUBLIC_SAFETY),
@@ -54,7 +54,7 @@ object RadarSectionViewMapper {
     fun emptyText(selectedView: RadarSectionViewType): String =
         when (selectedView) {
             RadarSectionViewType.ALL -> "No devices visible."
-            RadarSectionViewType.NEARBY -> "No ordinary nearby devices are visible right now."
+            RadarSectionViewType.NEARBY -> "No identified low-attention devices are visible right now."
             RadarSectionViewType.WATCHLIST -> "No watched devices are visible right now."
             RadarSectionViewType.SUSPICIOUS -> "No suspicious movement evidence is visible right now."
             RadarSectionViewType.PUBLIC_SAFETY ->

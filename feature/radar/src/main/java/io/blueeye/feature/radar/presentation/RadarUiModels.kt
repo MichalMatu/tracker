@@ -24,6 +24,8 @@ data class RadarUiItem(
     val hasIdentitySignal: Boolean,
     val evidenceSignals: RadarEvidenceSignals,
     val isProbing: Boolean = false,
+    val beaconType: String? = null,
+    val hasUserAlias: Boolean = false,
 )
 
 data class RadarUiSignalInfo(
@@ -75,7 +77,7 @@ enum class RadarUiSectionType(
         tone = RadarUiColorToken.WARNING,
     ),
     NEARBY(
-        title = "Nearby",
+        title = "Identified",
         description = "Identified devices without active attention evidence.",
         statusText = "No attention",
         tone = RadarUiColorToken.SAFE,
