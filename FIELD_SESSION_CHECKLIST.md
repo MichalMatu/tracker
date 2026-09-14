@@ -1,95 +1,58 @@
 # BlueEye field session checklist
 
-> Phase 3 field reacceptance is **ACCEPTED / CLOSED**. This checklist is active again for repeatable engineering field sessions and dataset collection. It is not, by itself, a release-readiness verdict. See `docs/README.md` for the current plan and `docs/PHASE3_FIELD_REACCEPTANCE_CLOSURE_2026-09-11.md` for the final Phase 3 acceptance record.
+Use this for repeatable physical tests. It is a capture/validation checklist, not a release verdict.
 
-## Next session focus — Details / UX verification
+## Before the session
 
-Test the current `main` build on the Samsung S22+ without changing app configuration during the comparison:
+- Record the exact `main`/APK SHA.
+- Do not switch builds or major configuration during one comparison session.
+- Confirm required Bluetooth/Nearby, Location and Notification permissions for the scenario.
+- Verify scanner state and intended alert/active-collection settings before leaving.
+- Avoid enabling HCI/bugreport capture unless the defect actually requires it.
 
-1. Open Radar and enter Details for a device with ordinary evidence.
-2. Confirm the first viewport prioritizes summary, current RSSI/last-seen context, signal history and key evidence before technical Bluetooth data.
-3. Confirm `Actions / Review`, `History`, `Technical details` and `All evidence` appear in the intended lower-priority order.
-4. Confirm **Technical details is collapsed by default** and expands/collapses without losing the surrounding Details state.
-5. While scanning continues, expand Technical details and verify connection state, sensor data, radio metadata, services and `Raw Data` remain usable.
-6. Open `Raw Data`, copy/export the payload, close it, and return to the same Details position.
-7. Change RSSI/live state while scrolling through Details; watch for jumps, unexpected section insertion or layout instability.
-8. Repeat with a device that has extensive evidence and one with little/no evidence.
-9. Check dark mode and a larger Android font scale before treating the UX slice as accepted.
-10. Record any crash, ANR, unexpected scroll jump, broken collapse state, missing technical field or export/copy failure as a concrete defect rather than tuning heuristics live.
+## Useful scenarios
 
-This session is **validation**, not permission to alter scanner/parser/identity/scoring behavior in the field.
+- stationary/home baseline;
+- ordinary walk with no controlled target;
+- controlled known/watchlist companion device;
+- dense city/transit/shop environment;
+- targeted regression for one parser/identity/Follow-Me/alert/UI defect.
 
-## Before walking
-
-1. Record the exact app/source SHA being tested.
-2. Do not switch builds during the same comparison session.
-3. Confirm Bluetooth/Nearby Devices, Location and Notifications permissions required by the chosen test scenario.
-4. Confirm BlueEye is not unexpectedly battery-restricted for a background/screen-off test.
-5. Open the app and confirm the scanner is running normally before leaving.
-6. If alerts are part of the scenario, verify the intended alert configuration before the walk rather than changing it mid-session.
-7. If HCI correlation is intentionally required, enable/verify the platform snoop path before the session; ordinary UX/dataset walks do not require HCI by default.
-
-## Recommended session types
-
-Use separate sessions when possible so each dataset has a clear purpose:
-
-1. **Home/stationary baseline** — normal nearby Bluetooth devices with little/no user movement.
-2. **Ordinary walk / no controlled tracker** — false-positive background and screen-off continuity.
-3. **Controlled companion device** — carry a known Bluetooth/watchlist device to validate repeated presence and identity continuity.
-4. **Dense city / transit / shop** — many simultaneous devices and rotating-address pressure.
-5. **Targeted regression** — only when a specific parser, identity, Follow-Me, alert or background-scan defect needs reacceptance.
-
-For comparable datasets, avoid mixing configuration changes, app restarts and multiple unrelated experiments into one session unless the experiment explicitly requires them.
+Keep scenarios separate when possible so later analysis can explain what changed.
 
 ## During the session
 
-- Use the phone naturally unless the scenario requires a controlled locked-screen interval.
-- Note unusual events that can explain the data later: long stationary periods, transport, app restart, permission prompt, Bluetooth toggle, battery-saver change, known device joining/leaving, or manual Pause/Stop.
-- Do not interpret RSSI as exact distance.
-- Do not treat an observation GPS point as the exact Bluetooth device location; it is where the phone observed the signal.
+- Use the phone naturally unless the scenario defines a lock/screen-off interval.
+- Note events that can explain discontinuities: transport, long stationary interval, restart, permission prompt, Bluetooth toggle, battery saver, known device joining/leaving, Pause/Stop.
+- Treat RSSI as signal context, not distance.
+- Treat GPS as the phone's observation position, not the Bluetooth device's exact position.
+- Do not retune classifiers/thresholds while collecting evidence for the problem they are supposed to explain.
 
-## Do not tune before reviewing the capture
+## Minimum evidence to preserve
 
-When collecting data for a parser/scoring/identity problem, preserve the dataset before changing the relevant heuristic. Prefer this loop:
+- scenario and exact source/app SHA;
+- phone model + Android version;
+- approximate start/end/duration;
+- screen-on/off and movement context;
+- scanner/process health;
+- supported session export when needed;
+- GPS availability/quality summary when relevant;
+- known controlled devices/actions;
+- alerts, parser failures, crashes, ANRs, jank or UI defects observed.
+
+Deep regressions may additionally need private Room/WAL/SHM, bounded logcat or HCI/bugreport evidence. Never commit exact GPS, MACs, private databases, HCI or bugreports to the public repository.
+
+## Review loop
 
 ```text
 capture
-  -> analyze
-  -> create privacy-safe fixture
-  -> change deterministic rule/parser
-  -> replay regressions
-  -> collect next comparison capture
+  -> preserve original evidence
+  -> separate collection vs presentation defects
+  -> analyze against previous/controlled data
+  -> create privacy-safe regression fixture where practical
+  -> change deterministic code
+  -> replay tests
+  -> collect the next comparison
 ```
 
-Do not tune Follow-Me thresholds, identity correlation or parser rules merely because one live UI card looked surprising.
-
-## Minimum data to bring back
-
-For each engineering session, preserve or record as appropriate:
-
-- scenario name,
-- exact app/source SHA,
-- phone model and Android version,
-- approximate session start/end and duration,
-- whether the screen was mostly on/off and any deliberate lock interval,
-- whether scanner service/process remained healthy,
-- relevant exported session/database data using the supported export path,
-- whether GPS was enabled and the rough quality/availability of location samples,
-- known controlled devices used in the scenario,
-- notable user actions or interruptions,
-- observed alerts/errors/jank.
-
-For deep regressions, additional private evidence may include Room/WAL/SHM, targeted logcat or Bluetooth HCI/bugreport material. Keep exact GPS, MAC addresses, raw HCI/bugreports and private databases out of the public repository.
-
-## Post-session review
-
-1. Preserve the capture before resetting/clearing anything that the analysis may need.
-2. Check basic ingest/persistence consistency before drawing product conclusions.
-3. Separate collection defects from UI/presentation defects.
-4. Compare candidates against previous datasets when testing a rule change.
-5. Convert confirmed defects into privacy-safe regression fixtures where practical.
-6. Update the active plan/checklist only after evidence supports the conclusion.
-
-## Product boundaries
-
-BlueEye reports Bluetooth evidence, watchlist returns, cautious Follow-Me/identity analysis and supported classifications. It does not claim to identify a person, infer malicious intent, precisely range a device, know an exact Bluetooth device location, or detect every possible tracker/background signal.
+Update the active plan only after evidence supports the conclusion.

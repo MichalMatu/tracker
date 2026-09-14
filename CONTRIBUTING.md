@@ -1,90 +1,43 @@
 # Contributing to BlueEye Tracker
 
-Thanks for your interest in contributing.
+BlueEye is developed evidence-first: keep changes small, testable and consistent with the product's claim boundaries.
 
-BlueEye Tracker is operated **stability- and evidence-first**. Small changes are preferred, but the current workstream is no longer governed by the old Phase 1-3 recovery `NEXT ACTION` documents.
+## Read first
 
-## First read
-
-Please read these documents before changing code:
-
-1. [README.md](README.md)
-2. [docs/README.md](docs/README.md)
-3. [docs/PRODUCT_GOAL.md](docs/PRODUCT_GOAL.md)
-4. the active execution plan named by the documentation index — currently [docs/UI_UX_REDESIGN_PLAN.md](docs/UI_UX_REDESIGN_PLAN.md)
+1. [docs/README.md](docs/README.md)
+2. [docs/PRODUCT_GOAL.md](docs/PRODUCT_GOAL.md)
+3. the active plan relevant to the change
+4. [docs/ARCHITECTURE_CURRENT.md](docs/ARCHITECTURE_CURRENT.md)
 5. [docs/QUALITY_GATE.md](docs/QUALITY_GATE.md)
-6. [docs/ARCHITECTURE_CURRENT.md](docs/ARCHITECTURE_CURRENT.md)
 
-Historical stabilization guides/handoffs remain useful provenance, but they must not override the current documentation index and active plan.
+AI/agent-specific rules live in [AGENTS.md](AGENTS.md).
 
-## Contribution rules
+## Rules
 
-- Prefer **small, reviewable changes**.
-- Keep one clearly named concern per change/PR.
-- Do **not** re-enable intentionally disabled runtime paths without explicit justification and validation.
-- Preserve the rule that the app shows **evidence**, not overstated identity, intent, ranging or location claims.
-- Keep local collection/parsing/detection functional without cloud or AI dependencies.
-- Keep documentation in sync when changing project behavior or the canonical work plan.
-- Leave the repository green: buildable, testable and lint-clean.
-- Do not commit private field telemetry such as exact GPS, MACs, Room/WAL/SHM, HCI snoop or bugreports.
+- Prefer one clear concern per change.
+- Do not incidentally broaden scanner/parser/scoring behavior during unrelated UI work.
+- Keep passive scanning the default and active probing explicit.
+- Preserve local operation when cloud/AI integrations are disabled.
+- Do not make stronger identity, intent, distance or location claims than the evidence supports.
+- Do not commit private field telemetry (exact GPS, MACs, databases, HCI/bugreports or raw private captures).
+- Update an existing canonical document instead of creating a dated handoff/status file.
 
-## Development setup
+## Development
 
-- Use **JDK 21** as the build runtime/toolchain.
-- Current Android/Kotlin bytecode target remains **JVM 17**.
-- Main CI commands:
+Use JDK 21; project bytecode target remains JVM 17.
 
 ```bash
 ./gradlew qualityCheck
 ./gradlew :app:assembleDebug
+git diff --check
 ```
 
-Optional local secret scan:
+Run `gitleaks` when available. Hardware-dependent changes also need explicit device evidence.
 
-```bash
-gitleaks git --config .gitleaks.toml --redact --verbose
-```
+## Git
 
-## Branch and PR policy
+`main` is the application source of truth. `agent-control` is Local Agent infrastructure only. Follow the current task's branch instruction; the repository's normal AI-assisted workflow is direct work on `main` unless the user explicitly asks for a branch/PR.
 
-- `main` is the accepted source baseline.
-- `agent-control` is reserved for Local Agent infrastructure and never for application source.
-- Follow the maintainer/current-task branch instruction; use a dedicated work branch when explicitly requested or when the active workstream defines one.
-- Keep temporary branches focused and remove merged branches when they no longer serve a purpose.
-- Reference the relevant active-plan phase/checklist item in substantial PRs when applicable.
+## Bug reports
 
-Suggested PR title style:
-
-- `ui: simplify Radar device cards`
-- `perf: use lightweight Radar projection`
-- `docs: refresh project status and roadmap`
-- `tests: add regression coverage for signal history`
-
-## What a good change includes
-
-A good contribution usually includes:
-
-- the smallest safe implementation,
-- focused tests,
-- no unrelated refactors,
-- a short rationale in the PR description,
-- documentation updates when behavior or current-plan status changes,
-- explicit physical-device evidence when the behavior can only be validated on Android hardware.
-
-## Issues
-
-When reporting bugs, include:
-
-- device model,
-- Android version,
-- app build/commit SHA,
-- exact steps to reproduce,
-- expected behavior,
-- observed behavior,
-- logs/screenshots if available and safe to share.
-
-Do not post raw captures containing private device/location data publicly.
-
-## Security
-
-Please do not publish secrets, tokens, signing material, sensitive personal data or private field captures in issues or pull requests.
+Include device/Android version, app commit SHA, steps, expected vs observed behavior and safe logs/screenshots when relevant. Never post raw private captures publicly.

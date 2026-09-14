@@ -1,71 +1,78 @@
-# Current Architecture
+# Current architecture
 
-> **Current-status note (2026-09-12):** Phase 3 field reacceptance is **ACCEPTED / CLOSED** and Phase 4 is **UNBLOCKED**. The final Phase 3 authority is `PHASE3_FIELD_REACCEPTANCE_CLOSURE_2026-09-11.md`. Current execution order comes from `README.md` and `UI_UX_REDESIGN_PLAN.md`; the older stability-recovery guide remains historical provenance. The accepted scanner/ingest behavior must not be changed incidentally during the UI/UX workstream.
+BlueEye is a local-first Android/Kotlin application. `main` is the source of truth.
 
-Status after tooling review: the project is modern Android in framework choices, but not yet clean in dependency direction.
+## Modules
 
-Pipeline-specific issues are tracked in [PIPELINE_AUDIT.md](PIPELINE_AUDIT.md).
-
-## Current Modules
-
-| Module | Current role |
+| Module | Responsibility |
 | --- | --- |
 | `app` | Android entry point, Hilt wiring, Navigation Compose |
-| `core:model` | Shared models |
-| `core:domain` | Repository contracts and use cases |
-| `core:data` | Room, Bluetooth scanning, foreground service, classification, session/tracking logic |
-| `core:decoders` | BLE decoder library |
-| `core:ui` | Theme, dimensions, shared UI utilities |
-| `feature:radar` | Radar UI and ViewModel |
-| `feature:details` | Device details UI and ViewModel |
-| `feature:settings` | Settings UI and ViewModel |
-| `feature:watchlist` | Watchlist UI and ViewModel |
+| `core:model` | Shared domain/evidence models |
+| `core:domain` | Repository/runtime contracts and use cases |
+| `core:data` | Room, Bluetooth scanning, foreground service, classification, persistence, sessions and alerts |
+| `core:decoders` | BLE/Bluetooth decoders |
+| `core:ui` | Theme, dimensions and shared Compose UI |
+| `feature:radar` | Radar projection/presentation |
+| `feature:details` | Device evidence/history/technical Details |
+| `feature:settings` | Settings and session/export controls |
+| `feature:watchlist` | Watchlist UI |
 
-## Positive Signals
+Features should consume domain-facing contracts rather than `core:data` implementations.
 
-- Kotlin-first Android project.
-- Compose screens, no Fragment UI workflow.
-- Hilt is already used.
-- `core:domain` is physically separate now and has no Android imports in the checked source.
-- `feature:radar` no longer depends on `core:data`; scanner control goes through `ScannerRuntimeController`.
-- `feature:watchlist` no longer depends on `core:data`; public-safety-style signals go through `PublicSafetySignalMonitor`.
-- `feature:details` and `feature:settings` now depend on domain-facing repository contracts instead of `core:data`.
-- Phase 2 established one scanner lifecycle owner: direct `BleScanner` start/focused/passive/stop calls are confined to `ScannerService`, while feature modules use domain-facing scanner contracts.
-- Phase 3 separates `BleScanner` hardware lifecycle from `ScanIngestPipeline` queue/processing work; bounded latest-per-key buffering is independently testable.
-- Ingest metric semantics are isolated in `ScannerIngestDiagnosticsReducer`; `ScannerRuntimeDiagnosticsStore` is the synchronized publication facade rather than the counter God object.
-- Canonical device/tracking persistence remains in `DevicePersister`, while time-series RSSI/sample writes are isolated in `SignalSamplePersister`.
-- Evidence is a domain contract carried into Radar, Details, watchlist, export, and alert-history UI, including passive name/model/appearance/Class-of-Device/service/manufacturer context.
-- Navigation Compose uses serializable route types.
-- Basic Gradle quality gate exists.
+## Runtime data flow
 
-## Main Problems
+```text
+ScannerService
+  -> BleScanner (BLE + opportunistic Classic discovery)
+  -> ScanIngestPipeline (bounded ingest/coalescing)
+  -> BLE / Classic handlers
+  -> classification + enrichment + identity / Follow-Me analysis
+  -> DevicePersister / SignalSamplePersister / event history
+  -> domain Device/evidence projections
+  -> Radar / Details / Watchlist / export / alerts
+```
 
-### P0: Active Probing Must Stay Explicit
+Radar uses a lightweight projection rather than loading the full technical/evidence object graph for every list row. Technical/raw evidence stays available in Details.
 
-Passive BLE/Classics observation is the default. Active GATT collection is behind the domain-facing `ActiveCollectionRepository`, has explicit Radar/Settings UI, and requires confirmation before enabling automatic collection. The remaining risk is periodic RFCOMM or broader active probing: do not re-enable it without a separate opt-in boundary and visible active-evidence labeling.
+## Accepted runtime boundaries
 
-### P2: Scanner Service Boundary Is Controlled but Still Structurally Leaky
+- Passive observation is the default.
+- Automatic active GATT collection is an explicit opt-in through domain-facing settings/UI.
+- Periodic RFCOMM probing remains disabled unless a future product decision adds a separate explicit boundary.
+- Direct `BleScanner` lifecycle ownership belongs to `ScannerService`; feature code controls scanning through domain-facing contracts.
+- BLE hardware lifecycle and ingest processing are separated so queue/accounting behavior is testable without changing scanner ownership.
+- Device/tracking persistence and signal-sample persistence are separated.
+- High-attention classifications must surface evidence; final device labels alone are not sufficient.
+- Alert-relevant events and Follow-Me observations have durable history; ordinary latest-state evidence may still be derived from persisted device state.
 
-Phase 2 resolved runtime ownership: direct `BleScanner` lifecycle calls are confined to `ScannerService`, and feature modules control scanning through domain-facing contracts. The remaining debt is structural: `ScannerService` still lives in `core:data` under package `io.blueeye.service` and combines service lifecycle, notification, wake-lock, Bluetooth receiver and cleanup orchestration. At 423 LOC / 25 functions it is a refactor candidate, but the behavior is already field-accepted and this debt is not part of the current Radar/Details redesign unless a measured defect requires touching it.
+See [DETECTION_MODEL.md](DETECTION_MODEL.md) for evidence/confidence semantics.
 
-### P1: `core:data` Is Too Broad
+## Current product direction
 
-`core:data` still owns scanning, repositories, database, classification, tracking sessions, alerts, and foreground service control. This remains too broad for long-term change safety. The Phase 3 critical ingest path is decomposed internally, which reduces immediate runtime coupling without pretending the entire module boundary is solved.
+```text
+raw observations
+  -> deterministic parse/normalize
+  -> local persistence
+  -> local reduction / identity / encounters / movement / RSSI summaries
+  -> explainable local verdict
+  -> optional bounded analysis bundle/telemetry
+  -> optional external analyst
+```
 
-### P1/P2: Oversized Responsibilities Are Recorded Debt
+The optional telemetry bridge is a side channel, not a new source of truth. Failure of Google/network/AI must not affect local scanning, persistence or alerts.
 
-The closure/hardening audits identify several large historical files, led by `DeviceEvidenceFactory`, `DeviceCorrelationStrategy`, `DatabaseExporter`, `SettingsViewModel`, `ScannerService` and multiple large Compose screens. `RfcommConnectionManager` also retains `GlobalScope`, and a Bose RFCOMM handler contains `Thread.sleep`. These are explicit debt, not hidden findings. The Phase 3 runtime hotspots were decomposed where doing so was behavior-preserving; unrelated areas remain deferred. See `PHASE2_CLOSURE_AUDIT.md` and `PHASE3_CODE_QUALITY_REVIEW.md`.
+## Known architectural debt
 
-### P2: Tooling Debt Is Baseline-Gated
+- `core:data` is still broad and owns several unrelated runtime concerns.
+- `ScannerService` remains a large Android lifecycle/notification/wakelock/Bluetooth orchestration surface even though runtime ownership is now controlled.
+- `DeviceEvidenceFactory`, `DeviceCorrelationStrategy`, `DatabaseExporter`, `SettingsViewModel` and some Compose screens remain large responsibilities; split them when the active workstream provides a tested boundary rather than as drive-by refactors.
+- Some general classifier evidence is still derived from latest persisted state instead of an append-only evidence event stream.
+- Existing detekt baselines and ktlint exclusions represent acknowledged debt; do not expand them casually.
+- Identity carryover/Follow-Me heuristics should be tuned from reviewed field evidence and regression fixtures, not intuition.
 
-Detekt baselines exist for current debt. Ktlint excludes `core:data/src` and `core:decoders/src` for now. This is acceptable as a temporary quality gate, but not as the final standard.
+## Change rules
 
-## Recommended Next Refactor Order
-
-The list below is architectural follow-up. It must be reconciled with the active execution plan in `UI_UX_REDESIGN_PLAN.md`; do not let broad cleanup preempt measured UX/performance work or the later parser/reducer milestones.
-
-1. Keep active probing explicit and add a separate RFCOMM opt-in boundary only if product evidence shows it is worth the cost.
-2. Use real session review outcomes for Follow-Me and identity/carryover tuning before raising confidence thresholds.
-3. Continue converting general classifier outputs into explicit evidence where the source can be preserved.
-4. Split oversized `core:data` areas when the active product/data-flow work provides a clear boundary and regression coverage.
-5. Pay down detekt/ktlint baselines module by module.
+1. Do not change accepted scanner/ingest semantics incidentally during UI work.
+2. Keep active probing explicit and provenance-visible.
+3. Prefer privacy-safe regression fixtures before heuristic/parser changes.
+4. Move repeated mechanical reasoning into deterministic local code over time; keep AI optional and higher-level.
