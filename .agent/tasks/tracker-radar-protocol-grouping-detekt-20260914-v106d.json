@@ -1,0 +1,15 @@
+{
+  "id": "tracker-radar-protocol-grouping-detekt-20260914-v106d",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 1800,
+  "idle_timeout": 600,
+  "task_timeout": 3600,
+  "commands": [
+    "set -eu; git fetch origin; git checkout main; git pull --ff-only origin main; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"c67752483b07ba88399c6e1e6940c33dd3a2f51f\"; CP=/Users/michal/agent-workspace/repos/tracker/checkpoints/tracker-radar-protocol-grouping-fix-20260914-v106c/1789365460648452000-task-exit; git apply \"$CP/tracked.patch\"; cp -a \"$CP/untracked/.\" .; git diff --check",
+    "set -u; export JAVA_HOME=$(/usr/libexec/java_home -v 21); export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew --no-daemon :feature:radar:detekt >/tmp/tracker-v106d-detekt.log 2>&1; RC=$?; echo DETEKT_EXIT=$RC; cat /tmp/tracker-v106d-detekt.log; echo DETEKT_REPORTS; find feature/radar/build/reports -maxdepth 3 -type f -print 2>/dev/null | sort; for f in feature/radar/build/reports/detekt/*; do if [ -f \"$f\" ]; then echo REPORT_FILE=$f; case \"$f\" in *.txt|*.md|*.xml|*.sarif) cat \"$f\";; esac; fi; done; exit 0"
+  ]
+}
