@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-telemetry-t0-open-bridge-20260914-v114c",
+  "task_digest": "fe420f6fd4df1e1954d9c2e651af521059a4b80ab924e891a80c669b3e02bcab",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-14T11:54:15.868221+00:00",
+  "attempt_id": "6d28e06531aee27e74f4274d",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 58345,
+  "updated_at": "2026-09-14T11:54:15.868347+00:00",
+  "pid": 58345
+}
