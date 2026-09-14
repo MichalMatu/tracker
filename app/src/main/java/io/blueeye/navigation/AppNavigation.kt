@@ -16,6 +16,7 @@ import io.blueeye.feature.details.DetailsScreen
 import io.blueeye.feature.radar.presentation.LiveNearbyScreen
 import io.blueeye.feature.radar.presentation.RadarScreen
 import io.blueeye.feature.settings.SettingsScreen
+import io.blueeye.feature.telemetry.TelemetryBridgeScreen
 import io.blueeye.feature.watchlist.WatchlistScreen
 import io.blueeye.ui.AppDrawer
 import kotlinx.coroutines.launch
@@ -28,14 +29,14 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination
 
-    // Helper to determine current screen for drawer selection
     val currentScreen: Screen =
         when (currentRoute?.route) {
             "io.blueeye.navigation.Screen.Radar" -> Screen.Radar
             "io.blueeye.navigation.Screen.LiveNearby" -> Screen.LiveNearby
             "io.blueeye.navigation.Screen.Watchlist" -> Screen.Watchlist
             "io.blueeye.navigation.Screen.Settings" -> Screen.Settings
-            else -> Screen.Radar // Default fallback
+            "io.blueeye.navigation.Screen.TelemetryBridge" -> Screen.TelemetryBridge
+            else -> Screen.Radar
         }
 
     ModalNavigationDrawer(
@@ -47,16 +48,10 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
                 scope = scope,
                 navigateTo = { screen ->
                     navController.navigate(screen) {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
-                        // on the back stack as users select items
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true
                         }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
                         launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
                         restoreState = true
                     }
                 },
@@ -116,6 +111,12 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
                     onDeviceClick = { deviceId ->
                         navController.navigate(Screen.Details(deviceId = deviceId))
                     },
+                )
+            }
+
+            composable<Screen.TelemetryBridge> {
+                TelemetryBridgeScreen(
+                    onBackClick = { navController.popBackStack() },
                 )
             }
         }

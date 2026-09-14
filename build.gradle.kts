@@ -59,6 +59,7 @@ tasks.register("qualityCheck") {
             ":feature:details",
             ":feature:radar",
             ":feature:settings",
+            ":feature:telemetry",
             ":feature:watchlist",
         )
     val jvmProjects = listOf(":core:domain", ":core:model")

@@ -81,5 +81,16 @@ fun AppDrawer(
             },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
+
+        NavigationDrawerItem(
+            label = { Text("Telemetry & AI Bridge") },
+            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+            selected = currentScreen is Screen.TelemetryBridge,
+            onClick = {
+                scope.launch { drawerState.close() }
+                navigateTo(Screen.TelemetryBridge)
+            },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        )
     }
 }

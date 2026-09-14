@@ -22,6 +22,7 @@ include(":core:data")
 include(":feature:radar")
 include(":feature:details")
 include(":feature:settings")
+include(":feature:telemetry")
 include(":feature:watchlist")
 
 include(":core:ui")

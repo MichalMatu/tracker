@@ -19,5 +19,8 @@ sealed interface Screen {
     data object Settings : Screen
 
     @Serializable
+    data object TelemetryBridge : Screen
+
+    @Serializable
     data object Watchlist : Screen
 }

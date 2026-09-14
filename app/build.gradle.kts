@@ -49,6 +49,7 @@ dependencies {
     implementation(project(":feature:radar"))
     implementation(project(":feature:details"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:telemetry"))
     implementation(project(":feature:watchlist"))
 
     implementation(project(":core:ui"))

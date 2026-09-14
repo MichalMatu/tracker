@@ -18,6 +18,9 @@ room = "2.6.1"
 datastore = "1.0.0"
 kotlinSerialization = "1.6.3"
 
+# Google
+playServicesAuth = "21.6.0"
+
 # Third Party
 flexbox = "3.0.0"
 gson = "2.10.1"
@@ -59,6 +62,9 @@ androidx-datastore-preferences = { group = "androidx.datastore", name = "datasto
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerialization" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javaxInject" }
+
+# Google
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
