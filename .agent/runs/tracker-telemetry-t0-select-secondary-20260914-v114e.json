@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-telemetry-t0-select-secondary-20260914-v114e",
+  "task_digest": "9a0eabe2c1f5ed131c7ae97637ec39dfc339e873a67bb8032c169167d1d5fba9",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-14T11:56:02.743449+00:00",
+  "attempt_id": "9bc5f51def891a0422abf3cf",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 60882,
+  "updated_at": "2026-09-14T11:56:02.743534+00:00",
+  "pid": 60882
+}
