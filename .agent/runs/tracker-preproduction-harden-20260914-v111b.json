@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-preproduction-harden-20260914-v111b",
+  "task_digest": "846bd982431fbd109b164e8a65561dc5056f07ac30f837d8f65a8f046bfa7d5a",
+  "idle_timeout": 900,
+  "task_timeout": 2400,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-14T07:54:37.259919+00:00",
+  "attempt_id": "92494211124d87dae3fa90b0",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 12127,
+  "updated_at": "2026-09-14T07:54:37.260001+00:00",
+  "pid": 12127
+}
