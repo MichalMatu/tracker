@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-t0-inspect-manual-test-20260914-v114l",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 300,
+  "idle_timeout": 180,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "commands": [
+    "set -eu; test \"$(git rev-parse HEAD)\" = \"a9e89bef5cf6cb3ec7300eeedb27803397ac1f78\"; SERIALS=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}'); COUNT=$(printf '%s\\n' \"$SERIALS\" | sed '/^$/d' | wc -l | tr -d ' '); test \"$COUNT\" = \"1\"; SERIAL=$(printf '%s\\n' \"$SERIALS\" | sed -n '1p'); echo '--- resumed ---'; adb -s \"$SERIAL\" shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' | head -5 || true; echo '--- current telemetry UI ---'; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/t0-manual-result.xml >/dev/null 2>&1 || true; adb -s \"$SERIAL\" shell cat /sdcard/t0-manual-result.xml 2>/dev/null | sed 's/></>\\n</g' | grep -E 'Telemetry &amp; AI Bridge|Account|Drive file scope|Gmail send scope|Connected|Granted|Run Drive|Last T0 test|Drive file|Drive file id|Gmail message id|failed|Failed|error|Error|meehow939|Created|sent|Sent|completed|Complete' | head -240 || true; echo '--- relevant logcat ---'; adb -s \"$SERIAL\" logcat -d -v brief | grep -Ei 'io\\.blueeye|drive|gmail|googleapis|AuthorizationClient|ApiException|HttpURLConnection|response code|bridge-test|BATCH_READY' | tail -260 || true"
+  ]
+}
