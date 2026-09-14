@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-live-nearby-finalize-20260914-v107c",
+  "task_digest": "fd20c4b012e099c4b428dd182d9b9bb69e414f2c1cdee225c30cbf32559f0fca",
+  "idle_timeout": 600,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-14T06:49:27.978404+00:00",
+  "attempt_id": "befd18c16441a4233f118047",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 31714,
+  "updated_at": "2026-09-14T06:49:27.978498+00:00",
+  "pid": 31714
+}
