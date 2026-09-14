@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.18.20",
   "state": "idle",
-  "pid": 72961,
-  "updated_at": "2026-09-14T13:44:20.831120+00:00",
+  "pid": 77649,
+  "updated_at": "2026-09-14T13:49:32.765748+00:00",
   "self_revision": "4255bd0ba13b7f14dec67f0bfe8d1def78f8a3c9",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 72961,
+  "worker_pid": 77649,
   "supervisor_pid": 72854,
-  "last_task_id": "tracker-telemetry-t0-revoke-button-verify-20260914-v114n",
   "execution_variant": "parallel"
 }
