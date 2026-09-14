@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-telemetry-t0-publish-auth-fix-20260914-v114h",
+  "task_digest": "b98167e8c1332aa62fcb18c4200bedbb9a7af16c41389eb1887808ee36876c02",
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-14T12:00:27.957841+00:00",
+  "attempt_id": "dd934a587b6469344d0fce27",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 65829,
+  "updated_at": "2026-09-14T12:00:27.957896+00:00",
+  "pid": 65829
+}
