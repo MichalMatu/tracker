@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-clean-merged-branches-20260914-v114w",
+  "task_digest": "bb04049e711a1589172089bf836610803955898f2090a8b6bdadbabbe2ca0edc",
+  "idle_timeout": 180,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "started_at": "2026-09-14T15:05:05.486152+00:00",
+  "attempt_id": "e0030e3ae8b6e5385dbe657a",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 27169,
+  "updated_at": "2026-09-14T15:05:05.486326+00:00",
+  "pid": 27169
+}
