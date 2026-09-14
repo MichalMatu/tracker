@@ -1,5 +1,6 @@
 package io.blueeye.feature.telemetry
 
+import android.accounts.Account
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -96,9 +97,15 @@ fun TelemetryBridgeScreen(
         val requestBuilder =
             AuthorizationRequest.builder()
                 .setRequestedScopes(GoogleBridgeScopes.requested)
+
         if (forceAccountPicker) {
             requestBuilder.setPrompt(AuthorizationRequest.Prompt.SELECT_ACCOUNT)
+        } else {
+            uiState.selectedAccountEmail?.let { email ->
+                requestBuilder.setAccount(googleAccount(email))
+            }
         }
+
         authorizationClient.authorize(requestBuilder.build())
             .addOnSuccessListener { result ->
                 if (result.hasResolution()) {
@@ -120,11 +127,11 @@ fun TelemetryBridgeScreen(
 
     fun revokeAccess() {
         viewModel.onRevocationStarted()
-        val request =
-            RevokeAccessRequest.builder()
-                .setScopes(GoogleBridgeScopes.requested)
-                .build()
-        authorizationClient.revokeAccess(request)
+        val requestBuilder = RevokeAccessRequest.builder().setScopes(GoogleBridgeScopes.requested)
+        uiState.selectedAccountEmail?.let { email ->
+            requestBuilder.setAccount(googleAccount(email))
+        }
+        authorizationClient.revokeAccess(requestBuilder.build())
             .addOnSuccessListener { viewModel.onRevoked() }
             .addOnFailureListener { error ->
                 viewModel.onRevocationFailed(error.message ?: "Google access revocation failed")
@@ -169,93 +176,119 @@ private fun TelemetryBridgeContent(
                 .padding(Dimens.PaddingMedium),
         verticalArrangement = Arrangement.spacedBy(Dimens.PaddingMedium),
     ) {
-        Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Column(
-                modifier = Modifier.padding(Dimens.PaddingMedium),
-                verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
-            ) {
-                Text("Developer bridge", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text(
-                    "Use a dedicated secondary Google account. The prototype requests only email identity, Drive file access, and Gmail send access.",
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Text(
-                    "No telemetry is collected automatically in T0. This screen only validates Google authorization, one Drive JSON upload, and one self-addressed Gmail trigger.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier.padding(Dimens.PaddingMedium),
-                verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
-            ) {
-                Text("Connection", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                StatusRow("Account", state.selectedAccountEmail ?: "Not selected")
-                StatusRow("Drive file scope", if (state.hasDriveAccess) "Granted" else "Not granted")
-                StatusRow("Gmail send scope", if (state.hasGmailSendAccess) "Granted" else "Not granted")
-                Text(state.statusMessage, style = MaterialTheme.typography.bodyMedium)
-                if (state.errorMessage != null) {
-                    Text(
-                        state.errorMessage,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-            }
-        }
-
-        Button(
-            onClick = onConnect,
-            enabled = !state.isBusy,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(if (state.isAuthorized) "Change Google account" else "Connect Google account")
-        }
-
-        Button(
-            onClick = onRunTest,
-            enabled = state.isAuthorized && !state.isBusy,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            if (state.isBusy && state.isAuthorized) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(Dimens.IconMedium),
-                    strokeWidth = Dimens.PaddingExtraSmall / 2f,
-                )
-            } else {
-                Text("Run Drive + Gmail test")
-            }
-        }
-
-        OutlinedButton(
-            onClick = onDisconnect,
-            enabled = state.isAuthorized && !state.isBusy,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text("Revoke Google access")
-        }
-
+        BridgeIntroCard()
+        BridgeConnectionCard(state)
+        BridgeActions(state, onConnect, onRunTest, onDisconnect)
         if (state.lastDriveFileId != null || state.lastGmailMessageId != null) {
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.padding(Dimens.PaddingMedium),
-                    verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
-                ) {
-                    Text("Last T0 test", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    state.lastDriveFileName?.let { StatusRow("Drive file", it) }
-                    state.lastDriveFileId?.let { StatusRow("Drive file id", it) }
-                    state.lastGmailMessageId?.let { StatusRow("Gmail message id", it) }
-                }
+            LastBridgeTestCard(state)
+        }
+        Spacer(Modifier.height(Dimens.PaddingSmall))
+    }
+}
+
+@Composable
+private fun BridgeIntroCard() {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(Dimens.PaddingMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
+        ) {
+            Text("Developer bridge", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(
+                text =
+                    "Use a dedicated secondary Google account. " +
+                        "The prototype requests only email identity, Drive file access, and Gmail send access.",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Text(
+                text =
+                    "No telemetry is collected automatically in T0. " +
+                        "This screen only validates Google authorization, one Drive JSON upload, " +
+                        "and one self-addressed Gmail trigger.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun BridgeConnectionCard(state: TelemetryBridgeUiState) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(Dimens.PaddingMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
+        ) {
+            Text("Connection", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            StatusRow("Account", state.selectedAccountEmail ?: "Not selected")
+            StatusRow("Drive file scope", if (state.hasDriveAccess) "Granted" else "Not granted")
+            StatusRow("Gmail send scope", if (state.hasGmailSendAccess) "Granted" else "Not granted")
+            Text(state.statusMessage, style = MaterialTheme.typography.bodyMedium)
+            state.errorMessage?.let { errorMessage ->
+                Text(
+                    errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
         }
+    }
+}
 
-        Spacer(Modifier.height(Dimens.PaddingSmall))
+@Composable
+private fun BridgeActions(
+    state: TelemetryBridgeUiState,
+    onConnect: () -> Unit,
+    onRunTest: () -> Unit,
+    onDisconnect: () -> Unit,
+) {
+    Button(
+        onClick = onConnect,
+        enabled = !state.isBusy,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(if (state.isAuthorized) "Change Google account" else "Connect Google account")
+    }
+
+    Button(
+        onClick = onRunTest,
+        enabled = state.canRunTest && !state.isBusy,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        if (state.isBusy && state.isAuthorized) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(Dimens.IconMedium),
+                strokeWidth = Dimens.PaddingExtraSmall / 2f,
+            )
+        } else {
+            Text("Run Drive + Gmail test")
+        }
+    }
+
+    OutlinedButton(
+        onClick = onDisconnect,
+        enabled = state.isAuthorized && !state.isBusy,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text("Revoke Google access")
+    }
+}
+
+@Composable
+private fun LastBridgeTestCard(state: TelemetryBridgeUiState) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(Dimens.PaddingMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall),
+        ) {
+            Text("Last T0 test", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            state.lastDriveFileName?.let { StatusRow("Drive file", it) }
+            state.lastDriveFileId?.let { StatusRow("Drive file id", it) }
+            state.lastGmailMessageId?.let { StatusRow("Gmail message id", it) }
+        }
     }
 }
 
@@ -273,19 +306,19 @@ private fun StatusRow(
             text = label,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(0.38f),
+            modifier = Modifier.weight(1f),
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(0.62f),
+            modifier = Modifier.weight(1f),
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun TelemetryBridgeContentPreview() {
+internal fun TelemetryBridgeContentPreview() {
     MaterialTheme {
         TelemetryBridgeContent(
             state =
@@ -304,3 +337,5 @@ private fun TelemetryBridgeContentPreview() {
         )
     }
 }
+
+private fun googleAccount(email: String): Account = Account(email, "com.google")
