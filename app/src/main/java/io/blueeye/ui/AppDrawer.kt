@@ -50,6 +50,17 @@ fun AppDrawer(
         )
 
         NavigationDrawerItem(
+            label = { Text("Live Nearby") },
+            icon = { Icon(Icons.Default.List, contentDescription = null) },
+            selected = currentScreen is Screen.LiveNearby,
+            onClick = {
+                scope.launch { drawerState.close() }
+                navigateTo(Screen.LiveNearby)
+            },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        )
+
+        NavigationDrawerItem(
             label = { Text("Watchlist") },
             icon = { Icon(Icons.Default.List, contentDescription = null) },
             selected = currentScreen is Screen.Watchlist,

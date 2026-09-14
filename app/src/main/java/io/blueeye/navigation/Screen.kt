@@ -10,6 +10,9 @@ sealed interface Screen {
     data object Radar : Screen
 
     @Serializable
+    data object LiveNearby : Screen
+
+    @Serializable
     data class Details(val deviceId: String) : Screen
 
     @Serializable

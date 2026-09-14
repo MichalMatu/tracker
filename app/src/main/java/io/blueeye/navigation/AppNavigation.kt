@@ -13,6 +13,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.blueeye.feature.details.DetailsScreen
+import io.blueeye.feature.radar.presentation.LiveNearbyScreen
 import io.blueeye.feature.radar.presentation.RadarScreen
 import io.blueeye.feature.settings.SettingsScreen
 import io.blueeye.feature.watchlist.WatchlistScreen
@@ -31,6 +32,7 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
     val currentScreen: Screen =
         when (currentRoute?.route) {
             "io.blueeye.navigation.Screen.Radar" -> Screen.Radar
+            "io.blueeye.navigation.Screen.LiveNearby" -> Screen.LiveNearby
             "io.blueeye.navigation.Screen.Watchlist" -> Screen.Watchlist
             "io.blueeye.navigation.Screen.Settings" -> Screen.Settings
             else -> Screen.Radar // Default fallback
@@ -67,6 +69,17 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
         ) {
             composable<Screen.Radar> {
                 RadarScreen(
+                    onDeviceClick = { deviceId ->
+                        navController.navigate(Screen.Details(deviceId = deviceId))
+                    },
+                    onMenuClick = {
+                        scope.launch { drawerState.open() }
+                    },
+                )
+            }
+
+            composable<Screen.LiveNearby> {
+                LiveNearbyScreen(
                     onDeviceClick = { deviceId ->
                         navController.navigate(Screen.Details(deviceId = deviceId))
                     },
