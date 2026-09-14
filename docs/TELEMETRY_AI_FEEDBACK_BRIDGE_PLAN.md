@@ -2,11 +2,14 @@
 
 ## Status
 
-- **Active implementation plan; implementation not yet accepted.**
+- **T0 is code-complete and build-verified on the working branch; physical end-to-end acceptance is still pending.**
 - Working branch: `feature/telemetry-ai-bridge`, forked from `main` at `6e07e2bc5063a7fda47a0e5a2ec8dbdaca1a0e7a`.
-- Selected prototype: **Google Drive data plane + Gmail control/feedback plane**.
+- Verified T0 code SHA: `489f90f1c53bb7feafa1bb0d16a486919e7990c5`.
+- Local Agent verification on that exact SHA passed focused compile/ktlint/detekt/lint/unit tests and then full `qualityCheck` + `:app:assembleDebug`.
+- Selected developer prototype: **Google Drive data plane + Gmail control/feedback plane**.
 - Use one dedicated secondary Google account, isolated from the operator's normal account.
 - The mandatory **plan -> current code -> Google/Android capabilities** audit was repeated on 2026-09-14 before implementation; result: **PASS WITH GATES**.
+- T1+ automatic telemetry remains blocked until the physical OAuth -> Drive -> Gmail -> ChatGPT path is proven and the Google policy/productization fit is explicitly accepted or the affected transport plane is replaced.
 
 ## Goal
 
