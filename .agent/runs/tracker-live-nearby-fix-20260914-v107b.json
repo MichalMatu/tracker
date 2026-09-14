@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 1,
+  "index": 2,
   "total": 5,
-  "command": "set -eu; git fetch origin; git checkout main; git pull --ff-only origin main; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"b0daebe2daf28d26e5259a25a542fe6a5078e16a\"; CP=/Users/michal/agent-workspace/repos/tracker/checkpoints/tracker-live-nearby-20260914-v107a/1789368113031961000-task-exit; git apply \"$CP/tracked.patch\"; cp -a \"$CP/untracked/.\" .; git diff --check",
-  "pid": 27037,
+  "command": "set -eu; git fetch origin agent-control; git show origin/agent-control:.agent/scripts/tracker-live-nearby-fix-v107b.sh > /tmp/tracker-live-nearby-fix-v107b.sh; bash /tmp/tracker-live-nearby-fix-v107b.sh",
+  "pid": 27119,
   "timeout": 1800,
   "idle_timeout": 600,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-14T06:45:22.693512+00:00",
-  "stage_name": "command-1",
-  "stage_index": 1,
+  "started_at": "2026-09-14T06:45:24.764806+00:00",
+  "stage_name": "command-2",
+  "stage_index": 2,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-live-nearby-fix-20260914-v107b",
@@ -18,5 +18,5 @@
   "task_digest": "88de2638f988329b12838737fee2eafc839b998bf8feae3a8cbd4885e2222238",
   "daemon_version": "4.18.20",
   "daemon_pid": 26432,
-  "updated_at": "2026-09-14T06:45:22.694450+00:00"
+  "updated_at": "2026-09-14T06:45:24.831802+00:00"
 }
