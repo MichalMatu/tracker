@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-telemetry-t0-retry-auth-20260914-v114i",
+  "task_digest": "e4999c429c93bc833b40a7ee8686de8463162a9631cc52c71170e5a915ea83b4",
+  "idle_timeout": 900,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-14T12:01:09.525406+00:00",
+  "attempt_id": "6f74cbb6f22ecc5d414186cb",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 66991,
+  "updated_at": "2026-09-14T12:01:09.525471+00:00",
+  "pid": 66991
+}
