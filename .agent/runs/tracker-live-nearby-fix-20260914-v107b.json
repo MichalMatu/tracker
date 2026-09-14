@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 5,
-  "command": "set -eu; git fetch origin agent-control; git show origin/agent-control:.agent/scripts/tracker-live-nearby-fix-v107b.sh > /tmp/tracker-live-nearby-fix-v107b.sh; bash /tmp/tracker-live-nearby-fix-v107b.sh",
-  "pid": 27119,
+  "command": "set -u; export JAVA_HOME=$(/usr/libexec/java_home -v 21); export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew --no-daemon :feature:radar:detekt >/tmp/tracker-v107b-detekt.log 2>&1; RC=$?; echo DETEKT_EXIT=$RC; cat /tmp/tracker-v107b-detekt.log; if [ -f feature/radar/build/reports/detekt/detekt.txt ]; then echo DETEKT_TEXT_REPORT; cat feature/radar/build/reports/detekt/detekt.txt; fi; exit 0",
+  "pid": 27619,
   "timeout": 1800,
   "idle_timeout": 600,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-14T06:45:24.764806+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-14T06:45:42.955939+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 5,
   "stage_phase": "commands",
   "task_id": "tracker-live-nearby-fix-20260914-v107b",
@@ -18,5 +18,5 @@
   "task_digest": "88de2638f988329b12838737fee2eafc839b998bf8feae3a8cbd4885e2222238",
   "daemon_version": "4.18.20",
   "daemon_pid": 26432,
-  "updated_at": "2026-09-14T06:45:24.831802+00:00"
+  "updated_at": "2026-09-14T06:45:42.987074+00:00"
 }
