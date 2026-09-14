@@ -1,0 +1,15 @@
+{
+  "id": "tracker-clean-merged-branches-20260914-v114w",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 300,
+  "idle_timeout": 180,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "commands": [
+    "set -eu; git fetch origin --prune; test \"$(git rev-parse HEAD)\" = \"c14bc2d61ff21e5e5390506548642273e1301ab9\"; git push origin --delete feature/telemetry-ai-bridge tmp/device-task-anchor tmp/device-task-anchor-2 tmp/noop; git fetch origin --prune; echo '--- remaining remote branches ---'; git branch -r | sed 's/^ *//' | sort"
+  ]
+}
