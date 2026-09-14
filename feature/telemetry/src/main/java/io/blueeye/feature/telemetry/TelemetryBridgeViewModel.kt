@@ -180,7 +180,7 @@ class TelemetryBridgeViewModel
             viewModelScope.launch {
                 bridgeApi.fetchAccountEmail(token)
                     .onSuccess { email ->
-                        persistAccountEmail(email)
+                        preferences.edit().putString(KEY_ACCOUNT_EMAIL, email).apply()
                         _uiState.update { state ->
                             state.copy(
                                 selectedAccountEmail = email,
@@ -230,10 +230,6 @@ class TelemetryBridgeViewModel
             accessToken = null
             preferences.edit().remove(KEY_ACCOUNT_EMAIL).apply()
             _uiState.value = TelemetryBridgeUiState(statusMessage = "Google access revoked")
-        }
-
-        private fun persistAccountEmail(email: String) {
-            preferences.edit().putString(KEY_ACCOUNT_EMAIL, email).apply()
         }
 
         private fun runBridgeTest(
