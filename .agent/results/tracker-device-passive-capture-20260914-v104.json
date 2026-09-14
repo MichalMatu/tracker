@@ -1,0 +1,60 @@
+{
+  "id": "tracker-device-passive-capture-20260914-v104",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-14T04:51:19.688053+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; git fetch origin; git checkout main; git pull --ff-only origin main; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"c67752483b07ba88399c6e1e6940c33dd3a2f51f\"; MODEL=$(adb shell getprop ro.product.model | tr -d '\\r'); test \"$MODEL\" = \"SM-S906B\"; adb shell dumpsys activity services io.blueeye | grep -q 'io.blueeye/.service.ScannerService'; TMP=$(mktemp -d); trap 'rm -rf \"$TMP\"' EXIT; snapshot(){ P=$1; adb exec-out run-as io.blueeye cat databases/tracker_database > \"$TMP/$P.db\"; adb exec-out run-as io.blueeye cat databases/tracker_database-wal > \"$TMP/$P.db-wal\" 2>/dev/null || true; adb exec-out run-as io.blueeye cat databases/tracker_database-shm > \"$TMP/$P.db-shm\" 2>/dev/null || true; }; snapshot pre; PRE=$(sqlite3 \"$TMP/pre.db\" 'select coalesce(max(timestamp),0) from signal_samples;'); echo PRE_MAX_TS=$PRE; echo SIGNAL_COLUMNS=$(sqlite3 \"$TMP/pre.db\" 'pragma table_info(signal_samples);' | cut -d'|' -f2 | paste -sd, -); echo DEVICE_COLUMNS=$(sqlite3 \"$TMP/pre.db\" 'pragma table_info(devices);' | cut -d'|' -f2 | paste -sd, -); sleep 180; snapshot post; POST=$(sqlite3 \"$TMP/post.db\" 'select coalesce(max(timestamp),0) from signal_samples;'); echo POST_MAX_TS=$POST; test \"$POST\" -gt \"$PRE\"; echo NEW_SIGNAL_SAMPLES=$(sqlite3 \"$TMP/post.db\" \"select count(*) from signal_samples where timestamp>$PRE;\"); echo TARGET_SIGNAL_ROWS; sqlite3 -header -separator '|' \"$TMP/post.db\" \"select coalesce(deviceName,'') as name,coalesce(deviceType,'') as type,coalesce(vendorName,'') as vendor,coalesce(beaconType,'') as beacon,count(*) as samples,round(avg(rssi),1) as avgRssi,min(timestamp) as firstTs,max(timestamp) as lastTs from signal_samples where timestamp>$PRE and (lower(coalesce(deviceName,'')) like '%fmdn%' or lower(coalesce(deviceName,'')) like '%gfps%' or lower(coalesce(deviceName,'')) like '%wf-1000xm5%' or lower(coalesce(deviceName,'')) like '%sony%' or lower(coalesce(deviceName,'')) like '%garmin%' or lower(coalesce(deviceName,'')) like '%forerunner%' or lower(coalesce(beaconType,'')) like '%find hub%' or lower(coalesce(serviceDataByUuidHex,'')) like '%feaa%' or lower(coalesce(serviceDataByUuidHex,'')) like '%fe2c%' or manufacturerId=135) group by name,type,vendor,beacon order by samples desc limit 100;\"; echo RECENT_TOP; sqlite3 -header -separator '|' \"$TMP/post.db\" \"select coalesce(deviceName,'') as name,coalesce(deviceType,'') as type,coalesce(vendorName,'') as vendor,coalesce(beaconType,'') as beacon,count(*) as samples,round(avg(rssi),1) as avgRssi,min(timestamp) as firstTs,max(timestamp) as lastTs from signal_samples where timestamp>$PRE group by name,type,vendor,beacon order by samples desc limit 40;\"; echo TRACKER_RAW_PREFIXES; sqlite3 -header -separator '|' \"$TMP/post.db\" \"select coalesce(deviceName,'') as name,coalesce(deviceType,'') as type,coalesce(beaconType,'') as beacon,rssi,substr(coalesce(serviceDataByUuidHex,''),1,180) as serviceData,timestamp from signal_samples where timestamp>$PRE and (lower(coalesce(beaconType,'')) like '%find hub%' or lower(coalesce(deviceName,'')) like '%fmdn%' or lower(coalesce(deviceName,'')) like '%gfps%' or lower(coalesce(serviceDataByUuidHex,'')) like '%feaa%' or lower(coalesce(serviceDataByUuidHex,'')) like '%fe2c%') order by timestamp desc limit 30;\"",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n   5bfe5194..5d669967  agent-control -> origin/agent-control\nSwitched to branch 'main'\nYour branch is up to date with 'origin/main'.\nFrom https://github.com/MichalMatu/tracker\n * branch              main       -> FETCH_HEAD\nAlready up to date.\nPRE_MAX_TS=1789361484862\nSIGNAL_COLUMNS=id,deviceFingerprint,observedMac,technology,deviceName,deviceType,vendorName,rssi,latitude,longitude,locationAccuracy,timestamp,manufacturerId,manufacturerDataHex,manufacturerDataByIdHex,serviceUuids,serviceDataByUuidHex,appearance,txPower,isConnectable,primaryPhy,secondaryPhy,advertisingIntervalMs,beaconType,rawDataHex,sensorData,classOfDevice,trackingStatus,followingScore,isTactical,tacticalCategory,probeError\nDEVICE_COLUMNS=fingerprint,lastMacAddress,macAddressType,carryoverReasonCode,carryoverConfidence,carryoverFeatures,technology,lastDeviceName,deviceType,vendorName,manufacturerId,predictedModel,classOfDevice,isCarAudio,trackingStatus,followingScore,followMeExplanation,followMeDurationScore,followMeRssiStabilityScore,followMeDeviceTypeScore,followMeMacBehaviorScore,followMeEncounterScore,followMeUserMoved,followMeBaselineDevice,totalSeenDurationSeconds,isInWatchlist,isSafeBeacon,userAlias,userNotes,alertSound,alertVibration,isTrackingEnabled,isIgnoredForTracking,calibrationLabel,identityCarryoverVerdict,lastWatchlistReturnAlertAt,lastWatchlistReturnOfflineDurationMs,lastRssi,firstSeenAt,lastSeenAt,encounterCount,sensorData,txPower,isConnectable,primaryPhy,secondaryPhy,advertisingIntervalMs,beaconType,connectionStatus,connectionAttempts,lastProbeTimestamp,modelNumber,serialNumber,firmwareRevision,hardwareRevision,softwareRevision,manufacturerName,batteryLevel,gattServices,characteristicData,lastRawData,probeError,isPaired\nPOST_MAX_TS=1789361667326\nNEW_SIGNAL_SAMPLES=509\nTARGET_SIGNAL_ROWS\nname|type|vendor|beacon|samples|avgRssi|firstTs|lastTs\n|TRACKER||Google Find Hub|41|-73.7|1789361485516|1789361665728\nRECENT_TOP\nname|type|vendor|beacon|samples|avgRssi|firstTs|lastTs\n|UNKNOWN||Apple Device|112|-59.0|1789361489497|1789361666740\nLE-Bose QC Ultra Headphones|HEADPHONES||Bose QC 35|63|-63.7|1789361486675|1789361666543\nTY|SMART_HOME||Smart Lighting|54|-77.8|1789361486513|1789361663971\nShellyPlugSG3-E4B063D7F530|UNKNOWN|||44|-57.7|1789361487403|1789361665549\nMacBook Air|LAPTOP||Apple Device|42|-56.1|1789361486878|1789361667326\n|TRACKER||Google Find Hub|41|-73.7|1789361485516|1789361665728\n|TRACKER||Apple FindMy / AirTag|40|-80.5|1789361490797|1789361664185\n|UNKNOWN|||36|-91.2|1789361493079|1789361661391\nATC_4F24CD|UNKNOWN||Xiaomi LYWSD03MMC (BTHome)|22|-52.5|1789361494454|1789361664919\n[TV] Samsung Q60 Series (65)|TV||Samsung SmartTag|19|-86.1|1789361493707|1789361663226\nOclean X Pro Elite|UNKNOWN|||18|-84.4|1789361495166|1789361659178\nTP357S (7620)|UNKNOWN||ThermoPro TP35x|18|-68.0|1789361485630|1789361658026\nTRACKER_RAW_PREFIXES\nname|type|beacon|rssi|serviceData|timestamp\n|TRACKER|Google Find Hub|-79|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361665728\n|TRACKER|Google Find Hub|-60|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361658602\n|TRACKER|Google Find Hub|-85|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361655712\n|TRACKER|Google Find Hub|-72|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361651717\n|TRACKER|Google Find Hub|-54|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361646586\n|TRACKER|Google Find Hub|-83|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361644587\n|TRACKER|Google Find Hub|-79|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361639704\n|TRACKER|Google Find Hub|-77|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361629685\n|TRACKER|Google Find Hub|-55|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361628580\n|TRACKER|Google Find Hub|-89|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361626575\n|TRACKER|Google Find Hub|-65|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361620575\n|TRACKER|Google Find Hub|-73|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361617682\n|TRACKER|Google Find Hub|-83|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361609671\n|TRACKER|Google Find Hub|-72|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361606581\n|TRACKER|Google Find Hub|-73|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361603724\n|TRACKER|Google Find Hub|-84|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361599668\n|TRACKER|Google Find Hub|-58|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361598578\n|TRACKER|Google Find Hub|-71|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361591693\n|TRACKER|Google Find Hub|-60|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361586580\n|TRACKER|Google Find Hub|-70|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361579692\n|TRACKER|Google Find Hub|-66|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361576577\n|TRACKER|Google Find Hub|-81|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361574573\n|TRACKER|Google Find Hub|-75|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361567686\n|TRACKER|Google Find Hub|-62|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361566563\n|TRACKER|Google Find Hub|-74|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361557612\n|TRACKER|Google Find Hub|-52|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361554548\n|TRACKER|Google Find Hub|-83|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361550548\n|TRACKER|Google Find Hub|-73|0000feaa-0000-1000-8000-00805f9b34fb=40DB5BE4906963809DAAE9DFEA9464FB4701A952804D|1789361547594\n|TRACKER|Google Find Hub|-65|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361546535\n|TRACKER|Google Find Hub|-76|0000feaa-0000-1000-8000-00805f9b34fb=40D130DA989EB92A46565C2E2A9471A098357680C0DD|1789361544534\n",
+      "elapsed_seconds": 188.249,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 9.59,
+      "output_policy": "stream",
+      "captured_output_chars": 6698,
+      "output_truncated": false,
+      "current_rss_mb": 9.31,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 188.249
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.107
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.068
+  },
+  "finished_at": "2026-09-14T04:54:29.574275+00:00",
+  "task_digest": "07e8871b402f98ad88edbe3eed1fc9d80bba751c99ad99da5a183ae1ebf68404",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "b04728cea41e01dc34884760",
+  "daemon_version": "4.18.20"
+}
