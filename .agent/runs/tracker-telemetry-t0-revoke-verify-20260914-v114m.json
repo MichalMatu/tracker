@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-telemetry-t0-revoke-verify-20260914-v114m",
+  "task_digest": "d61f410d6011ef1e833fda470516070ce2c7d8c020bc93dd7c558ac797369227",
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-14T13:39:01.647471+00:00",
+  "attempt_id": "00bcf8ae4608ba01cb46cb82",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 68859,
+  "updated_at": "2026-09-14T13:39:01.647521+00:00",
+  "pid": 68859
+}
