@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-t0-revoke-button-verify-20260914-v114n",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 300,
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 2048,
+  "commands": [
+    "set -eu; test \"$(git rev-parse HEAD)\" = \"a9e89bef5cf6cb3ec7300eeedb27803397ac1f78\"; SERIALS=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}'); COUNT=$(printf '%s\\n' \"$SERIALS\" | sed '/^$/d' | wc -l | tr -d ' '); test \"$COUNT\" = \"1\"; SERIAL=$(printf '%s\\n' \"$SERIALS\" | sed -n '1p'); adb -s \"$SERIAL\" shell uiautomator dump /sdcard/t0-revoke-button.xml >/dev/null 2>&1 || true; adb -s \"$SERIAL\" shell cat /sdcard/t0-revoke-button.xml | python3 -c 'import sys,xml.etree.ElementTree as ET; r=ET.fromstring(sys.stdin.read()); target=next(x for x in r.iter() if x.attrib.get(\"text\")==\"Run Drive + Gmail test\"); pm={c:p for p in r.iter() for c in p}; cur=target; chain=[];\nwhile True:\n chain.append(cur.attrib);\n if cur not in pm: break\n cur=pm[cur]\nfor a in chain: print({k:a.get(k) for k in (\"class\",\"text\",\"clickable\",\"enabled\",\"bounds\")})'"
+  ]
+}
