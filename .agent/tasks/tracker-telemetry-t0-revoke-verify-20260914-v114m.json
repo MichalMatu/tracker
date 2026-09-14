@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-t0-revoke-verify-20260914-v114m",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 300,
+  "idle_timeout": 300,
+  "task_timeout": 900,
+  "memory_limit_mb": 2048,
+  "commands": [
+    "set -eu; test \"$(git rev-parse HEAD)\" = \"a9e89bef5cf6cb3ec7300eeedb27803397ac1f78\"; SERIALS=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}'); COUNT=$(printf '%s\\n' \"$SERIALS\" | sed '/^$/d' | wc -l | tr -d ' '); test \"$COUNT\" = \"1\"; SERIAL=$(printf '%s\\n' \"$SERIALS\" | sed -n '1p'); adb -s \"$SERIAL\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null; sleep 1; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/t0-revoke.xml >/dev/null 2>&1 || true; if ! adb -s \"$SERIAL\" shell cat /sdcard/t0-revoke.xml 2>/dev/null | grep -q 'Telemetry &amp; AI Bridge'; then adb -s \"$SERIAL\" shell input tap 75 160; sleep 1; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/t0-drawer.xml >/dev/null 2>&1 || true; B=$(adb -s \"$SERIAL\" shell cat /sdcard/t0-drawer.xml | python3 -c 'import sys,xml.etree.ElementTree as ET; r=ET.fromstring(sys.stdin.read()); n=next(x for x in r.iter() if x.attrib.get(\"text\")==\"Telemetry & AI Bridge\"); print(n.attrib[\"bounds\"])'); XY=$(printf '%s' \"$B\" | python3 -c 'import sys,re; a=list(map(int,re.findall(r\"\\d+\",sys.stdin.read()))); print((a[0]+a[2])//2,(a[1]+a[3])//2)'); set -- $XY; adb -s \"$SERIAL\" shell input tap \"$1\" \"$2\"; sleep 1; fi; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/t0-revoke-final.xml >/dev/null 2>&1 || true; echo '--- post-revoke UI ---'; adb -s \"$SERIAL\" shell cat /sdcard/t0-revoke-final.xml 2>/dev/null | sed 's/></>\\n</g' | grep -E 'Telemetry &amp; AI Bridge|Account|Drive file scope|Gmail send scope|Granted|Not granted|Disconnected|Connect Google account|Change Google account|Run Drive \\+ Gmail test|Revoke Google access|T0 API test|Authorization|meehow939' | head -240 || true; echo '--- run-test node ---'; adb -s \"$SERIAL\" shell cat /sdcard/t0-revoke-final.xml 2>/dev/null | sed 's/></>\\n</g' | grep 'Run Drive + Gmail test' | head -5 || true; echo '--- relevant logcat ---'; adb -s \"$SERIAL\" logcat -d -v brief | grep -Ei 'io\\.blueeye|revoke|AuthorizationClient|ApiException|oauth' | tail -160 || true"
+  ]
+}
