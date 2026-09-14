@@ -1,0 +1,60 @@
+{
+  "id": "tracker-fhn-two-tronic-audit-20260914-v105b",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-14T05:06:06.135728+00:00",
+  "command_timeout": 900,
+  "edits": {},
+  "commands": [
+    {
+      "command": "set -eu; git fetch origin; git checkout main; git pull --ff-only origin main; test -z \"$(git status --porcelain)\"; test \"$(git rev-parse HEAD)\" = \"c67752483b07ba88399c6e1e6940c33dd3a2f51f\"; MODEL=$(adb shell getprop ro.product.model | tr -d '\\r'); test \"$MODEL\" = \"SM-S906B\"; TMP=$(mktemp -d); trap 'rm -rf \"$TMP\"' EXIT; adb exec-out run-as io.blueeye cat databases/tracker_database > \"$TMP/db\"; adb exec-out run-as io.blueeye cat databases/tracker_database-wal > \"$TMP/db-wal\" 2>/dev/null || true; adb exec-out run-as io.blueeye cat databases/tracker_database-shm > \"$TMP/db-shm\" 2>/dev/null || true; MAX=$(sqlite3 \"$TMP/db\" 'select coalesce(max(timestamp),0) from signal_samples;'); START=$((MAX-900000)); echo WINDOW_MS=900000; echo FHN_TOTAL=$(sqlite3 \"$TMP/db\" \"select count(*) from signal_samples where timestamp>=$START and beaconType='Google Find Hub';\"); echo FHN_DISTINCT_FINGERPRINTS=$(sqlite3 \"$TMP/db\" \"select count(distinct deviceFingerprint) from signal_samples where timestamp>=$START and beaconType='Google Find Hub';\"); echo FHN_ANON_GROUPS; sqlite3 -header -separator '|' \"$TMP/db\" \"with g as (select deviceFingerprint,count(*) samples,round(avg(rssi),1) avgRssi,min(rssi) minRssi,max(rssi) maxRssi,min(timestamp) firstTs,max(timestamp) lastTs,count(distinct serviceDataByUuidHex) payloadVariants from signal_samples where timestamp>=$START and beaconType='Google Find Hub' group by deviceFingerprint), r as (select row_number() over(order by avgRssi desc) n,samples,avgRssi,minRssi,maxRssi,firstTs,lastTs,payloadVariants from g) select printf('FHN-%02d',n) as anon,samples,avgRssi,minRssi,maxRssi,(lastTs-firstTs) as spanMs,payloadVariants from r order by n;\"; echo CONCURRENCY_5S_BUCKETS; sqlite3 -header -separator '|' \"$TMP/db\" \"with b as (select cast(timestamp/5000 as integer) bucket,count(distinct deviceFingerprint) n from signal_samples where timestamp>=$START and beaconType='Google Find Hub' group by bucket) select n as concurrentFingerprints,count(*) as buckets from b group by n order by n;\"; echo FHN_STATUS_SUMMARY; sqlite3 -header -separator '|' \"$TMP/db\" \"select trackingStatus,count(*) rows,round(avg(followingScore),1) avgScore from devices where beaconType='Google Find Hub' group by trackingStatus order by trackingStatus;\"",
+      "exit_code": 0,
+      "output": "From https://github.com/MichalMatu/tracker\n   e6477a6e..2a99e75a  agent-control -> origin/agent-control\nSwitched to branch 'main'\nYour branch is up to date with 'origin/main'.\nFrom https://github.com/MichalMatu/tracker\n * branch              main       -> FETCH_HEAD\nAlready up to date.\nWINDOW_MS=900000\nFHN_TOTAL=191\nFHN_DISTINCT_FINGERPRINTS=2\nFHN_ANON_GROUPS\nanon|samples|avgRssi|minRssi|maxRssi|spanMs|payloadVariants\nFHN-01|106|-67.0|-91|-52|886765|1\nFHN-02|85|-77.9|-93|-70|894927|1\nCONCURRENCY_5S_BUCKETS\nconcurrentFingerprints|buckets\n1|108\n2|37\nFHN_STATUS_SUMMARY\ntrackingStatus|rows|avgScore\nSAFE|4|20.0\n",
+      "elapsed_seconds": 5.243,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 4096,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": 9.59,
+      "output_policy": "stream",
+      "captured_output_chars": 614,
+      "output_truncated": false,
+      "current_rss_mb": 9.59,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 5.243
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.086
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.063
+  },
+  "finished_at": "2026-09-14T05:06:12.971086+00:00",
+  "task_digest": "f1df7daafdf2dd118da76cca09507f3d79e06d77cb1038223c71f3f5c008e402",
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "attempt_id": "50ea491a2ec67c1607115e4d",
+  "daemon_version": "4.18.20"
+}
