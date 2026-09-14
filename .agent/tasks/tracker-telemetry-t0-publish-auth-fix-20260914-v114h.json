@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-t0-publish-auth-fix-20260914-v114h",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 2048,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -eu; test \"$(git rev-parse HEAD)\" = \"0fe28cc50c0cb2aab19af31aaf4a40a76aff3205\"; git cat-file -e a9e89bef5cf6cb3ec7300eeedb27803397ac1f78^{commit}; test \"$(git rev-parse a9e89bef5cf6cb3ec7300eeedb27803397ac1f78^)\" = \"0fe28cc50c0cb2aab19af31aaf4a40a76aff3205\"; git merge-base --is-ancestor 0fe28cc50c0cb2aab19af31aaf4a40a76aff3205 a9e89bef5cf6cb3ec7300eeedb27803397ac1f78; git show --stat --oneline --no-renames a9e89bef5cf6cb3ec7300eeedb27803397ac1f78; git push origin a9e89bef5cf6cb3ec7300eeedb27803397ac1f78:refs/heads/feature/telemetry-ai-bridge"
+  ]
+}
