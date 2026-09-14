@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 3,
+  "index": 4,
   "total": 4,
-  "command": "set -eu; export JAVA_HOME=$(/usr/libexec/java_home -v 21); export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew --no-daemon :feature:radar:testDebugUnitTest :feature:radar:detekt :app:assembleDebug",
-  "pid": 32034,
+  "command": "set -eu; git fetch origin; test \"$(git rev-parse origin/main)\" = \"b0daebe2daf28d26e5259a25a542fe6a5078e16a\"; git diff --check; git add app/src/main/java/io/blueeye/navigation/AppNavigation.kt app/src/main/java/io/blueeye/navigation/Screen.kt app/src/main/java/io/blueeye/ui/AppDrawer.kt feature/radar/src/main/java/io/blueeye/feature/radar/presentation feature/radar/src/test/java/io/blueeye/feature/radar/presentation; git commit -m \"Add Live Nearby signal view\"; git push origin main; test -z \"$(git status --porcelain)\"; echo PUSHED_HEAD=$(git rev-parse HEAD)",
+  "pid": 32785,
   "timeout": 1800,
   "idle_timeout": 600,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-14T06:49:31.489293+00:00",
-  "stage_name": "command-3",
-  "stage_index": 3,
+  "started_at": "2026-09-14T06:50:00.651696+00:00",
+  "stage_name": "command-4",
+  "stage_index": 4,
   "stage_total": 4,
   "stage_phase": "commands",
   "task_id": "tracker-live-nearby-finalize-20260914-v107c",
@@ -18,5 +18,5 @@
   "task_digest": "fd20c4b012e099c4b428dd182d9b9bb69e414f2c1cdee225c30cbf32559f0fca",
   "daemon_version": "4.18.20",
   "daemon_pid": 31714,
-  "updated_at": "2026-09-14T06:49:31.559782+00:00"
+  "updated_at": "2026-09-14T06:50:00.722102+00:00"
 }
