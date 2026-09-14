@@ -1,16 +1,16 @@
 {
   "event": "command_started",
   "phase": "commands",
-  "index": 2,
+  "index": 3,
   "total": 4,
-  "command": "set -eu; git fetch origin agent-control; git show origin/agent-control:.agent/scripts/tracker-live-nearby-v107a.sh > /tmp/tracker-live-nearby-v107a.sh; bash /tmp/tracker-live-nearby-v107a.sh; export JAVA_HOME=$(/usr/libexec/java_home -v 21); export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew --no-daemon :feature:radar:detekt --auto-correct || true; git diff --check",
-  "pid": 17483,
+  "command": "set -eu; export JAVA_HOME=$(/usr/libexec/java_home -v 21); export PATH=\"$JAVA_HOME/bin:$PATH\"; ./gradlew --no-daemon :feature:radar:testDebugUnitTest :feature:radar:detekt :app:assembleDebug",
+  "pid": 17887,
   "timeout": 1800,
   "idle_timeout": 600,
   "memory_limit_mb": 4096,
-  "started_at": "2026-09-14T06:40:56.115738+00:00",
-  "stage_name": "command-2",
-  "stage_index": 2,
+  "started_at": "2026-09-14T06:41:04.172614+00:00",
+  "stage_name": "command-3",
+  "stage_index": 3,
   "stage_total": 4,
   "stage_phase": "commands",
   "task_id": "tracker-live-nearby-20260914-v107a",
@@ -18,5 +18,5 @@
   "task_digest": "898693bff49624ed6a37929b3dd758d510100e935a23c8d554324118de37a198",
   "daemon_version": "4.18.20",
   "daemon_pid": 17243,
-  "updated_at": "2026-09-14T06:40:56.195329+00:00"
+  "updated_at": "2026-09-14T06:41:04.208026+00:00"
 }
