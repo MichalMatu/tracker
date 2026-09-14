@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-t0-compile-20260914-v113b",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 4096,
+  "command_timeout": 1800,
+  "idle_timeout": 600,
+  "task_timeout": 2400,
+  "commands": [
+    "set -eu; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; test \"$(git rev-parse HEAD)\" = \"8e8a853e62025d6a05cecbf40a382d9800b8d60e\"; ./gradlew :feature:telemetry:compileDebugKotlin :app:compileDebugKotlin --stacktrace"
+  ]
+}
