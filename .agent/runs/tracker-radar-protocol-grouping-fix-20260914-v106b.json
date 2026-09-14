@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-radar-protocol-grouping-fix-20260914-v106b",
+  "task_digest": "455aae7fe0059d290b96e45c507accf04156eece77fa962844d3c18f59501fb3",
+  "idle_timeout": 600,
+  "task_timeout": 3600,
+  "memory_limit_mb": 4096,
+  "started_at": "2026-09-14T05:50:51.893144+00:00",
+  "attempt_id": "4b938bdc15ee33aa03ac6365",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 58642,
+  "updated_at": "2026-09-14T05:50:51.893292+00:00",
+  "pid": 58642
+}
