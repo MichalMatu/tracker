@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-t0-device-ui-inspect-20260914-v114b",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 2048,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -eu; test \"$(git rev-parse HEAD)\" = \"0fe28cc50c0cb2aab19af31aaf4a40a76aff3205\"; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -1); test -n \"$SERIAL\"; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/blueeye-current.xml >/dev/null; adb -s \"$SERIAL\" shell cat /sdcard/blueeye-current.xml | sed 's/></>\\n</g' | grep -E 'text=|content-desc=' | head -120"
+  ]
+}
