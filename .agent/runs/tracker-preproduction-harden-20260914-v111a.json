@@ -1,9 +1,0 @@
-{
-  "event": "invalid_task_rejected",
-  "status": "failed",
-  "failure_reason": "invalid_task_file",
-  "updated_at": "2026-09-14T07:38:18.905887+00:00",
-  "task_id": "tracker-preproduction-harden-20260914-v111a",
-  "daemon_version": "4.18.20",
-  "pid": 95852
-}
