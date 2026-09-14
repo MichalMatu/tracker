@@ -67,7 +67,7 @@ fun TelemetryBridgeScreen(
     val consumeAuthorizationResult: (AuthorizationResult) -> Unit = { result ->
         viewModel.onAuthorizationResult(
             token = result.accessToken,
-            grantedScopes = result.grantedScopes.mapTo(linkedSetOf()) { scope -> scope.scopeUri },
+            grantedScopes = result.grantedScopes.toSet(),
             runTestAfterAuthorization = pendingAction == AuthorizationUiAction.RUN_TEST,
         )
     }
@@ -226,7 +226,7 @@ private fun TelemetryBridgeContent(
             if (state.isBusy && state.isAuthorized) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(Dimens.IconMedium),
-                    strokeWidth = Dimens.PaddingExtraSmall / 2,
+                    strokeWidth = Dimens.PaddingExtraSmall / 2f,
                 )
             } else {
                 Text("Run Drive + Gmail test")

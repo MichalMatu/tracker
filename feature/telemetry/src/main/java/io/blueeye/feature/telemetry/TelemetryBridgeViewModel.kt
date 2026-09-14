@@ -41,7 +41,7 @@ data class TelemetryBridgeUiState(
 @HiltViewModel
 class TelemetryBridgeViewModel
     @Inject
-    constructor(
+    internal constructor(
         private val bridgeApi: GoogleWorkspaceBridgeApi,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(TelemetryBridgeUiState())
