@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-t0-extract-result-ids-20260914-v114m",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 300,
+  "idle_timeout": 180,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "commands": [
+    "set -eu; test \"$(git rev-parse HEAD)\" = \"a9e89bef5cf6cb3ec7300eeedb27803397ac1f78\"; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1; exit}'); test -n \"$SERIAL\"; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/t0-result-ids.xml >/dev/null; adb -s \"$SERIAL\" shell cat /sdcard/t0-result-ids.xml | python3 -c 'import sys,xml.etree.ElementTree as ET; r=ET.fromstring(sys.stdin.read()); texts=[n.attrib.get(\"text\",\"\") for n in r.iter() if n.attrib.get(\"text\")]; start=next((i for i,t in enumerate(texts) if t==\"Last T0 test\"),0); print(\"\\n\".join(texts[start:]))'"
+  ]
+}
