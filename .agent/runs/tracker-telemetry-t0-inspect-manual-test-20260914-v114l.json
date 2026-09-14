@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-telemetry-t0-inspect-manual-test-20260914-v114l",
+  "task_digest": "c2bb78e3c32daca08eb1893ae632a1de4601725b253ac2648b320d3cad426479",
+  "idle_timeout": 180,
+  "task_timeout": 600,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-14T13:16:16.645008+00:00",
+  "attempt_id": "9e563461159300f058e344ad",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 53262,
+  "updated_at": "2026-09-14T13:16:16.645081+00:00",
+  "pid": 53262
+}
