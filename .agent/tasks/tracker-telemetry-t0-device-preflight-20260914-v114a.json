@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-t0-device-preflight-20260914-v114a",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 4096,
+  "command_timeout": 2400,
+  "idle_timeout": 900,
+  "task_timeout": 3600,
+  "commands": [
+    "set -eu; export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"; test \"$(git rev-parse HEAD)\" = \"0fe28cc50c0cb2aab19af31aaf4a40a76aff3205\"; echo '--- ADB ---'; adb devices -l; SERIALS=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}'); COUNT=$(printf '%s\\n' \"$SERIALS\" | sed '/^$/d' | wc -l | tr -d ' '); test \"$COUNT\" = \"1\"; SERIAL=$(printf '%s\\n' \"$SERIALS\" | sed -n '1p'); echo \"serial=$SERIAL\"; adb -s \"$SERIAL\" shell getprop ro.product.manufacturer; adb -s \"$SERIAL\" shell getprop ro.product.model; adb -s \"$SERIAL\" shell getprop ro.build.version.release; echo '--- BUILD ---'; ./gradlew :app:assembleDebug --stacktrace; APK=app/build/outputs/apk/debug/app-debug.apk; test -f \"$APK\"; echo '--- APK ---'; if command -v apkanalyzer >/dev/null 2>&1; then PKG=$(apkanalyzer manifest application-id \"$APK\"); else PKG=$(find \"${ANDROID_HOME:-$HOME/Library/Android/sdk}\" -name aapt -type f | sort -V | tail -1 | xargs -I{} {} dump badging \"$APK\" | sed -n \"s/package: name='\\([^']*\\)'.*/\\1/p\"); fi; test -n \"$PKG\"; echo \"package=$PKG\"; echo '--- INSTALL ---'; adb -s \"$SERIAL\" install -r \"$APK\"; echo '--- LAUNCH ---'; adb -s \"$SERIAL\" shell monkey -p \"$PKG\" -c android.intent.category.LAUNCHER 1 >/dev/null; sleep 2; adb -s \"$SERIAL\" shell dumpsys package \"$PKG\" | grep -E 'versionName=|versionCode=' | head -5 || true; adb -s \"$SERIAL\" shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' | head -5 || true; echo '--- UI ---'; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/blueeye-window.xml >/dev/null 2>&1 || true; adb -s \"$SERIAL\" shell cat /sdcard/blueeye-window.xml 2>/dev/null | head -c 30000 || true"
+  ]
+}
