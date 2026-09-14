@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-auth-restore-build-jdk21-20260914-v114q",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "resources": [],
+  "command_timeout": 1200,
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 4096,
+  "commands": [
+    "set -eu; test \"$(git rev-parse HEAD)\" = \"4298788b081fb16c4237f7655b32f7a81c279723\"; export JAVA_HOME=$(/usr/libexec/java_home -v 21); export PATH=\"$JAVA_HOME/bin:$PATH\"; java -version; ./gradlew :feature:telemetry:compileDebugKotlin :feature:telemetry:ktlintCheck :feature:telemetry:detekt :feature:telemetry:testDebugUnitTest :app:assembleDebug"
+  ]
+}
