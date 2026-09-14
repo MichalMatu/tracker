@@ -1,0 +1,15 @@
+{
+  "id": "tracker-telemetry-t0-connect-google-20260914-v114d",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "feature/telemetry-ai-bridge",
+  "allow_write": false,
+  "resources": [],
+  "memory_limit_mb": 2048,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "commands": [
+    "set -eu; test \"$(git rev-parse HEAD)\" = \"0fe28cc50c0cb2aab19af31aaf4a40a76aff3205\"; SERIAL=$(adb devices | awk 'NR>1 && $2==\"device\" {print $1}' | head -1); test -n \"$SERIAL\"; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/blueeye-telemetry.xml >/dev/null; BOUNDS=$(adb -s \"$SERIAL\" shell cat /sdcard/blueeye-telemetry.xml | python3 -c 'import sys,xml.etree.ElementTree as ET; r=ET.fromstring(sys.stdin.read()); n=next((x for x in r.iter() if x.attrib.get(\"text\")==\"Connect Google account\"),None); assert n is not None, \"Connect button not found\"; print(n.attrib[\"bounds\"])'); XY=$(printf '%s' \"$BOUNDS\" | python3 -c 'import sys,re; a=list(map(int,re.findall(r\"\\d+\",sys.stdin.read()))); print((a[0]+a[2])//2,(a[1]+a[3])//2)'); set -- $XY; echo \"connect_bounds=$BOUNDS tap=$1,$2\"; adb -s \"$SERIAL\" shell input tap \"$1\" \"$2\"; sleep 2; echo '--- resumed ---'; adb -s \"$SERIAL\" shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' | head -5 || true; echo '--- auth UI ---'; adb -s \"$SERIAL\" shell uiautomator dump /sdcard/blueeye-auth.xml >/dev/null 2>&1 || true; adb -s \"$SERIAL\" shell cat /sdcard/blueeye-auth.xml 2>/dev/null | sed 's/></>\\n</g' | grep -E 'text=|content-desc=' | head -100 || true"
+  ]
+}
