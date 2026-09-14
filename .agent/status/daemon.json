@@ -2,8 +2,8 @@
   "version": 1,
   "daemon_version": "4.18.20",
   "state": "idle",
-  "pid": 19684,
-  "updated_at": "2026-09-14T14:54:49.894984+00:00",
+  "pid": 21133,
+  "updated_at": "2026-09-14T14:55:58.511100+00:00",
   "self_revision": "4255bd0ba13b7f14dec67f0bfe8d1def78f8a3c9",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -23,8 +23,7 @@
   "default_branch": "main",
   "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
   "execution_model": "multi_repository_worker",
-  "worker_pid": 19684,
-  "supervisor_pid": 19592,
-  "last_task_id": "tracker-adb-preflight-20260914-v114u",
+  "worker_pid": 21133,
+  "supervisor_pid": 21040,
   "execution_variant": "parallel"
 }
