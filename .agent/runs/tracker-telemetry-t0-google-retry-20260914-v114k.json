@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "tracker-telemetry-t0-google-retry-20260914-v114k",
+  "task_digest": "80da6e44e08dcb705f68bba6045ecbe70414d634d5129abc87bcc0afc7a909b2",
+  "idle_timeout": 300,
+  "task_timeout": 1200,
+  "memory_limit_mb": 2048,
+  "started_at": "2026-09-14T13:13:17.419157+00:00",
+  "attempt_id": "e0abfbcef41fc59d346afa05",
+  "daemon_version": "4.18.20",
+  "daemon_pid": 50936,
+  "updated_at": "2026-09-14T13:13:17.419252+00:00",
+  "pid": 50936
+}
