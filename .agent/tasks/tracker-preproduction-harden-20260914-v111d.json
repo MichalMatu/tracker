@@ -1,0 +1,14 @@
+{
+  "id": "tracker-preproduction-harden-20260914-v111d",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "command_timeout": 1800,
+  "idle_timeout": 900,
+  "task_timeout": 2400,
+  "commands": [
+    "set -eu; git fetch origin agent-control; git show origin/agent-control:.agent/scripts/tracker-preproduction-harden-v111d.sh > /tmp/tracker-preproduction-harden-v111d.sh; chmod +x /tmp/tracker-preproduction-harden-v111d.sh; bash /tmp/tracker-preproduction-harden-v111d.sh"
+  ]
+}
