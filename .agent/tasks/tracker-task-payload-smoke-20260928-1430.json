@@ -1,0 +1,15 @@
+{
+  "id": "tracker-task-payload-smoke-20260928-1430",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "resources": [],
+  "allow_write": false,
+  "work_branch": "main",
+  "commands": [
+    {
+      "payload_file": "tracker-task-payload-smoke-20260928-1430.payload/commands/001.sh"
+    }
+  ],
+  "command_timeout": 30,
+  "task_timeout": 120,
+  "memory_limit_mb": 256
+}

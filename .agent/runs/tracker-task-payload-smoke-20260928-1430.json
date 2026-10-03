@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "tracker-task-payload-smoke-20260928-1430",
+  "task_digest": "ed99f740d3ed4c23d9799e9725b80af07cbc4295a88ba5256151e540a4ae0ca4",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-09-28T12:32:54.234920+00:00",
+  "attempt_id": "0ab24cbe63a31418a5c52928",
+  "daemon_version": "4.19.2",
+  "daemon_pid": 87399,
+  "updated_at": "2026-09-28T12:32:54.832005+00:00",
+  "pid": 87399
+}

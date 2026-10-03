@@ -1,0 +1,59 @@
+{
+  "id": "tracker-task-payload-smoke-20260928-1430",
+  "status": "done",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "started_at": "2026-09-28T12:32:51.226288+00:00",
+  "command_timeout": 30,
+  "edits": {},
+  "commands": [
+    {
+      "command": "printf 'task-payload-transport-smoke-ok\\n'\n",
+      "exit_code": 0,
+      "output": "task-payload-transport-smoke-ok\n",
+      "elapsed_seconds": 0.139,
+      "timed_out": false,
+      "idle_timed_out": false,
+      "memory_limit_mb": 256,
+      "memory_limited": false,
+      "background_process_leak": false,
+      "peak_rss_mb": null,
+      "output_policy": "stream",
+      "captured_output_chars": 32,
+      "output_truncated": false,
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands"
+    }
+  ],
+  "verification": [],
+  "stages": [
+    {
+      "stage_name": "command-1",
+      "stage_index": 1,
+      "stage_total": 1,
+      "stage_phase": "commands",
+      "outcome": "passed",
+      "elapsed_seconds": 0.139
+    }
+  ],
+  "git_status": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.346
+  },
+  "git_diff": {
+    "exit_code": 0,
+    "output": "",
+    "elapsed_seconds": 0.207
+  },
+  "finished_at": "2026-09-28T12:32:54.234920+00:00",
+  "task_digest": "ed99f740d3ed4c23d9799e9725b80af07cbc4295a88ba5256151e540a4ae0ca4",
+  "idle_timeout": 300,
+  "task_timeout": 120,
+  "memory_limit_mb": 256,
+  "attempt_id": "0ab24cbe63a31418a5c52928",
+  "daemon_version": "4.19.2"
+}
