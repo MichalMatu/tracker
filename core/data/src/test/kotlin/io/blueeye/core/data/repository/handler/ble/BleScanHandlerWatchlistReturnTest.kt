@@ -51,6 +51,16 @@ class BleScanHandlerWatchlistReturnTest {
     private val alertDecisionEngine: AlertDecisionEngine = mock()
     private val autoActiveProbeCoordinator: AutoActiveProbeCoordinator = mock()
     private val alertEvidenceEventRecorder: AlertEvidenceEventRecorder = mock()
+    private val followMeAnalysisCoordinator =
+        FollowMeAnalysisCoordinator(
+            classifier = classifier,
+            followMeScoreCalculator = followMeScoreCalculator,
+            trackerAlertService = trackerAlertService,
+            diagnosticLogger = diagnosticLogger,
+            locationProvider = locationProvider,
+            sessionManager = sessionManager,
+            alertDecisionEngine = alertDecisionEngine,
+        )
 
     private val handler =
         BleScanHandler(
@@ -60,12 +70,7 @@ class BleScanHandlerWatchlistReturnTest {
             classifier = classifier,
             persister = persister,
             tacticalAlertService = tacticalAlertService,
-            followMeScoreCalculator = followMeScoreCalculator,
-            trackerAlertService = trackerAlertService,
-            diagnosticLogger = diagnosticLogger,
-            locationProvider = locationProvider,
-            sessionManager = sessionManager,
-            alertDecisionEngine = alertDecisionEngine,
+            followMeAnalysisCoordinator = followMeAnalysisCoordinator,
             autoActiveProbeCoordinator = autoActiveProbeCoordinator,
             alertEvidenceEventRecorder = alertEvidenceEventRecorder,
         )
