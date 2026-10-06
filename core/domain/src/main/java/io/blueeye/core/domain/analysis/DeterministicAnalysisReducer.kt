@@ -165,12 +165,18 @@ private object SignalReducer {
                     minimumRssi = bucketSamples.minOf(SignalSample::rssi),
                     maximumRssi = bucketSamples.maxOf(SignalSample::rssi),
                     averageRssi = rssiTotal.toDouble() / bucketSamples.size,
-                    usableLocationSampleCount = bucketSamples.count(::hasUsableLocation),
+                    usableLocationSampleCount =
+                        bucketSamples.count { sample ->
+                            locationState(sample) == LocationState.USABLE
+                        },
                 )
             }
 
     private fun locationQuality(samples: List<SignalSample>): AnalysisLocationQualitySummary {
-        val usable = samples.filter(::hasUsableLocation)
+        val usable =
+            samples.filter { sample ->
+                locationState(sample) == LocationState.USABLE
+            }
         val rejected = samples.count { sample -> locationState(sample) == LocationState.REJECTED }
         val missing = samples.count { sample -> locationState(sample) == LocationState.MISSING }
         val accuracies = usable.mapNotNull(SignalSample::locationAccuracy)
@@ -185,8 +191,6 @@ private object SignalReducer {
         )
     }
 
-    private fun hasUsableLocation(sample: SignalSample): Boolean = locationState(sample) == LocationState.USABLE
-
     private fun locationState(sample: SignalSample): LocationState {
         val latitude = sample.latitude
         val longitude = sample.longitude
@@ -194,7 +198,9 @@ private object SignalReducer {
 
         return when {
             latitude == null || longitude == null || accuracy == null -> LocationState.MISSING
-            isUsableLatitude(latitude) && isUsableLongitude(longitude) && isUsableAccuracy(accuracy) -> LocationState.USABLE
+            isUsableLatitude(latitude) &&
+                isUsableLongitude(longitude) &&
+                isUsableAccuracy(accuracy) -> LocationState.USABLE
             else -> LocationState.REJECTED
         }
     }
