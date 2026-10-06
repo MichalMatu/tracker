@@ -17,13 +17,13 @@ BlueEye reports observations and evidence. It does **not** claim to identify a p
 
 - Source of truth: `main`.
 - Phase 3 scanner/ingest field reacceptance: **closed / accepted**.
-- Compact Radar cards and lightweight Radar projection: accepted.
-- Details progressive disclosure and collapsed Technical Details: implemented.
-- Recent field work reduced false positives/protocol flooding and added the Live Nearby signal view.
-- Active product work: field validation, Radar/Details quality and the deterministic analysis pipeline.
-- Planned developer workstream: optional Drive + Gmail telemetry/AI feedback bridge.
+- Compact Radar, lightweight projection, decision-first Details, Live Nearby and the per-device sightings map are implemented on `main`.
+- A1 parser/data hardening, A2 Deterministic Analysis Reducer V1 and A3 Versioned Analysis Bundle V1 are closed on `main`.
+- Drive + Gmail T0 telemetry/AI developer bridge is implemented and accepted for debug use.
+- Physical S22+ validation for the latest Radar/Details/map runtime remains a **deferred device gate**; it is not treated as completed without a reachable wireless-ADB session.
+- A4 optional analyst work and T1+ production telemetry are future product/architecture decisions, not active implementation work.
 
-Current plans:
+Current references:
 
 - [UI/UX and analysis plan](docs/UI_UX_REDESIGN_PLAN.md)
 - [Telemetry & AI feedback bridge plan](docs/TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md)
