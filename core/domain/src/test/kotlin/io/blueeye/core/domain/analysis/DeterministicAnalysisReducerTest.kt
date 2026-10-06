@@ -93,7 +93,7 @@ class DeterministicAnalysisReducerTest {
         assertEquals(2, candidate.signal.sampleCount)
         assertEquals(2, candidate.signal.buckets.size)
         assertEquals(0L, candidate.signal.buckets[0].startedAt)
-        assertEquals(30_000L, candidate.signal.buckets[1].startedAt)
+        assertEquals(AnalysisReducerRulesV1.signalBucketMs, candidate.signal.buckets[1].startedAt)
         assertEquals(-70, candidate.signal.minRssi)
         assertEquals(-50, candidate.signal.maxRssi)
         assertEquals(-60.0, candidate.signal.averageRssi ?: 0.0, DOUBLE_DELTA)
@@ -157,7 +157,7 @@ class DeterministicAnalysisReducerTest {
 
         assertEquals(
             listOf("candidate-a", "other-device"),
-            candidate.identityRelations.map { it.candidateKey },
+            candidate.identityRelations.map { it.relatedLocalCandidateKey },
         )
         assertTrue(
             candidate.diagnostics.contradictions.contains(
@@ -261,7 +261,7 @@ class DeterministicAnalysisReducerTest {
     }
 
     @Test
-    fun `foreign device samples are excluded while legacy blank fingerprint samples remain usable`() {
+    fun `foreign and unscoped signal samples are excluded`() {
         val candidate =
             reduce(
                 signalSamples =
@@ -273,7 +273,7 @@ class DeterministicAnalysisReducerTest {
                 completeness = completeHistory(),
             )
 
-        assertEquals(2, candidate.signal.sampleCount)
+        assertEquals(1, candidate.signal.sampleCount)
     }
 
     private fun reduce(
