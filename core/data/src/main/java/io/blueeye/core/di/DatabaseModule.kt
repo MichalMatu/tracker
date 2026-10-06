@@ -35,7 +35,7 @@ object DatabaseModule {
             .addMigrations(migration13To14, migration14To15)
             .addMigrations(migration15To16, migration16To17, migration17To18, migration18To19)
             .addMigrations(migration19To20, migration20To21, migration21To22, migration22To23)
-            .fallbackToDestructiveMigration() // Na etapie developmentu
+            .fallbackToDestructiveMigrationFrom(*LEGACY_DESTRUCTIVE_MIGRATION_VERSIONS)
             .build()
     }
 
@@ -86,6 +86,11 @@ object DatabaseModule {
     private const val DATABASE_VERSION_21 = 21
     private const val DATABASE_VERSION_22 = 22
     private const val DATABASE_VERSION_23 = 23
+
+    // Pre-v13 schemas are legacy development builds. From v13 onward, a missing migration must
+    // fail closed instead of silently deleting field history.
+    private val LEGACY_DESTRUCTIVE_MIGRATION_VERSIONS =
+        IntArray(DATABASE_VERSION_13 - 1) { index -> index + 1 }
 
     private val migration13To14 =
         object : Migration(DATABASE_VERSION_13, DATABASE_VERSION_14) {
