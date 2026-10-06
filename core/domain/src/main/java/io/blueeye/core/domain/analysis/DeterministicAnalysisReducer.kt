@@ -71,7 +71,9 @@ object DeterministicAnalysisReducer {
                             input = input,
                             maxFollowMeScore = observations.movement.maxScore,
                             rejectedHighConfidenceIdentity =
-                                evidence.identityRelations.hasRejectedHighConfidenceRelation(),
+                                AnalysisEvidenceReducer.hasRejectedHighConfidenceRelation(
+                                    evidence.identityRelations,
+                                ),
                         ),
                     qualityFlags =
                         qualityFlags(
