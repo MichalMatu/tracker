@@ -17,6 +17,7 @@ import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.IdentityCarryoverVerdict
 import io.blueeye.core.model.RadarDeviceSummary
+import io.blueeye.core.model.SightingObservation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -81,6 +82,11 @@ constructor(
 
     override fun getSignalSamples(fingerprint: String): Flow<Result<List<io.blueeye.core.model.SignalSample>>> {
         return deviceHistoryDataSource.getSignalSamples(fingerprint)
+            .asResult()
+    }
+
+    override fun getSightings(fingerprint: String): Flow<Result<List<SightingObservation>>> {
+        return deviceHistoryDataSource.getSightings(fingerprint)
             .asResult()
     }
 
