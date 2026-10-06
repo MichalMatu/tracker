@@ -189,8 +189,7 @@ class DeterministicAnalysisReducerTest {
                                 timestamp = 1L,
                                 rssi = -60,
                                 accuracy = 10f,
-                                deviceFingerprint = "foreign-device",
-                            ),
+                            ).copy(deviceFingerprint = "foreign-device"),
                         ),
                     followMeHistory = emptyList(),
                     alertEvents =
@@ -269,12 +268,11 @@ class DeterministicAnalysisReducerTest {
         accuracy: Float?,
         latitude: Double? = 51.1,
         longitude: Double? = 17.0,
-        deviceFingerprint: String = CANDIDATE_KEY,
     ): SignalSample =
         SignalSample(
             timestamp = timestamp,
             rssi = rssi,
-            deviceFingerprint = deviceFingerprint,
+            deviceFingerprint = CANDIDATE_KEY,
             observedMac = "AA:BB:CC:DD:EE:FF",
             latitude = latitude,
             longitude = longitude,
