@@ -158,14 +158,14 @@ internal object AnalysisObservationReducer {
         current.encounterCount != previous.encounterCount ||
             current.timestamp - previous.timestamp > ENCOUNTER_SEGMENT_GAP_MS
 
-    private fun hasCoordinates(sample: SignalSample): Boolean =
-        sample.latitude != null && sample.longitude != null
-
     private fun hasUsableLocation(sample: SignalSample): Boolean {
-        val latitude = sample.latitude ?: return false
-        val longitude = sample.longitude ?: return false
-        val accuracy = sample.locationAccuracy ?: return false
-        return latitude.isFinite() &&
+        val latitude = sample.latitude
+        val longitude = sample.longitude
+        val accuracy = sample.locationAccuracy
+        return latitude != null &&
+            longitude != null &&
+            accuracy != null &&
+            latitude.isFinite() &&
             longitude.isFinite() &&
             accuracy.isFinite() &&
             latitude in MIN_LATITUDE..MAX_LATITUDE &&
@@ -173,13 +173,6 @@ internal object AnalysisObservationReducer {
             accuracy > MIN_LOCATION_ACCURACY_METERS &&
             accuracy <= MAX_LOCATION_ACCURACY_METERS
     }
-
-    private fun List<SignalSample>.averageRssi(): Double? =
-        if (isEmpty()) {
-            null
-        } else {
-            sumOf { it.rssi.toLong() }.toDouble() / size
-        }
 
     private fun bucketStart(timestamp: Long): Long =
         Math.floorDiv(timestamp, SIGNAL_BUCKET_MS) * SIGNAL_BUCKET_MS
@@ -202,3 +195,13 @@ internal object AnalysisObservationReducer {
     private const val MIN_LOCATION_ACCURACY_METERS = 0f
     private const val MAX_LOCATION_ACCURACY_METERS = 100f
 }
+
+private fun hasCoordinates(sample: SignalSample): Boolean =
+    sample.latitude != null && sample.longitude != null
+
+private fun List<SignalSample>.averageRssi(): Double? =
+    if (isEmpty()) {
+        null
+    } else {
+        sumOf { it.rssi.toLong() }.toDouble() / size
+    }
