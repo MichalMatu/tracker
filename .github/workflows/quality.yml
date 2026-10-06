@@ -40,9 +40,12 @@ jobs:
         run: ./gradlew --parallel --max-workers=3 qualityCheck --stacktrace
 
       # Keep this in the same job so compilation/configuration caches from the
-      # quality gate remain hot for the APK build.
+      # quality gate remain hot for the APK builds.
       - name: Build debug APK
         run: ./gradlew --parallel --max-workers=3 :app:assembleDebug --stacktrace
+
+      - name: Smoke-test release configuration
+        run: ./gradlew --parallel --max-workers=3 :app:assembleRelease --stacktrace
 
       - name: Package exact source snapshot
         if: always()
