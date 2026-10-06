@@ -20,7 +20,7 @@ data class AnalysisCandidateV1(
     val localAssessment: AnalysisLocalAssessmentV1,
     val signal: AnalysisSignalSummaryV1,
     val followMe: AnalysisFollowMeSummaryV1,
-    val identityRelations: List<AnalysisIdentityRelationV1>,
+    val identity: AnalysisIdentitySummaryV1,
     val diagnostics: AnalysisDiagnosticsV1,
 )
 
@@ -44,6 +44,7 @@ data class AnalysisSignalSummaryV1(
     val minRssi: Int?,
     val maxRssi: Int?,
     val averageRssi: Double?,
+    val totalBucketCount: Int,
     val buckets: List<AnalysisSignalBucketV1>,
     val locationQuality: AnalysisLocationQualityV1,
 )
@@ -73,6 +74,11 @@ data class AnalysisFollowMeSummaryV1(
     val baselineObservationCount: Int,
 )
 
+data class AnalysisIdentitySummaryV1(
+    val totalRelationCount: Int,
+    val relations: List<AnalysisIdentityRelationV1>,
+)
+
 data class AnalysisIdentityRelationV1(
     val relatedLocalCandidateKey: String,
     val timestamp: Long,
@@ -100,6 +106,8 @@ data class AnalysisDiagnosticsV1(
 enum class AnalysisQualityFlagV1 {
     NO_SIGNAL_SAMPLES,
     OUT_OF_SCOPE_SIGNAL_SAMPLES_DROPPED,
+    SIGNAL_BUCKETS_TRUNCATED,
+    IDENTITY_RELATIONS_TRUNCATED,
     NO_LOCATION_DATA,
     POOR_LOCATION_QUALITY,
     SIGNAL_HISTORY_INCOMPLETE,
