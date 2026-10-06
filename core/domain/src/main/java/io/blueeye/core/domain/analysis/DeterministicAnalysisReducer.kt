@@ -2,6 +2,7 @@ package io.blueeye.core.domain.analysis
 
 import io.blueeye.core.model.AlertEvidenceEvent
 import io.blueeye.core.model.AlertEvidenceEventType
+import io.blueeye.core.model.DetectionConfidence
 import io.blueeye.core.model.DetectionEvidence
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceCalibrationLabel
@@ -28,6 +29,13 @@ data class AnalysisHistoryCompleteness(
     val followMeHistoryComplete: Boolean = false,
     val identityHistoryComplete: Boolean = false,
 )
+
+object AnalysisReducerRulesV1 {
+    const val reducerVersion = 1
+    const val signalBucketMs = 30_000L
+    const val maxLocationAccuracyMeters = 100f
+    const val maxRepresentativeEvidence = 8
+}
 
 data class AnalysisReducerInputV1(
     val device: Device,
@@ -75,7 +83,7 @@ object DeterministicAnalysisReducer {
             )
 
         return AnalysisCandidateV1(
-            candidateKey = device.fingerprint,
+            localCandidateKey = device.fingerprint,
             window =
                 AnalysisWindowV1(
                     firstSeenAt = device.firstSeenAt,
@@ -104,9 +112,7 @@ object DeterministicAnalysisReducer {
     ): List<SignalSample> =
         samples
             .asSequence()
-            .filter { sample ->
-                sample.deviceFingerprint.isBlank() || sample.deviceFingerprint == fingerprint
-            }
+            .filter { sample -> sample.deviceFingerprint == fingerprint }
             .distinct()
             .sortedWith(SIGNAL_ORDER)
             .toList()
@@ -135,7 +141,7 @@ object DeterministicAnalysisReducer {
             .sortedWith(IDENTITY_ORDER)
             .map { candidate ->
                 AnalysisIdentityRelationV1(
-                    candidateKey =
+                    relatedLocalCandidateKey =
                         if (candidate.deviceFingerprint == fingerprint) {
                             candidate.candidateFingerprint
                         } else {
@@ -281,26 +287,25 @@ private object AnalysisSignalReducer {
             latitude in Rules.minLatitude..Rules.maxLatitude &&
             longitude in Rules.minLongitude..Rules.maxLongitude &&
             accuracy > Rules.minAccuracyMeters &&
-            accuracy <= Rules.maxAccuracyMeters
+            accuracy <= AnalysisReducerRulesV1.maxLocationAccuracyMeters
     }
 
     private fun bucketStart(timestamp: Long): Long =
-        Math.floorDiv(timestamp, Rules.signalBucketMs) * Rules.signalBucketMs
+        Math.floorDiv(timestamp, AnalysisReducerRulesV1.signalBucketMs) * AnalysisReducerRulesV1.signalBucketMs
 
     private fun List<SignalSample>.averageRssi(): Double? =
-        takeIf(List<SignalSample>::isNotEmpty)
-            ?.let { values ->
-                values.sumOf { it.rssi.toLong() }.toDouble() / values.size
-            }
+        if (isEmpty()) {
+            null
+        } else {
+            sumOf { it.rssi.toLong() }.toDouble() / size
+        }
 
     private object Rules {
-        const val signalBucketMs = 30_000L
         const val minLatitude = -90.0
         const val maxLatitude = 90.0
         const val minLongitude = -180.0
         const val maxLongitude = 180.0
         const val minAccuracyMeters = 0f
-        const val maxAccuracyMeters = 100f
     }
 }
 
@@ -322,7 +327,7 @@ private object AnalysisEvidenceReducer {
         return candidates
             .sortedWith(EVIDENCE_ORDER)
             .distinctBy(EvidenceCandidate::dedupeKey)
-            .take(MAX_REPRESENTATIVE_EVIDENCE)
+            .take(AnalysisReducerRulesV1.maxRepresentativeEvidence)
             .map(EvidenceCandidate::toSummary)
     }
 
@@ -346,7 +351,7 @@ private object AnalysisEvidenceReducer {
         )
 
     private val EVIDENCE_ORDER =
-        compareByDescending<EvidenceCandidate> { it.evidence.confidence.ordinal }
+        compareByDescending<EvidenceCandidate> { confidenceRank(it.evidence.confidence) }
             .thenByDescending { it.evidence.timestamp }
             .thenByDescending { it.eventType != null }
             .thenBy { it.evidence.source.name }
@@ -354,7 +359,13 @@ private object AnalysisEvidenceReducer {
             .thenBy { it.evidence.reasonText }
             .thenBy { it.eventType?.name.orEmpty() }
 
-    private const val MAX_REPRESENTATIVE_EVIDENCE = 8
+    private fun confidenceRank(confidence: DetectionConfidence): Int =
+        when (confidence) {
+            DetectionConfidence.CRITICAL -> 4
+            DetectionConfidence.HIGH -> 3
+            DetectionConfidence.MEDIUM -> 2
+            DetectionConfidence.LOW -> 1
+        }
 }
 
 private data class EvidenceCandidate(
