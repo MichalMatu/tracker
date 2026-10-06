@@ -25,9 +25,9 @@ import org.maplibre.android.MapLibre
 import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
-import kotlin.math.abs
 
 @Composable
 internal fun DetailsSightingsMapView(
@@ -42,95 +42,44 @@ internal fun DetailsSightingsMapView(
     val mapView =
         remember(context) {
             MapLibre.getInstance(context.applicationContext)
-            MapView(context).apply {
-                onCreate(null)
-            }
+            MapView(context).apply { onCreate(null) }
         }
 
     DisposableEffect(mapView, lifecycleOwner) {
-        var started = false
-        var resumed = false
-        var destroyed = false
-
-        fun pauseIfNeeded() {
-            if (resumed) {
-                mapView.onPause()
-                resumed = false
-            }
-        }
-
-        fun stopIfNeeded() {
-            if (started) {
-                mapView.onStop()
-                started = false
-            }
-        }
-
-        fun destroyIfNeeded() {
-            if (!destroyed) {
-                mapView.onDestroy()
-                destroyed = true
-            }
-        }
+        val lifecycleController = MapViewLifecycleController(mapView)
+        var disposed = false
 
         val failureListener =
             MapView.OnDidFailLoadingMapListener { message ->
-                loadError = message.ifBlank { "Map tiles could not be loaded." }
+                if (!disposed) {
+                    loadError = message.ifBlank { "Map tiles could not be loaded." }
+                }
             }
         mapView.addOnDidFailLoadingMapListener(failureListener)
 
         val observer =
             LifecycleEventObserver { _, event ->
-                when (event) {
-                    Lifecycle.Event.ON_START -> {
-                        if (!started) {
-                            mapView.onStart()
-                            started = true
-                        }
-                    }
-
-                    Lifecycle.Event.ON_RESUME -> {
-                        if (!resumed) {
-                            mapView.onResume()
-                            resumed = true
-                        }
-                    }
-
-                    Lifecycle.Event.ON_PAUSE -> pauseIfNeeded()
-                    Lifecycle.Event.ON_STOP -> stopIfNeeded()
-                    Lifecycle.Event.ON_DESTROY -> {
-                        pauseIfNeeded()
-                        stopIfNeeded()
-                        destroyIfNeeded()
-                    }
-
-                    else -> Unit
-                }
+                lifecycleController.onEvent(event)
             }
-
         lifecycleOwner.lifecycle.addObserver(observer)
-        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-            mapView.onStart()
-            started = true
-        }
-        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            mapView.onResume()
-            resumed = true
-        }
+        lifecycleController.sync(lifecycleOwner.lifecycle.currentState)
 
         mapView.getMapAsync { mapLibreMap ->
-            mapLibreMap.setStyle(OPEN_FREE_MAP_STYLE_URL) {
-                loadError = null
-                map = mapLibreMap
+            if (!disposed) {
+                mapLibreMap.setStyle(MapConfig.styleUrl) {
+                    if (!disposed) {
+                        loadError = null
+                        map = mapLibreMap
+                    }
+                }
             }
         }
 
         onDispose {
+            disposed = true
             lifecycleOwner.lifecycle.removeObserver(observer)
             mapView.removeOnDidFailLoadingMapListener(failureListener)
-            pauseIfNeeded()
-            stopIfNeeded()
-            destroyIfNeeded()
+            lifecycleController.dispose()
             map = null
         }
     }
@@ -148,7 +97,7 @@ internal fun DetailsSightingsMapView(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(MAP_HEIGHT_DP.dp),
+                .height(MapConfig.heightDp.dp),
         contentAlignment = Alignment.Center,
     ) {
         AndroidView(
@@ -165,23 +114,112 @@ internal fun DetailsSightingsMapView(
     }
 }
 
+private class MapViewLifecycleController(
+    private val mapView: MapView,
+) {
+    private var started = false
+    private var resumed = false
+    private var destroyed = false
+
+    fun sync(state: Lifecycle.State) {
+        if (state.isAtLeast(Lifecycle.State.STARTED)) {
+            start()
+        }
+        if (state.isAtLeast(Lifecycle.State.RESUMED)) {
+            resume()
+        }
+    }
+
+    fun onEvent(event: Lifecycle.Event) {
+        when (event) {
+            Lifecycle.Event.ON_START -> start()
+            Lifecycle.Event.ON_RESUME -> resume()
+            Lifecycle.Event.ON_PAUSE -> pause()
+            Lifecycle.Event.ON_STOP -> stop()
+            Lifecycle.Event.ON_DESTROY -> dispose()
+            else -> Unit
+        }
+    }
+
+    fun dispose() {
+        pause()
+        stop()
+        if (!destroyed) {
+            mapView.onDestroy()
+            destroyed = true
+        }
+    }
+
+    private fun start() {
+        if (!started && !destroyed) {
+            mapView.onStart()
+            started = true
+        }
+    }
+
+    private fun resume() {
+        if (!resumed && !destroyed) {
+            mapView.onResume()
+            resumed = true
+        }
+    }
+
+    private fun pause() {
+        if (resumed) {
+            mapView.onPause()
+            resumed = false
+        }
+    }
+
+    private fun stop() {
+        if (started) {
+            mapView.onStop()
+            started = false
+        }
+    }
+}
+
 @Suppress("DEPRECATION")
 private fun renderSightings(
     map: MapLibreMap,
     clusters: List<DetailsSightingCluster>,
 ) {
     map.clear()
-    clusters.forEach { cluster ->
-        map.addMarker(
-            MarkerOptions()
-                .position(LatLng(cluster.latitude, cluster.longitude))
-                .title(clusterTitle(cluster))
-                .snippet(clusterSnippet(cluster)),
-        )
-    }
+    val points =
+        clusters.map { cluster ->
+            LatLng(cluster.latitude, cluster.longitude).also { point ->
+                map.addMarker(
+                    MarkerOptions()
+                        .position(point)
+                        .title(clusterTitle(cluster))
+                        .snippet(clusterSnippet(cluster)),
+                )
+            }
+        }
 
-    if (clusters.isNotEmpty()) {
-        map.cameraPosition = cameraPositionFor(clusters)
+    when (points.size) {
+        0 -> Unit
+        1 ->
+            map.cameraPosition =
+                CameraPosition.Builder()
+                    .target(points.single())
+                    .zoom(MapConfig.singlePointZoom)
+                    .build()
+        else -> fitCameraToPoints(map, points)
+    }
+}
+
+private fun fitCameraToPoints(
+    map: MapLibreMap,
+    points: List<LatLng>,
+) {
+    val boundsBuilder = LatLngBounds.Builder()
+    points.forEach(boundsBuilder::include)
+    map.getCameraForLatLngBounds(
+        boundsBuilder.build(),
+        Array(CAMERA_PADDING_SIDES) { MapConfig.cameraPaddingPx },
+    )?.let { camera ->
+        map.cameraPosition = camera
     }
 }
 
@@ -196,43 +234,11 @@ private fun clusterSnippet(cluster: DetailsSightingCluster): String =
     "GPS accuracy ${cluster.bestAccuracyMeters.toInt()}–${cluster.worstAccuracyMeters.toInt()} m · " +
         "avg RSSI ${cluster.averageRssi.toInt()} dBm"
 
-private fun cameraPositionFor(clusters: List<DetailsSightingCluster>): CameraPosition {
-    val centerLatitude = clusters.map(DetailsSightingCluster::latitude).average()
-    val centerLongitude = clusters.map(DetailsSightingCluster::longitude).average()
-    val latitudeSpan =
-        clusters.maxOf(DetailsSightingCluster::latitude) -
-            clusters.minOf(DetailsSightingCluster::latitude)
-    val longitudeSpan =
-        clusters.maxOf(DetailsSightingCluster::longitude) -
-            clusters.minOf(DetailsSightingCluster::longitude)
-    val span = maxOf(abs(latitudeSpan), abs(longitudeSpan))
-
-    return CameraPosition.Builder()
-        .target(LatLng(centerLatitude, centerLongitude))
-        .zoom(zoomForSpan(span))
-        .build()
+private object MapConfig {
+    const val styleUrl = "https://tiles.openfreemap.org/styles/liberty"
+    const val heightDp = 280
+    const val singlePointZoom = 16.0
+    const val cameraPaddingPx = 48
 }
 
-private fun zoomForSpan(spanDegrees: Double): Double =
-    when {
-        spanDegrees <= VERY_CLOSE_SPAN_DEGREES -> VERY_CLOSE_ZOOM
-        spanDegrees <= NEARBY_SPAN_DEGREES -> NEARBY_ZOOM
-        spanDegrees <= LOCAL_SPAN_DEGREES -> LOCAL_ZOOM
-        spanDegrees <= CITY_SPAN_DEGREES -> CITY_ZOOM
-        spanDegrees <= REGIONAL_SPAN_DEGREES -> REGIONAL_ZOOM
-        else -> WIDE_ZOOM
-    }
-
-private const val OPEN_FREE_MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty"
-private const val MAP_HEIGHT_DP = 280
-private const val VERY_CLOSE_SPAN_DEGREES = 0.002
-private const val NEARBY_SPAN_DEGREES = 0.01
-private const val LOCAL_SPAN_DEGREES = 0.05
-private const val CITY_SPAN_DEGREES = 0.2
-private const val REGIONAL_SPAN_DEGREES = 1.0
-private const val VERY_CLOSE_ZOOM = 16.0
-private const val NEARBY_ZOOM = 14.0
-private const val LOCAL_ZOOM = 12.0
-private const val CITY_ZOOM = 10.0
-private const val REGIONAL_ZOOM = 8.0
-private const val WIDE_ZOOM = 5.0
+private const val CAMERA_PADDING_SIDES = 4
