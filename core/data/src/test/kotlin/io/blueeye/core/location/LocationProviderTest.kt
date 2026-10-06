@@ -18,7 +18,7 @@ class LocationProviderTest {
             whenever(context.getSystemService(Context.LOCATION_SERVICE)).thenReturn(null)
             val staleLocation =
                 mock<Location>().also { location ->
-                    whenever(location.time).thenReturn(System.currentTimeMillis() - 20_000L)
+                    whenever(location.time).thenReturn(System.currentTimeMillis() - STALE_AGE_MS)
                 }
             val provider =
                 object : LocationProvider(context) {
@@ -34,10 +34,10 @@ class LocationProviderTest {
             whenever(context.getSystemService(Context.LOCATION_SERVICE)).thenReturn(null)
             val recentLocation =
                 mock<Location>().also { location ->
-                    whenever(location.time).thenReturn(System.currentTimeMillis() - 1_000L)
-                    whenever(location.latitude).thenReturn(51.1079)
-                    whenever(location.longitude).thenReturn(17.0385)
-                    whenever(location.accuracy).thenReturn(5f)
+                    whenever(location.time).thenReturn(System.currentTimeMillis() - RECENT_AGE_MS)
+                    whenever(location.latitude).thenReturn(LATITUDE)
+                    whenever(location.longitude).thenReturn(LONGITUDE)
+                    whenever(location.accuracy).thenReturn(ACCURACY_METERS)
                 }
             val provider =
                 object : LocationProvider(context) {
@@ -45,8 +45,16 @@ class LocationProviderTest {
                 }
 
             assertEquals(
-                Triple<Double?, Double?, Float?>(51.1079, 17.0385, 5f),
+                Triple<Double?, Double?, Float?>(LATITUDE, LONGITUDE, ACCURACY_METERS),
                 provider.getFreshCoordinates(),
             )
         }
+
+    private companion object {
+        const val STALE_AGE_MS = 20_000L
+        const val RECENT_AGE_MS = 1_000L
+        const val LATITUDE = 51.1079
+        const val LONGITUDE = 17.0385
+        const val ACCURACY_METERS = 5f
+    }
 }
