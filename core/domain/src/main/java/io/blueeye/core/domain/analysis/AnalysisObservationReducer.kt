@@ -11,7 +11,6 @@ import io.blueeye.core.model.analysis.AnalysisMovementSummaryV1
 import io.blueeye.core.model.analysis.AnalysisRssiSummaryV1
 import io.blueeye.core.model.analysis.AnalysisSignalBucketV1
 import io.blueeye.core.model.analysis.AnalysisSignalSummaryV1
-import kotlin.math.floor
 
 internal object AnalysisObservationReducer {
     fun signal(samples: List<SignalSample>): AnalysisSignalSummaryV1 {
@@ -183,7 +182,7 @@ internal object AnalysisObservationReducer {
         }
 
     private fun bucketStart(timestamp: Long): Long =
-        floor(timestamp.toDouble() / SIGNAL_BUCKET_MS).toLong() * SIGNAL_BUCKET_MS
+        Math.floorDiv(timestamp, SIGNAL_BUCKET_MS) * SIGNAL_BUCKET_MS
 
     private data class AnalysisSignalIdentity(
         val timestamp: Long,
