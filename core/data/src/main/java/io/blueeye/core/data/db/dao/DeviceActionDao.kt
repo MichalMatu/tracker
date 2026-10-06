@@ -10,7 +10,7 @@ import io.blueeye.core.data.db.entity.WatchlistEntity
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.IdentityCarryoverVerdict
 
-internal class DeviceCalibrationUpdate(
+class DeviceCalibrationUpdate(
     val fingerprint: String,
 ) {
     var userAlias: String? = null
