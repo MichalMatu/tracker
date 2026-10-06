@@ -34,7 +34,6 @@ class DeviceHistoryDataSource @Inject constructor(
         signalSampleDao.getSightingsForDevice(fingerprint)
             .map { projections -> projections.toSightingObservations() }
 
-
     fun getFollowMeHistory(fingerprint: String): Flow<List<FollowMeHistorySample>> =
         followMeObservationDao.getRecentForDevice(fingerprint)
             .map { entities -> entities.toFollowMeHistoryDomain() }
