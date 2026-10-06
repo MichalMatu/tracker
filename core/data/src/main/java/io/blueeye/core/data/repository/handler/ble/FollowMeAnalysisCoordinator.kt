@@ -31,6 +31,7 @@ import javax.inject.Singleton
  * without coupling the rest of BLE ingest to the Follow-Me implementation.
  */
 @Singleton
+@Suppress("LongParameterList")
 internal class FollowMeAnalysisCoordinator @Inject constructor(
     private val classifier: ScanResultClassifier,
     private val followMeScoreCalculator: FollowMeScoreCalculator,
