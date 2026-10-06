@@ -37,9 +37,8 @@ object AnalysisBundleBuilder {
         require(startedAt <= endedAt) { "session range must be ordered" }
 
         val canonicalCandidates = candidates.sortedBy(AnalysisCandidate::deviceFingerprint)
-        requireUniqueFingerprints(canonicalCandidates)
-        requireFiniteValues(canonicalCandidates)
-        val aliases = buildAliases(canonicalCandidates)
+        AnalysisBundleValidator.validate(canonicalCandidates)
+        val aliases = AnalysisBundleAliasFactory.build(canonicalCandidates)
 
         return AnalysisBundleV1(
             session =
@@ -49,8 +48,18 @@ object AnalysisBundleBuilder {
                     endedAt = endedAt,
                     candidateCount = canonicalCandidates.size,
                 ),
-            candidates = canonicalCandidates.map { candidate -> candidate.toBundle(aliases) },
+            candidates =
+                canonicalCandidates.map { candidate ->
+                    AnalysisBundleCandidateMapper.map(candidate, aliases)
+                },
         )
+    }
+}
+
+private object AnalysisBundleValidator {
+    fun validate(candidates: List<AnalysisCandidate>) {
+        requireUniqueFingerprints(candidates)
+        requireFiniteValues(candidates)
     }
 
     private fun requireUniqueFingerprints(candidates: List<AnalysisCandidate>) {
@@ -85,8 +94,10 @@ object AnalysisBundleBuilder {
             }
         }
     }
+}
 
-    private fun buildAliases(candidates: List<AnalysisCandidate>): Map<String, String> {
+private object AnalysisBundleAliasFactory {
+    fun build(candidates: List<AnalysisCandidate>): Map<String, String> {
         val primaryFingerprints =
             candidates
                 .map(AnalysisCandidate::deviceFingerprint)
@@ -119,28 +130,38 @@ object AnalysisBundleBuilder {
     ): String =
         "$prefix-${(zeroBasedIndex + 1).toString().padStart(ALIAS_DIGITS, '0')}"
 
-    private fun AnalysisCandidate.toBundle(aliases: Map<String, String>): AnalysisBundleCandidateV1 =
+    private const val CANDIDATE_ALIAS_PREFIX = "candidate"
+    private const val IDENTITY_ALIAS_PREFIX = "identity"
+    private const val ALIAS_DIGITS = 3
+}
+
+private object AnalysisBundleCandidateMapper {
+    fun map(
+        candidate: AnalysisCandidate,
+        aliases: Map<String, String>,
+    ): AnalysisBundleCandidateV1 =
         AnalysisBundleCandidateV1(
-            candidateId = aliases.getValue(deviceFingerprint),
+            candidateId = aliases.getValue(candidate.deviceFingerprint),
             localVerdict =
                 AnalysisBundleLocalVerdictV1(
-                    trackingStatus = trackingStatus.name,
-                    followingScore = followingScore,
+                    trackingStatus = candidate.trackingStatus.name,
+                    followingScore = candidate.followingScore,
                 ),
-            signal = signal.toBundle(),
-            timeBuckets = toBundleTimeBuckets(),
-            locationQuality = toBundleLocationQuality(),
-            movement = toBundleMovement(),
-            encounters = toBundleEncounters(),
-            identityCandidates = toBundleIdentityCandidates(aliases),
-            representativeEvidence = toBundleEvidence(),
-            omittedActiveEvidenceCount = representativeEvidence.count(::isActiveProbeEvidence),
-            qualityFlags = qualityFlags.map { it.name }.distinct().sorted(),
-            contradictions = toBundleContradictions(aliases),
+            signal = signal(candidate.signal),
+            timeBuckets = timeBuckets(candidate),
+            locationQuality = locationQuality(candidate),
+            movement = movement(candidate),
+            encounters = encounters(candidate),
+            identityCandidates = identityCandidates(candidate, aliases),
+            representativeEvidence = AnalysisBundleEvidenceMapper.map(candidate),
+            omittedActiveEvidenceCount =
+                candidate.representativeEvidence.count(AnalysisBundleEvidenceMapper::isActive),
+            qualityFlags = candidate.qualityFlags.map { it.name }.distinct().sorted(),
+            contradictions = contradictions(candidate, aliases),
         )
 
-    private fun AnalysisCandidate.toBundleTimeBuckets(): List<AnalysisBundleTimeBucketV1> =
-        timeBuckets
+    private fun timeBuckets(candidate: AnalysisCandidate): List<AnalysisBundleTimeBucketV1> =
+        candidate.timeBuckets
             .sortedWith(
                 compareBy(
                     { it.startTimestamp },
@@ -161,24 +182,24 @@ object AnalysisBundleBuilder {
                 )
             }
 
-    private fun AnalysisCandidate.toBundleLocationQuality(): AnalysisBundleLocationQualityV1 =
+    private fun locationQuality(candidate: AnalysisCandidate): AnalysisBundleLocationQualityV1 =
         AnalysisBundleLocationQualityV1(
-            totalSampleCount = locationQuality.totalSampleCount,
-            usableSampleCount = locationQuality.usableSampleCount,
-            rejectedSampleCount = locationQuality.rejectedSampleCount,
-            missingSampleCount = locationQuality.missingSampleCount,
-            bestAccuracyMeters = locationQuality.bestAccuracyMeters,
-            worstUsableAccuracyMeters = locationQuality.worstUsableAccuracyMeters,
+            totalSampleCount = candidate.locationQuality.totalSampleCount,
+            usableSampleCount = candidate.locationQuality.usableSampleCount,
+            rejectedSampleCount = candidate.locationQuality.rejectedSampleCount,
+            missingSampleCount = candidate.locationQuality.missingSampleCount,
+            bestAccuracyMeters = candidate.locationQuality.bestAccuracyMeters,
+            worstUsableAccuracyMeters = candidate.locationQuality.worstUsableAccuracyMeters,
         )
 
-    private fun AnalysisCandidate.toBundleMovement(): AnalysisBundleMovementV1 =
+    private fun movement(candidate: AnalysisCandidate): AnalysisBundleMovementV1 =
         AnalysisBundleMovementV1(
-            sampleCount = movement.sampleCount,
-            movingSampleCount = movement.movingSampleCount,
-            stationarySampleCount = movement.stationarySampleCount,
-            unknownSampleCount = movement.unknownSampleCount,
+            sampleCount = candidate.movement.sampleCount,
+            movingSampleCount = candidate.movement.movingSampleCount,
+            stationarySampleCount = candidate.movement.stationarySampleCount,
+            unknownSampleCount = candidate.movement.unknownSampleCount,
             segments =
-                movement.segments
+                candidate.movement.segments
                     .sortedWith(
                         compareBy(
                             { it.startTimestamp },
@@ -196,21 +217,22 @@ object AnalysisBundleBuilder {
                     },
         )
 
-    private fun AnalysisCandidate.toBundleEncounters(): AnalysisBundleEncounterV1 =
+    private fun encounters(candidate: AnalysisCandidate): AnalysisBundleEncounterV1 =
         AnalysisBundleEncounterV1(
-            historySampleCount = encounters.historySampleCount,
-            firstObservedAt = encounters.firstObservedAt,
-            lastObservedAt = encounters.lastObservedAt,
-            maxEncounterCount = encounters.maxEncounterCount,
-            peakScore = encounters.peakScore,
-            peakTrackingStatus = encounters.peakTrackingStatus?.name,
-            distinctObservedMacCount = encounters.distinctObservedMacCount,
+            historySampleCount = candidate.encounters.historySampleCount,
+            firstObservedAt = candidate.encounters.firstObservedAt,
+            lastObservedAt = candidate.encounters.lastObservedAt,
+            maxEncounterCount = candidate.encounters.maxEncounterCount,
+            peakScore = candidate.encounters.peakScore,
+            peakTrackingStatus = candidate.encounters.peakTrackingStatus?.name,
+            distinctObservedMacCount = candidate.encounters.distinctObservedMacCount,
         )
 
-    private fun AnalysisCandidate.toBundleIdentityCandidates(
+    private fun identityCandidates(
+        candidate: AnalysisCandidate,
         aliases: Map<String, String>,
     ): List<AnalysisBundleIdentityCandidateV1> =
-        identityCandidates
+        candidate.identityCandidates
             .map { identity ->
                 AnalysisBundleIdentityCandidateV1(
                     relatedCandidateId = aliases.getValue(identity.candidateFingerprint),
@@ -232,17 +254,11 @@ object AnalysisBundleBuilder {
                 ),
             )
 
-    private fun AnalysisCandidate.toBundleEvidence(): List<AnalysisBundleEvidenceV1> =
-        representativeEvidence
-            .filterNot(::isActiveProbeEvidence)
-            .sortedWith(EVIDENCE_ORDER)
-            .map { evidence -> evidence.toBundle() }
-            .distinct()
-
-    private fun AnalysisCandidate.toBundleContradictions(
+    private fun contradictions(
+        candidate: AnalysisCandidate,
         aliases: Map<String, String>,
     ): List<AnalysisBundleContradictionV1> =
-        contradictions
+        candidate.contradictions
             .map { contradiction ->
                 AnalysisBundleContradictionV1(
                     type = contradiction.type.name,
@@ -258,40 +274,49 @@ object AnalysisBundleBuilder {
                 ),
             )
 
-    private fun AnalysisSignalSummary.toBundle(): AnalysisBundleSignalV1 =
+    private fun signal(summary: AnalysisSignalSummary): AnalysisBundleSignalV1 =
         AnalysisBundleSignalV1(
-            sourceSampleCount = sourceSampleCount,
-            reducedSampleCount = reducedSampleCount,
-            duplicateSampleCount = duplicateSampleCount,
-            firstObservedAt = firstObservedAt,
-            lastObservedAt = lastObservedAt,
+            sourceSampleCount = summary.sourceSampleCount,
+            reducedSampleCount = summary.reducedSampleCount,
+            duplicateSampleCount = summary.duplicateSampleCount,
+            firstObservedAt = summary.firstObservedAt,
+            lastObservedAt = summary.lastObservedAt,
             rssi =
-                rssi?.let { summary ->
+                summary.rssi?.let { rssi ->
                     AnalysisBundleRssiV1(
-                        sampleCount = summary.sampleCount,
-                        minimum = summary.minimum,
-                        maximum = summary.maximum,
-                        average = summary.average,
-                        median = summary.median,
+                        sampleCount = rssi.sampleCount,
+                        minimum = rssi.minimum,
+                        maximum = rssi.maximum,
+                        average = rssi.average,
+                        median = rssi.median,
                     )
                 },
         )
+}
 
-    private fun AnalysisEvidenceSummary.toBundle(): AnalysisBundleEvidenceV1 =
-        AnalysisBundleEvidenceV1(
-            source = source.name,
-            confidence = confidence.name,
-            timestamp = timestamp,
-            isPassive = isPassive,
-            provenance = provenance.name,
-            alertEventType = alertEventType?.name,
-        )
+private object AnalysisBundleEvidenceMapper {
+    fun map(candidate: AnalysisCandidate): List<AnalysisBundleEvidenceV1> =
+        candidate.representativeEvidence
+            .filterNot(::isActive)
+            .sortedWith(EVIDENCE_ORDER)
+            .map { evidence -> toBundle(evidence) }
+            .distinct()
 
-    private fun isActiveProbeEvidence(evidence: AnalysisEvidenceSummary): Boolean =
+    fun isActive(evidence: AnalysisEvidenceSummary): Boolean =
         evidence.source == EvidenceSource.GATT_PROBE ||
             evidence.source == EvidenceSource.RFCOMM_PROBE ||
             evidence.provenance == EvidenceProvenance.ACTIVE_GATT ||
             evidence.provenance == EvidenceProvenance.ACTIVE_RFCOMM
+
+    private fun toBundle(evidence: AnalysisEvidenceSummary): AnalysisBundleEvidenceV1 =
+        AnalysisBundleEvidenceV1(
+            source = evidence.source.name,
+            confidence = evidence.confidence.name,
+            timestamp = evidence.timestamp,
+            isPassive = evidence.isPassive,
+            provenance = evidence.provenance.name,
+            alertEventType = evidence.alertEventType?.name,
+        )
 
     private fun confidencePriority(confidence: DetectionConfidence): Int =
         when (confidence) {
@@ -310,9 +335,6 @@ object AnalysisBundleBuilder {
             .thenBy { it.alertEventType?.name.orEmpty() }
             .thenBy(AnalysisEvidenceSummary::isPassive)
 
-    private const val CANDIDATE_ALIAS_PREFIX = "candidate"
-    private const val IDENTITY_ALIAS_PREFIX = "identity"
-    private const val ALIAS_DIGITS = 3
     private const val LOW_CONFIDENCE_PRIORITY = 0
     private const val MEDIUM_CONFIDENCE_PRIORITY = 1
     private const val HIGH_CONFIDENCE_PRIORITY = 2
