@@ -232,7 +232,9 @@ private object AnalysisSignalReduction {
                 )
             }
 
-    private fun isUsableSignal(sample: SignalSample): Boolean = sample.timestamp >= 0L && sample.rssi in MIN_RSSI..MAX_RSSI
+    private fun isUsableSignal(sample: SignalSample): Boolean {
+        return sample.timestamp >= 0L && sample.rssi in MIN_RSSI..MAX_RSSI
+    }
 
     private fun hasAnyLocationData(sample: SignalSample): Boolean =
         sample.latitude != null || sample.longitude != null || sample.locationAccuracy != null
@@ -293,9 +295,13 @@ private object AnalysisContextReduction {
     const val MAX_IDENTITY_CANDIDATES = 8
     const val MAX_REPRESENTATIVE_EVIDENCE = 8
 
-    fun canonicalFollowMe(source: List<FollowMeHistorySample>): List<FollowMeHistorySample> = source.distinct().sortedWith(FOLLOW_ME_ORDER)
+    fun canonicalFollowMe(source: List<FollowMeHistorySample>): List<FollowMeHistorySample> {
+        return source.distinct().sortedWith(FOLLOW_ME_ORDER)
+    }
 
-    fun canonicalEvents(source: List<AlertEvidenceEvent>): List<AlertEvidenceEvent> = source.distinct().sortedWith(ALERT_EVENT_ORDER)
+    fun canonicalEvents(source: List<AlertEvidenceEvent>): List<AlertEvidenceEvent> {
+        return source.distinct().sortedWith(ALERT_EVENT_ORDER)
+    }
 
     fun canonicalCandidates(source: List<IdentityContinuityCandidate>): List<IdentityContinuityCandidate> =
         source.distinct().sortedWith(IDENTITY_INPUT_ORDER)
@@ -385,10 +391,10 @@ private object AnalysisContextReduction {
         deviceEvidence: List<DetectionEvidence>,
         events: List<AlertEvidenceEvent>,
     ): RepresentativeEvidenceSelection {
-        val fromDevice = deviceEvidence.map { evidence -> evidence.toAnalysisEvidence(alertEventType = null) }
+        val fromDevice = deviceEvidence.map { evidence -> evidence.toRepresentative(eventType = null) }
         val fromEvents =
             events.map { event ->
-                event.evidence.toAnalysisEvidence(alertEventType = event.eventType)
+                event.evidence.toRepresentative(eventType = event.eventType)
             }
         val canonical =
             (fromDevice + fromEvents)
@@ -492,8 +498,8 @@ private object AnalysisContextReduction {
         return false
     }
 
-    private fun DetectionEvidence.toAnalysisEvidence(alertEventType: AlertEvidenceEventType?): AnalysisRepresentativeEvidence =
-        AnalysisRepresentativeEvidence(
+    private fun DetectionEvidence.toRepresentative(eventType: AlertEvidenceEventType?): AnalysisRepresentativeEvidence {
+        return AnalysisRepresentativeEvidence(
             source = source,
             confidence = confidence,
             reasonText = reasonText,
@@ -501,8 +507,9 @@ private object AnalysisContextReduction {
             parsedValue = parsedValue,
             isPassive = isPassive,
             provenance = provenance,
-            alertEventType = alertEventType,
+            alertEventType = eventType,
         )
+    }
 
     private fun confidencePriority(confidence: DetectionConfidence): Int = confidence.ordinal + 1
 
