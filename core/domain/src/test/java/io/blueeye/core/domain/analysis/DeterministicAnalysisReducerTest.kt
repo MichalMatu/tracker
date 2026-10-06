@@ -27,8 +27,8 @@ class DeterministicAnalysisReducerTest {
     fun `reduction is invariant to input permutation`() {
         val signals =
             listOf(
-                signal(timestamp = 61_000L, rssi = -60, latitude = 51.1, longitude = 17.0, accuracy = 12f),
-                signal(timestamp = 1_000L, rssi = -70, latitude = 51.2, longitude = 17.1, accuracy = 20f),
+                signal(timestamp = 61_000L, rssi = -60, location = TestLocation(51.1, 17.0, 12f)),
+                signal(timestamp = 1_000L, rssi = -70, location = TestLocation(51.2, 17.1, 20f)),
             )
         val history =
             listOf(
@@ -169,9 +169,7 @@ class DeterministicAnalysisReducerTest {
                             signal(
                                 timestamp = 2L,
                                 rssi = -71,
-                                latitude = 51.1,
-                                longitude = 17.0,
-                                accuracy = 150f,
+                                location = TestLocation(51.1, 17.0, 150f),
                             ),
                         ),
                 ),
@@ -319,18 +317,16 @@ class DeterministicAnalysisReducerTest {
         timestamp: Long,
         rssi: Int,
         fingerprint: String = PRIMARY,
-        latitude: Double? = null,
-        longitude: Double? = null,
-        accuracy: Float? = null,
+        location: TestLocation? = null,
     ): SignalSample =
         SignalSample(
             timestamp = timestamp,
             rssi = rssi,
             deviceFingerprint = fingerprint,
             observedMac = fingerprint,
-            latitude = latitude,
-            longitude = longitude,
-            locationAccuracy = accuracy,
+            latitude = location?.latitude,
+            longitude = location?.longitude,
+            locationAccuracy = location?.accuracy,
         )
 
     private fun followMe(
@@ -401,6 +397,12 @@ class DeterministicAnalysisReducerTest {
             isPassive = true,
             provenance = EvidenceProvenance.FOLLOW_ME_ANALYSIS,
         )
+
+    private data class TestLocation(
+        val latitude: Double,
+        val longitude: Double,
+        val accuracy: Float,
+    )
 
     private companion object {
         private const val PRIMARY = "device-primary"
