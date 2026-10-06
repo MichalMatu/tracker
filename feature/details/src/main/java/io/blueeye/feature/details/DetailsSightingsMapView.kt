@@ -109,6 +109,15 @@ internal fun DetailsSightingsMapView(
             }
 
         lifecycleOwner.lifecycle.addObserver(observer)
+        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            mapView.onStart()
+            started = true
+        }
+        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            mapView.onResume()
+            resumed = true
+        }
+
         mapView.getMapAsync { mapLibreMap ->
             mapLibreMap.setStyle(OPEN_FREE_MAP_STYLE_URL) {
                 loadError = null
