@@ -11,10 +11,11 @@ import io.blueeye.core.model.TrackingStatus
 /**
  * Stable local analysis representation for one device candidate.
  *
- * V1 intentionally excludes raw MAC addresses, exact coordinates and raw Bluetooth payloads.
+ * V1 intentionally excludes explicit MAC fields, exact coordinates and raw Bluetooth payloads.
+ * localCandidateKey is an app-local fingerprint and must be remapped before any external bundle.
  */
 data class AnalysisCandidateV1(
-    val candidateKey: String,
+    val localCandidateKey: String,
     val window: AnalysisWindowV1,
     val localAssessment: AnalysisLocalAssessmentV1,
     val signal: AnalysisSignalSummaryV1,
@@ -73,7 +74,7 @@ data class AnalysisFollowMeSummaryV1(
 )
 
 data class AnalysisIdentityRelationV1(
-    val candidateKey: String,
+    val relatedLocalCandidateKey: String,
     val timestamp: Long,
     val reasonCode: String,
     val confidence: Float,
