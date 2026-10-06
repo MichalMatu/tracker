@@ -12,6 +12,16 @@ This directory contains **current sources of truth**, not a chronological work l
 - The current implementation workstream is closed, and the STABLE_CORE S22+ physical runtime gate is **closed / accepted**. Manual GATT, Radar, live Details, Technical/Raw access and the good-GPS sightings-map lifecycle were verified on-device; poor/no-GPS fallback states were not naturally present in that session and remain software-covered.
 - A4 optional analyst integration and T1+ production transport require a new explicit product/architecture decision before implementation.
 
+## Closure checkpoint — 2026-10-07
+
+- Accepted runtime/code baseline: `f5c4c8be4620c567497dc4cc77b41b08d8cf0a95`.
+- STABLE_CORE physical acceptance on Samsung S22+ is closed: manual read-only GATT, Radar scanner→Room freshness/grouping/scroll health, active Details live updates, Technical/Raw access, good-GPS sightings-map semantics and repeated Show/Hide + Home/return lifecycle all passed without crash/ANR.
+- The field session did not naturally contain poor/no-GPS targets; those fallback states were not synthesized and remain covered by deterministic software tests.
+- Closure status head before this checkpoint: `de981f8dc2a5a4e9dfd21d74bacfcacb9cdd0b5f`. Compared with the accepted runtime SHA, its four intervening commits changed only `README.md`, `docs/README.md`, `docs/UI_UX_REDESIGN_PLAN.md` and `docs/HISTORY.md`.
+- CI on `de981f8d...`: Quality #312 **success**, Secret Scan #346 **success**, Sandbox Pack #120 **success**, Tester Release #269 **success**.
+- Remote branch state at checkpoint: only `main` plus infrastructure-only `agent-control`; no work branches remain and open pull requests = 0.
+- No product/code follow-up is implicitly queued. A4 optional analyst work and T1+ production telemetry still require a separate explicit product/architecture decision.
+
 ## Read order
 
 1. [PRODUCT_GOAL.md](PRODUCT_GOAL.md) — product purpose and claim boundaries.
