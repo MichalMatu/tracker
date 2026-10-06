@@ -54,6 +54,8 @@ data class AnalysisReducerInputV1(
 object DeterministicAnalysisReducer {
     fun reduce(input: AnalysisReducerInputV1): AnalysisCandidateV1 {
         val device = input.device
+        val hasOutOfScopeSignals =
+            input.signalSamples.any { sample -> sample.deviceFingerprint != device.fingerprint }
         val signals = scopedSignals(device.fingerprint, input.signalSamples)
         val followMe = input.followMeHistory.distinct().sortedWith(FOLLOW_ME_ORDER)
         val identityRelations = reduceIdentityRelations(device.fingerprint, input.identityCandidates)
@@ -73,6 +75,7 @@ object DeterministicAnalysisReducer {
                     qualityFlags(
                         signalSummary = signalSummary,
                         completeness = input.historyCompleteness,
+                        hasOutOfScopeSignals = hasOutOfScopeSignals,
                     ),
                 contradictions =
                     contradictions(
@@ -159,10 +162,14 @@ object DeterministicAnalysisReducer {
     private fun qualityFlags(
         signalSummary: AnalysisSignalSummaryV1,
         completeness: AnalysisHistoryCompleteness,
+        hasOutOfScopeSignals: Boolean,
     ): List<AnalysisQualityFlagV1> =
         buildSet {
             if (signalSummary.sampleCount == 0) {
                 add(AnalysisQualityFlagV1.NO_SIGNAL_SAMPLES)
+            }
+            if (hasOutOfScopeSignals) {
+                add(AnalysisQualityFlagV1.OUT_OF_SCOPE_SIGNAL_SAMPLES_DROPPED)
             }
             if (signalSummary.locationQuality.samplesWithCoordinates == 0) {
                 add(AnalysisQualityFlagV1.NO_LOCATION_DATA)
@@ -189,6 +196,7 @@ object DeterministicAnalysisReducer {
         buildSet {
             val calibratedSafe =
                 device.isSafeBeacon ||
+                    device.isIgnoredForTracking ||
                     device.calibrationLabel == DeviceCalibrationLabel.FALSE_POSITIVE ||
                     device.calibrationLabel == DeviceCalibrationLabel.KNOWN_SAFE
             if (calibratedSafe && device.trackingStatus != TrackingStatus.SAFE) {
