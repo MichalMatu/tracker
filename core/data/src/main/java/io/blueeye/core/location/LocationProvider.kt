@@ -107,7 +107,7 @@ open class LocationProvider @Inject constructor(
                     } else {
                         null
                     }
-                    ?: getLastLocation()
+                    ?: getLastLocation()?.takeIf(::isActiveFixFresh)
             }
 
         return location?.toCoordinates()

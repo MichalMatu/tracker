@@ -34,7 +34,7 @@ class AndroidScannerRuntimeController
                 ScannerServiceController.stop(context)
             }
 
-        override fun resetTrackingMemory(): Result<Unit> =
+        override suspend fun resetTrackingMemory(): Result<Unit> =
             runCatching {
                 carryoverTracker.clear()
                 bleScanHandler.resetSession()

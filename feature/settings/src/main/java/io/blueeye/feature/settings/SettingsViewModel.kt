@@ -8,7 +8,6 @@ import io.blueeye.core.domain.alert.AlertDeliveryDiagnostics
 import io.blueeye.core.domain.alert.AlertDispatcher
 import io.blueeye.core.domain.alert.AlertRequest
 import io.blueeye.core.domain.alert.AlertVibrationPattern
-import io.blueeye.core.domain.calibration.suppressesTracking
 import io.blueeye.core.domain.calibration.toCalibrationDeviceConfig
 import io.blueeye.core.domain.repository.ActiveCollectionRepository
 import io.blueeye.core.domain.repository.DeviceRepository
@@ -443,16 +442,13 @@ class SettingsViewModel
                     _updateStatus.value = "Review action failed: device unavailable"
                     return@launch
                 }
-                val updateResult =
-                    deviceRepository.updateDeviceConfig(
-                        fingerprint = fingerprint,
-                        config = device.toCalibrationDeviceConfig(label),
-                    )
-                if (updateResult.isSuccess) {
-                    deviceRepository.setIgnoredForTracking(fingerprint, label.suppressesTracking())
-                    deviceRepository.setCalibrationLabel(fingerprint, label)
+                deviceRepository.updateDeviceCalibration(
+                    fingerprint = fingerprint,
+                    config = device.toCalibrationDeviceConfig(label),
+                    label = label,
+                ).onSuccess {
                     _updateStatus.value = "Review action saved: ${label.name}"
-                } else {
+                }.onFailure {
                     _updateStatus.value = "Review action failed"
                 }
             }

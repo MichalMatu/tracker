@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import io.blueeye.BuildConfig
 import io.blueeye.feature.details.DetailsScreen
 import io.blueeye.feature.radar.presentation.LiveNearbyScreen
 import io.blueeye.feature.radar.presentation.RadarScreen
@@ -114,10 +115,12 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
                 )
             }
 
-            composable<Screen.TelemetryBridge> {
-                TelemetryBridgeScreen(
-                    onBackClick = { navController.popBackStack() },
-                )
+            if (BuildConfig.DEBUG) {
+                composable<Screen.TelemetryBridge> {
+                    TelemetryBridgeScreen(
+                        onBackClick = { navController.popBackStack() },
+                    )
+                }
             }
         }
     }

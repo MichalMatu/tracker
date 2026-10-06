@@ -29,6 +29,7 @@ class TacticalAlertService @Inject constructor(
     private val alertDispatcher: AlertDispatcher,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val activeDevicesLock = Any()
 
     /** Currently active professional/public-safety-like signals. */
     private val activeDevices = mutableMapOf<String, TacticalDetection>()
@@ -48,7 +49,6 @@ class TacticalAlertService @Inject constructor(
             if (!isEnabled) return@launch
 
             val now = System.currentTimeMillis()
-            val isNewDevice = !activeDevices.containsKey(request.macAddress)
             val detectionEvidence = request.evidence ?: TacticalEvidenceFactory.build(
                 match = request.match,
                 source = request.evidenceSource,
@@ -57,21 +57,25 @@ class TacticalAlertService @Inject constructor(
                 provenance = request.evidenceProvenance,
             )
 
-            val detection = TacticalDetection(
-                macAddress = request.macAddress,
-                vendorName = request.match.vendorName,
-                category = request.match.category.name,
-                confidence = request.match.confidence.name,
-                description = request.match.description,
-                evidence = detectionEvidence,
-                rssi = request.rssi,
-                firstSeenAt = activeDevices[request.macAddress]?.firstSeenAt ?: now,
-                lastSeenAt = now,
-            )
-            activeDevices[request.macAddress] = detection
-
-            cleanupOldDevices()
-            updateFlows()
+            val isNewDevice =
+                synchronized(activeDevicesLock) {
+                    val previous = activeDevices[request.macAddress]
+                    val detection = TacticalDetection(
+                        macAddress = request.macAddress,
+                        vendorName = request.match.vendorName,
+                        category = request.match.category.name,
+                        confidence = request.match.confidence.name,
+                        description = request.match.description,
+                        evidence = detectionEvidence,
+                        rssi = request.rssi,
+                        firstSeenAt = previous?.firstSeenAt ?: now,
+                        lastSeenAt = now,
+                    )
+                    activeDevices[request.macAddress] = detection
+                    cleanupOldDevicesLocked(now)
+                    updateFlows(activeDetectionsSnapshotLocked())
+                    previous == null
+                }
 
             if (ScannerRuntimePolicy.allowsAutomaticPublicSafetyAlertSideEffects &&
                 TacticalSignalAlertPolicy.shouldVibrate(isNewDevice, request.evidenceSource)
@@ -112,8 +116,7 @@ class TacticalAlertService @Inject constructor(
         }
     }
 
-    private fun cleanupOldDevices() {
-        val now = System.currentTimeMillis()
+    private fun cleanupOldDevicesLocked(now: Long) {
         val expired = activeDevices.entries
             .filter { now - it.value.lastSeenAt > DEVICE_TIMEOUT_MS }
             .map { it.key }
@@ -121,15 +124,20 @@ class TacticalAlertService @Inject constructor(
         expired.forEach { activeDevices.remove(it) }
     }
 
-    private fun updateFlows() {
-        _activeCount.value = activeDevices.size
-        _activeDetections.value = activeDevices.values.toList()
+    private fun activeDetectionsSnapshotLocked(): List<TacticalDetection> =
+        activeDevices.values.toList()
             .sortedByDescending { it.lastSeenAt }
+
+    private fun updateFlows(detections: List<TacticalDetection>) {
+        _activeCount.value = detections.size
+        _activeDetections.value = detections
     }
 
     fun clearAll() {
-        activeDevices.clear()
-        updateFlows()
+        synchronized(activeDevicesLock) {
+            activeDevices.clear()
+            updateFlows(emptyList())
+        }
     }
 
     suspend fun isEnabled(): Boolean {

@@ -10,6 +10,19 @@ import io.blueeye.core.data.db.entity.WatchlistEntity
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.IdentityCarryoverVerdict
 
+class DeviceCalibrationUpdate(
+    val fingerprint: String,
+) {
+    var userAlias: String? = null
+    var userNotes: String? = null
+    var isSafeBeacon: Boolean = false
+    var alertSound: Boolean = false
+    var alertVibration: Boolean = false
+    var isTrackingEnabled: Boolean = true
+    var isIgnoredForTracking: Boolean = false
+    var calibrationLabel: DeviceCalibrationLabel = DeviceCalibrationLabel.UNKNOWN
+}
+
 @Dao
 @Suppress("TooManyFunctions")
 interface DeviceActionDao {
@@ -140,6 +153,9 @@ interface DeviceActionDao {
         retargetIdentityCandidates(targetFingerprint, duplicateFingerprint)
         deleteByFingerprint(duplicateFingerprint)
     }
+
+    @Update(entity = DeviceEntity::class)
+    suspend fun updateCalibrationState(update: DeviceCalibrationUpdate): Int
 
     @Query("UPDATE devices SET isIgnoredForTracking = :ignored WHERE fingerprint = :fingerprint")
     suspend fun setIgnoredForTracking(fingerprint: String, ignored: Boolean)

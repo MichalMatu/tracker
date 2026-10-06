@@ -1,5 +1,6 @@
 package io.blueeye.core.data.repository
 
+import io.blueeye.core.data.db.dao.DeviceCalibrationUpdate
 import io.blueeye.core.data.db.dao.DeviceDao
 import io.blueeye.core.data.mapper.toDomain
 import io.blueeye.core.data.mapper.toRadarDomain
@@ -10,6 +11,7 @@ import io.blueeye.core.data.repository.handler.paired.ProbeResultHandler
 import io.blueeye.core.data.scanner.ScannerIngestEvent
 import io.blueeye.core.data.scanner.ScannerRuntimeDiagnosticsStore
 import io.blueeye.core.data.utils.asResult
+import io.blueeye.core.domain.calibration.suppressesTracking
 import io.blueeye.core.domain.repository.DeviceRepository
 import io.blueeye.core.model.Device
 import io.blueeye.core.model.DeviceCalibrationLabel
@@ -119,6 +121,29 @@ constructor(
                 )
             deviceDao.update(updated)
         } ?: throw NoSuchElementException("Device not found: $fingerprint")
+    }
+
+    override suspend fun updateDeviceCalibration(
+        fingerprint: String,
+        config: io.blueeye.core.domain.repository.DeviceConfig,
+        label: DeviceCalibrationLabel,
+    ): Result<Unit> = runCatching {
+        val updatedRows =
+            deviceDao.updateCalibrationState(
+                DeviceCalibrationUpdate(fingerprint).apply {
+                    userAlias = config.alias
+                    userNotes = config.notes
+                    isSafeBeacon = config.isSafe
+                    alertSound = config.alertSound
+                    alertVibration = config.alertVibration
+                    isTrackingEnabled = config.isTrackingEnabled
+                    isIgnoredForTracking = label.suppressesTracking()
+                    calibrationLabel = label
+                }
+            )
+        if (updatedRows != 1) {
+            throw NoSuchElementException("Device not found: $fingerprint")
+        }
     }
 
     override suspend fun setIgnoredForTracking(fingerprint: String, ignored: Boolean): Result<Unit> = runCatching {

@@ -35,7 +35,6 @@ object DatabaseModule {
             .addMigrations(migration13To14, migration14To15)
             .addMigrations(migration15To16, migration16To17, migration17To18, migration18To19)
             .addMigrations(migration19To20, migration20To21, migration21To22, migration22To23)
-            .fallbackToDestructiveMigration() // Na etapie developmentu
             .build()
     }
 

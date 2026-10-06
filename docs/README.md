@@ -7,7 +7,7 @@ This directory contains **current sources of truth**, not a chronological work l
 - `main` is the source of truth.
 - Phase 3 scanner/ingest field reacceptance is **closed / accepted**.
 - Radar/Details redesign has landed; current work is field validation, noise/false-positive reduction and remaining UX/analysis follow-up.
-- The optional Drive + Gmail telemetry/AI bridge is planned but not yet an application dependency.
+- The optional Drive + Gmail T0 telemetry/AI developer bridge is implemented and accepted for debug use; T1+ automatic production telemetry remains intentionally blocked.
 
 ## Read order
 

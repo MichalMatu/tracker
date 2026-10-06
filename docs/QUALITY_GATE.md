@@ -12,10 +12,11 @@
 ```bash
 ./gradlew qualityCheck
 ./gradlew :app:assembleDebug
+./gradlew :app:assembleRelease
 git diff --check
 ```
 
-`qualityCheck` is the broad repository gate for static checks/lint/tests. Run secret scanning when available:
+`qualityCheck` is the broad repository gate for static checks/lint/tests. The debug build remains the tester artifact; the release build is a configuration smoke test until production signing is configured. Run secret scanning when available:
 
 ```bash
 gitleaks git --config .gitleaks.toml --redact --verbose

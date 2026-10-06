@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.blueeye.BuildConfig
 import io.blueeye.navigation.Screen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -82,15 +83,17 @@ fun AppDrawer(
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
         )
 
-        NavigationDrawerItem(
-            label = { Text("Telemetry & AI Bridge") },
-            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-            selected = currentScreen is Screen.TelemetryBridge,
-            onClick = {
-                scope.launch { drawerState.close() }
-                navigateTo(Screen.TelemetryBridge)
-            },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-        )
+        if (BuildConfig.DEBUG) {
+            NavigationDrawerItem(
+                label = { Text("Telemetry & AI Bridge") },
+                icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                selected = currentScreen is Screen.TelemetryBridge,
+                onClick = {
+                    scope.launch { drawerState.close() }
+                    navigateTo(Screen.TelemetryBridge)
+                },
+                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+            )
+        }
     }
 }
