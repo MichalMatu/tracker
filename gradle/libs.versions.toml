@@ -25,7 +25,7 @@ playServicesAuth = "21.6.0"
 flexbox = "3.0.0"
 gson = "2.10.1"
 javaxInject = "1"
-maplibre = "10.3.7"
+maplibre = "11.0.0"
 
 # Testing
 junit = "4.13.2"
