@@ -99,6 +99,7 @@ data class AnalysisDiagnosticsV1(
 
 enum class AnalysisQualityFlagV1 {
     NO_SIGNAL_SAMPLES,
+    OUT_OF_SCOPE_SIGNAL_SAMPLES_DROPPED,
     NO_LOCATION_DATA,
     POOR_LOCATION_QUALITY,
     SIGNAL_HISTORY_INCOMPLETE,
