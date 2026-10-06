@@ -6,14 +6,16 @@ This directory contains **current sources of truth**, not a chronological work l
 
 - `main` is the source of truth.
 - Phase 3 scanner/ingest field reacceptance is **closed / accepted**.
-- Radar/Details redesign and the per-device sightings map have landed; physical S22+ validation remains for map/runtime behavior.
-- A2 Deterministic Analysis Reducer V1 and A3 Versioned Analysis Bundle V1 are implemented on `main` as pure local analysis layers.
+- Radar/Details redesign, Live Nearby and the per-device sightings map have landed.
+- A1 parser/data hardening, A2 Deterministic Analysis Reducer V1 and A3 Versioned Analysis Bundle V1 are closed on `main`.
 - The optional Drive + Gmail T0 telemetry/AI developer bridge is implemented and accepted for debug use; the Analysis Bundle is not wired into it and T1+ automatic production telemetry remains intentionally blocked.
+- The current implementation workstream is closed. Remaining S22+ checks are deferred physical runtime validation, not claimed acceptance.
+- A4 optional analyst integration and T1+ production transport require a new explicit product/architecture decision before implementation.
 
 ## Read order
 
 1. [PRODUCT_GOAL.md](PRODUCT_GOAL.md) — product purpose and claim boundaries.
-2. The active plan relevant to the task:
+2. The plan/reference relevant to the task:
    - [UI_UX_REDESIGN_PLAN.md](UI_UX_REDESIGN_PLAN.md)
    - [TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md](TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md)
 3. [ARCHITECTURE_CURRENT.md](ARCHITECTURE_CURRENT.md) — current modules/data flow/debt.
