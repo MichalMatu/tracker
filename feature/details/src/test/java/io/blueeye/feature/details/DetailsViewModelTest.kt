@@ -132,6 +132,9 @@ class DetailsViewModelTest {
         whenever(deviceRepository.getSignalSamples(FINGERPRINT)).thenReturn(
             flowOf(Result.success(emptyList<SignalSample>())),
         )
+        whenever(deviceRepository.getSightings(FINGERPRINT)).thenReturn(
+            flowOf(Result.success(emptyList())),
+        )
         whenever(deviceRepository.getFollowMeHistory(FINGERPRINT)).thenReturn(
             flowOf(Result.success(emptyList<FollowMeHistorySample>())),
         )
