@@ -214,99 +214,131 @@ class BleScanHandler @Inject constructor(
         if (ctx.isTactical) return
 
         val existing = ctx.existingDevice
-        val now = System.currentTimeMillis()
-        val fingerprint = ctx.fingerprint
         val isIgnored = existing?.isIgnoredForTracking == true
-        val isSuppressedForFollowMe =
-            existing?.isSafeBeacon == true ||
-                isIgnored ||
-                existing?.isTrackingEnabled == false ||
-                existing?.calibrationLabel?.suppressesFollowMeScoring() == true
-
-        if (isSuppressedForFollowMe) {
-            ctx.followingScore = 0f
-            ctx.trackingStatus = TrackingStatus.SAFE
-            ctx.followMeExplanation = "User calibration marks this device safe or disables Follow-Me scoring."
-            ctx.clearFollowMeScoreComponents()
+        if (shouldSuppressFollowMe(existing, isIgnored)) {
+            markFollowMeSuppressed(ctx)
             return
         }
 
+        val now = System.currentTimeMillis()
         val currentLocation = locationProvider.getFreshCoordinates()
-        val deviceType = classifier.resolveType(ctx)
-        val isKnownTracker = deviceType in KNOWN_TRACKER_TYPES
-
         val computation =
             trackingStateMutex.withLock {
-                sessionManager.updateMovement(
-                    currentLat = currentLocation?.first,
-                    currentLon = currentLocation?.second,
-                    currentAccuracyM = currentLocation?.third,
+                computeFollowMeLocked(
+                    ctx = ctx,
                     now = now,
-                )
-                val sessionFirstSeen = sessionManager.recordDeviceSighting(fingerprint, now)
-                val movementTrackingAvailable = sessionManager.hasMovementReference()
-                val userIsMoving = sessionManager.isUserMoving(now)
-                val isBaselineDevice = sessionManager.isDeviceZastane(fingerprint)
-                val encounterCount = sessionManager.getMovingEncounterCount(fingerprint)
-                val rssiSamples = movingRssiSamples(fingerprint, ctx.validRssi, userIsMoving)
-
-                val metrics =
-                    FollowMeScoreCalculator.DeviceMetrics(
-                        deviceType = deviceType,
-                        firstSeenAt = sessionFirstSeen,
-                        lastSeenAt = now,
-                        encounterCount = encounterCount,
-                        rssiSamples = rssiSamples,
-                        macChangeCount = ctx.macChangeCount,
-                        isKnownTracker = isKnownTracker,
-                        hasStablePayload = ctx.hasStablePayloadEvidence(),
-                        userHasMoved = userIsMoving,
-                        isBaselineDevice = isBaselineDevice,
-                        movementTrackingAvailable = movementTrackingAvailable,
-                        observedWhileMovingDurationMs =
-                            sessionManager.getObservedWhileMovingDurationMs(fingerprint),
-                    )
-
-                val result = followMeScoreCalculator.calculateScore(metrics)
-
-                ctx.followingScore = result.totalScore.toFloat()
-                ctx.trackingStatus = result.status
-                ctx.followMeExplanation = result.explanation
-                ctx.followMeDurationScore = result.durationScore
-                ctx.followMeRssiStabilityScore = result.rssiStabilityScore
-                ctx.followMeDeviceTypeScore = result.deviceTypeScore
-                ctx.followMeMacBehaviorScore = result.macBehaviorScore
-                ctx.followMeEncounterScore = result.encounterScore
-                ctx.followMeUserMoved = userIsMoving
-                ctx.followMeBaselineDevice = isBaselineDevice
-
-                val shouldAlert =
-                    alertDecisionEngine.shouldAlert(
-                        isIgnored = isIgnored,
-                        userHasMoved = userIsMoving,
-                        isZastane = isBaselineDevice,
-                        trackingStatus = result.status,
-                    )
-                val decisionExplanation =
-                    if (shouldAlert) {
-                        alertDecisionEngine.getDecisionExplanation(
-                            isIgnored = isIgnored,
-                            isKnownTracker = isKnownTracker,
-                            userHasMoved = userIsMoving,
-                            isZastane = isBaselineDevice,
-                            trackingStatus = result.status,
-                        )
-                    } else {
-                        null
-                    }
-
-                FollowMeComputation(
-                    result = result,
-                    isKnownTracker = isKnownTracker,
-                    decisionExplanation = decisionExplanation,
+                    isIgnored = isIgnored,
+                    currentLocation = currentLocation,
                 )
             }
 
+        logFollowMeScore(ctx, computation)
+        dispatchFollowMeAlert(ctx, computation)
+    }
+
+    private fun shouldSuppressFollowMe(
+        existing: DeviceEntity?,
+        isIgnored: Boolean,
+    ): Boolean =
+        existing?.isSafeBeacon == true ||
+            isIgnored ||
+            existing?.isTrackingEnabled == false ||
+            existing?.calibrationLabel?.suppressesFollowMeScoring() == true
+
+    private fun markFollowMeSuppressed(ctx: ScanDataContext) {
+        ctx.followingScore = 0f
+        ctx.trackingStatus = TrackingStatus.SAFE
+        ctx.followMeExplanation = "User calibration marks this device safe or disables Follow-Me scoring."
+        ctx.clearFollowMeScoreComponents()
+    }
+
+    private fun computeFollowMeLocked(
+        ctx: ScanDataContext,
+        now: Long,
+        isIgnored: Boolean,
+        currentLocation: Triple<Double?, Double?, Float?>?,
+    ): FollowMeComputation {
+        val fingerprint = ctx.fingerprint
+        sessionManager.updateMovement(
+            currentLat = currentLocation?.first,
+            currentLon = currentLocation?.second,
+            currentAccuracyM = currentLocation?.third,
+            now = now,
+        )
+        val sessionFirstSeen = sessionManager.recordDeviceSighting(fingerprint, now)
+        val movementTrackingAvailable = sessionManager.hasMovementReference()
+        val userIsMoving = sessionManager.isUserMoving(now)
+        val isBaselineDevice = sessionManager.isDeviceZastane(fingerprint)
+        val deviceType = classifier.resolveType(ctx)
+        val isKnownTracker = deviceType in KNOWN_TRACKER_TYPES
+        val metrics =
+            FollowMeScoreCalculator.DeviceMetrics(
+                deviceType = deviceType,
+                firstSeenAt = sessionFirstSeen,
+                lastSeenAt = now,
+                encounterCount = sessionManager.getMovingEncounterCount(fingerprint),
+                rssiSamples = movingRssiSamples(fingerprint, ctx.validRssi, userIsMoving),
+                macChangeCount = ctx.macChangeCount,
+                isKnownTracker = isKnownTracker,
+                hasStablePayload = ctx.hasStablePayloadEvidence(),
+                userHasMoved = userIsMoving,
+                isBaselineDevice = isBaselineDevice,
+                movementTrackingAvailable = movementTrackingAvailable,
+                observedWhileMovingDurationMs =
+                    sessionManager.getObservedWhileMovingDurationMs(fingerprint),
+            )
+        val result = followMeScoreCalculator.calculateScore(metrics)
+        applyFollowMeResult(ctx, result, userIsMoving, isBaselineDevice)
+
+        val decisionExplanation =
+            if (
+                alertDecisionEngine.shouldAlert(
+                    isIgnored = isIgnored,
+                    userHasMoved = userIsMoving,
+                    isZastane = isBaselineDevice,
+                    trackingStatus = result.status,
+                )
+            ) {
+                alertDecisionEngine.getDecisionExplanation(
+                    isIgnored = isIgnored,
+                    isKnownTracker = isKnownTracker,
+                    userHasMoved = userIsMoving,
+                    isZastane = isBaselineDevice,
+                    trackingStatus = result.status,
+                )
+            } else {
+                null
+            }
+
+        return FollowMeComputation(
+            result = result,
+            isKnownTracker = isKnownTracker,
+            decisionExplanation = decisionExplanation,
+        )
+    }
+
+    private fun applyFollowMeResult(
+        ctx: ScanDataContext,
+        result: FollowMeScoreCalculator.ScoreResult,
+        userIsMoving: Boolean,
+        isBaselineDevice: Boolean,
+    ) {
+        ctx.followingScore = result.totalScore.toFloat()
+        ctx.trackingStatus = result.status
+        ctx.followMeExplanation = result.explanation
+        ctx.followMeDurationScore = result.durationScore
+        ctx.followMeRssiStabilityScore = result.rssiStabilityScore
+        ctx.followMeDeviceTypeScore = result.deviceTypeScore
+        ctx.followMeMacBehaviorScore = result.macBehaviorScore
+        ctx.followMeEncounterScore = result.encounterScore
+        ctx.followMeUserMoved = userIsMoving
+        ctx.followMeBaselineDevice = isBaselineDevice
+    }
+
+    private fun logFollowMeScore(
+        ctx: ScanDataContext,
+        computation: FollowMeComputation,
+    ) {
         scope.launch {
             val location = locationProvider.getFreshCoordinates()
             diagnosticLogger.logScore(
@@ -316,22 +348,26 @@ class BleScanHandler @Inject constructor(
                 location?.second,
             )
         }
+    }
 
-        computation.decisionExplanation?.let { decisionExplanation ->
-            ctx.followMeAlertEvidence =
-                ctx.toFollowMeAlertEvidence(
-                    result = computation.result,
-                    decisionExplanation = decisionExplanation,
-                    isKnownTracker = computation.isKnownTracker,
-                )
-            trackerAlertService.onDeviceAnalyzed(
-                mac = ctx.mac,
-                score = computation.result.totalScore,
-                status = computation.result.status,
-                evidenceReason = computation.result.explanation,
+    private fun dispatchFollowMeAlert(
+        ctx: ScanDataContext,
+        computation: FollowMeComputation,
+    ) {
+        val decisionExplanation = computation.decisionExplanation ?: return
+        ctx.followMeAlertEvidence =
+            ctx.toFollowMeAlertEvidence(
+                result = computation.result,
+                decisionExplanation = decisionExplanation,
                 isKnownTracker = computation.isKnownTracker,
             )
-        }
+        trackerAlertService.onDeviceAnalyzed(
+            mac = ctx.mac,
+            score = computation.result.totalScore,
+            status = computation.result.status,
+            evidenceReason = computation.result.explanation,
+            isKnownTracker = computation.isKnownTracker,
+        )
     }
 
     private fun movingRssiSamples(
