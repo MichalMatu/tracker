@@ -99,13 +99,13 @@ Before execution read `.agent/binding.json` and `.agent/status/daemon.json` on `
 Physical Android validation uses the user's Samsung Galaxy S22+ over **wireless ADB** by default. Persisted quick-connect facts:
 
 ```text
-model:                 SM-S906B
-adb serial/device id:  RFCT70L7E8J
-last known endpoint:   192.168.0.100:39687
-older known endpoint:  192.168.0.100:34745
+model:                   SM-S906B
+adb serial/device id:    RFCT70L7E8J
+known recent IP:         192.168.0.100
+recent rotated ports:    34771, 39687, 34745
 ```
 
-For device tasks, do not conclude that the phone is unavailable merely because no USB device is listed. Fast reconnect order: `adb start-server`, then `adb connect 192.168.0.100:39687`; if that endpoint has rotated, try `adb connect 192.168.0.100:34745`, then `adb reconnect` / `adb devices -l`. Use `adb mdns services` only as the fallback discovery path. After connecting, verify the target is Samsung `SM-S906B` before installation, launch, BLE, location or UI actions. Android Wireless debugging may rotate its TCP port, so when a newly verified endpoint replaces the saved one, update this block instead of rediscovering it in every task.
+For device tasks, do not conclude that the phone is unavailable merely because no USB device is listed. Fast reconnect order: `adb start-server`, then try the recorded endpoints on `192.168.0.100` in newest-known order (`:34771`, `:39687`, `:34745`). Verify `ro.product.model=SM-S906B` before installation, launch, BLE, location or UI actions. Android Wireless debugging rotates its TCP port, so recorded ports are connection hints rather than a claim that one is currently live. If none responds, use `adb mdns services` as the fallback; when a new endpoint is verified, replace the endpoint list with the newly verified port first instead of repeatedly rediscovering old values.
 
 Task ids/payloads are immutable. Inspect `.agent/runs/<id>.json` and terminal `.agent/results/<id>.json`. Do not edit the daemon control clone, launch local Codex from a task, restart the shared supervisor from repository work, or queue a duplicate while a healthy task is active.
 
