@@ -217,7 +217,7 @@ private fun fitCameraToPoints(
     points.forEach(boundsBuilder::include)
     map.getCameraForLatLngBounds(
         boundsBuilder.build(),
-        Array(CAMERA_PADDING_SIDES) { MapConfig.cameraPaddingPx },
+        Array(MapConfig.cameraPaddingSides) { MapConfig.cameraPaddingPx },
     )?.let { camera ->
         map.cameraPosition = camera
     }
@@ -239,6 +239,5 @@ private object MapConfig {
     const val heightDp = 280
     const val singlePointZoom = 16.0
     const val cameraPaddingPx = 48
+    const val cameraPaddingSides = 4
 }
-
-private const val CAMERA_PADDING_SIDES = 4
