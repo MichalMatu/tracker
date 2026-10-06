@@ -57,7 +57,7 @@ class TacticalAlertService @Inject constructor(
                 provenance = request.evidenceProvenance,
             )
 
-            val (isNewDevice, detections) =
+            val isNewDevice =
                 synchronized(activeDevicesLock) {
                     val previous = activeDevices[request.macAddress]
                     val detection = TacticalDetection(
@@ -73,9 +73,9 @@ class TacticalAlertService @Inject constructor(
                     )
                     activeDevices[request.macAddress] = detection
                     cleanupOldDevicesLocked(now)
-                    Pair(previous == null, activeDetectionsSnapshotLocked())
+                    updateFlows(activeDetectionsSnapshotLocked())
+                    previous == null
                 }
-            updateFlows(detections)
 
             if (ScannerRuntimePolicy.allowsAutomaticPublicSafetyAlertSideEffects &&
                 TacticalSignalAlertPolicy.shouldVibrate(isNewDevice, request.evidenceSource)
@@ -136,8 +136,8 @@ class TacticalAlertService @Inject constructor(
     fun clearAll() {
         synchronized(activeDevicesLock) {
             activeDevices.clear()
+            updateFlows(emptyList())
         }
-        updateFlows(emptyList())
     }
 
     suspend fun isEnabled(): Boolean {
