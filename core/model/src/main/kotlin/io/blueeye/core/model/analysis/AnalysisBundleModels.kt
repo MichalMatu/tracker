@@ -5,7 +5,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-const val ANALYSIS_BUNDLE_SCHEMA_VERSION = 1
+const val AnalysisBundleSchemaVersion = 1
 
 /**
  * Versioned, privacy-bounded representation intended for optional higher-level analysis.
@@ -14,7 +14,7 @@ const val ANALYSIS_BUNDLE_SCHEMA_VERSION = 1
  */
 @Serializable
 data class AnalysisBundleV1(
-    val schemaVersion: Int = ANALYSIS_BUNDLE_SCHEMA_VERSION,
+    val schemaVersion: Int = AnalysisBundleSchemaVersion,
     val session: AnalysisBundleSessionV1,
     val privacy: AnalysisBundlePrivacyV1 = AnalysisBundlePrivacyV1(),
     val candidates: List<AnalysisBundleCandidateV1>,
