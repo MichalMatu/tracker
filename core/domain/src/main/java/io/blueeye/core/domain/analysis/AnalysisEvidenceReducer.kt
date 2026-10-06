@@ -21,6 +21,14 @@ internal object AnalysisEvidenceReducer {
             representativeEvidence = representativeEvidence(device.evidence, alertEvents),
         )
 
+    fun hasRejectedHighConfidenceRelation(
+        relations: List<AnalysisIdentityRelationV1>,
+    ): Boolean =
+        relations.any { relation ->
+            relation.verdict == IdentityCarryoverVerdict.FALSE_MATCH &&
+                relation.confidence >= HIGH_CONFIDENCE_IDENTITY_THRESHOLD
+        }
+
     private fun identityRelations(
         candidateKey: String,
         candidates: List<IdentityContinuityCandidate>,
@@ -113,12 +121,5 @@ internal object AnalysisEvidenceReducer {
     )
 
     private const val MAX_REPRESENTATIVE_EVIDENCE = 8
+    private const val HIGH_CONFIDENCE_IDENTITY_THRESHOLD = 0.8f
 }
-
-internal fun List<AnalysisIdentityRelationV1>.hasRejectedHighConfidenceRelation(): Boolean =
-    any { relation ->
-        relation.verdict == IdentityCarryoverVerdict.FALSE_MATCH &&
-            relation.confidence >= HIGH_CONFIDENCE_IDENTITY_THRESHOLD
-    }
-
-private const val HIGH_CONFIDENCE_IDENTITY_THRESHOLD = 0.8f
