@@ -8,10 +8,12 @@ import io.blueeye.core.data.mapper.toAlertEvidenceEventDomain
 import io.blueeye.core.data.mapper.toDomain
 import io.blueeye.core.data.mapper.toFollowMeHistoryDomain
 import io.blueeye.core.data.mapper.toIdentityContinuityCandidateDomain
+import io.blueeye.core.data.mapper.toSightingObservations
 import io.blueeye.core.model.AlertEvidenceEvent
 import io.blueeye.core.model.FollowMeHistorySample
 import io.blueeye.core.model.IdentityContinuityCandidate
 import io.blueeye.core.model.SignalSample
+import io.blueeye.core.model.SightingObservation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -27,6 +29,11 @@ class DeviceHistoryDataSource @Inject constructor(
     fun getSignalSamples(fingerprint: String): Flow<List<SignalSample>> =
         signalSampleDao.getSamplesForDevice(fingerprint)
             .map { entities -> entities.toDomain() }
+
+    fun getSightings(fingerprint: String): Flow<List<SightingObservation>> =
+        signalSampleDao.getSightingsForDevice(fingerprint)
+            .map { projections -> projections.toSightingObservations() }
+
 
     fun getFollowMeHistory(fingerprint: String): Flow<List<FollowMeHistorySample>> =
         followMeObservationDao.getRecentForDevice(fingerprint)
