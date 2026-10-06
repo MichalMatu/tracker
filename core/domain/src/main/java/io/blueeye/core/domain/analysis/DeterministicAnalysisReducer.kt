@@ -205,11 +205,9 @@ private object SignalReducer {
         }
     }
 
-    private fun isUsableLatitude(latitude: Double): Boolean =
-        latitude.isFinite() && latitude in MIN_LATITUDE..MAX_LATITUDE
+    private fun isUsableLatitude(latitude: Double): Boolean = latitude.isFinite() && latitude in MIN_LATITUDE..MAX_LATITUDE
 
-    private fun isUsableLongitude(longitude: Double): Boolean =
-        longitude.isFinite() && longitude in MIN_LONGITUDE..MAX_LONGITUDE
+    private fun isUsableLongitude(longitude: Double): Boolean = longitude.isFinite() && longitude in MIN_LONGITUDE..MAX_LONGITUDE
 
     private fun isUsableAccuracy(accuracy: Float): Boolean =
         accuracy.isFinite() &&
