@@ -79,6 +79,14 @@ Implementation policy:
 - [ ] Harden manufacturer/service/UUID/address-transition boundaries from reproducible evidence.
 - [ ] Formalize GPS/data-quality policy where it affects analysis.
 
+Current progress on `main`:
+- privacy-safe legacy Lime/LBCAT-S-shaped scan fixtures cover the confirmed 59-byte advertisement/scan-response layout without retaining field identifiers;
+- `ServiceDataExtractor` regression tests cover valid 16-bit service data, empty payloads and truncated AD structures;
+- `AdvertisementEvidenceParser` regression tests prevent reserved/truncated raw records from fabricating Appearance, manufacturer or service-UUID evidence while preserving representative valid structured evidence;
+- existing address-carryover tests already cover coexistence-vs-rotation timing, corroborated sequential carryover, long-gap candidate-only behavior and Apple family/shadow conflict guards.
+
+A1 remains open for additional field-defect protocol/vendor fixtures and explicit GPS/data-quality policy hardening.
+
 ## A2 — Deterministic reducer
 
 - [x] Canonical sorting, duplicate/noise reduction and fixed time bucketing.
