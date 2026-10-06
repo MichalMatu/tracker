@@ -48,7 +48,7 @@ internal data class BleScanProcessingOutcome(
  * through enrichment, scoring, evidence recording, persistence, and alerts.
  */
 @Singleton
-@Suppress("LongParameterList")
+@Suppress("LongParameterList", "TooManyFunctions")
 class BleScanHandler @Inject constructor(
     private val deviceDao: DeviceDao,
     private val macAddressResolver: MacAddressResolver,
