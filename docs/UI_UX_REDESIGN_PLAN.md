@@ -6,7 +6,7 @@
 - Scanner/ingest Phase 3 baseline is accepted; do not reopen it without a concrete regression.
 - Compact Radar cards, lightweight Radar projection, decision-first Details, collapsed Technical Details, Live Nearby and the per-device sightings map have landed.
 - A1 parser/data hardening, A2 Deterministic Analysis Reducer V1 and A3 Versioned Analysis Bundle V1 are implemented.
-- Remaining U1/U2/U3 checks below are deferred **physical S22+ acceptance checks**. They must not be marked passed without real-device evidence.
+- U1/U2/U3 physical S22+ acceptance is **closed** for the STABLE_CORE baseline from real-device evidence collected on 2026-10-07. The session physically covered Radar, live Details, Technical/Raw access and the good-GPS sightings-map lifecycle; poor/no-GPS fallback states were not naturally present and remain covered by deterministic tests.
 - A4 is future optional analyst work and requires a new explicit product decision; it is not an active implementation queue.
 
 ## Product guardrails
@@ -32,9 +32,9 @@
 
 Historical phase-by-phase acceptance reports were intentionally removed; concise provenance is in `HISTORY.md` and full details remain in Git history.
 
-## Deferred physical validation — U1 Radar
+## Physical validation — U1 Radar
 
-These checks require a reachable Samsung S22+ and are intentionally not claimed complete from software-only evidence:
+Accepted on Samsung S22+ for the STABLE_CORE baseline. Real-device evidence covered:
 
 - validate current `main` after the latest noise/classification changes;
 - confirm active/in-range devices stay easy to find amid high-volume protocols;
@@ -43,11 +43,11 @@ These checks require a reachable Samsung S22+ and are intentionally not claimed 
 - repeat a dense 100+ scenario only when a comparable field run is needed;
 - confirm list geometry/recomposition/jank remains within the accepted direction.
 
-**Runtime gate:** a real dense/ordinary walk remains usable and attention groups are evidence-driven rather than dominated by protocol volume.
+**Runtime gate:** **accepted.** Scanner→Room freshness, protocol-noise grouping, ordinary Radar usability and clean scroll/process health were verified on-device. No reproducible product regression was found.
 
-## Deferred physical validation — U2 Details / Tracking & Signal
+## Physical validation — U2 Details / Tracking & Signal
 
-Software/UI implementation is present. Real-device acceptance still needs to confirm:
+Accepted on Samsung S22+ for the STABLE_CORE baseline. Real-device evidence covered:
 
 - the first viewport explains device/attention state without relying on raw Bluetooth fields;
 - RSSI history remains readable with meaningful time context;
@@ -55,7 +55,7 @@ Software/UI implementation is present. Real-device acceptance still needs to con
 - secondary history/technical sections remain stable during live updates and scrolling;
 - dark mode and large font scale remain usable on-device.
 
-**Runtime gate:** live Details remains readable/stable through a long session with both rich-evidence and low-evidence devices.
+**Runtime gate:** **accepted for the exercised field session.** Active Details received fresh signal samples, remained process-stable, and preserved Technical/Raw access. The field session did not naturally provide every low-evidence variant.
 
 ## U3 — Sightings map
 
@@ -74,7 +74,7 @@ Implementation policy:
 - map tiles load only after an explicit **Show map** action; stored sighting records remain local, while the displayed map area is requested from the configured third-party tile provider;
 - a global map destination remains deferred.
 
-**Implementation gate:** complete. Physical S22+ validation remains a deferred runtime gate for readability, lifecycle behavior, poor-GPS handling and dense-sample interpretation.
+**Implementation gate:** complete. **Physical S22+ runtime acceptance is closed for the STABLE_CORE baseline:** good-GPS observations, privacy copy, explicit Show/Hide map behavior, third-party-tile disclosure, repeated map toggling and Home/return lifecycle were verified on-device. The session contained no natural poor/no-GPS records, so those fallback states remain covered by deterministic software tests rather than synthetic field telemetry.
 
 ## A1 — Parser/data hardening
 
@@ -132,4 +132,4 @@ The continuous developer telemetry/feedback transport is specified separately in
 
 ## Closure
 
-The current implementation baseline is closed on `main`: compact Radar, decision-first Details, sightings-map implementation, parser/data hardening and deterministic A2/A3 analysis are in place while scanner/ingest semantics remain accepted and untouched. The only remaining acceptance work in this plan is explicit physical S22+ validation; future analyst/production-telemetry work requires a new decision and is not implicitly queued.
+The current implementation baseline is closed on `main`: compact Radar, decision-first Details, sightings-map implementation, parser/data hardening and deterministic A2/A3 analysis are in place while scanner/ingest semantics remain accepted and untouched. STABLE_CORE physical S22+ acceptance is also closed. Future analyst/production-telemetry work requires a new decision and is not implicitly queued.
