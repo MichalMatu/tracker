@@ -20,7 +20,7 @@ BlueEye reports observations and evidence. It does **not** claim to identify a p
 - Compact Radar, lightweight projection, decision-first Details, Live Nearby and the per-device sightings map are implemented on `main`.
 - A1 parser/data hardening, A2 Deterministic Analysis Reducer V1 and A3 Versioned Analysis Bundle V1 are closed on `main`.
 - Drive + Gmail T0 telemetry/AI developer bridge is implemented and accepted for debug use.
-- Physical S22+ validation for the latest Radar/Details/map runtime remains a **deferred device gate**; it is not treated as completed without a reachable wireless-ADB session.
+- Physical S22+ validation for the latest Radar/Details/map runtime is **closed / accepted** for the STABLE_CORE baseline. Manual GATT, Radar ingest/UI health, live Details, Technical/Raw access, the good-GPS sightings map and map lifecycle were exercised on-device; poor/no-GPS fallback states were not naturally present in that field session and remain covered by deterministic software tests.
 - A4 optional analyst work and T1+ production telemetry are future product/architecture decisions, not active implementation work.
 
 Current references:
