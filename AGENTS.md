@@ -101,11 +101,13 @@ Physical Android validation uses the user's Samsung Galaxy S22+ over **wireless 
 ```text
 model:                   SM-S906B
 adb serial/device id:    RFCT70L7E8J
+current verified host:   Android-2.local
+current verified port:   40503
 known recent IP:         192.168.0.100
-recent rotated ports:    34771, 39687, 34745
+older rotated ports:     34771, 39687, 34745
 ```
 
-For device tasks, do not conclude that the phone is unavailable merely because no USB device is listed. Fast reconnect order: `adb start-server`, then try the recorded endpoints on `192.168.0.100` in newest-known order (`:34771`, `:39687`, `:34745`). Verify `ro.product.model=SM-S906B` before installation, launch, BLE, location or UI actions. Android Wireless debugging rotates its TCP port, so recorded ports are connection hints rather than a claim that one is currently live. If none responds, use `adb mdns services` as the fallback; when a new endpoint is verified, replace the endpoint list with the newly verified port first instead of repeatedly rediscovering old values.
+For device tasks, do not conclude that the phone is unavailable merely because no USB device is listed. Fast reconnect order: `adb start-server`, then try `adb connect Android-2.local:40503`; if hostname resolution fails, try `adb connect 192.168.0.100:40503`. Verify `ro.product.model=SM-S906B` before installation, launch, BLE, location or UI actions. Android Wireless debugging rotates its TCP port, so the current port is a fast-path hint rather than a permanent endpoint. If it no longer responds, try the older recorded ports on `192.168.0.100`, then use Bonjour/`adb mdns services` fallback and update this block with the newly verified endpoint.
 
 Task ids/payloads are immutable. Inspect `.agent/runs/<id>.json` and terminal `.agent/results/<id>.json`. Do not edit the daemon control clone, launch local Codex from a task, restart the shared supervisor from repository work, or queue a duplicate while a healthy task is active.
 
