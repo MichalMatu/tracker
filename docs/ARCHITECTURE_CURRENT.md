@@ -47,6 +47,37 @@ Radar uses a lightweight projection rather than loading the full technical/evide
 
 See [DETECTION_MODEL.md](DETECTION_MODEL.md) for evidence/confidence semantics.
 
+## Active collection under `STABLE_CORE`
+
+The active GATT implementation is retained; the stabilization profile suppresses only **automatic** collection.
+
+- `ScannerRuntimePolicy.profile` is currently `STABLE_CORE`.
+- `allowsAutomaticActiveProbe`, `allowsAutomaticRfcommProbe` and opportunistic Classic discovery are `false`.
+- `ActiveCollectionRepositoryImpl` masks any previously persisted automatic-probe preference as `false` and rejects attempts to enable it while the profile remains `STABLE_CORE`.
+- `AutoActiveProbeCoordinator.enqueueCandidate()` returns before queueing or touching the connection manager when automatic probing is disallowed. Tests cover both the persisted-preference case and the coordinator no-interaction boundary.
+- The primary Settings surface renders automatic active collection as unavailable under `STABLE_CORE`.
+- The explicit per-device Details action is a separate path and remains implemented: `DetailsViewModel.connect()` calls `DeviceConnectionController.connect()`; `BleConnectionManager` connects, discovers GATT services, reads characteristics that advertise the READ property one at a time, and persists the resulting active evidence. This manual path does not write characteristics.
+- Periodic RFCOMM probing remains disabled independently.
+
+Do not describe the current profile as "GATT removed" or "active probing not implemented." The precise statement is: **automatic active collection is disabled during core stabilization; explicit per-device read-oriented GATT inspection still exists.**
+
+## Privacy-safe field reference: Lime legacy BLE family
+
+A September 2026 field capture provides a useful regression/reference case without committing private location, exact MAC, raw capture files or full vehicle identifiers:
+
+- 11 devices used names matching `lime-931303XXXXXX`.
+- 232 persisted BLE samples shared one advertisement schema.
+- Every Android `ScanRecord` was 59 bytes and is best interpreted as 31 bytes of legacy advertising data plus 28 bytes of scan-response data.
+- The legacy advertising portion is exactly 31 bytes: Flags (`0x01`, value `0x06`) followed by a 26-byte AD structure using unassigned/reserved type `0x00`.
+- The scan-response portion contains Complete Local Name (`0x09`, 17 bytes), Peripheral Connection Interval Range (`0x12`, 4 bytes) and Tx Power (`0x0A`, value 0 dBm).
+- For each individual device the 59-byte record stayed byte-for-byte stable across the capture. Across all 11 devices only byte positions 44-49 varied, corresponding to the final six digits of the local name. No dynamic battery/lock/status field was visible in passive advertising.
+- No advertised service UUIDs, Service Data or Manufacturer Specific Data were present in these records.
+- All observed devices were connectable on LE 1M PHY. The captured device rows had `connectionAttempts = 0` and no persisted GATT services/characteristics, so the session is passive-only evidence; it does **not** imply that GATT is absent.
+- Five observed address prefixes map publicly to Texas Instruments. Together with the `lime-931303XXXXXX` name pattern and public teardown/reference material, the working hardware identification is the older Lime **LBCAT-S family**, likely European LBCAT-S/LBCATSL revisions using TI CC2540-class BLE. Treat this as high-confidence family identification, not proof of the exact CCU revision or scooter chassis.
+- Different scooter chassis may share this CCU/BLE family. Do not infer a vehicle generation solely from this radio fingerprint.
+
+This case is useful for parser/regression work because it separates three claims that must remain distinct: passive advertisement structure, probable CCU family, and active GATT evidence. Future authorized field validation can compare the same passive fingerprint with explicit per-device GATT discovery without enabling automatic fleet-wide probing.
+
 ## Current product direction
 
 ```text
