@@ -96,6 +96,17 @@ workspace:     ~/agent-workspace/repos/tracker/{control,work,checkpoints}
 
 Before execution read `.agent/binding.json` and `.agent/status/daemon.json` on `agent-control`; registry, control binding and task `agent_binding` must match exactly. Every executable task uses `resources: []`, including ADB/device tasks; detect and verify the intended device inside the task instead of declaring a named/machine resource.
 
+Physical Android validation uses the user's Samsung Galaxy S22+ over **wireless ADB** by default. Persisted quick-connect facts:
+
+```text
+model:                 SM-S906B
+adb serial/device id:  RFCT70L7E8J
+last known endpoint:   192.168.0.100:39687
+older known endpoint:  192.168.0.100:34745
+```
+
+For device tasks, do not conclude that the phone is unavailable merely because no USB device is listed. Fast reconnect order: `adb start-server`, then `adb connect 192.168.0.100:39687`; if that endpoint has rotated, try `adb connect 192.168.0.100:34745`, then `adb reconnect` / `adb devices -l`. Use `adb mdns services` only as the fallback discovery path. After connecting, verify the target is Samsung `SM-S906B` before installation, launch, BLE, location or UI actions. Android Wireless debugging may rotate its TCP port, so when a newly verified endpoint replaces the saved one, update this block instead of rediscovering it in every task.
+
 Task ids/payloads are immutable. Inspect `.agent/runs/<id>.json` and terminal `.agent/results/<id>.json`. Do not edit the daemon control clone, launch local Codex from a task, restart the shared supervisor from repository work, or queue a duplicate while a healthy task is active.
 
 If exact evidence proves an active task cannot succeed, cancel that exact task, wait for terminal cancellation/result evidence, then queue a new uniquely-id'd replacement. Source publication and physical-device verification remain separate gates.
