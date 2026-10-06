@@ -107,7 +107,7 @@ object DeterministicAnalysisReducer {
             rejectedSampleCount = uniqueSignals.size - acceptedSignals.size,
             minRssi = rssi.firstOrNull(),
             maxRssi = rssi.lastOrNull(),
-            averageRssi = rssi.averageOrNull(),
+            averageRssi = rssi.averageIntOrNull(),
             medianRssi = rssi.medianOrNull(),
         )
     }
@@ -123,7 +123,7 @@ object DeterministicAnalysisReducer {
             rejectedLocationCount = withLocation.size - usable.size,
             bestAccuracyMeters = accuracies.firstOrNull(),
             worstAccuracyMeters = accuracies.lastOrNull(),
-            averageAccuracyMeters = accuracies.map(Float::toDouble).averageOrNull(),
+            averageAccuracyMeters = accuracies.map(Float::toDouble).averageDoubleOrNull(),
         )
     }
 
@@ -421,10 +421,10 @@ object DeterministicAnalysisReducer {
             accuracy <= MAX_ACCURACY_METERS
     }
 
-    private fun List<Int>.averageOrNull(): Double? =
+    private fun List<Int>.averageIntOrNull(): Double? =
         if (isEmpty()) null else sumOf(Int::toLong).toDouble() / size
 
-    private fun List<Double>.averageOrNull(): Double? =
+    private fun List<Double>.averageDoubleOrNull(): Double? =
         if (isEmpty()) null else sum() / size
 
     private fun List<Int>.medianOrNull(): Double? {
