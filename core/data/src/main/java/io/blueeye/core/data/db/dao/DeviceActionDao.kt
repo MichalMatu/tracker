@@ -10,6 +10,18 @@ import io.blueeye.core.data.db.entity.WatchlistEntity
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.IdentityCarryoverVerdict
 
+internal data class DeviceCalibrationUpdate(
+    val fingerprint: String,
+    val userAlias: String?,
+    val userNotes: String?,
+    val isSafeBeacon: Boolean,
+    val alertSound: Boolean,
+    val alertVibration: Boolean,
+    val isTrackingEnabled: Boolean,
+    val isIgnoredForTracking: Boolean,
+    val calibrationLabel: DeviceCalibrationLabel,
+)
+
 @Dao
 @Suppress("TooManyFunctions")
 interface DeviceActionDao {
@@ -141,31 +153,8 @@ interface DeviceActionDao {
         deleteByFingerprint(duplicateFingerprint)
     }
 
-    @Query(
-        """
-        UPDATE devices
-        SET userAlias = :alias,
-            userNotes = :notes,
-            isSafeBeacon = :isSafe,
-            alertSound = :alertSound,
-            alertVibration = :alertVibration,
-            isTrackingEnabled = :isTrackingEnabled,
-            isIgnoredForTracking = :ignored,
-            calibrationLabel = :label
-        WHERE fingerprint = :fingerprint
-        """,
-    )
-    suspend fun updateCalibrationState(
-        fingerprint: String,
-        alias: String?,
-        notes: String?,
-        isSafe: Boolean,
-        alertSound: Boolean,
-        alertVibration: Boolean,
-        isTrackingEnabled: Boolean,
-        ignored: Boolean,
-        label: DeviceCalibrationLabel,
-    ): Int
+    @Update(entity = DeviceEntity::class)
+    suspend fun updateCalibrationState(update: DeviceCalibrationUpdate): Int
 
     @Query("UPDATE devices SET isIgnoredForTracking = :ignored WHERE fingerprint = :fingerprint")
     suspend fun setIgnoredForTracking(fingerprint: String, ignored: Boolean)
