@@ -32,7 +32,7 @@ import javax.inject.Singleton
  */
 @Singleton
 @Suppress("LongParameterList")
-internal class FollowMeAnalysisCoordinator @Inject constructor(
+class FollowMeAnalysisCoordinator @Inject constructor(
     private val classifier: ScanResultClassifier,
     private val followMeScoreCalculator: FollowMeScoreCalculator,
     private val trackerAlertService: TrackerAlertService,
