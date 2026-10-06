@@ -1,5 +1,7 @@
 package io.blueeye.core.domain.analysis
 
+import io.blueeye.core.model.AlertEvidenceEvent
+import io.blueeye.core.model.AlertEvidenceEventType
 import io.blueeye.core.model.DetectionConfidence
 import io.blueeye.core.model.DetectionEvidence
 import io.blueeye.core.model.FollowMeHistorySample
@@ -31,46 +33,53 @@ import kotlin.math.abs
  */
 object DeterministicAnalysisReducer {
     fun reduce(input: AnalysisInput): DeterministicAnalysisCandidate {
-        val uniqueSignals = input.signalSamples.distinct().sortedWith(SIGNAL_ORDER)
-        val acceptedSignals = uniqueSignals.filter(::isUsableSignal)
-        val uniqueFollowMe = input.followMeHistory.distinct().sortedWith(FOLLOW_ME_ORDER)
-        val uniqueEvents = input.alertEvidenceEvents.distinct().sortedWith(ALERT_EVENT_ORDER)
-        val uniqueCandidates = input.identityCandidates.distinct().sortedWith(IDENTITY_INPUT_ORDER)
+        val signals = AnalysisSignalReduction.canonicalSignals(input.signalSamples)
+        val followMeHistory = AnalysisContextReduction.canonicalFollowMe(input.followMeHistory)
+        val alertEvents = AnalysisContextReduction.canonicalEvents(input.alertEvidenceEvents)
+        val identityInput = AnalysisContextReduction.canonicalCandidates(input.identityCandidates)
 
-        val signalSummary = signalSummary(input.signalSamples.size, uniqueSignals, acceptedSignals)
-        val locationSummary = locationSummary(acceptedSignals)
-        val movementSummary = movementSummary(input.device.encounterCount, uniqueFollowMe)
-        val identityCandidates = identityCandidates(input.device.fingerprint, uniqueCandidates, acceptedSignals)
+        val signalSummary =
+            AnalysisSignalReduction.signalSummary(
+                sourceCount = input.signalSamples.size,
+                signals = signals,
+            )
+        val locationSummary = AnalysisSignalReduction.locationSummary(signals.accepted)
+        val movementSummary =
+            AnalysisContextReduction.movementSummary(
+                deviceEncounterCount = input.device.encounterCount,
+                history = followMeHistory,
+            )
+        val identityCandidates =
+            AnalysisContextReduction.identityCandidates(
+                primaryFingerprint = input.device.fingerprint,
+                candidates = identityInput,
+                signals = signals.accepted,
+            )
         val identitySummary =
             AnalysisIdentitySummary(
                 sourceCandidateCount = input.identityCandidates.size,
-                omittedCandidateCount = (identityCandidates.size - MAX_IDENTITY_CANDIDATES).coerceAtLeast(0),
-                candidates = identityCandidates.take(MAX_IDENTITY_CANDIDATES),
+                omittedCandidateCount =
+                    (identityCandidates.size - AnalysisContextReduction.MAX_IDENTITY_CANDIDATES)
+                        .coerceAtLeast(0),
+                candidates = identityCandidates.take(AnalysisContextReduction.MAX_IDENTITY_CANDIDATES),
             )
-        val representativeEvidence = representativeEvidence(input.device.evidence, uniqueEvents)
+        val representativeEvidence =
+            AnalysisContextReduction.representativeEvidence(
+                deviceEvidence = input.device.evidence,
+                events = alertEvents,
+            )
         val contradictions =
-            contradictions(
+            AnalysisContextReduction.contradictions(
                 input = input,
-                followMeHistory = uniqueFollowMe,
+                followMeHistory = followMeHistory,
                 identityCandidates = identityCandidates,
-                rawIdentityCandidates = uniqueCandidates,
+                rawIdentityCandidates = identityInput,
             )
-
         val duplicateCount =
-            (input.signalSamples.size - uniqueSignals.size) +
-                (input.followMeHistory.size - uniqueFollowMe.size) +
-                (input.alertEvidenceEvents.size - uniqueEvents.size) +
-                (input.identityCandidates.size - uniqueCandidates.size)
-
-        val qualityFlags =
-            qualityFlags(
-                duplicateCount = duplicateCount,
-                signalSummary = signalSummary,
-                locationSummary = locationSummary,
-                movementSummary = movementSummary,
-                identitySummary = identitySummary,
-                representativeEvidenceCount = representativeEvidence.totalCount,
-            )
+            (input.signalSamples.size - signals.unique.size) +
+                (input.followMeHistory.size - followMeHistory.size) +
+                (input.alertEvidenceEvents.size - alertEvents.size) +
+                (input.identityCandidates.size - identityInput.size)
 
         return DeterministicAnalysisCandidate(
             deviceFingerprint = input.device.fingerprint,
@@ -79,33 +88,111 @@ object DeterministicAnalysisReducer {
             window =
                 analysisWindow(
                     input = input,
-                    acceptedSignals = acceptedSignals,
-                    followMeHistory = uniqueFollowMe,
-                    identityCandidates = uniqueCandidates,
+                    acceptedSignals = signals.accepted,
+                    followMeHistory = followMeHistory,
+                    identityCandidates = identityInput,
                 ),
             signal = signalSummary,
             locationQuality = locationSummary,
             movement = movementSummary,
             identity = identitySummary,
-            timeBuckets = timeBuckets(acceptedSignals),
+            timeBuckets = AnalysisSignalReduction.timeBuckets(signals.accepted),
             representativeEvidence = representativeEvidence.items,
-            qualityFlags = qualityFlags,
+            qualityFlags =
+                qualityFlags(
+                    QualityInputs(
+                        duplicateCount = duplicateCount,
+                        signalSummary = signalSummary,
+                        locationSummary = locationSummary,
+                        movementSummary = movementSummary,
+                        identitySummary = identitySummary,
+                        hasIdentityCoexistence =
+                            identityCandidates.any {
+                                it.disposition == AnalysisIdentityDisposition.COEXISTENCE_CONFLICT
+                            },
+                        representativeEvidenceCount = representativeEvidence.totalCount,
+                    ),
+                ),
             contradictions = contradictions,
         )
     }
 
-    private fun signalSummary(
-        sourceCount: Int,
-        uniqueSignals: List<SignalSample>,
+    private fun qualityFlags(inputs: QualityInputs): List<AnalysisQualityFlag> {
+        val flags = mutableSetOf<AnalysisQualityFlag>()
+        if (inputs.duplicateCount > 0) flags += AnalysisQualityFlag.DUPLICATES_REDUCED
+        if (inputs.signalSummary.rejectedSampleCount > 0) flags += AnalysisQualityFlag.INVALID_SIGNAL_SAMPLES
+        if (inputs.signalSummary.acceptedSampleCount == 0) flags += AnalysisQualityFlag.NO_SIGNAL_SAMPLES
+        if (inputs.locationSummary.usableLocationCount == 0) flags += AnalysisQualityFlag.NO_USABLE_LOCATION
+        if (
+            inputs.locationSummary.usableLocationCount > 0 &&
+            inputs.locationSummary.usableLocationCount < inputs.signalSummary.acceptedSampleCount
+        ) {
+            flags += AnalysisQualityFlag.PARTIAL_LOCATION_COVERAGE
+        }
+        if (inputs.locationSummary.rejectedLocationCount > 0) {
+            flags += AnalysisQualityFlag.INVALID_LOCATION_SAMPLES
+        }
+        if (inputs.movementSummary.sourceObservationCount == 0) {
+            flags += AnalysisQualityFlag.NO_FOLLOW_ME_HISTORY
+        }
+        if (inputs.movementSummary.unknownMovementObservationCount > 0) {
+            flags += AnalysisQualityFlag.MOVEMENT_UNKNOWN
+        }
+        if (inputs.hasIdentityCoexistence) {
+            flags += AnalysisQualityFlag.IDENTITY_COEXISTENCE_DETECTED
+        }
+        if (inputs.identitySummary.omittedCandidateCount > 0) {
+            flags += AnalysisQualityFlag.IDENTITY_CANDIDATES_TRUNCATED
+        }
+        if (inputs.representativeEvidenceCount > AnalysisContextReduction.MAX_REPRESENTATIVE_EVIDENCE) {
+            flags += AnalysisQualityFlag.REPRESENTATIVE_EVIDENCE_TRUNCATED
+        }
+        return flags.sortedBy(AnalysisQualityFlag::name)
+    }
+
+    private fun analysisWindow(
+        input: AnalysisInput,
         acceptedSignals: List<SignalSample>,
+        followMeHistory: List<FollowMeHistorySample>,
+        identityCandidates: List<IdentityContinuityCandidate>,
+    ): AnalysisWindow {
+        val timestamps =
+            buildList {
+                add(input.device.firstSeenAt)
+                add(input.device.lastSeenAt)
+                acceptedSignals.mapTo(this, SignalSample::timestamp)
+                followMeHistory.mapTo(this, FollowMeHistorySample::timestamp)
+                input.alertEvidenceEvents.mapTo(this) { it.timestamp }
+                identityCandidates.mapTo(this, IdentityContinuityCandidate::timestamp)
+            }.filter { it >= 0L }
+
+        return AnalysisWindow(
+            startTimestamp = timestamps.minOrNull() ?: 0L,
+            endTimestamp = timestamps.maxOrNull() ?: 0L,
+        )
+    }
+}
+
+private object AnalysisSignalReduction {
+    fun canonicalSignals(source: List<SignalSample>): CanonicalSignals {
+        val unique = source.distinct().sortedWith(SIGNAL_ORDER)
+        return CanonicalSignals(
+            unique = unique,
+            accepted = unique.filter(::isUsableSignal),
+        )
+    }
+
+    fun signalSummary(
+        sourceCount: Int,
+        signals: CanonicalSignals,
     ): AnalysisSignalSummary {
-        val rssi = acceptedSignals.map(SignalSample::rssi).sorted()
+        val rssi = signals.accepted.map(SignalSample::rssi).sorted()
         return AnalysisSignalSummary(
             sourceSampleCount = sourceCount,
-            uniqueSampleCount = uniqueSignals.size,
-            acceptedSampleCount = acceptedSignals.size,
-            duplicateSampleCount = sourceCount - uniqueSignals.size,
-            rejectedSampleCount = uniqueSignals.size - acceptedSignals.size,
+            uniqueSampleCount = signals.unique.size,
+            acceptedSampleCount = signals.accepted.size,
+            duplicateSampleCount = sourceCount - signals.unique.size,
+            rejectedSampleCount = signals.unique.size - signals.accepted.size,
             minRssi = rssi.firstOrNull(),
             maxRssi = rssi.lastOrNull(),
             averageRssi = rssi.averageIntOrNull(),
@@ -113,7 +200,7 @@ object DeterministicAnalysisReducer {
         )
     }
 
-    private fun locationSummary(signals: List<SignalSample>): AnalysisLocationQualitySummary {
+    fun locationSummary(signals: List<SignalSample>): AnalysisLocationQualitySummary {
         val withLocation = signals.filter(::hasAnyLocationData)
         val usable = withLocation.filter(::hasUsableLocation)
         val accuracies = usable.map { requireNotNull(it.locationAccuracy) }.sorted()
@@ -128,7 +215,97 @@ object DeterministicAnalysisReducer {
         )
     }
 
-    private fun movementSummary(
+    fun timeBuckets(signals: List<SignalSample>): List<AnalysisTimeBucket> =
+        signals
+            .groupBy { sample -> Math.floorDiv(sample.timestamp, TIME_BUCKET_MS) * TIME_BUCKET_MS }
+            .toSortedMap()
+            .map { (bucketStart, samples) ->
+                val rssi = samples.map(SignalSample::rssi)
+                AnalysisTimeBucket(
+                    startTimestamp = bucketStart,
+                    endExclusiveTimestamp = bucketStart + TIME_BUCKET_MS,
+                    sampleCount = samples.size,
+                    minRssi = rssi.min(),
+                    maxRssi = rssi.max(),
+                    averageRssi = rssi.map(Int::toDouble).average(),
+                    usableLocationCount = samples.count(::hasUsableLocation),
+                )
+            }
+
+    private fun isUsableSignal(sample: SignalSample): Boolean =
+        sample.timestamp >= 0L && sample.rssi in MIN_RSSI..MAX_RSSI
+
+    private fun hasAnyLocationData(sample: SignalSample): Boolean =
+        sample.latitude != null || sample.longitude != null || sample.locationAccuracy != null
+
+    private fun hasUsableLocation(sample: SignalSample): Boolean {
+        val latitude = sample.latitude
+        val longitude = sample.longitude
+        val accuracy = sample.locationAccuracy
+        return latitude != null &&
+            longitude != null &&
+            accuracy != null &&
+            latitude.isFinite() &&
+            longitude.isFinite() &&
+            accuracy.isFinite() &&
+            latitude in MIN_LATITUDE..MAX_LATITUDE &&
+            longitude in MIN_LONGITUDE..MAX_LONGITUDE &&
+            accuracy > MIN_ACCURACY_METERS &&
+            accuracy <= MAX_ACCURACY_METERS
+    }
+
+    private fun List<Int>.averageIntOrNull(): Double? =
+        if (isEmpty()) null else sumOf(Int::toLong).toDouble() / size
+
+    private fun List<Double>.averageDoubleOrNull(): Double? =
+        if (isEmpty()) null else sum() / size
+
+    private fun List<Int>.medianOrNull(): Double? {
+        if (isEmpty()) return null
+        val middle = size / 2
+        return if (size % 2 == 1) {
+            this[middle].toDouble()
+        } else {
+            (this[middle - 1].toDouble() + this[middle].toDouble()) / 2.0
+        }
+    }
+
+    private val SIGNAL_ORDER =
+        compareBy<SignalSample>(
+            SignalSample::timestamp,
+            SignalSample::deviceFingerprint,
+            { it.observedMac.orEmpty() },
+            SignalSample::rssi,
+            { it.latitude ?: Double.NEGATIVE_INFINITY },
+            { it.longitude ?: Double.NEGATIVE_INFINITY },
+            { it.locationAccuracy ?: Float.NEGATIVE_INFINITY },
+        )
+
+    private const val TIME_BUCKET_MS = 60_000L
+    private const val MIN_RSSI = -127
+    private const val MAX_RSSI = 20
+    private const val MIN_LATITUDE = -90.0
+    private const val MAX_LATITUDE = 90.0
+    private const val MIN_LONGITUDE = -180.0
+    private const val MAX_LONGITUDE = 180.0
+    private const val MIN_ACCURACY_METERS = 0f
+    private const val MAX_ACCURACY_METERS = 100f
+}
+
+private object AnalysisContextReduction {
+    const val MAX_IDENTITY_CANDIDATES = 8
+    const val MAX_REPRESENTATIVE_EVIDENCE = 8
+
+    fun canonicalFollowMe(source: List<FollowMeHistorySample>): List<FollowMeHistorySample> =
+        source.distinct().sortedWith(FOLLOW_ME_ORDER)
+
+    fun canonicalEvents(source: List<AlertEvidenceEvent>): List<AlertEvidenceEvent> =
+        source.distinct().sortedWith(ALERT_EVENT_ORDER)
+
+    fun canonicalCandidates(source: List<IdentityContinuityCandidate>): List<IdentityContinuityCandidate> =
+        source.distinct().sortedWith(IDENTITY_INPUT_ORDER)
+
+    fun movementSummary(
         deviceEncounterCount: Int,
         history: List<FollowMeHistorySample>,
     ): AnalysisMovementSummary {
@@ -150,9 +327,7 @@ object DeterministicAnalysisReducer {
             }
 
             if (sample.userMoved == true) {
-                if (!inMovingSegment) {
-                    movingSegments += 1
-                }
+                if (!inMovingSegment) movingSegments += 1
                 inMovingSegment = true
             } else {
                 inMovingSegment = false
@@ -161,7 +336,6 @@ object DeterministicAnalysisReducer {
         }
 
         val maxHistoryEncounterCount = history.maxOfOrNull(FollowMeHistorySample::encounterCount) ?: 0
-
         return AnalysisMovementSummary(
             sourceObservationCount = history.size,
             encounterSegmentCount = encounterSegments,
@@ -173,7 +347,7 @@ object DeterministicAnalysisReducer {
         )
     }
 
-    private fun identityCandidates(
+    fun identityCandidates(
         primaryFingerprint: String,
         candidates: List<IdentityContinuityCandidate>,
         signals: List<SignalSample>,
@@ -212,47 +386,9 @@ object DeterministicAnalysisReducer {
             .sortedWith(IDENTITY_OUTPUT_ORDER)
     }
 
-    private fun hasCoexistence(
-        first: List<Long>,
-        second: List<Long>,
-    ): Boolean {
-        var firstIndex = 0
-        var secondIndex = 0
-        while (firstIndex < first.size && secondIndex < second.size) {
-            val firstTimestamp = first[firstIndex]
-            val secondTimestamp = second[secondIndex]
-            if (abs(firstTimestamp - secondTimestamp) <= IDENTITY_COEXISTENCE_WINDOW_MS) {
-                return true
-            }
-            if (firstTimestamp < secondTimestamp) {
-                firstIndex += 1
-            } else {
-                secondIndex += 1
-            }
-        }
-        return false
-    }
-
-    private fun timeBuckets(signals: List<SignalSample>): List<AnalysisTimeBucket> =
-        signals
-            .groupBy { sample -> Math.floorDiv(sample.timestamp, TIME_BUCKET_MS) * TIME_BUCKET_MS }
-            .toSortedMap()
-            .map { (bucketStart, samples) ->
-                val rssi = samples.map(SignalSample::rssi)
-                AnalysisTimeBucket(
-                    startTimestamp = bucketStart,
-                    endExclusiveTimestamp = bucketStart + TIME_BUCKET_MS,
-                    sampleCount = samples.size,
-                    minRssi = rssi.min(),
-                    maxRssi = rssi.max(),
-                    averageRssi = rssi.map(Int::toDouble).average(),
-                    usableLocationCount = samples.count(::hasUsableLocation),
-                )
-            }
-
-    private fun representativeEvidence(
+    fun representativeEvidence(
         deviceEvidence: List<DetectionEvidence>,
-        events: List<io.blueeye.core.model.AlertEvidenceEvent>,
+        events: List<AlertEvidenceEvent>,
     ): RepresentativeEvidenceSelection {
         val fromDevice = deviceEvidence.map { evidence -> evidence.toAnalysisEvidence(alertEventType = null) }
         val fromEvents =
@@ -270,21 +406,7 @@ object DeterministicAnalysisReducer {
         )
     }
 
-    private fun DetectionEvidence.toAnalysisEvidence(
-        alertEventType: io.blueeye.core.model.AlertEvidenceEventType?,
-    ): AnalysisRepresentativeEvidence =
-        AnalysisRepresentativeEvidence(
-            source = source,
-            confidence = confidence,
-            reasonText = reasonText,
-            timestamp = timestamp,
-            parsedValue = parsedValue,
-            isPassive = isPassive,
-            provenance = provenance,
-            alertEventType = alertEventType,
-        )
-
-    private fun contradictions(
+    fun contradictions(
         input: AnalysisInput,
         followMeHistory: List<FollowMeHistorySample>,
         identityCandidates: List<AnalysisIdentityCandidate>,
@@ -322,7 +444,8 @@ object DeterministicAnalysisReducer {
                 AnalysisContradiction(
                     type = AnalysisContradictionType.TRACKING_STATUS_DIVERGENCE,
                     detail =
-                        "device=${input.device.trackingStatus.name}, latestFollowMe=${latestFollowMe.trackingStatus.name}",
+                        "device=${input.device.trackingStatus.name}, " +
+                            "latestFollowMe=${latestFollowMe.trackingStatus.name}",
                 )
         }
 
@@ -335,7 +458,12 @@ object DeterministicAnalysisReducer {
                 )
         }
 
-        if (followMeHistory.any { it.trackingStatus == TrackingStatus.DANGEROUS && it.userMoved == false }) {
+        val dangerousWithoutMovement =
+            followMeHistory.any {
+                it.trackingStatus == TrackingStatus.DANGEROUS &&
+                    it.userMoved == false
+            }
+        if (dangerousWithoutMovement) {
             contradictions +=
                 AnalysisContradiction(
                     type = AnalysisContradictionType.FOLLOW_ME_WITHOUT_MOVEMENT,
@@ -348,113 +476,42 @@ object DeterministicAnalysisReducer {
             .sortedWith(compareBy<AnalysisContradiction>({ it.type.name }, AnalysisContradiction::detail))
     }
 
-    private fun qualityFlags(
-        duplicateCount: Int,
-        signalSummary: AnalysisSignalSummary,
-        locationSummary: AnalysisLocationQualitySummary,
-        movementSummary: AnalysisMovementSummary,
-        identitySummary: AnalysisIdentitySummary,
-        representativeEvidenceCount: Int,
-    ): List<AnalysisQualityFlag> {
-        val flags = mutableSetOf<AnalysisQualityFlag>()
-        if (duplicateCount > 0) flags += AnalysisQualityFlag.DUPLICATES_REDUCED
-        if (signalSummary.rejectedSampleCount > 0) flags += AnalysisQualityFlag.INVALID_SIGNAL_SAMPLES
-        if (signalSummary.acceptedSampleCount == 0) flags += AnalysisQualityFlag.NO_SIGNAL_SAMPLES
-        if (locationSummary.usableLocationCount == 0) flags += AnalysisQualityFlag.NO_USABLE_LOCATION
-        if (
-            locationSummary.usableLocationCount > 0 &&
-            locationSummary.usableLocationCount < signalSummary.acceptedSampleCount
-        ) {
-            flags += AnalysisQualityFlag.PARTIAL_LOCATION_COVERAGE
+    private fun hasCoexistence(
+        first: List<Long>,
+        second: List<Long>,
+    ): Boolean {
+        var firstIndex = 0
+        var secondIndex = 0
+        while (firstIndex < first.size && secondIndex < second.size) {
+            val firstTimestamp = first[firstIndex]
+            val secondTimestamp = second[secondIndex]
+            if (abs(firstTimestamp - secondTimestamp) <= IDENTITY_COEXISTENCE_WINDOW_MS) {
+                return true
+            }
+            if (firstTimestamp < secondTimestamp) {
+                firstIndex += 1
+            } else {
+                secondIndex += 1
+            }
         }
-        if (locationSummary.rejectedLocationCount > 0) flags += AnalysisQualityFlag.INVALID_LOCATION_SAMPLES
-        if (movementSummary.sourceObservationCount == 0) flags += AnalysisQualityFlag.NO_FOLLOW_ME_HISTORY
-        if (movementSummary.unknownMovementObservationCount > 0) flags += AnalysisQualityFlag.MOVEMENT_UNKNOWN
-        if (identitySummary.candidates.any { it.disposition == AnalysisIdentityDisposition.COEXISTENCE_CONFLICT }) {
-            flags += AnalysisQualityFlag.IDENTITY_COEXISTENCE_DETECTED
-        }
-        if (identitySummary.omittedCandidateCount > 0) flags += AnalysisQualityFlag.IDENTITY_CANDIDATES_TRUNCATED
-        if (representativeEvidenceCount > MAX_REPRESENTATIVE_EVIDENCE) {
-            flags += AnalysisQualityFlag.REPRESENTATIVE_EVIDENCE_TRUNCATED
-        }
-        return flags.sortedBy(AnalysisQualityFlag::name)
+        return false
     }
 
-    private fun analysisWindow(
-        input: AnalysisInput,
-        acceptedSignals: List<SignalSample>,
-        followMeHistory: List<FollowMeHistorySample>,
-        identityCandidates: List<IdentityContinuityCandidate>,
-    ): AnalysisWindow {
-        val timestamps =
-            buildList {
-                add(input.device.firstSeenAt)
-                add(input.device.lastSeenAt)
-                acceptedSignals.mapTo(this, SignalSample::timestamp)
-                followMeHistory.mapTo(this, FollowMeHistorySample::timestamp)
-                input.alertEvidenceEvents.mapTo(this) { it.timestamp }
-                identityCandidates.mapTo(this, IdentityContinuityCandidate::timestamp)
-            }.filter { it >= 0L }
-
-        return AnalysisWindow(
-            startTimestamp = timestamps.minOrNull() ?: 0L,
-            endTimestamp = timestamps.maxOrNull() ?: 0L,
+    private fun DetectionEvidence.toAnalysisEvidence(
+        alertEventType: AlertEvidenceEventType?,
+    ): AnalysisRepresentativeEvidence =
+        AnalysisRepresentativeEvidence(
+            source = source,
+            confidence = confidence,
+            reasonText = reasonText,
+            timestamp = timestamp,
+            parsedValue = parsedValue,
+            isPassive = isPassive,
+            provenance = provenance,
+            alertEventType = alertEventType,
         )
-    }
 
-    private fun isUsableSignal(sample: SignalSample): Boolean =
-        sample.timestamp >= 0L && sample.rssi in MIN_RSSI..MAX_RSSI
-
-    private fun hasAnyLocationData(sample: SignalSample): Boolean =
-        sample.latitude != null || sample.longitude != null || sample.locationAccuracy != null
-
-    private fun hasUsableLocation(sample: SignalSample): Boolean {
-        val latitude = sample.latitude ?: return false
-        val longitude = sample.longitude ?: return false
-        val accuracy = sample.locationAccuracy ?: return false
-        return latitude.isFinite() &&
-            longitude.isFinite() &&
-            accuracy.isFinite() &&
-            latitude in MIN_LATITUDE..MAX_LATITUDE &&
-            longitude in MIN_LONGITUDE..MAX_LONGITUDE &&
-            accuracy > MIN_ACCURACY_METERS &&
-            accuracy <= MAX_ACCURACY_METERS
-    }
-
-    private fun List<Int>.averageIntOrNull(): Double? =
-        if (isEmpty()) null else sumOf(Int::toLong).toDouble() / size
-
-    private fun List<Double>.averageDoubleOrNull(): Double? =
-        if (isEmpty()) null else sum() / size
-
-    private fun List<Int>.medianOrNull(): Double? {
-        if (isEmpty()) return null
-        val middle = size / 2
-        return if (size % 2 == 1) {
-            this[middle].toDouble()
-        } else {
-            (this[middle - 1].toDouble() + this[middle].toDouble()) / 2.0
-        }
-    }
-
-    private fun confidencePriority(confidence: DetectionConfidence): Int =
-        when (confidence) {
-            DetectionConfidence.LOW -> 1
-            DetectionConfidence.MEDIUM -> 2
-            DetectionConfidence.HIGH -> 3
-            DetectionConfidence.CRITICAL -> 4
-        }
-
-    private val SIGNAL_ORDER =
-        compareBy<SignalSample>(
-            SignalSample::timestamp,
-            SignalSample::deviceFingerprint,
-            { it.observedMac.orEmpty() },
-            SignalSample::rssi,
-            { it.latitude ?: Double.NEGATIVE_INFINITY },
-            { it.longitude ?: Double.NEGATIVE_INFINITY },
-            { it.locationAccuracy ?: Float.NEGATIVE_INFINITY },
-        )
+    private fun confidencePriority(confidence: DetectionConfidence): Int = confidence.ordinal + 1
 
     private val FOLLOW_ME_ORDER =
         compareBy<FollowMeHistorySample>(
@@ -466,10 +523,10 @@ object DeterministicAnalysisReducer {
         )
 
     private val ALERT_EVENT_ORDER =
-        compareBy<io.blueeye.core.model.AlertEvidenceEvent>(
-            { it.timestamp },
-            { it.deviceFingerprint },
-            { it.observedMac },
+        compareBy<AlertEvidenceEvent>(
+            AlertEvidenceEvent::timestamp,
+            AlertEvidenceEvent::deviceFingerprint,
+            AlertEvidenceEvent::observedMac,
             { it.eventType.name },
             { it.evidence.source.name },
             { it.evidence.reasonText },
@@ -485,7 +542,7 @@ object DeterministicAnalysisReducer {
         )
 
     private val IDENTITY_OUTPUT_ORDER =
-        compareByDescending<AnalysisIdentityCandidate> { it.confidence }
+        compareByDescending<AnalysisIdentityCandidate>(AnalysisIdentityCandidate::confidence)
             .thenByDescending(AnalysisIdentityCandidate::timestamp)
             .thenBy(AnalysisIdentityCandidate::candidateFingerprint)
             .thenBy(AnalysisIdentityCandidate::reasonCode)
@@ -500,23 +557,27 @@ object DeterministicAnalysisReducer {
             .thenBy { it.parsedValue.orEmpty() }
             .thenBy { it.alertEventType?.name.orEmpty() }
 
-    private data class RepresentativeEvidenceSelection(
-        val totalCount: Int,
-        val items: List<AnalysisRepresentativeEvidence>,
-    )
-
-    private const val TIME_BUCKET_MS = 60_000L
     private const val FOLLOW_ME_SEGMENT_GAP_MS = 30_000L
     private const val IDENTITY_COEXISTENCE_WINDOW_MS = 2_000L
     private const val HIGH_IDENTITY_CONFIDENCE = 0.75f
-    private const val MAX_IDENTITY_CANDIDATES = 8
-    private const val MAX_REPRESENTATIVE_EVIDENCE = 8
-    private const val MIN_RSSI = -127
-    private const val MAX_RSSI = 20
-    private const val MIN_LATITUDE = -90.0
-    private const val MAX_LATITUDE = 90.0
-    private const val MIN_LONGITUDE = -180.0
-    private const val MAX_LONGITUDE = 180.0
-    private const val MIN_ACCURACY_METERS = 0f
-    private const val MAX_ACCURACY_METERS = 100f
 }
+
+private data class CanonicalSignals(
+    val unique: List<SignalSample>,
+    val accepted: List<SignalSample>,
+)
+
+private data class RepresentativeEvidenceSelection(
+    val totalCount: Int,
+    val items: List<AnalysisRepresentativeEvidence>,
+)
+
+private data class QualityInputs(
+    val duplicateCount: Int,
+    val signalSummary: AnalysisSignalSummary,
+    val locationSummary: AnalysisLocationQualitySummary,
+    val movementSummary: AnalysisMovementSummary,
+    val identitySummary: AnalysisIdentitySummary,
+    val hasIdentityCoexistence: Boolean,
+    val representativeEvidenceCount: Int,
+)
