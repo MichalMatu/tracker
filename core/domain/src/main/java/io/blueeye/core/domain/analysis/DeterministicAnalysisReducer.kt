@@ -37,8 +37,16 @@ object DeterministicAnalysisReducer {
         val uniqueEvents = input.alertEvidenceEvents.distinct().sortedWith(ALERT_EVENT_ORDER)
         val uniqueCandidates = input.identityCandidates.distinct().sortedWith(IDENTITY_INPUT_ORDER)
 
+        val signalSummary = signalSummary(input.signalSamples.size, uniqueSignals, acceptedSignals)
         val locationSummary = locationSummary(acceptedSignals)
+        val movementSummary = movementSummary(input.device.encounterCount, uniqueFollowMe)
         val identityCandidates = identityCandidates(input.device.fingerprint, uniqueCandidates, acceptedSignals)
+        val identitySummary =
+            AnalysisIdentitySummary(
+                sourceCandidateCount = input.identityCandidates.size,
+                omittedCandidateCount = (identityCandidates.size - MAX_IDENTITY_CANDIDATES).coerceAtLeast(0),
+                candidates = identityCandidates.take(MAX_IDENTITY_CANDIDATES),
+            )
         val representativeEvidence = representativeEvidence(input.device.evidence, uniqueEvents)
         val contradictions =
             contradictions(
@@ -57,12 +65,10 @@ object DeterministicAnalysisReducer {
         val qualityFlags =
             qualityFlags(
                 duplicateCount = duplicateCount,
-                uniqueSignals = uniqueSignals,
-                acceptedSignals = acceptedSignals,
+                signalSummary = signalSummary,
                 locationSummary = locationSummary,
-                followMeHistory = uniqueFollowMe,
-                identityCandidates = identityCandidates,
-                sourceIdentityCandidateCount = uniqueCandidates.size,
+                movementSummary = movementSummary,
+                identitySummary = identitySummary,
                 representativeEvidenceCount = representativeEvidence.totalCount,
             )
 
@@ -77,15 +83,10 @@ object DeterministicAnalysisReducer {
                     followMeHistory = uniqueFollowMe,
                     identityCandidates = uniqueCandidates,
                 ),
-            signal = signalSummary(input.signalSamples.size, uniqueSignals, acceptedSignals),
+            signal = signalSummary,
             locationQuality = locationSummary,
-            movement = movementSummary(input.device.encounterCount, uniqueFollowMe),
-            identity =
-                AnalysisIdentitySummary(
-                    sourceCandidateCount = input.identityCandidates.size,
-                    omittedCandidateCount = (identityCandidates.size - MAX_IDENTITY_CANDIDATES).coerceAtLeast(0),
-                    candidates = identityCandidates.take(MAX_IDENTITY_CANDIDATES),
-                ),
+            movement = movementSummary,
+            identity = identitySummary,
             timeBuckets = timeBuckets(acceptedSignals),
             representativeEvidence = representativeEvidence.items,
             qualityFlags = qualityFlags,
@@ -349,31 +350,30 @@ object DeterministicAnalysisReducer {
 
     private fun qualityFlags(
         duplicateCount: Int,
-        uniqueSignals: List<SignalSample>,
-        acceptedSignals: List<SignalSample>,
+        signalSummary: AnalysisSignalSummary,
         locationSummary: AnalysisLocationQualitySummary,
-        followMeHistory: List<FollowMeHistorySample>,
-        identityCandidates: List<AnalysisIdentityCandidate>,
-        sourceIdentityCandidateCount: Int,
+        movementSummary: AnalysisMovementSummary,
+        identitySummary: AnalysisIdentitySummary,
         representativeEvidenceCount: Int,
     ): List<AnalysisQualityFlag> {
         val flags = mutableSetOf<AnalysisQualityFlag>()
         if (duplicateCount > 0) flags += AnalysisQualityFlag.DUPLICATES_REDUCED
-        if (uniqueSignals.size > acceptedSignals.size) flags += AnalysisQualityFlag.INVALID_SIGNAL_SAMPLES
-        if (acceptedSignals.isEmpty()) flags += AnalysisQualityFlag.NO_SIGNAL_SAMPLES
+        if (signalSummary.rejectedSampleCount > 0) flags += AnalysisQualityFlag.INVALID_SIGNAL_SAMPLES
+        if (signalSummary.acceptedSampleCount == 0) flags += AnalysisQualityFlag.NO_SIGNAL_SAMPLES
         if (locationSummary.usableLocationCount == 0) flags += AnalysisQualityFlag.NO_USABLE_LOCATION
-        if (locationSummary.usableLocationCount > 0 && locationSummary.usableLocationCount < acceptedSignals.size) {
+        if (
+            locationSummary.usableLocationCount > 0 &&
+            locationSummary.usableLocationCount < signalSummary.acceptedSampleCount
+        ) {
             flags += AnalysisQualityFlag.PARTIAL_LOCATION_COVERAGE
         }
         if (locationSummary.rejectedLocationCount > 0) flags += AnalysisQualityFlag.INVALID_LOCATION_SAMPLES
-        if (followMeHistory.isEmpty()) flags += AnalysisQualityFlag.NO_FOLLOW_ME_HISTORY
-        if (followMeHistory.any { it.userMoved == null }) flags += AnalysisQualityFlag.MOVEMENT_UNKNOWN
-        if (identityCandidates.any { it.disposition == AnalysisIdentityDisposition.COEXISTENCE_CONFLICT }) {
+        if (movementSummary.sourceObservationCount == 0) flags += AnalysisQualityFlag.NO_FOLLOW_ME_HISTORY
+        if (movementSummary.unknownMovementObservationCount > 0) flags += AnalysisQualityFlag.MOVEMENT_UNKNOWN
+        if (identitySummary.candidates.any { it.disposition == AnalysisIdentityDisposition.COEXISTENCE_CONFLICT }) {
             flags += AnalysisQualityFlag.IDENTITY_COEXISTENCE_DETECTED
         }
-        if (sourceIdentityCandidateCount > MAX_IDENTITY_CANDIDATES) {
-            flags += AnalysisQualityFlag.IDENTITY_CANDIDATES_TRUNCATED
-        }
+        if (identitySummary.omittedCandidateCount > 0) flags += AnalysisQualityFlag.IDENTITY_CANDIDATES_TRUNCATED
         if (representativeEvidenceCount > MAX_REPRESENTATIVE_EVIDENCE) {
             flags += AnalysisQualityFlag.REPRESENTATIVE_EVIDENCE_TRUNCATED
         }
