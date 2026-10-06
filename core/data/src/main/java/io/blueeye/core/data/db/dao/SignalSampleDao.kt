@@ -41,7 +41,6 @@ interface SignalSampleDao {
     """,
     )
     fun getSamplesWithLocation(limit: Int = 500): Flow<List<SignalSampleEntity>>
-
     /**
      * Lightweight per-device observations for the sightings map.
      * Raw Bluetooth payload fields are intentionally not selected.
