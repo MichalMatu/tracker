@@ -74,7 +74,7 @@ class DeterministicAnalysisReducerTest {
         val summary =
             DeterministicAnalysisReducer.reduce(
                 AnalysisInputV1(
-                    device = device(firstSeenAt = 0L, lastSeenAt = 60_000L),
+                    device = device(),
                     signalSamples =
                         listOf(
                             first,
@@ -233,8 +233,6 @@ class DeterministicAnalysisReducerTest {
     }
 
     private fun device(
-        firstSeenAt: Long = 0L,
-        lastSeenAt: Long = 300_000L,
         trackingStatus: TrackingStatus = TrackingStatus.SAFE,
         followingScore: Float = 0f,
         calibrationLabel: DeviceCalibrationLabel = DeviceCalibrationLabel.UNKNOWN,
@@ -258,8 +256,8 @@ class DeterministicAnalysisReducerTest {
             userNotes = null,
             alertSound = false,
             alertVibration = false,
-            firstSeenAt = firstSeenAt,
-            lastSeenAt = lastSeenAt,
+            firstSeenAt = 0L,
+            lastSeenAt = 300_000L,
             encounterCount = 1,
             calibrationLabel = calibrationLabel,
             evidence = evidence,
