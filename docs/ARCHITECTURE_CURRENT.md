@@ -78,6 +78,18 @@ A September 2026 field capture provides a useful regression/reference case witho
 
 This case is useful for parser/regression work because it separates three claims that must remain distinct: passive advertisement structure, probable CCU family, and active GATT evidence. Future authorized field validation can compare the same passive fingerprint with explicit per-device GATT discovery without enabling automatic fleet-wide probing.
 
+A1 parser/data hardening is closed around this boundary: privacy-safe Lime-shaped scan fixtures, service-data truncation tests and advertisement-evidence boundary tests prevent malformed/reserved records from fabricating structured evidence. Existing carryover regressions preserve the coexistence-vs-rotation and identity-conflict safeguards.
+
+## Location/data-quality boundary
+
+Location is observation metadata for the phone, never an inferred exact Bluetooth-device position.
+
+- A usable observation requires finite latitude/longitude within valid geographic ranges.
+- Reported accuracy must be finite, greater than 0 m and at most 100 m.
+- Details sightings reject unusable observations before clustering and represent a cluster with a real accepted observation rather than a synthetic device coordinate.
+- Deterministic analysis counts usable, rejected and missing location samples separately and exposes location-quality summaries/flags without emitting exact coordinates.
+- No route/polyline is inferred from phone observation points.
+
 ## Deterministic analysis boundary
 
 A2/A3 are implemented as an Android-light local analysis layer:
