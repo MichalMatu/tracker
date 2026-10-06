@@ -6,6 +6,7 @@ import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.IdentityCarryoverVerdict
 import io.blueeye.core.model.IdentityContinuityCandidate
 import io.blueeye.core.model.RadarDeviceSummary
+import io.blueeye.core.model.SightingObservation
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -30,6 +31,8 @@ interface DeviceQueryRepository {
     fun getDeviceFlow(fingerprint: String): Flow<Result<Device?>>
 
     fun getSignalSamples(fingerprint: String): Flow<Result<List<io.blueeye.core.model.SignalSample>>>
+
+    fun getSightings(fingerprint: String): Flow<Result<List<SightingObservation>>>
 
     fun getFollowMeHistory(fingerprint: String): Flow<Result<List<io.blueeye.core.model.FollowMeHistorySample>>>
 
