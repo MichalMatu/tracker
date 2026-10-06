@@ -232,8 +232,7 @@ private object AnalysisSignalReduction {
                 )
             }
 
-    private fun isUsableSignal(sample: SignalSample): Boolean =
-        sample.timestamp >= 0L && sample.rssi in MIN_RSSI..MAX_RSSI
+    private fun isUsableSignal(sample: SignalSample): Boolean = sample.timestamp >= 0L && sample.rssi in MIN_RSSI..MAX_RSSI
 
     private fun hasAnyLocationData(sample: SignalSample): Boolean =
         sample.latitude != null || sample.longitude != null || sample.locationAccuracy != null
@@ -254,11 +253,9 @@ private object AnalysisSignalReduction {
             accuracy <= MAX_ACCURACY_METERS
     }
 
-    private fun List<Int>.averageIntOrNull(): Double? =
-        if (isEmpty()) null else sumOf(Int::toLong).toDouble() / size
+    private fun List<Int>.averageIntOrNull(): Double? = if (isEmpty()) null else sumOf(Int::toLong).toDouble() / size
 
-    private fun List<Double>.averageDoubleOrNull(): Double? =
-        if (isEmpty()) null else sum() / size
+    private fun List<Double>.averageDoubleOrNull(): Double? = if (isEmpty()) null else sum() / size
 
     private fun List<Int>.medianOrNull(): Double? {
         if (isEmpty()) return null
@@ -296,11 +293,9 @@ private object AnalysisContextReduction {
     const val MAX_IDENTITY_CANDIDATES = 8
     const val MAX_REPRESENTATIVE_EVIDENCE = 8
 
-    fun canonicalFollowMe(source: List<FollowMeHistorySample>): List<FollowMeHistorySample> =
-        source.distinct().sortedWith(FOLLOW_ME_ORDER)
+    fun canonicalFollowMe(source: List<FollowMeHistorySample>): List<FollowMeHistorySample> = source.distinct().sortedWith(FOLLOW_ME_ORDER)
 
-    fun canonicalEvents(source: List<AlertEvidenceEvent>): List<AlertEvidenceEvent> =
-        source.distinct().sortedWith(ALERT_EVENT_ORDER)
+    fun canonicalEvents(source: List<AlertEvidenceEvent>): List<AlertEvidenceEvent> = source.distinct().sortedWith(ALERT_EVENT_ORDER)
 
     fun canonicalCandidates(source: List<IdentityContinuityCandidate>): List<IdentityContinuityCandidate> =
         source.distinct().sortedWith(IDENTITY_INPUT_ORDER)
@@ -497,9 +492,7 @@ private object AnalysisContextReduction {
         return false
     }
 
-    private fun DetectionEvidence.toAnalysisEvidence(
-        alertEventType: AlertEvidenceEventType?,
-    ): AnalysisRepresentativeEvidence =
+    private fun DetectionEvidence.toAnalysisEvidence(alertEventType: AlertEvidenceEventType?): AnalysisRepresentativeEvidence =
         AnalysisRepresentativeEvidence(
             source = source,
             confidence = confidence,
