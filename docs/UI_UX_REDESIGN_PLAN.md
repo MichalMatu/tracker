@@ -2,11 +2,12 @@
 
 ## Status
 
-- **Active product plan** on `main`.
+- **Current implementation slice is closed on `main`.**
 - Scanner/ingest Phase 3 baseline is accepted; do not reopen it without a concrete regression.
-- Compact Radar cards, lightweight Radar projection, decision-first Details and collapsed Technical Details have landed.
-- Recent field changes reduced false-positive/protocol noise and added Live Nearby.
-- Deterministic Analysis Reducer V1 (A2) and Versioned Analysis Bundle V1 (A3) have landed; current focus is physical validation plus the next explicitly scoped product/analyst work, not another broad refactor.
+- Compact Radar cards, lightweight Radar projection, decision-first Details, collapsed Technical Details, Live Nearby and the per-device sightings map have landed.
+- A1 parser/data hardening, A2 Deterministic Analysis Reducer V1 and A3 Versioned Analysis Bundle V1 are implemented.
+- Remaining U1/U2/U3 checks below are deferred **physical S22+ acceptance checks**. They must not be marked passed without real-device evidence.
+- A4 is future optional analyst work and requires a new explicit product decision; it is not an active implementation queue.
 
 ## Product guardrails
 
@@ -31,27 +32,30 @@
 
 Historical phase-by-phase acceptance reports were intentionally removed; concise provenance is in `HISTORY.md` and full details remain in Git history.
 
-## U1 — Field quality and Radar usefulness
+## Deferred physical validation — U1 Radar
 
-- [ ] Validate current `main` on Samsung S22+ after the latest noise/classification changes.
-- [ ] Confirm active/in-range devices stay easy to find even when high-volume protocols are present.
-- [ ] Verify Apple/Find Hub protocol traffic no longer floods useful Radar content.
-- [ ] Record and reduce reproducible false positives without weakening evidence requirements globally.
-- [ ] Verify 100+ controlled/recent-device behavior when a dense scenario is needed.
-- [ ] Keep list geometry/recomposition/jank within the accepted direction while live values update.
+These checks require a reachable Samsung S22+ and are intentionally not claimed complete from software-only evidence:
 
-**Gate:** a real dense/ordinary walk remains usable and attention groups are evidence-driven rather than dominated by protocol volume.
+- validate current `main` after the latest noise/classification changes;
+- confirm active/in-range devices stay easy to find amid high-volume protocols;
+- verify Apple/Find Hub traffic does not flood useful Radar content;
+- capture any reproducible false positives before changing heuristics;
+- repeat a dense 100+ scenario only when a comparable field run is needed;
+- confirm list geometry/recomposition/jank remains within the accepted direction.
 
-## U2 — Details / Tracking & Signal
+**Runtime gate:** a real dense/ordinary walk remains usable and attention groups are evidence-driven rather than dominated by protocol volume.
 
-- [ ] Verify the current first viewport explains device/attention state without reading raw Bluetooth fields.
-- [ ] Keep RSSI history first-class with meaningful time context, current value and bounded aggregation/downsampling.
-- [ ] Show movement/Follow-Me context only when it adds decision value.
-- [ ] Keep secondary history/technical sections stable during live updates and scrolling.
-- [ ] Prefer lazy/keyed composition where measurement shows it materially improves long Details surfaces.
-- [ ] Validate dark mode and large font scale.
+## Deferred physical validation — U2 Details / Tracking & Signal
 
-**Gate:** live Details remains readable/stable through a long session with both rich-evidence and low-evidence devices.
+Software/UI implementation is present. Real-device acceptance still needs to confirm:
+
+- the first viewport explains device/attention state without relying on raw Bluetooth fields;
+- RSSI history remains readable with meaningful time context;
+- movement/Follow-Me context appears only when it adds decision value;
+- secondary history/technical sections remain stable during live updates and scrolling;
+- dark mode and large font scale remain usable on-device.
+
+**Runtime gate:** live Details remains readable/stable through a long session with both rich-evidence and low-evidence devices.
 
 ## U3 — Sightings map
 
@@ -70,22 +74,24 @@ Implementation policy:
 - map tiles load only after an explicit **Show map** action; stored sighting records remain local, while the displayed map area is requested from the configured third-party tile provider;
 - a global map destination remains deferred.
 
-**Gate:** implementation is complete; physical validation on S22+ remains required to confirm map readability, lifecycle behavior, poor-GPS handling and dense-sample interpretation.
+**Implementation gate:** complete. Physical S22+ validation remains a deferred runtime gate for readability, lifecycle behavior, poor-GPS handling and dense-sample interpretation.
 
 ## A1 — Parser/data hardening
 
-- [ ] Build privacy-safe fixtures from confirmed field defects.
-- [ ] Add malformed/truncated payload tests and representative supported protocol/vendor fixtures.
-- [ ] Harden manufacturer/service/UUID/address-transition boundaries from reproducible evidence.
-- [ ] Formalize GPS/data-quality policy where it affects analysis.
+- [x] Build privacy-safe fixtures from confirmed field defects.
+- [x] Add malformed/truncated payload tests and representative supported protocol/vendor fixtures.
+- [x] Harden manufacturer/service/UUID/address-transition boundaries from reproducible evidence.
+- [x] Formalize GPS/data-quality policy where it affects analysis.
 
-Current progress on `main`:
+Accepted evidence on `main`:
+
 - privacy-safe legacy Lime/LBCAT-S-shaped scan fixtures cover the confirmed 59-byte advertisement/scan-response layout without retaining field identifiers;
-- `ServiceDataExtractor` regression tests cover valid 16-bit service data, empty payloads and truncated AD structures;
-- `AdvertisementEvidenceParser` regression tests prevent reserved/truncated raw records from fabricating Appearance, manufacturer or service-UUID evidence while preserving representative valid structured evidence;
-- existing address-carryover tests already cover coexistence-vs-rotation timing, corroborated sequential carryover, long-gap candidate-only behavior and Apple family/shadow conflict guards.
+- `ServiceDataExtractor` tests cover valid 16-bit service data, empty payloads and truncated AD structures;
+- `AdvertisementEvidenceParser` tests prevent reserved/truncated raw records from fabricating Appearance, manufacturer or service-UUID evidence while preserving representative valid structured evidence;
+- address-carryover tests cover coexistence-vs-rotation timing, corroborated sequential carryover, long-gap candidate-only behavior and Apple family/shadow conflict guards;
+- location policy is deterministic in both Details sightings and analysis reduction: coordinates must be finite/in-range, accuracy must be finite, greater than 0 m and at most 100 m, poor/missing samples are rejected or counted separately, and analysis output does not expose exact coordinates.
 
-A1 remains open for additional field-defect protocol/vendor fixtures and explicit GPS/data-quality policy hardening.
+**Gate:** A1 is closed. Future parser/heuristic changes must still begin from new reproducible privacy-safe field evidence rather than reopening this baseline speculatively.
 
 ## A2 — Deterministic reducer
 
@@ -112,16 +118,18 @@ A1 remains open for additional field-defect protocol/vendor fixtures and explici
 
 **Gate:** A3 is implemented and merged. `AnalysisBundleV1` is a local, bounded contract ready for future optional analyst integration; T0 remains debug-only and T1+ telemetry remains blocked.
 
-## A4 — Optional analyst and feedback loop
+## A4 — Future optional analyst and feedback loop
 
-- [ ] Explicit opt-in; local detection remains fully functional when disabled.
-- [ ] Keep AI assessment separate from local assessment.
-- [ ] Structured response: assessment, confidence, supporting/counter evidence, unknowns/data-quality caveats.
-- [ ] Turn confirmed field problems into privacy-safe fixtures and deterministic fixes where possible.
-- [ ] Replay old regression datasets before accepting heuristic changes.
+Not active until an explicit product decision opens this workstream. The intended guardrails remain:
+
+- explicit opt-in; local detection remains fully functional when disabled;
+- AI assessment stays separate from local assessment;
+- structured response includes assessment, confidence, supporting/counter evidence and unknowns/data-quality caveats;
+- confirmed field problems become privacy-safe fixtures and deterministic fixes where possible;
+- old regression datasets are replayed before heuristic changes are accepted.
 
 The continuous developer telemetry/feedback transport is specified separately in `TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md`.
 
-## Definition of done
+## Closure
 
-This workstream is successful when normal users see a compact stable Radar and decision-first Details, field noise/false positives stay controlled, signal/location history is useful without overstating precision, and large sessions can be deterministically reduced to small explainable analysis inputs while the app remains fully local-first without AI.
+The current implementation baseline is closed on `main`: compact Radar, decision-first Details, sightings-map implementation, parser/data hardening and deterministic A2/A3 analysis are in place while scanner/ingest semantics remain accepted and untouched. The only remaining acceptance work in this plan is explicit physical S22+ validation; future analyst/production-telemetry work requires a new decision and is not implicitly queued.
