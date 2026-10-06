@@ -41,7 +41,8 @@ The practical goal is to help a user answer:
 
 6. **Optional deeper analysis**
    - Local deterministic collection, parsing, reduction and alerting must remain fully functional without AI.
-   - A future optional Analyst mode may send a small, versioned Analysis Bundle containing reduced evidence rather than the entire database/raw scan stream.
+   - A deterministic local reducer and versioned Analysis Bundle V1 now provide a small privacy-bounded representation instead of the entire database/raw scan stream.
+   - A future optional Analyst mode may consume that bundle; no production transport is enabled by the existence of the schema.
    - AI assessment must be labeled separately from the local assessment and include supporting evidence, counter-evidence and uncertainty.
 
 ## Processing direction

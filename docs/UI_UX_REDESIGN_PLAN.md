@@ -6,7 +6,7 @@
 - Scanner/ingest Phase 3 baseline is accepted; do not reopen it without a concrete regression.
 - Compact Radar cards, lightweight Radar projection, decision-first Details and collapsed Technical Details have landed.
 - Recent field changes reduced false-positive/protocol noise and added Live Nearby.
-- Current focus: physical validation and remaining product/data-analysis work, not another visual rewrite.
+- Deterministic Analysis Reducer V1 (A2) and Versioned Analysis Bundle V1 (A3) have landed; current focus is physical validation plus the next explicitly scoped product/analyst work, not another broad refactor.
 
 ## Product guardrails
 
@@ -81,24 +81,28 @@ Implementation policy:
 
 ## A2 — Deterministic reducer
 
-Reduce large scan sessions locally before any AI step:
+- [x] Canonical sorting, duplicate/noise reduction and fixed time bucketing.
+- [x] RSSI and location-quality summaries without exact GPS in the output.
+- [x] Movement/encounter segmentation and Follow-Me history reduction.
+- [x] Identity candidate summaries with coexistence safeguards.
+- [x] Bounded representative evidence, quality flags and contradictions.
+- [x] Pure `DeterministicAnalysisReducer` in `core:domain`; no DB, Android API or system clock dependency.
+- [x] Permutation, duplicate, bucket-boundary, coexistence, RSSI, poor/no-GPS, Follow-Me, evidence and contradiction tests.
 
-- duplicate/noise reduction and time bucketing;
-- identity candidates with coexistence safeguards;
-- movement/encounter segmentation;
-- RSSI/location summaries;
-- representative evidence selection;
-- contradictions and data-quality flags.
-
-Output a stable, explainable analysis-candidate representation.
+**Gate:** A2 is implemented and merged. The reducer produces a stable, explainable `AnalysisCandidate` representation and does not change accepted scanner/ingest behavior.
 
 ## A3 — Versioned Analysis Bundle
 
-- [ ] Versioned candidate/session schema.
-- [ ] Timeline/encounters, movement, RSSI statistics and location-quality summaries.
-- [ ] Identity transitions, representative packets/features, local verdict and contradictions.
-- [ ] Explicit privacy review; avoid unrestricted DB/raw-history upload.
-- [ ] Deterministic serialization tests.
+- [x] Versioned V1 candidate/session schema in `core:model`.
+- [x] Timeline/encounters, movement, RSSI statistics and location-quality summaries.
+- [x] Identity summaries, local verdict, representative structured evidence, quality flags and contradictions.
+- [x] Deterministic session-scoped aliases instead of raw device/identity fingerprints.
+- [x] Exact coordinates, hardware addresses, raw payloads and free-form evidence text excluded from the bundle.
+- [x] Active GATT/RFCOMM probe evidence excluded by default and counted as omitted.
+- [x] Deterministic JSON serialization/round-trip and privacy-boundary tests.
+- [x] Pure `AnalysisBundleBuilder`; no `DatabaseExporter`, Drive/Gmail or T1+ transport integration.
+
+**Gate:** A3 is implemented and merged. `AnalysisBundleV1` is a local, bounded contract ready for future optional analyst integration; T0 remains debug-only and T1+ telemetry remains blocked.
 
 ## A4 — Optional analyst and feedback loop
 

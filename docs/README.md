@@ -6,8 +6,9 @@ This directory contains **current sources of truth**, not a chronological work l
 
 - `main` is the source of truth.
 - Phase 3 scanner/ingest field reacceptance is **closed / accepted**.
-- Radar/Details redesign has landed; current work is field validation, noise/false-positive reduction and remaining UX/analysis follow-up.
-- The optional Drive + Gmail T0 telemetry/AI developer bridge is implemented and accepted for debug use; T1+ automatic production telemetry remains intentionally blocked.
+- Radar/Details redesign and the per-device sightings map have landed; physical S22+ validation remains for map/runtime behavior.
+- A2 Deterministic Analysis Reducer V1 and A3 Versioned Analysis Bundle V1 are implemented on `main` as pure local analysis layers.
+- The optional Drive + Gmail T0 telemetry/AI developer bridge is implemented and accepted for debug use; the Analysis Bundle is not wired into it and T1+ automatic production telemetry remains intentionally blocked.
 
 ## Read order
 

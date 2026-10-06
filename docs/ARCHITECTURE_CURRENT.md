@@ -7,8 +7,8 @@ BlueEye is a local-first Android/Kotlin application. `main` is the source of tru
 | Module | Responsibility |
 | --- | --- |
 | `app` | Android entry point, Hilt wiring, Navigation Compose |
-| `core:model` | Shared domain/evidence models |
-| `core:domain` | Repository/runtime contracts and use cases |
+| `core:model` | Shared domain/evidence models, deterministic analysis models and versioned Analysis Bundle schema |
+| `core:domain` | Repository/runtime contracts/use cases plus pure deterministic analysis reduction and bundle building |
 | `core:data` | Room, Bluetooth scanning, foreground service, classification, persistence, sessions and alerts |
 | `core:decoders` | BLE/Bluetooth decoders |
 | `core:ui` | Theme, dimensions and shared Compose UI |
@@ -77,6 +77,20 @@ A September 2026 field capture provides a useful regression/reference case witho
 - Different scooter chassis may share this CCU/BLE family. Do not infer a vehicle generation solely from this radio fingerprint.
 
 This case is useful for parser/regression work because it separates three claims that must remain distinct: passive advertisement structure, probable CCU family, and active GATT evidence. Future authorized field validation can compare the same passive fingerprint with explicit per-device GATT discovery without enabling automatic fleet-wide probing.
+
+## Deterministic analysis boundary
+
+A2/A3 are implemented as an Android-light local analysis layer:
+
+- `core:model/.../analysis/AnalysisModels.kt` defines the stable reduced analysis candidate model.
+- `core:domain/.../analysis/DeterministicAnalysisReducer.kt` reduces existing device, signal, Follow-Me, alert-evidence and identity-candidate inputs without DB, Android API or wall-clock access.
+- The reducer canonicalizes order, removes duplicate/noise samples, uses fixed time buckets, summarizes RSSI/location quality, segments movement, bounds representative evidence and surfaces quality flags/contradictions.
+- `core:model/.../analysis/AnalysisBundleModels.kt` defines versioned `AnalysisBundleV1` JSON.
+- `core:domain/.../analysis/AnalysisBundleBuilder.kt` maps reduced candidates into a deterministic privacy-bounded bundle with session-scoped aliases.
+- The bundle excludes exact coordinates, raw hardware identifiers/fingerprints, raw payloads and free-form evidence text. Active GATT/RFCOMM probe evidence is excluded by default and counted as omitted.
+- The bundle is not wired into `DatabaseExporter`, Drive/Gmail or a production telemetry outbox. T0 remains a debug bridge and T1+ remains intentionally blocked.
+
+This layer consumes already accepted runtime inputs; it does not reopen scanner/ingest ownership or semantics.
 
 ## Current product direction
 
