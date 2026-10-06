@@ -39,6 +39,13 @@ jobs:
       - name: Static analysis, lint and unit tests
         run: ./gradlew --parallel --max-workers=3 qualityCheck --stacktrace
 
+      - name: Print detekt reports on failure
+        if: failure()
+        shell: bash
+        run: |
+          set -u
+          find . -path '*/build/reports/detekt/*.txt' -type f -print -exec cat {} \;
+
       # Keep this in the same job so compilation/configuration caches from the
       # quality gate remain hot for the APK builds.
       - name: Build debug APK
