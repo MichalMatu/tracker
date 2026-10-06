@@ -29,6 +29,20 @@ data class DetailsSightingsSummary(
 ) {
     val hasUsableLocations: Boolean
         get() = clusters.isNotEmpty()
+
+    companion object {
+        val EMPTY =
+            DetailsSightingsSummary(
+                clusters = emptyList(),
+                sourceObservationCount = 0,
+                acceptedObservationCount = 0,
+                visibleObservationCount = 0,
+                rejectedObservationCount = 0,
+                omittedClusterCount = 0,
+                firstSeenAt = null,
+                lastSeenAt = null,
+            )
+    }
 }
 
 object DetailsSightingsReducer {
