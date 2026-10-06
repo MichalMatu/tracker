@@ -127,8 +127,7 @@ private object AnalysisBundleAliasFactory {
     private fun alias(
         prefix: String,
         zeroBasedIndex: Int,
-    ): String =
-        "$prefix-${(zeroBasedIndex + 1).toString().padStart(ALIAS_DIGITS, '0')}"
+    ): String = "$prefix-${(zeroBasedIndex + 1).toString().padStart(ALIAS_DIGITS, '0')}"
 
     private const val CANDIDATE_ALIAS_PREFIX = "candidate"
     private const val IDENTITY_ALIAS_PREFIX = "identity"
