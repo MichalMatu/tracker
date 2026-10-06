@@ -157,7 +157,7 @@ class DeterministicAnalysisReducerTest {
 
         assertEquals(
             listOf("candidate-a", "other-device"),
-            candidate.identityRelations.map { it.relatedLocalCandidateKey },
+            candidate.identity.relations.map { it.relatedLocalCandidateKey },
         )
         assertTrue(
             candidate.diagnostics.contradictions.contains(
@@ -256,6 +256,45 @@ class DeterministicAnalysisReducerTest {
         assertTrue(
             candidate.diagnostics.contradictions.contains(
                 AnalysisContradictionV1.BASELINE_OBSERVATION_WITH_DANGEROUS_STATUS,
+            ),
+        )
+    }
+
+    @Test
+    fun `large timelines remain bounded and report truncation`() {
+        val signalCount = AnalysisReducerRulesV1.maxSignalBuckets + 2
+        val identityCount = AnalysisReducerRulesV1.maxIdentityRelations + 2
+        val candidate =
+            reduce(
+                signalSamples =
+                    (0 until signalCount).map { index ->
+                        signal(
+                            timestamp = index.toLong() * AnalysisReducerRulesV1.signalBucketMs,
+                        )
+                    },
+                identityCandidates =
+                    (0 until identityCount).map { index ->
+                        identity(
+                            id = index.toLong(),
+                            timestamp = index.toLong(),
+                            candidateFingerprint = "candidate-$index",
+                        )
+                    },
+                completeness = completeHistory(),
+            )
+
+        assertEquals(signalCount, candidate.signal.totalBucketCount)
+        assertEquals(AnalysisReducerRulesV1.maxSignalBuckets, candidate.signal.buckets.size)
+        assertEquals(identityCount, candidate.identity.totalRelationCount)
+        assertEquals(AnalysisReducerRulesV1.maxIdentityRelations, candidate.identity.relations.size)
+        assertTrue(
+            candidate.diagnostics.qualityFlags.contains(
+                AnalysisQualityFlagV1.SIGNAL_BUCKETS_TRUNCATED,
+            ),
+        )
+        assertTrue(
+            candidate.diagnostics.qualityFlags.contains(
+                AnalysisQualityFlagV1.IDENTITY_RELATIONS_TRUNCATED,
             ),
         )
     }
