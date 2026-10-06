@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.blueeye.core.domain.calibration.suppressesTracking
 import io.blueeye.core.domain.calibration.toCalibrationDeviceConfig
 import io.blueeye.core.domain.details.DeviceConnectionController
 import io.blueeye.core.domain.details.DeviceFocusedScanController
@@ -162,16 +161,11 @@ class DetailsViewModel
         fun updateCalibrationLabel(label: DeviceCalibrationLabel) {
             val current = _device.value ?: return
             viewModelScope.launch {
-                val config = current.toCalibrationDeviceConfig(label)
-                val result =
-                    repository.updateDeviceConfig(
-                        fingerprint = fingerprint,
-                        config = config,
-                    )
-                if (result.isSuccess) {
-                    repository.setIgnoredForTracking(fingerprint, label.suppressesTracking())
-                    repository.setCalibrationLabel(fingerprint, label)
-                }
+                repository.updateDeviceCalibration(
+                    fingerprint = fingerprint,
+                    config = current.toCalibrationDeviceConfig(label),
+                    label = label,
+                )
             }
         }
 
