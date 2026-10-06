@@ -63,6 +63,7 @@ dependencies {
     // UI
     implementation(libs.androidx.core.ktx)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.maplibre.android)
 
     // Testing
     testImplementation(libs.junit)
