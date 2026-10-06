@@ -56,6 +56,12 @@ interface DeviceManageRepository {
         config: DeviceConfig
     ): Result<Unit>
 
+    suspend fun updateDeviceCalibration(
+        fingerprint: String,
+        config: DeviceConfig,
+        label: DeviceCalibrationLabel,
+    ): Result<Unit>
+
     suspend fun setIgnoredForTracking(
         fingerprint: String,
         ignored: Boolean
