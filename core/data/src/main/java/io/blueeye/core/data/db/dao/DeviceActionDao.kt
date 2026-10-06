@@ -10,17 +10,18 @@ import io.blueeye.core.data.db.entity.WatchlistEntity
 import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.IdentityCarryoverVerdict
 
-internal data class DeviceCalibrationUpdate(
+internal class DeviceCalibrationUpdate(
     val fingerprint: String,
-    val userAlias: String?,
-    val userNotes: String?,
-    val isSafeBeacon: Boolean,
-    val alertSound: Boolean,
-    val alertVibration: Boolean,
-    val isTrackingEnabled: Boolean,
-    val isIgnoredForTracking: Boolean,
-    val calibrationLabel: DeviceCalibrationLabel,
-)
+) {
+    var userAlias: String? = null
+    var userNotes: String? = null
+    var isSafeBeacon: Boolean = false
+    var alertSound: Boolean = false
+    var alertVibration: Boolean = false
+    var isTrackingEnabled: Boolean = true
+    var isIgnoredForTracking: Boolean = false
+    var calibrationLabel: DeviceCalibrationLabel = DeviceCalibrationLabel.UNKNOWN
+}
 
 @Dao
 @Suppress("TooManyFunctions")
