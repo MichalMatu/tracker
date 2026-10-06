@@ -130,17 +130,16 @@ constructor(
     ): Result<Unit> = runCatching {
         val updatedRows =
             deviceDao.updateCalibrationState(
-                DeviceCalibrationUpdate(
-                    fingerprint = fingerprint,
-                    userAlias = config.alias,
-                    userNotes = config.notes,
-                    isSafeBeacon = config.isSafe,
-                    alertSound = config.alertSound,
-                    alertVibration = config.alertVibration,
-                    isTrackingEnabled = config.isTrackingEnabled,
-                    isIgnoredForTracking = label.suppressesTracking(),
-                    calibrationLabel = label,
-                )
+                DeviceCalibrationUpdate(fingerprint).apply {
+                    userAlias = config.alias
+                    userNotes = config.notes
+                    isSafeBeacon = config.isSafe
+                    alertSound = config.alertSound
+                    alertVibration = config.alertVibration
+                    isTrackingEnabled = config.isTrackingEnabled
+                    isIgnoredForTracking = label.suppressesTracking()
+                    calibrationLabel = label
+                }
             )
         if (updatedRows != 1) {
             throw NoSuchElementException("Device not found: $fingerprint")
