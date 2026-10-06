@@ -43,6 +43,9 @@ Confidence describes the **evidence-backed app classification**, not real-world 
 - Follow-Me score/components/movement suppression/RSSI behavior use `FOLLOW_ME_ANALYSIS` provenance so they remain distinguishable from direct radio observations.
 - Public-safety-like calibration (`Known Safe` / `False Positive`) is a local review decision, not proof that a real-world service/person is or is not present.
 - High-attention Radar/Details state must have an explainable evidence path; `deviceType` alone is insufficient.
+- Phone GPS is observation context, not device location. Location samples are usable only when coordinates are finite/in-range and reported accuracy is finite, greater than 0 m and at most 100 m.
+- Missing/poor/invalid location must be rejected or represented as data-quality counts/flags rather than silently converted into a position.
+- Reduced analysis/bundle output must not expose exact coordinates.
 
 ## UI language
 
