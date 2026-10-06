@@ -10,5 +10,5 @@ interface ScannerRuntimeController {
 
     fun stopScanning(): Result<Unit>
 
-    fun resetTrackingMemory(): Result<Unit>
+    suspend fun resetTrackingMemory(): Result<Unit>
 }
