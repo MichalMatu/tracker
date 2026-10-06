@@ -51,11 +51,11 @@ See [DETECTION_MODEL.md](DETECTION_MODEL.md) for evidence/confidence semantics.
 
 The active GATT implementation is retained; the stabilization profile suppresses only **automatic** collection.
 
-- `ScannerRuntimePolicy.profile` is currently `STABLE_CORE`.
-- `allowsAutomaticActiveProbe`, `allowsAutomaticRfcommProbe` and opportunistic Classic discovery are `false`.
-- `ActiveCollectionRepositoryImpl` masks any previously persisted automatic-probe preference as `false` and rejects attempts to enable it while the profile remains `STABLE_CORE`.
-- `AutoActiveProbeCoordinator.enqueueCandidate()` returns before queueing or touching the connection manager when automatic probing is disallowed. Tests cover both the persisted-preference case and the coordinator no-interaction boundary.
-- The primary Settings surface renders automatic active collection as unavailable under `STABLE_CORE`.
+- `ScannerRuntimePolicy.profile` remains `STABLE_CORE`.
+- Explicit opt-in automatic GATT collection is enabled again through `allowsAutomaticActiveProbe=true`; automatic RFCOMM probing and opportunistic Classic discovery remain disabled.
+- `ActiveCollectionRepositoryImpl` exposes and persists the user's explicit automatic-GATT preference again. Passive scanning remains the default until the user turns the master switch on.
+- `AutoActiveProbeCoordinator` keeps the existing bounded sequential queue: only connectable candidates are admitted, one device is probed at a time, duplicate/recent candidates are suppressed, probes time out after 12 seconds, and a successfully/failed recently probed device is cooled down for 15 minutes.
+- The primary Settings/Radar surfaces may enable automatic active collection only through the explicit confirmation flow; disabling the switch clears the queue and disconnects the active automatic probe.
 - The explicit per-device Details action is a separate path and remains implemented: `DetailsViewModel.connect()` calls `DeviceConnectionController.connect()`; `BleConnectionManager` connects, discovers GATT services, reads characteristics that advertise the READ property one at a time, and persists the resulting active evidence. This manual path does not write characteristics.
 - Periodic RFCOMM probing remains disabled independently.
 

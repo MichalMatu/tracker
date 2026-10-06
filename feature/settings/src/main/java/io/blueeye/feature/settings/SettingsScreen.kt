@@ -47,7 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.blueeye.core.domain.scanner.ScannerRuntimeProfile
+import io.blueeye.core.domain.scanner.ScannerRuntimePolicy
 import io.blueeye.core.ui.theme.Dimens
 
 @OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
@@ -259,8 +259,7 @@ fun AlertSettingsContent(
                     soundEnabled = uiState.trackerSoundEnabled,
                     headsUpEnabled = uiState.trackerHeadsUpEnabled,
                     autoActiveProbeEnabled = uiState.autoActiveProbeEnabled,
-                    autoActiveProbeAvailable =
-                        uiState.scannerDiagnostics.runtimeProfile != ScannerRuntimeProfile.STABLE_CORE,
+                    autoActiveProbeAvailable = ScannerRuntimePolicy.allowsAutomaticActiveProbe,
                 ),
             actions =
                 AlertSettingsCardActions(
