@@ -55,13 +55,22 @@ Historical phase-by-phase acceptance reports were intentionally removed; concise
 
 ## U3 — Sightings map
 
-- [ ] Add per-device sightings only from valid location samples with accuracy metadata.
-- [ ] Cluster/aggregate observations instead of one marker per raw sample.
-- [ ] Clearly label semantics as phone observation locations.
-- [ ] Handle absent/poor GPS without implying precision.
-- [ ] Defer a global map destination until the per-device map proves useful.
+- [x] Add per-device sightings only from location samples with accuracy metadata.
+- [x] Cluster/aggregate observations instead of one marker per raw sample.
+- [x] Clearly label semantics as phone observation locations.
+- [x] Handle absent/poor GPS without implying precision.
+- [x] Defer a global map destination until the per-device map proves useful.
 
-**Gate:** map interpretation remains honest under poor GPS and dense samples.
+Implementation policy:
+
+- the Details map uses a lightweight per-device read model and never loads raw Bluetooth payloads for map rendering;
+- coordinates must be finite/in-range and reported accuracy must be greater than 0 m and at most 100 m to be mapped;
+- observations are reduced deterministically to at most 50 visible groups; each group is represented by a real observation rather than a synthetic device position;
+- no route/polyline is drawn because phone observation points are not a tracker trajectory;
+- map tiles load only after an explicit **Show map** action; stored sighting records remain local, while the displayed map area is requested from the configured third-party tile provider;
+- a global map destination remains deferred.
+
+**Gate:** implementation is complete; physical validation on S22+ remains required to confirm map readability, lifecycle behavior, poor-GPS handling and dense-sample interpretation.
 
 ## A1 — Parser/data hardening
 
