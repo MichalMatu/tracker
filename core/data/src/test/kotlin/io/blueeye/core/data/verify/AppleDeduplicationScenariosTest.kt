@@ -1,5 +1,6 @@
 package io.blueeye.core.data.verify
 
+import io.blueeye.core.data.db.dao.DeviceCalibrationUpdate
 import io.blueeye.core.data.db.dao.DeviceDao
 import io.blueeye.core.data.db.dao.DeviceSearchDao
 import io.blueeye.core.data.db.dao.SignalSampleDao
@@ -477,6 +478,22 @@ class AppleDeduplicationScenariosTest {
         ) {}
 
         override suspend fun updateProbeData(fingerprint: String, status: String, attempts: Int, timestamp: Long, model: String?, serial: String?, firmware: String?, hardware: String?, software: String?, manufacturer: String?, battery: Int?, services: String?, charData: String?, error: String?, newDeviceType: DeviceType) {}
+        override suspend fun updateCalibrationState(update: DeviceCalibrationUpdate): Int {
+            val existing = db[update.fingerprint] ?: return 0
+            db[update.fingerprint] =
+                existing.copy(
+                    userAlias = update.userAlias,
+                    userNotes = update.userNotes,
+                    isSafeBeacon = update.isSafeBeacon,
+                    alertSound = update.alertSound,
+                    alertVibration = update.alertVibration,
+                    isTrackingEnabled = update.isTrackingEnabled,
+                    isIgnoredForTracking = update.isIgnoredForTracking,
+                    calibrationLabel = update.calibrationLabel,
+                )
+            return 1
+        }
+
         override suspend fun setIgnoredForTracking(fingerprint: String, ignored: Boolean) {}
         override suspend fun setCalibrationLabel(fingerprint: String, label: DeviceCalibrationLabel) {}
         override suspend fun setIdentityCarryoverVerdict(
