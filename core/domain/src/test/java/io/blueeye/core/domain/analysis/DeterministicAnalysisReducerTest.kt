@@ -33,7 +33,7 @@ class DeterministicAnalysisReducerTest {
         val device = device(evidence = evidence)
         val signals =
             listOf(
-                signal(NOW + 61_000L, -72, latitude = 51.1, longitude = 17.0, accuracy = 20f),
+                signal(NOW + 61_000L, -72, location = TestLocation(51.1, 17.0, 20f)),
                 signal(NOW, -55),
                 signal(NOW + 20_000L, -65),
             )
@@ -165,16 +165,12 @@ class DeterministicAnalysisReducerTest {
                         signal(
                             NOW + 1L,
                             -61,
-                            latitude = 51.1,
-                            longitude = 17.0,
-                            accuracy = 150f,
+                            location = TestLocation(51.1, 17.0, 150f),
                         ),
                         signal(
                             NOW + 2L,
                             -62,
-                            latitude = 91.0,
-                            longitude = 17.0,
-                            accuracy = 10f,
+                            location = TestLocation(91.0, 17.0, 10f),
                         ),
                     ),
             )
@@ -324,18 +320,16 @@ class DeterministicAnalysisReducerTest {
         timestamp: Long,
         rssi: Int,
         fingerprint: String = FINGERPRINT,
-        latitude: Double? = null,
-        longitude: Double? = null,
-        accuracy: Float? = null,
+        location: TestLocation? = null,
     ): SignalSample =
         SignalSample(
             timestamp = timestamp,
             rssi = rssi,
             deviceFingerprint = fingerprint,
             observedMac = "AA:BB:CC:DD:EE:FF",
-            latitude = latitude,
-            longitude = longitude,
-            locationAccuracy = accuracy,
+            latitude = location?.latitude,
+            longitude = location?.longitude,
+            locationAccuracy = location?.accuracyMeters,
         )
 
     private fun followMe(
@@ -409,6 +403,12 @@ class DeterministicAnalysisReducerTest {
                     reason = "alert-$timestamp",
                 ),
         )
+
+    private data class TestLocation(
+        val latitude: Double,
+        val longitude: Double,
+        val accuracyMeters: Float,
+    )
 
     private companion object {
         private const val NOW = 1_790_000_000_000L
