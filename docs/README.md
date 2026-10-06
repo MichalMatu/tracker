@@ -9,7 +9,7 @@ This directory contains **current sources of truth**, not a chronological work l
 - Radar/Details redesign, Live Nearby and the per-device sightings map have landed.
 - A1 parser/data hardening, A2 Deterministic Analysis Reducer V1 and A3 Versioned Analysis Bundle V1 are closed on `main`.
 - The optional Drive + Gmail T0 telemetry/AI developer bridge is implemented and accepted for debug use; the Analysis Bundle is not wired into it and T1+ automatic production telemetry remains intentionally blocked.
-- The current implementation workstream is closed. Remaining S22+ checks are deferred physical runtime validation, not claimed acceptance.
+- The current implementation workstream is closed, and the STABLE_CORE S22+ physical runtime gate is **closed / accepted**. Manual GATT, Radar, live Details, Technical/Raw access and the good-GPS sightings-map lifecycle were verified on-device; poor/no-GPS fallback states were not naturally present in that session and remain software-covered.
 - A4 optional analyst integration and T1+ production transport require a new explicit product/architecture decision before implementation.
 
 ## Read order
