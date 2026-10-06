@@ -1,5 +1,6 @@
 package io.blueeye.core.data.repository
 
+import io.blueeye.core.data.db.dao.DeviceCalibrationUpdate
 import io.blueeye.core.data.db.dao.DeviceDao
 import io.blueeye.core.data.mapper.toDomain
 import io.blueeye.core.data.mapper.toRadarDomain
@@ -129,15 +130,17 @@ constructor(
     ): Result<Unit> = runCatching {
         val updatedRows =
             deviceDao.updateCalibrationState(
-                fingerprint = fingerprint,
-                alias = config.alias,
-                notes = config.notes,
-                isSafe = config.isSafe,
-                alertSound = config.alertSound,
-                alertVibration = config.alertVibration,
-                isTrackingEnabled = config.isTrackingEnabled,
-                ignored = label.suppressesTracking(),
-                label = label,
+                DeviceCalibrationUpdate(
+                    fingerprint = fingerprint,
+                    userAlias = config.alias,
+                    userNotes = config.notes,
+                    isSafeBeacon = config.isSafe,
+                    alertSound = config.alertSound,
+                    alertVibration = config.alertVibration,
+                    isTrackingEnabled = config.isTrackingEnabled,
+                    isIgnoredForTracking = label.suppressesTracking(),
+                    calibrationLabel = label,
+                )
             )
         if (updatedRows != 1) {
             throw NoSuchElementException("Device not found: $fingerprint")
