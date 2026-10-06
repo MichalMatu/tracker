@@ -274,6 +274,11 @@ class DeterministicAnalysisReducerTest {
             )
 
         assertEquals(1, candidate.signal.sampleCount)
+        assertTrue(
+            candidate.diagnostics.qualityFlags.contains(
+                AnalysisQualityFlagV1.OUT_OF_SCOPE_SIGNAL_SAMPLES_DROPPED,
+            ),
+        )
     }
 
     private fun reduce(
