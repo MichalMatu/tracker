@@ -1,6 +1,7 @@
 package io.blueeye.core.domain.analysis
 
 import io.blueeye.core.model.AlertEvidenceEvent
+import io.blueeye.core.model.AlertEvidenceEventType
 import io.blueeye.core.model.DetectionConfidence
 import io.blueeye.core.model.DetectionEvidence
 import io.blueeye.core.model.Device
@@ -187,27 +188,29 @@ private object SignalReducer {
     private fun hasUsableLocation(sample: SignalSample): Boolean = locationState(sample) == LocationState.USABLE
 
     private fun locationState(sample: SignalSample): LocationState {
-        val latitude = sample.latitude ?: return LocationState.MISSING
-        val longitude = sample.longitude ?: return LocationState.MISSING
-        val accuracy = sample.locationAccuracy ?: return LocationState.MISSING
+        val latitude = sample.latitude
+        val longitude = sample.longitude
+        val accuracy = sample.locationAccuracy
 
-        return if (
-            latitude.isFinite() &&
-            longitude.isFinite() &&
-            accuracy.isFinite() &&
-            latitude in MIN_LATITUDE..MAX_LATITUDE &&
-            longitude in MIN_LONGITUDE..MAX_LONGITUDE &&
-            accuracy > MIN_ACCURACY_METERS &&
-            accuracy <= MAX_ACCURACY_METERS
-        ) {
-            LocationState.USABLE
-        } else {
-            LocationState.REJECTED
+        return when {
+            latitude == null || longitude == null || accuracy == null -> LocationState.MISSING
+            isUsableLatitude(latitude) && isUsableLongitude(longitude) && isUsableAccuracy(accuracy) -> LocationState.USABLE
+            else -> LocationState.REJECTED
         }
     }
 
-    private fun bucketStart(timestamp: Long): Long =
-        Math.floorDiv(timestamp, TIME_BUCKET_MS) * TIME_BUCKET_MS
+    private fun isUsableLatitude(latitude: Double): Boolean =
+        latitude.isFinite() && latitude in MIN_LATITUDE..MAX_LATITUDE
+
+    private fun isUsableLongitude(longitude: Double): Boolean =
+        longitude.isFinite() && longitude in MIN_LONGITUDE..MAX_LONGITUDE
+
+    private fun isUsableAccuracy(accuracy: Float): Boolean =
+        accuracy.isFinite() &&
+            accuracy > MIN_ACCURACY_METERS &&
+            accuracy <= MAX_ACCURACY_METERS
+
+    private fun bucketStart(timestamp: Long): Long = Math.floorDiv(timestamp, TIME_BUCKET_MS) * TIME_BUCKET_MS
 
     private val SIGNAL_ORDER =
         compareBy<SignalSample>(
@@ -487,18 +490,26 @@ private object IdentityReducer {
 
         var primaryIndex = 0
         var candidateIndex = 0
-        while (primaryIndex < primaryTimes.size && candidateIndex < candidateTimes.size) {
+        var hasCoexistence = false
+        while (
+            primaryIndex < primaryTimes.size &&
+            candidateIndex < candidateTimes.size &&
+            !hasCoexistence
+        ) {
             val primary = primaryTimes[primaryIndex]
             val candidate = candidateTimes[candidateIndex]
-            if (primary <= candidate) {
-                if (candidate - primary < IDENTITY_COEXISTENCE_GUARD_MS) return true
-                primaryIndex += 1
-            } else {
-                if (primary - candidate < IDENTITY_COEXISTENCE_GUARD_MS) return true
-                candidateIndex += 1
+            val gap = if (primary <= candidate) candidate - primary else primary - candidate
+            hasCoexistence = gap < IDENTITY_COEXISTENCE_GUARD_MS
+
+            if (!hasCoexistence) {
+                if (primary <= candidate) {
+                    primaryIndex += 1
+                } else {
+                    candidateIndex += 1
+                }
             }
         }
-        return false
+        return hasCoexistence
     }
 
     private fun otherFingerprint(
@@ -548,9 +559,7 @@ private object EvidenceReducer {
             .take(MAX_REPRESENTATIVE_EVIDENCE)
     }
 
-    private fun DetectionEvidence.toSummary(
-        alertEventType: io.blueeye.core.model.AlertEvidenceEventType?,
-    ): AnalysisEvidenceSummary =
+    private fun DetectionEvidence.toSummary(alertEventType: AlertEvidenceEventType?): AnalysisEvidenceSummary =
         AnalysisEvidenceSummary(
             source = source,
             confidence = confidence,
@@ -563,10 +572,10 @@ private object EvidenceReducer {
 
     private fun confidencePriority(confidence: DetectionConfidence): Int =
         when (confidence) {
-            DetectionConfidence.LOW -> 0
-            DetectionConfidence.MEDIUM -> 1
-            DetectionConfidence.HIGH -> 2
-            DetectionConfidence.CRITICAL -> 3
+            DetectionConfidence.LOW -> LOW_CONFIDENCE_PRIORITY
+            DetectionConfidence.MEDIUM -> MEDIUM_CONFIDENCE_PRIORITY
+            DetectionConfidence.HIGH -> HIGH_CONFIDENCE_PRIORITY
+            DetectionConfidence.CRITICAL -> CRITICAL_CONFIDENCE_PRIORITY
         }
 
     private val EVIDENCE_ORDER =
@@ -578,5 +587,9 @@ private object EvidenceReducer {
             .thenBy(AnalysisEvidenceSummary::reasonText)
             .thenBy { it.alertEventType?.name.orEmpty() }
 
+    private const val LOW_CONFIDENCE_PRIORITY = 0
+    private const val MEDIUM_CONFIDENCE_PRIORITY = 1
+    private const val HIGH_CONFIDENCE_PRIORITY = 2
+    private const val CRITICAL_CONFIDENCE_PRIORITY = 3
     private const val MAX_REPRESENTATIVE_EVIDENCE = 8
 }
