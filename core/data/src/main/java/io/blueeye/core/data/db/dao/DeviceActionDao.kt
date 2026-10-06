@@ -141,6 +141,32 @@ interface DeviceActionDao {
         deleteByFingerprint(duplicateFingerprint)
     }
 
+    @Query(
+        """
+        UPDATE devices
+        SET userAlias = :alias,
+            userNotes = :notes,
+            isSafeBeacon = :isSafe,
+            alertSound = :alertSound,
+            alertVibration = :alertVibration,
+            isTrackingEnabled = :isTrackingEnabled,
+            isIgnoredForTracking = :ignored,
+            calibrationLabel = :label
+        WHERE fingerprint = :fingerprint
+        """,
+    )
+    suspend fun updateCalibrationState(
+        fingerprint: String,
+        alias: String?,
+        notes: String?,
+        isSafe: Boolean,
+        alertSound: Boolean,
+        alertVibration: Boolean,
+        isTrackingEnabled: Boolean,
+        ignored: Boolean,
+        label: DeviceCalibrationLabel,
+    ): Int
+
     @Query("UPDATE devices SET isIgnoredForTracking = :ignored WHERE fingerprint = :fingerprint")
     suspend fun setIgnoredForTracking(fingerprint: String, ignored: Boolean)
 
