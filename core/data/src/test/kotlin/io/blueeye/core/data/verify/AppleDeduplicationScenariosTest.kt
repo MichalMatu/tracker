@@ -6,9 +6,9 @@ import io.blueeye.core.data.db.dao.DeviceSearchDao
 import io.blueeye.core.data.db.dao.SignalSampleDao
 import io.blueeye.core.data.db.entity.DeviceEntity
 import io.blueeye.core.data.db.entity.SignalSampleEntity
-import io.blueeye.core.data.db.projection.SightingObservationProjection
 import io.blueeye.core.data.db.entity.WatchlistEntity
 import io.blueeye.core.data.db.projection.RadarDeviceProjection
+import io.blueeye.core.data.db.projection.SightingObservationProjection
 import io.blueeye.core.data.repository.handler.classic.ClassicDevicePersister
 import io.blueeye.core.data.repository.handler.classic.ClassicScanDataContext
 import io.blueeye.core.data.repository.handler.common.DeviceTypePriorityHelper
