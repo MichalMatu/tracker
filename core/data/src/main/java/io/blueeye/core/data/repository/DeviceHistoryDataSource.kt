@@ -12,8 +12,8 @@ import io.blueeye.core.data.mapper.toSightingObservations
 import io.blueeye.core.model.AlertEvidenceEvent
 import io.blueeye.core.model.FollowMeHistorySample
 import io.blueeye.core.model.IdentityContinuityCandidate
-import io.blueeye.core.model.SignalSample
 import io.blueeye.core.model.SightingObservation
+import io.blueeye.core.model.SignalSample
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
