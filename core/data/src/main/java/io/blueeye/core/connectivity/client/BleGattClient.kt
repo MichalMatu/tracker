@@ -19,6 +19,7 @@ import javax.inject.Singleton
 class BleGattClient
 @Inject
 constructor() {
+    @Volatile
     private var bluetoothGatt: BluetoothGatt? = null
 
     // Używamy SharedFlow z replay=0 i extraBufferCapacity, żeby nie gubić zdarzeń
@@ -37,8 +38,12 @@ constructor() {
                 status: Int,
                 newState: Int,
             ) {
+                if (!isCurrentGatt(gatt)) {
+                    Log.d(TAG, "Ignoring stale connection callback")
+                    return
+                }
                 Log.d(
-                    "BleGattClient",
+                    TAG,
                     "onConnectionStateChange: status=$status newState=$newState",
                 )
                 _events.tryEmit(BleGattEvent.ConnectionStateChanged(status, newState))
@@ -48,7 +53,11 @@ constructor() {
                 gatt: BluetoothGatt,
                 status: Int,
             ) {
-                Log.d("BleGattClient", "onServicesDiscovered: status=$status")
+                if (!isCurrentGatt(gatt)) {
+                    Log.d(TAG, "Ignoring stale services callback")
+                    return
+                }
+                Log.d(TAG, "onServicesDiscovered: status=$status")
                 _events.tryEmit(BleGattEvent.ServicesDiscovered(status))
             }
 
@@ -58,6 +67,10 @@ constructor() {
                 value: ByteArray,
                 status: Int,
             ) {
+                if (!isCurrentGatt(gatt)) {
+                    Log.d(TAG, "Ignoring stale characteristic callback")
+                    return
+                }
                 _events.tryEmit(BleGattEvent.CharacteristicRead(characteristic, value, status))
             }
 
@@ -68,6 +81,10 @@ constructor() {
                 characteristic: BluetoothGattCharacteristic,
                 status: Int,
             ) {
+                if (!isCurrentGatt(gatt)) {
+                    Log.d(TAG, "Ignoring stale legacy characteristic callback")
+                    return
+                }
                 @Suppress("DEPRECATION")
                 _events.tryEmit(
                     BleGattEvent.CharacteristicRead(
@@ -78,6 +95,8 @@ constructor() {
                 )
             }
         }
+
+    private fun isCurrentGatt(gatt: BluetoothGatt): Boolean = gatt === bluetoothGatt
 
     @SuppressLint("MissingPermission")
     fun connect(
@@ -98,7 +117,7 @@ constructor() {
         try {
             bluetoothGatt?.close()
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-            Log.e("BleGattClient", "Error closing GATT", e)
+            Log.e(TAG, "Error closing GATT", e)
         }
         bluetoothGatt = null
     }
@@ -119,5 +138,9 @@ constructor() {
 
     fun getServices(): List<BluetoothGattService> {
         return bluetoothGatt?.services ?: emptyList()
+    }
+
+    private companion object {
+        private const val TAG = "BleGattClient"
     }
 }
