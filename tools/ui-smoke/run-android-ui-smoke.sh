@@ -194,12 +194,10 @@ tap_text "Walk bag tag"
 wait_target content-desc "Refresh focused scan"
 shot 05-details
 
-# Calibration now lives in Details -> Actions / Review.
-scroll_until "Actions / Review"
-wait_target text "Suspicious"
-shot 06-details-calibration
-tap_text "Suspicious"
-
+# Actions and calibration now live in Details -> Actions / Review.
+# Scroll to the exact actionable control rather than stopping when only the card title is visible.
+scroll_until "Edit profile & alerts"
+shot 06-details-actions
 tap_text "Edit profile & alerts"
 wait_target text "Edit Device"
 shot 07-details-edit
@@ -207,13 +205,17 @@ tap_switch_for_text "Alert Sound"
 tap_switch_for_text "Alert Vibration"
 tap_text "Save"
 
+scroll_until "Suspicious"
+shot 08-details-calibration
+tap_text "Suspicious"
+
 # Raw data is intentionally behind collapsed Technical details.
 scroll_until "Technical details"
 tap_text "Show"
 scroll_until "Raw Data"
 tap_text "Raw Data"
 wait_target text "Copy Raw Data"
-shot 08-details-raw-data
+shot 09-details-raw-data
 tap_text "Copy Raw Data"
 tap_text "Export JSON to Clipboard"
 tap_text "Close"
