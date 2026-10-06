@@ -1,6 +1,7 @@
 package io.blueeye.feature.details
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
@@ -143,7 +144,7 @@ internal fun DetailsSightingsMapView(
     ) {
         AndroidView(
             factory = { mapView },
-            modifier = Modifier.matchParentSize(),
+            modifier = Modifier.fillMaxSize(),
         )
         loadError?.let {
             Text(
