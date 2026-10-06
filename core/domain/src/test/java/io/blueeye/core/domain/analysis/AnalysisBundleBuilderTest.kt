@@ -62,7 +62,7 @@ class AnalysisBundleBuilderTest {
         assertEquals(first, second)
         assertEquals(AnalysisBundleJson.encode(first), AnalysisBundleJson.encode(second))
         assertEquals(listOf("candidate-001", "candidate-002"), first.candidates.map { it.candidateId })
-        assertEquals(0.1f, first.candidates.first().localVerdict.followingScore)
+        assertEquals(0.1f, first.candidates.first().localVerdict.followingScore, 0f)
         assertEquals(
             "identity-001",
             first.candidates.last().identityCandidates.single().relatedCandidateId,
@@ -135,107 +135,117 @@ class AnalysisBundleBuilderTest {
         followingScore: Float,
         relatedFingerprint: String? = null,
         evidence: List<AnalysisEvidenceSummary> = emptyList(),
-    ): AnalysisCandidate {
-        val identities =
-            relatedFingerprint?.let { related ->
-                listOf(
-                    AnalysisIdentityCandidateSummary(
-                        candidateFingerprint = related,
-                        observationCount = 2,
-                        firstObservedAt = NOW,
-                        lastObservedAt = NOW + 10_000L,
-                        maxConfidence = 0.8f,
-                        reasonCodes = listOf("WEIGHTED_FEATURE_MATCH"),
-                        verdicts = listOf(IdentityCarryoverVerdict.UNREVIEWED),
-                        latestVerdict = IdentityCarryoverVerdict.UNREVIEWED,
-                        hasCoexistenceEvidence = true,
-                    ),
-                )
-            }.orEmpty()
-        val contradictions =
-            relatedFingerprint?.let { related ->
-                listOf(
-                    AnalysisContradiction(
-                        type = AnalysisContradictionType.IDENTITY_COEXISTENCE,
-                        relatedFingerprint = related,
-                        description = "Private reducer description is intentionally not bundled.",
-                    ),
-                )
-            }.orEmpty()
-
-        return AnalysisCandidate(
+    ): AnalysisCandidate =
+        AnalysisCandidate(
             deviceFingerprint = fingerprint,
             trackingStatus = TrackingStatus.SUSPICIOUS,
             followingScore = followingScore,
-            signal =
-                AnalysisSignalSummary(
-                    sourceSampleCount = 3,
-                    reducedSampleCount = 2,
-                    duplicateSampleCount = 1,
-                    firstObservedAt = NOW,
-                    lastObservedAt = NOW + 10_000L,
-                    rssi =
-                        AnalysisRssiSummary(
-                            sampleCount = 2,
-                            minimum = -80,
-                            maximum = -60,
-                            average = -70.0,
-                            median = -70.0,
-                        ),
-                ),
-            timeBuckets =
-                listOf(
-                    AnalysisTimeBucket(
-                        startTimestamp = NOW,
-                        endTimestampExclusive = NOW + 60_000L,
-                        sampleCount = 2,
-                        minimumRssi = -80,
-                        maximumRssi = -60,
-                        averageRssi = -70.0,
-                        usableLocationSampleCount = 1,
-                    ),
-                ),
-            locationQuality =
-                AnalysisLocationQualitySummary(
-                    totalSampleCount = 2,
-                    usableSampleCount = 1,
-                    rejectedSampleCount = 0,
-                    missingSampleCount = 1,
-                    bestAccuracyMeters = 12f,
-                    worstUsableAccuracyMeters = 12f,
-                ),
-            movement =
-                AnalysisMovementSummary(
-                    sampleCount = 2,
-                    movingSampleCount = 2,
-                    stationarySampleCount = 0,
-                    unknownSampleCount = 0,
-                    segments =
-                        listOf(
-                            AnalysisMovementSegment(
-                                startTimestamp = NOW,
-                                endTimestamp = NOW + 10_000L,
-                                sampleCount = 2,
-                                state = AnalysisMovementState.MOVING,
-                            ),
-                        ),
-                ),
-            encounters =
-                AnalysisEncounterSummary(
-                    historySampleCount = 2,
-                    firstObservedAt = NOW,
-                    lastObservedAt = NOW + 10_000L,
-                    maxEncounterCount = 2,
-                    peakScore = 0.75f,
-                    peakTrackingStatus = TrackingStatus.SUSPICIOUS,
-                    distinctObservedMacCount = 2,
-                ),
-            identityCandidates = identities,
+            signal = signalSummary(),
+            timeBuckets = timeBuckets(),
+            locationQuality = locationQuality(),
+            movement = movementSummary(),
+            encounters = encounterSummary(),
+            identityCandidates = identitySummaries(relatedFingerprint),
             representativeEvidence = evidence,
             qualityFlags = listOf(AnalysisQualityFlag.DUPLICATE_SIGNAL_SAMPLES_REDUCED),
-            contradictions = contradictions,
+            contradictions = contradictionSummaries(relatedFingerprint),
         )
-    }
+
+    private fun signalSummary(): AnalysisSignalSummary =
+        AnalysisSignalSummary(
+            sourceSampleCount = 3,
+            reducedSampleCount = 2,
+            duplicateSampleCount = 1,
+            firstObservedAt = NOW,
+            lastObservedAt = NOW + 10_000L,
+            rssi =
+                AnalysisRssiSummary(
+                    sampleCount = 2,
+                    minimum = -80,
+                    maximum = -60,
+                    average = -70.0,
+                    median = -70.0,
+                ),
+        )
+
+    private fun timeBuckets(): List<AnalysisTimeBucket> =
+        listOf(
+            AnalysisTimeBucket(
+                startTimestamp = NOW,
+                endTimestampExclusive = NOW + 60_000L,
+                sampleCount = 2,
+                minimumRssi = -80,
+                maximumRssi = -60,
+                averageRssi = -70.0,
+                usableLocationSampleCount = 1,
+            ),
+        )
+
+    private fun locationQuality(): AnalysisLocationQualitySummary =
+        AnalysisLocationQualitySummary(
+            totalSampleCount = 2,
+            usableSampleCount = 1,
+            rejectedSampleCount = 0,
+            missingSampleCount = 1,
+            bestAccuracyMeters = 12f,
+            worstUsableAccuracyMeters = 12f,
+        )
+
+    private fun movementSummary(): AnalysisMovementSummary =
+        AnalysisMovementSummary(
+            sampleCount = 2,
+            movingSampleCount = 2,
+            stationarySampleCount = 0,
+            unknownSampleCount = 0,
+            segments =
+                listOf(
+                    AnalysisMovementSegment(
+                        startTimestamp = NOW,
+                        endTimestamp = NOW + 10_000L,
+                        sampleCount = 2,
+                        state = AnalysisMovementState.MOVING,
+                    ),
+                ),
+        )
+
+    private fun encounterSummary(): AnalysisEncounterSummary =
+        AnalysisEncounterSummary(
+            historySampleCount = 2,
+            firstObservedAt = NOW,
+            lastObservedAt = NOW + 10_000L,
+            maxEncounterCount = 2,
+            peakScore = 0.75f,
+            peakTrackingStatus = TrackingStatus.SUSPICIOUS,
+            distinctObservedMacCount = 2,
+        )
+
+    private fun identitySummaries(relatedFingerprint: String?): List<AnalysisIdentityCandidateSummary> =
+        relatedFingerprint?.let { related ->
+            listOf(
+                AnalysisIdentityCandidateSummary(
+                    candidateFingerprint = related,
+                    observationCount = 2,
+                    firstObservedAt = NOW,
+                    lastObservedAt = NOW + 10_000L,
+                    maxConfidence = 0.8f,
+                    reasonCodes = listOf("WEIGHTED_FEATURE_MATCH"),
+                    verdicts = listOf(IdentityCarryoverVerdict.UNREVIEWED),
+                    latestVerdict = IdentityCarryoverVerdict.UNREVIEWED,
+                    hasCoexistenceEvidence = true,
+                ),
+            )
+        }.orEmpty()
+
+    private fun contradictionSummaries(relatedFingerprint: String?): List<AnalysisContradiction> =
+        relatedFingerprint?.let { related ->
+            listOf(
+                AnalysisContradiction(
+                    type = AnalysisContradictionType.IDENTITY_COEXISTENCE,
+                    relatedFingerprint = related,
+                    description = "Private reducer description is intentionally not bundled.",
+                ),
+            )
+        }.orEmpty()
 
     private fun evidence(
         source: EvidenceSource,
