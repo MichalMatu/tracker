@@ -64,6 +64,10 @@ fun DetailsScreen(
     val device by viewModel.device.collectAsStateWithLifecycle()
     val connectionState by viewModel.connectionState.collectAsStateWithLifecycle()
     val signalSamples by viewModel.signalSamples.collectAsStateWithLifecycle(initialValue = emptyList())
+    val sightingsSummary by
+        viewModel.sightingsSummary.collectAsStateWithLifecycle(
+            initialValue = DetailsSightingsSummary.EMPTY,
+        )
     val followMeHistory by viewModel.followMeHistory.collectAsStateWithLifecycle(initialValue = emptyList())
     val alertEvidenceEvents by viewModel.alertEvidenceEvents.collectAsStateWithLifecycle(initialValue = emptyList())
     val services by viewModel.discoveredServices.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -128,6 +132,10 @@ fun DetailsScreen(
 
                 if (signalSamples.isNotEmpty()) {
                     DetailsSignalHistoryCard(samples = signalSamples)
+                }
+
+                if (sightingsSummary.sourceObservationCount > 0) {
+                    DetailsSightingsSummaryCard(summary = sightingsSummary)
                 }
 
                 if (followMeHistory.isNotEmpty()) {

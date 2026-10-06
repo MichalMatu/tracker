@@ -8,6 +8,7 @@ import io.blueeye.core.data.db.entity.DeviceEntity
 import io.blueeye.core.data.db.entity.SignalSampleEntity
 import io.blueeye.core.data.db.entity.WatchlistEntity
 import io.blueeye.core.data.db.projection.RadarDeviceProjection
+import io.blueeye.core.data.db.projection.SightingObservationProjection
 import io.blueeye.core.data.repository.handler.classic.ClassicDevicePersister
 import io.blueeye.core.data.repository.handler.classic.ClassicScanDataContext
 import io.blueeye.core.data.repository.handler.common.DeviceTypePriorityHelper
@@ -581,6 +582,10 @@ class AppleDeduplicationScenariosTest {
         override fun getSamplesForDevice(fingerprint: String, limit: Int): Flow<List<SignalSampleEntity>> = flowOf(emptyList())
 
         override fun getSamplesWithLocation(limit: Int): Flow<List<SignalSampleEntity>> = flowOf(emptyList())
+        override fun getSightingsForDevice(
+            fingerprint: String,
+            limit: Int,
+        ): Flow<List<SightingObservationProjection>> = flowOf(emptyList())
         override suspend fun getSamplesInTimeRange(fingerprint: String, startTime: Long, endTime: Long): List<SignalSampleEntity> = emptyList()
         override suspend fun getAverageRssi(fingerprint: String, sampleCount: Int): Float? = null
         override suspend fun deleteAll() {}

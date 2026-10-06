@@ -57,6 +57,13 @@ class DetailsViewModel
                 .sample(UI_REFRESH_INTERVAL_MS)
                 .map { result -> result.getOrDefault(emptyList()) }
 
+        val sightingsSummary =
+            repository.getSightings(fingerprint)
+                .sample(UI_REFRESH_INTERVAL_MS)
+                .map { result ->
+                    DetailsSightingsReducer.reduce(result.getOrDefault(emptyList()))
+                }
+
         val followMeHistory =
             repository.getFollowMeHistory(fingerprint)
                 .sample(UI_REFRESH_INTERVAL_MS)

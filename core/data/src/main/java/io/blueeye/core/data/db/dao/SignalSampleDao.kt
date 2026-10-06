@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import io.blueeye.core.data.db.entity.SignalSampleEntity
+import io.blueeye.core.data.db.projection.SightingObservationProjection
 import kotlinx.coroutines.flow.Flow
 
 /** Data Access Object dla tabeli signal_samples. */
@@ -40,6 +41,26 @@ interface SignalSampleDao {
     """,
     )
     fun getSamplesWithLocation(limit: Int = 500): Flow<List<SignalSampleEntity>>
+
+    /**
+     * Lightweight per-device observations for the sightings map.
+     * Raw Bluetooth payload fields are intentionally not selected.
+     */
+    @Query(
+        """
+        SELECT timestamp, rssi, latitude, longitude, locationAccuracy
+        FROM signal_samples
+        WHERE deviceFingerprint = :fingerprint
+          AND latitude IS NOT NULL
+          AND longitude IS NOT NULL
+        ORDER BY timestamp DESC
+        LIMIT :limit
+        """,
+    )
+    fun getSightingsForDevice(
+        fingerprint: String,
+        limit: Int = 2000,
+    ): Flow<List<SightingObservationProjection>>
 
     /** Pobierz próbki dla urządzenia z określonego przedziału czasowego */
     @Query(
