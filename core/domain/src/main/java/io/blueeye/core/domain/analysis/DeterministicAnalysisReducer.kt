@@ -17,6 +17,7 @@ import io.blueeye.core.model.analysis.AnalysisDiagnosticsV1
 import io.blueeye.core.model.analysis.AnalysisEvidenceSummaryV1
 import io.blueeye.core.model.analysis.AnalysisFollowMeSummaryV1
 import io.blueeye.core.model.analysis.AnalysisIdentityRelationV1
+import io.blueeye.core.model.analysis.AnalysisIdentitySummaryV1
 import io.blueeye.core.model.analysis.AnalysisLocalAssessmentV1
 import io.blueeye.core.model.analysis.AnalysisLocationQualityV1
 import io.blueeye.core.model.analysis.AnalysisQualityFlagV1
@@ -34,6 +35,8 @@ object AnalysisReducerRulesV1 {
     const val reducerVersion = 1
     const val signalBucketMs = 30_000L
     const val maxLocationAccuracyMeters = 100f
+    const val maxSignalBuckets = 240
+    const val maxIdentityRelations = 32
     const val maxRepresentativeEvidence = 8
 }
 
@@ -58,7 +61,7 @@ object DeterministicAnalysisReducer {
             input.signalSamples.any { sample -> sample.deviceFingerprint != device.fingerprint }
         val signals = scopedSignals(device.fingerprint, input.signalSamples)
         val followMe = input.followMeHistory.distinct().sortedWith(FOLLOW_ME_ORDER)
-        val identityRelations = reduceIdentityRelations(device.fingerprint, input.identityCandidates)
+        val identity = reduceIdentityRelations(device.fingerprint, input.identityCandidates)
         val signalSummary = AnalysisSignalReducer.reduce(signals)
         val followMeSummary = reduceFollowMe(followMe)
         val diagnostics =
@@ -74,6 +77,7 @@ object DeterministicAnalysisReducer {
                 qualityFlags =
                     qualityFlags(
                         signalSummary = signalSummary,
+                        identity = identity,
                         completeness = input.historyCompleteness,
                         hasOutOfScopeSignals = hasOutOfScopeSignals,
                     ),
@@ -81,7 +85,7 @@ object DeterministicAnalysisReducer {
                     contradictions(
                         device = device,
                         followMe = followMe,
-                        identityRelations = identityRelations,
+                        identityRelations = identity.relations,
                     ),
             )
 
@@ -104,7 +108,7 @@ object DeterministicAnalysisReducer {
                 ),
             signal = signalSummary,
             followMe = followMeSummary,
-            identityRelations = identityRelations,
+            identity = identity,
             diagnostics = diagnostics,
         )
     }
@@ -133,34 +137,42 @@ object DeterministicAnalysisReducer {
     private fun reduceIdentityRelations(
         fingerprint: String,
         candidates: List<IdentityContinuityCandidate>,
-    ): List<AnalysisIdentityRelationV1> =
-        candidates
-            .asSequence()
-            .filter { candidate ->
-                candidate.deviceFingerprint == fingerprint ||
-                    candidate.candidateFingerprint == fingerprint
-            }
-            .distinct()
-            .sortedWith(IDENTITY_ORDER)
-            .map { candidate ->
-                AnalysisIdentityRelationV1(
-                    relatedLocalCandidateKey =
-                        if (candidate.deviceFingerprint == fingerprint) {
-                            candidate.candidateFingerprint
-                        } else {
-                            candidate.deviceFingerprint
-                        },
-                    timestamp = candidate.timestamp,
-                    reasonCode = candidate.reasonCode,
-                    confidence = candidate.confidence,
-                    verdict = candidate.verdict,
-                    featureSummary = candidate.featureSummary,
-                )
-            }
-            .toList()
+    ): AnalysisIdentitySummaryV1 {
+        val relations =
+            candidates
+                .asSequence()
+                .filter { candidate ->
+                    candidate.deviceFingerprint == fingerprint ||
+                        candidate.candidateFingerprint == fingerprint
+                }
+                .distinct()
+                .sortedWith(IDENTITY_ORDER)
+                .map { candidate ->
+                    AnalysisIdentityRelationV1(
+                        relatedLocalCandidateKey =
+                            if (candidate.deviceFingerprint == fingerprint) {
+                                candidate.candidateFingerprint
+                            } else {
+                                candidate.deviceFingerprint
+                            },
+                        timestamp = candidate.timestamp,
+                        reasonCode = candidate.reasonCode,
+                        confidence = candidate.confidence,
+                        verdict = candidate.verdict,
+                        featureSummary = candidate.featureSummary,
+                    )
+                }
+                .toList()
+
+        return AnalysisIdentitySummaryV1(
+            totalRelationCount = relations.size,
+            relations = relations.takeLast(AnalysisReducerRulesV1.maxIdentityRelations),
+        )
+    }
 
     private fun qualityFlags(
         signalSummary: AnalysisSignalSummaryV1,
+        identity: AnalysisIdentitySummaryV1,
         completeness: AnalysisHistoryCompleteness,
         hasOutOfScopeSignals: Boolean,
     ): List<AnalysisQualityFlagV1> =
@@ -170,6 +182,12 @@ object DeterministicAnalysisReducer {
             }
             if (hasOutOfScopeSignals) {
                 add(AnalysisQualityFlagV1.OUT_OF_SCOPE_SIGNAL_SAMPLES_DROPPED)
+            }
+            if (signalSummary.totalBucketCount > signalSummary.buckets.size) {
+                add(AnalysisQualityFlagV1.SIGNAL_BUCKETS_TRUNCATED)
+            }
+            if (identity.totalRelationCount > identity.relations.size) {
+                add(AnalysisQualityFlagV1.IDENTITY_RELATIONS_TRUNCATED)
             }
             if (signalSummary.locationQuality.samplesWithCoordinates == 0) {
                 add(AnalysisQualityFlagV1.NO_LOCATION_DATA)
@@ -244,12 +262,14 @@ object DeterministicAnalysisReducer {
 private object AnalysisSignalReducer {
     fun reduce(samples: List<SignalSample>): AnalysisSignalSummaryV1 {
         val locationQuality = reduceLocationQuality(samples)
+        val buckets = reduceBuckets(samples)
         return AnalysisSignalSummaryV1(
             sampleCount = samples.size,
             minRssi = samples.minOfOrNull(SignalSample::rssi),
             maxRssi = samples.maxOfOrNull(SignalSample::rssi),
             averageRssi = samples.averageRssi(),
-            buckets = reduceBuckets(samples),
+            totalBucketCount = buckets.size,
+            buckets = buckets.takeLast(AnalysisReducerRulesV1.maxSignalBuckets),
             locationQuality = locationQuality,
         )
     }
