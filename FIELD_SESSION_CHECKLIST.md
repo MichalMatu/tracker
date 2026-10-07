@@ -8,6 +8,7 @@ Use this for repeatable physical tests. It is a capture/validation checklist, no
 - Do not switch builds or major configuration during one comparison session.
 - Confirm required Bluetooth/Nearby, Location and Notification permissions for the scenario.
 - Verify scanner state and intended alert/active-collection settings before leaving.
+- If automatic GATT is part of the scenario, explicitly enable the master switch and record that choice. The accepted field baseline probes one connectable device at a time; the 15 min cooldown is per previously probed device, so newly seen eligible devices can still be queued immediately.
 - Avoid enabling HCI/bugreport capture unless the defect actually requires it.
 
 ## Useful scenarios
@@ -38,6 +39,7 @@ Keep scenarios separate when possible so later analysis can explain what changed
 - supported session export when needed;
 - GPS availability/quality summary when relevant;
 - known controlled devices/actions;
+- whether automatic GATT was enabled, plus aggregate probe success/error/timeout behavior when relevant;
 - alerts, parser failures, crashes, ANRs, jank or UI defects observed.
 
 Deep regressions may additionally need private Room/WAL/SHM, bounded logcat or HCI/bugreport evidence. Never commit exact GPS, MACs, private databases, HCI or bugreports to the public repository.

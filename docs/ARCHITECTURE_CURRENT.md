@@ -49,17 +49,19 @@ See [DETECTION_MODEL.md](DETECTION_MODEL.md) for evidence/confidence semantics.
 
 ## Active collection under `STABLE_CORE`
 
-The active GATT implementation is retained; the stabilization profile suppresses only **automatic** collection.
+The active GATT implementation is retained under `STABLE_CORE`; passive observation remains the default, while automatic GATT collection is available only through an explicit user opt-in.
 
 - `ScannerRuntimePolicy.profile` remains `STABLE_CORE`.
 - Explicit opt-in automatic GATT collection is enabled again through `allowsAutomaticActiveProbe=true`; automatic RFCOMM probing and opportunistic Classic discovery remain disabled.
 - `ActiveCollectionRepositoryImpl` exposes and persists the user's explicit automatic-GATT preference again. Passive scanning remains the default until the user turns the master switch on.
-- `AutoActiveProbeCoordinator` keeps the existing bounded sequential queue: only connectable candidates are admitted, one device is probed at a time, duplicate/recent candidates are suppressed, probes time out after 12 seconds, and a successfully/failed recently probed device is cooled down for 15 minutes.
+- `AutoActiveProbeCoordinator` keeps the existing bounded sequential queue: only connectable candidates are admitted, one device is probed at a time, duplicate/recent candidates are suppressed, probes time out after 12 seconds, and a successfully/failed recently probed device is cooled down for 15 minutes. Cooldown is per device/fingerprint, so a newly seen eligible device can still be queued immediately.
 - The primary Settings/Radar surfaces may enable automatic active collection only through the explicit confirmation flow; disabling the switch clears the queue and disconnects the active automatic probe.
 - The explicit per-device Details action is a separate path and remains implemented: `DetailsViewModel.connect()` calls `DeviceConnectionController.connect()`; `BleConnectionManager` connects, discovers GATT services, reads characteristics that advertise the READ property one at a time, and persists the resulting active evidence. This manual path does not write characteristics.
 - Periodic RFCOMM probing remains disabled independently.
 
-Do not describe the current profile as "GATT removed" or "active probing not implemented." The precise statement is: **automatic active collection is disabled during core stabilization; explicit per-device read-oriented GATT inspection still exists.**
+Do not describe the current profile as "GATT removed" or "active probing not implemented." The precise statement is: **passive observation is the default, explicit automatic read-oriented GATT collection is available through the master switch, and manual per-device GATT inspection remains available; RFCOMM and opportunistic Classic discovery stay disabled.**
+
+The current field-test baseline keeps automatic GATT at concurrency 1. Physical S22+ validation on the 2026-10-07 runtime baseline persisted 22 recent probe outcomes, including 14 devices with discovered services and 19 with characteristic data; the Room snapshot passed `PRAGMA quick_check`, passive scanning continued, and no crash/ANR was observed. Any future concurrency >1 experiment must use independent GATT session state rather than sharing the current singleton connection state.
 
 ## Privacy-safe field reference: Lime legacy BLE family
 

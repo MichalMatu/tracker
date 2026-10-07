@@ -7,6 +7,7 @@
 - Compact Radar cards, lightweight Radar projection, decision-first Details, collapsed Technical Details, Live Nearby and the per-device sightings map have landed.
 - A1 parser/data hardening, A2 Deterministic Analysis Reducer V1 and A3 Versioned Analysis Bundle V1 are implemented.
 - U1/U2/U3 physical S22+ acceptance is **closed** for the STABLE_CORE baseline from real-device evidence collected on 2026-10-07. The session physically covered Radar, live Details, Technical/Raw access and the good-GPS sightings-map lifecycle; poor/no-GPS fallback states were not naturally present and remain covered by deterministic tests.
+- Explicit opt-in automatic GATT collection has been re-enabled and physically accepted for field testing in its existing sequential form; this does not reopen the accepted scanner/ingest baseline.
 - A4 is future optional analyst work and requires a new explicit product decision; it is not an active implementation queue.
 
 ## Product guardrails
@@ -132,4 +133,4 @@ The continuous developer telemetry/feedback transport is specified separately in
 
 ## Closure
 
-The current implementation baseline is closed on `main`: compact Radar, decision-first Details, sightings-map implementation, parser/data hardening and deterministic A2/A3 analysis are in place while scanner/ingest semantics remain accepted and untouched. STABLE_CORE physical S22+ acceptance is also closed. Future analyst/production-telemetry work requires a new decision and is not implicitly queued.
+The current implementation baseline is closed on `main`: compact Radar, decision-first Details, sightings-map implementation, parser/data hardening and deterministic A2/A3 analysis are in place while scanner/ingest semantics remain accepted. STABLE_CORE physical S22+ acceptance is closed, and the explicit automatic-GATT master switch is additionally accepted for field testing with the bounded sequential queue. Future concurrency experiments, analyst integration and production telemetry are separate decisions and are not implicitly queued.

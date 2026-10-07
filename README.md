@@ -9,7 +9,8 @@ Android Bluetooth/BLE situational-awareness app focused on local-first collectio
 - supports watchlist returns and cautious Follow-Me/identity analysis;
 - reduces protocol noise before it reaches the main Radar view;
 - keeps technical/raw Bluetooth data inspectable without making it the default UI;
-- can export structured session evidence for deeper review.
+- can export structured session evidence for deeper review;
+- can explicitly opt in to automatic read-only GATT collection for connectable BLE devices while passive observation remains the default.
 
 BlueEye reports observations and evidence. It does **not** claim to identify a person, infer malicious intent from Bluetooth presence, turn RSSI into precise distance, or treat the phone's GPS observation point as the exact location of another device.
 
@@ -20,8 +21,9 @@ BlueEye reports observations and evidence. It does **not** claim to identify a p
 - Compact Radar, lightweight projection, decision-first Details, Live Nearby and the per-device sightings map are implemented on `main`.
 - A1 parser/data hardening, A2 Deterministic Analysis Reducer V1 and A3 Versioned Analysis Bundle V1 are closed on `main`.
 - Drive + Gmail T0 telemetry/AI developer bridge is implemented and accepted for debug use.
-- Physical S22+ validation for the latest Radar/Details/map runtime is **closed / accepted** for the STABLE_CORE baseline. Manual GATT, Radar ingest/UI health, live Details, Technical/Raw access, the good-GPS sightings map and map lifecycle were exercised on-device; poor/no-GPS fallback states were not naturally present in that field session and remain covered by deterministic software tests.
-- A4 optional analyst work and T1+ production telemetry are future product/architecture decisions, not active implementation work.
+- Physical S22+ validation for the Radar/Details/map runtime remains **closed / accepted** for the STABLE_CORE baseline.
+- The field-test baseline now also includes explicit opt-in **automatic GATT collection**: the existing one-device-at-a-time queue was re-enabled and physically verified on S22+. The accepted run persisted active probe data for 22 recently probed devices, including GATT services for 14 and characteristic data for 19, while the passive scanner continued recording samples; the Room snapshot passed `PRAGMA quick_check`, the app reported no crash/ANR, and the master-switch preference persisted across restart.
+- Automatic GATT remains read-oriented and explicit opt-in; periodic RFCOMM and opportunistic Classic discovery remain disabled. A4 optional analyst work and T1+ production telemetry are future product/architecture decisions, not active implementation work.
 
 Current references:
 
