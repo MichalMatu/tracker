@@ -17,7 +17,6 @@ constructor() {
     companion object {
         // Byte following 0x0075 that often indicates SmartThings/Find network
         const val TYPE_SMART_THINGS_FIND = 0x42
-
     }
 
     fun parse(data: ByteArray): SamsungDeviceData? {
