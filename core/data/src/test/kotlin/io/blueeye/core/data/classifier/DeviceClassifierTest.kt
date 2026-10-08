@@ -50,6 +50,26 @@ class DeviceClassifierTest {
     }
 
     @Test
+    fun `classifyBle keeps Sony WF-1000XM5 as headphones when Find Hub is advertised`() {
+        val findHub256 =
+            byteArrayOf(0x40) + ByteArray(33) { index -> (index + 1).toByte() }
+
+        val result =
+            classifier.classifyBle(
+                BleClassificationInput(
+                    manufacturerRecords = emptyMap(),
+                    serviceUuids = listOf(FIND_HUB_UUID),
+                    serviceDataByUuid = mapOf(FIND_HUB_UUID to findHub256),
+                    appearance = null,
+                    deviceName = "LE_WF-1000XM5",
+                    vendorName = "Sony",
+                )
+            )
+
+        assertEquals(DeviceType.HEADPHONES, result)
+    }
+
+    @Test
     fun `classifyBle uses apple manufacturer record even when it is not primary`() {
         whenever(appleContinuityParser.parse(APPLE_PAYLOAD))
             .thenReturn(AppleDeviceData(deviceModel = "AirPods"))

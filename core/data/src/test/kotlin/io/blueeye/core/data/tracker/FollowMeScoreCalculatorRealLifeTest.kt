@@ -85,15 +85,15 @@ class FollowMeScoreCalculatorRealLifeTest {
 
         // Analysis
         // Duration (10-30m) -> 25 pts (SCORE_DURATION_MEDIUM)
-        // RSSI Stable -> 20 pts
+        // RSSI Stable -> capped at 10 pts
         // Encounters (>10) -> 4 pts
-        // Total = 49 pts
+        // Total = 39 pts
         // Status = SAFE: bus rides are a common moving false positive unless
         // there is stronger evidence such as known tracker type or correlated MAC rotation.
 
         println("The Bus Neighbor Score: ${result.totalScore} -> ${result.status}")
         
-        assertEquals(49, result.totalScore)
+        assertEquals(39, result.totalScore)
         assertEquals(TrackingStatus.SAFE, result.status)
     }
 }

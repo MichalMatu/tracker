@@ -11,6 +11,8 @@ internal object FingerprintMatcher {
 
     private const val FAST_PAIR_ID_LEN = 3
     private const val FAST_PAIR_HEX_LEN = 6
+    private const val FIND_HUB_160_SERVICE_DATA_LENGTH = 22
+    private const val FIND_HUB_256_SERVICE_DATA_LENGTH = 34
 
     fun checkServiceData(serviceDataMap: Map<String, ByteArray>?): String? {
         if (serviceDataMap == null) return null
@@ -34,7 +36,12 @@ internal object FingerprintMatcher {
             Defs.EDDYSTONE_FRAME_URL -> "Eddystone Beacon (URL)"
             Defs.EDDYSTONE_FRAME_TLM -> "Eddystone Beacon (TLM)"
             Defs.EDDYSTONE_FRAME_EID -> "Eddystone Beacon (EID)"
-            Defs.FIND_HUB_FRAME, Defs.FIND_HUB_FRAME_WITH_FLAGS -> "Google Find Hub Tracker"
+            Defs.FIND_HUB_FRAME, Defs.FIND_HUB_FRAME_WITH_FLAGS ->
+                when (serviceData.size) {
+                    FIND_HUB_160_SERVICE_DATA_LENGTH -> "Google Find Hub (FHN-160)"
+                    FIND_HUB_256_SERVICE_DATA_LENGTH -> "Google Find Hub (FHN-256)"
+                    else -> "Google Find Hub"
+                }
             else -> null
         }
     }

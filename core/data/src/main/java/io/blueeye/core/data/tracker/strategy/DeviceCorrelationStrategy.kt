@@ -6,6 +6,7 @@ import io.blueeye.core.data.tracker.model.CarryoverMatchEvidence
 import io.blueeye.core.data.tracker.model.CarryoverMatchReason
 import io.blueeye.core.data.tracker.model.IdentityCandidateMatch
 import io.blueeye.core.data.tracker.model.TrackedTarget
+import io.blueeye.core.decoders.parser.generic.ServiceDataExtractor
 import io.blueeye.core.scanner.model.BleScanResultData
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -49,6 +50,14 @@ constructor() {
         private const val EXTREME_RSSI_DIFF = 50
         private const val RSSI_PENALTY_MULTIPLIER = 0.5f
         private const val SAME_NAME_MIN_PAYLOAD_SCORE = 0.8f
+        private const val BYTE_MASK = 0xFF
+        private const val FIND_HUB_SERVICE_UUID = 0xFEAA
+        private const val FIND_HUB_FRAME = 0x40
+        private const val FIND_HUB_FRAME_WITH_FLAGS = 0x41
+        private const val FIND_HUB_160_SERVICE_DATA_LENGTH = 22
+        private const val FIND_HUB_256_SERVICE_DATA_LENGTH = 34
+        private const val FIND_HUB_IDENTITY_BITS_160 = 160
+        private const val FIND_HUB_IDENTITY_BITS_256 = 256
 
         // Known Vendor Headers to strip (Little Endian Manufacturer ID)
         private val HEADER_APPLE = byteArrayOf(0x4C.toByte(), 0x00.toByte())
@@ -77,8 +86,11 @@ constructor() {
             val timeSinceLastSeen = input.data.timestamp - target.lastSeenAt
             val isSequentialCarryoverWindow =
                 timeSinceLastSeen in MIN_DESTRUCTIVE_CARRYOVER_GAP_MS..CARRYOVER_WINDOW_MS
+            val hasFindHubWidthConflict =
+                hasFindHubIdentityWidthConflict(input.rawData, target.lastPayload)
             val isEligibleTarget =
                 !hasNameFamilyConflict &&
+                    !hasFindHubWidthConflict &&
                     !isAmbiguousAppleShadowPair(input, target) &&
                     isSequentialCarryoverWindow
             if (!isEligibleTarget) continue
@@ -112,7 +124,9 @@ constructor() {
                     timeSinceLastSeen <= LONG_GAP_CANDIDATE_WINDOW_MS
             val hasNameFamilyConflict =
                 AppleIdentityConflictGuard.hasNameFamilyConflict(input.deviceName, target.lastDeviceName)
-            if (isWithinCandidateWindow && !hasNameFamilyConflict) {
+            val hasFindHubWidthConflict =
+                hasFindHubIdentityWidthConflict(input.rawData, target.lastPayload)
+            if (isWithinCandidateWindow && !hasNameFamilyConflict && !hasFindHubWidthConflict) {
                 val evidence = longGapSameNameEvidence(input, target)
                 if (evidence != null) {
                     return IdentityCandidateMatch(
@@ -492,6 +506,27 @@ constructor() {
             matchInterval(input.advertisingInterval, target.lastAdvertisingInterval) > 0f
     }
 
+    private fun hasFindHubIdentityWidthConflict(
+        firstPayload: ByteArray?,
+        secondPayload: ByteArray?,
+    ): Boolean {
+        val firstWidth = findHubIdentityWidth(firstPayload)
+        val secondWidth = findHubIdentityWidth(secondPayload)
+        return firstWidth != null && secondWidth != null && firstWidth != secondWidth
+    }
+
+    private fun findHubIdentityWidth(rawData: ByteArray?): Int? {
+        val serviceData = ServiceDataExtractor.extract16(rawData)[FIND_HUB_SERVICE_UUID]
+        val frameType = serviceData?.firstOrNull()?.toInt()?.and(BYTE_MASK)
+        if (frameType !in setOf(FIND_HUB_FRAME, FIND_HUB_FRAME_WITH_FLAGS)) return null
+
+        return when (serviceData?.size) {
+            FIND_HUB_160_SERVICE_DATA_LENGTH -> FIND_HUB_IDENTITY_BITS_160
+            FIND_HUB_256_SERVICE_DATA_LENGTH -> FIND_HUB_IDENTITY_BITS_256
+            else -> null
+        }
+    }
+
     private fun isGenericName(name: String?): Boolean {
         if (name.isNullOrBlank()) return true
         val lower = name.lowercase()
@@ -501,6 +536,7 @@ constructor() {
             "tv", "smart tv", "headphones", "headset", "earbuds", "speaker",
             "computer", "desktop", "laptop", "tablet", "phone", "watch",
             "le", "le device", "unknown", "accessory", "genericdevice",
+            "fmdn", "google find hub", "google find hub tracker", "find hub",
         )
     }
 

@@ -5,12 +5,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Parser for Samsung SmartTag (Manufacturer ID 0x0075).
- * Based on research into Samsung SmartThings Find / Offline Finding protocol.
+ * Parser for Samsung SmartThings Find / Offline Finding manufacturer data (0x0075).
  *
- * Typical Structure:
- * Type: 0x42 (often used for SmartThings / Find)
- * Payload contains obscure/encrypted data, but presence indicates a SmartTag.
+ * Type 0x42 is used by the wider Offline Finding ecosystem and is not sufficient on its own to
+ * identify a SmartTag. TVs and other Samsung devices can emit the same family of payloads.
  */
 @Singleton
 class SmartTagParser
@@ -19,37 +17,21 @@ constructor() {
     companion object {
         // Byte following 0x0075 that often indicates SmartThings/Find network
         const val TYPE_SMART_THINGS_FIND = 0x42
-
-        // Known signatures for SmartTag models (heuristics from sniffing)
-        // SmartTag (EI-T5300)
-        // SmartTag+ (EI-T7300) with UWB
     }
 
     fun parse(data: ByteArray): SamsungDeviceData? {
         if (data.isEmpty()) return null
 
-        // Check for SmartThings Find packet type
-        // Note: data here is the payload AFTER 0x0075
-        // The first byte often indicates the subtype/version logic
+        val isOfflineFindingPacket =
+            data.size >= 8 && data[0].toInt() and 0xFF == TYPE_SMART_THINGS_FIND
 
-        // Heuristic detection based on packet length and some structure
-        val isSmartTagPacket = data.size >= 8 && data[0].toInt() and 0xFF == TYPE_SMART_THINGS_FIND
-
-        if (isSmartTagPacket) {
-            // Encrypted identification data usually follows
-            // We can extract a snippet as a "Tag ID" for tracking
-            val tagId = if (data.size >= 12) {
-                data.copyOfRange(4, 12).joinToString("") { "%02X".format(it) }
-            } else {
-                data.joinToString("") { "%02X".format(it) }
-            }
-
+        if (isOfflineFindingPacket) {
             return SamsungDeviceData(
-                deviceModel = "Samsung SmartTag",
-                deviceType = DeviceType.TAG,
+                deviceModel = "Samsung Offline Finding",
+                deviceType = DeviceType.UNKNOWN,
                 isOfflineFinding = true,
-                isSmartTag = true,
-                smartTagId = tagId
+                isSmartTag = false,
+                smartTagId = null,
             )
         }
 

@@ -9,6 +9,10 @@ import java.lang.StringBuilder
  */
 object EddystoneParser {
     private const val OFS_TX_POWER = 1
+    private const val FIND_HUB_FRAME = 0x40
+    private const val FIND_HUB_FRAME_WITH_FLAGS = 0x41
+    private const val FIND_HUB_160_SERVICE_DATA_LENGTH = 22
+    private const val FIND_HUB_256_SERVICE_DATA_LENGTH = 34
     private const val OFS_URL_SCHEME = 2
 
     fun parse(uuid: Int, rest: ByteArray): String? {
@@ -21,9 +25,17 @@ object EddystoneParser {
             EddystoneConstants.FRAME_TYPE_URL -> parseUrl(rest)
             EddystoneConstants.FRAME_TYPE_TLM -> parseTlm(rest)
             EddystoneConstants.FRAME_TYPE_EID -> "Eddystone-EID"
+            FIND_HUB_FRAME, FIND_HUB_FRAME_WITH_FLAGS -> parseFindHub(rest)
             else -> "Eddystone (Unknown Frame Type: 0x%02X)".format(frameType)
         }
     }
+
+    private fun parseFindHub(rest: ByteArray): String =
+        when (rest.size) {
+            FIND_HUB_160_SERVICE_DATA_LENGTH -> "Google Find Hub (FHN-160)"
+            FIND_HUB_256_SERVICE_DATA_LENGTH -> "Google Find Hub (FHN-256)"
+            else -> "Google Find Hub"
+        }
 
     private fun parseUid(rest: ByteArray): String {
         return if (rest.size >= EddystoneConstants.MIN_UID_SIZE) {

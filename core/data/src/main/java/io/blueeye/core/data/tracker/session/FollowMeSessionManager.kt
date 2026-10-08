@@ -106,29 +106,31 @@ class FollowMeSessionManager @Inject constructor() {
         currentAccuracyM: Float? = null,
         now: Long = System.currentTimeMillis(),
     ): Boolean {
-        if (currentLat == null || currentLon == null) return userHasMoved
+        val fix = usableLocationFix(currentLat, currentLon, currentAccuracyM) ?: return userHasMoved
+        val latitude = fix.latitude
+        val longitude = fix.longitude
+        val accuracyM = fix.accuracyM
 
-        val accuracyM = currentAccuracyM.normalizedAccuracy()
         if (startLocationLat == null || startLocationLon == null) {
-            startLocationLat = currentLat
-            startLocationLon = currentLon
+            startLocationLat = latitude
+            startLocationLon = longitude
             startLocationAccuracyM = accuracyM
-            movementAnchorLat = currentLat
-            movementAnchorLon = currentLon
+            movementAnchorLat = latitude
+            movementAnchorLon = longitude
             movementAnchorAccuracyM = accuracyM
         } else if (!userHasMoved) {
             val distanceFromStart =
                 calculateDistance(
                     startLocationLat!!,
                     startLocationLon!!,
-                    currentLat,
-                    currentLon,
+                    latitude,
+                    longitude,
                 )
             val requiredDistance = requiredMovementDistance(startLocationAccuracyM, accuracyM)
             if (distanceFromStart >= requiredDistance) {
                 userHasMoved = true
-                movementAnchorLat = currentLat
-                movementAnchorLon = currentLon
+                movementAnchorLat = latitude
+                movementAnchorLon = longitude
                 movementAnchorAccuracyM = accuracyM
                 lastConfirmedMovementAt = now
                 Log.i(
@@ -141,11 +143,11 @@ class FollowMeSessionManager @Inject constructor() {
             val anchorLat = movementAnchorLat
             val anchorLon = movementAnchorLon
             if (anchorLat != null && anchorLon != null) {
-                val distanceFromAnchor = calculateDistance(anchorLat, anchorLon, currentLat, currentLon)
+                val distanceFromAnchor = calculateDistance(anchorLat, anchorLon, latitude, longitude)
                 val requiredDistance = requiredMovementDistance(movementAnchorAccuracyM, accuracyM)
                 if (distanceFromAnchor >= requiredDistance) {
-                    movementAnchorLat = currentLat
-                    movementAnchorLon = currentLon
+                    movementAnchorLat = latitude
+                    movementAnchorLon = longitude
                     movementAnchorAccuracyM = accuracyM
                     lastConfirmedMovementAt = now
                 }
@@ -236,6 +238,11 @@ class FollowMeSessionManager @Inject constructor() {
 
 private const val EarthRadiusMeters = 6_371_000.0
 private const val MovementThresholdMeters = 50.0
+private const val MaxLocationAccuracyMeters = 100f
+private const val MinLatitude = -90.0
+private const val MaxLatitude = 90.0
+private const val MinLongitude = -180.0
+private const val MaxLongitude = 180.0
 
 private fun requiredMovementDistance(
     firstAccuracyM: Double?,
@@ -263,7 +270,41 @@ private fun calculateDistance(
     return EarthRadiusMeters * c
 }
 
+private data class UsableLocationFix(
+    val latitude: Double,
+    val longitude: Double,
+    val accuracyM: Double,
+)
+
+private fun usableLocationFix(
+    latitude: Double?,
+    longitude: Double?,
+    accuracyM: Float?,
+): UsableLocationFix? {
+    val normalizedAccuracy = accuracyM.normalizedAccuracy()
+    val isUsable =
+        latitude?.isValidLatitude() == true &&
+            longitude?.isValidLongitude() == true &&
+            normalizedAccuracy != null
+
+    return if (isUsable) {
+        UsableLocationFix(
+            latitude = requireNotNull(latitude),
+            longitude = requireNotNull(longitude),
+            accuracyM = requireNotNull(normalizedAccuracy),
+        )
+    } else {
+        null
+    }
+}
+
 private fun Float?.normalizedAccuracy(): Double? =
     this
-        ?.takeIf { it.isFinite() && it > 0f }
+        ?.takeIf { it.isFinite() && it > 0f && it <= MaxLocationAccuracyMeters }
         ?.toDouble()
+
+private fun Double.isValidLatitude(): Boolean =
+    isFinite() && this in MinLatitude..MaxLatitude
+
+private fun Double.isValidLongitude(): Boolean =
+    isFinite() && this in MinLongitude..MaxLongitude

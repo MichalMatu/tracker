@@ -263,11 +263,43 @@ class FollowMeScoreCalculatorTest {
 
         val result = calculator.calculateScore(metrics)
 
-        assertEquals(95, result.totalScore)
+        assertEquals(85, result.totalScore)
         assertEquals(TrackingStatus.DANGEROUS, result.status)
         assertTrue(result.explanation.contains("Known tracker type"))
         assertTrue(result.explanation.contains("RSSI stayed stable during movement window"))
         assertFalse(result.explanation.contains("moving together"))
+    }
+
+    @Test
+    fun `long moving tracker outranks short stable RSSI tracker`() {
+        whenever(rssiAnalyzer.calculateStabilityScore(any())).doReturn(25)
+
+        val shortTracker =
+            calculator.calculateScore(
+                FollowMeScoreCalculator.DeviceMetrics(
+                    deviceType = DeviceType.TRACKER,
+                    firstSeenAt = 0L,
+                    lastSeenAt = 2 * 60_000L,
+                    encounterCount = 27,
+                    rssiSamples = listOf(-91, -92, -91, -93),
+                    userHasMoved = true,
+                )
+            )
+        val longTracker =
+            calculator.calculateScore(
+                FollowMeScoreCalculator.DeviceMetrics(
+                    deviceType = DeviceType.TRACKER,
+                    firstSeenAt = 0L,
+                    lastSeenAt = 11 * 60_000L,
+                    encounterCount = 26,
+                    rssiSamples = listOf(-48, -49, -47, -50),
+                    userHasMoved = true,
+                )
+            )
+
+        assertEquals(34, shortTracker.totalScore)
+        assertEquals(59, longTracker.totalScore)
+        assertTrue(longTracker.totalScore > shortTracker.totalScore)
     }
 
     @Test

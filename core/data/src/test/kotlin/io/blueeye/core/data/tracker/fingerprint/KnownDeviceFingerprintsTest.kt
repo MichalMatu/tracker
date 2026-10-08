@@ -29,14 +29,29 @@ class KnownDeviceFingerprintsTest {
     }
 
     @Test
-    fun `identify distinguishes Google Find Hub frame from Eddystone on shared FEAA uuid`() {
+    fun `identify distinguishes 160-bit Google Find Hub frame from Eddystone on shared FEAA uuid`() {
+        val payload = byteArrayOf(0x40) + ByteArray(21) { index -> (index + 1).toByte() }
+
         val result =
             KnownDeviceFingerprints.identify(
-                serviceDataMap = mapOf(EDDYSTONE_UUID to byteArrayOf(0x40, 0x01, 0x02)),
+                serviceDataMap = mapOf(EDDYSTONE_UUID to payload),
                 manufacturerSpecificData = emptyMap(),
             )
 
-        assertEquals("Google Find Hub Tracker", result)
+        assertEquals("Google Find Hub (FHN-160)", result)
+    }
+
+    @Test
+    fun `identify distinguishes 256-bit Google Find Hub frame`() {
+        val payload = byteArrayOf(0x40) + ByteArray(33) { index -> (index + 1).toByte() }
+
+        val result =
+            KnownDeviceFingerprints.identify(
+                serviceDataMap = mapOf(EDDYSTONE_UUID to payload),
+                manufacturerSpecificData = emptyMap(),
+            )
+
+        assertEquals("Google Find Hub (FHN-256)", result)
     }
 
     @Test

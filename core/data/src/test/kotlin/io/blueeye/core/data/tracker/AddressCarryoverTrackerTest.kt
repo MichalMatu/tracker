@@ -288,6 +288,104 @@ class AddressCarryoverTrackerTest {
         assertNotEquals(phoneResult.targetId, laptopResult.targetId)
     }
 
+    @Test
+    fun `generic FMDN names do not merge concurrent Find Hub devices`() {
+        val first =
+            findHubScan(
+                mac = "10:20:30:40:50:60",
+                name = "FMDN",
+                timestamp = 1_000_000L,
+                identityBytes = ByteArray(21) { 0x11.toByte() },
+                serviceDataLength = 22,
+            )
+        val second =
+            findHubScan(
+                mac = "10:20:30:40:50:61",
+                name = "FMDN",
+                timestamp = 1_005_000L,
+                identityBytes = ByteArray(21) { 0x66.toByte() },
+                serviceDataLength = 22,
+            )
+
+        val firstResult = tracker.processScan(first, first.name)
+        val secondResult = tracker.processScan(second, second.name)
+
+        assertTrue(firstResult.isNewTarget)
+        assertTrue(secondResult.isNewTarget)
+        assertFalse(secondResult.isCarryover)
+        assertNotEquals(firstResult.targetId, secondResult.targetId)
+    }
+
+    @Test
+    fun `Find Hub 160-bit and 256-bit identities never destructively merge`() {
+        val first =
+            findHubScan(
+                mac = "20:30:40:50:60:70",
+                name = "My Locator",
+                timestamp = 2_000_000L,
+                identityBytes = ByteArray(21) { 0x22.toByte() },
+                serviceDataLength = 22,
+            )
+        val second =
+            findHubScan(
+                mac = "20:30:40:50:60:71",
+                name = "My Locator",
+                timestamp = 2_005_000L,
+                identityBytes = ByteArray(33) { 0x22.toByte() },
+                serviceDataLength = 34,
+            )
+
+        val firstResult = tracker.processScan(first, first.name)
+        val secondResult = tracker.processScan(second, second.name)
+
+        assertTrue(firstResult.isNewTarget)
+        assertTrue(secondResult.isNewTarget)
+        assertFalse(secondResult.isCarryover)
+        assertNotEquals(firstResult.targetId, secondResult.targetId)
+    }
+
+    private fun findHubScan(
+        mac: String,
+        name: String,
+        timestamp: Long,
+        identityBytes: ByteArray,
+        serviceDataLength: Int,
+    ): BleScanResultData {
+        val adLength = serviceDataLength + 3
+        val rawData =
+            byteArrayOf(
+                adLength.toByte(),
+                0x16,
+                0xAA.toByte(),
+                0xFE.toByte(),
+                0x40,
+            ) + identityBytes +
+                byteArrayOf(
+                    0x03,
+                    0x1A,
+                    0x40,
+                    0x06,
+                )
+
+        return BleScanResultData(
+            mac = mac,
+            rssi = -55,
+            timestamp = timestamp,
+            technology = "BLE",
+            name = name,
+            serviceUuids = listOf("0000feaa-0000-1000-8000-00805f9b34fb"),
+            serviceDataByUuid =
+                mapOf(
+                    "0000feaa-0000-1000-8000-00805f9b34fb" to
+                        (byteArrayOf(0x40) + identityBytes),
+                ),
+            isConnectable = true,
+            primaryPhy = 1,
+            secondaryPhy = 0,
+            rawData = rawData,
+        )
+    }
+
     private fun createScanData(
         mac: String,
         name: String?,

@@ -49,7 +49,8 @@ constructor(
         private const val SCORE_DURATION_MEDIUM = 25
         private const val SCORE_DURATION_MAX = 30
 
-        private const val SCORE_RSSI_STABLE_THRESHOLD = 15
+        private const val SCORE_RSSI_STABLE_THRESHOLD = 5
+        private const val SCORE_RSSI_MAX = 10
 
         private const val SCORE_TYPE_KNOWN_TRACKER = 20
         private const val SCORE_TYPE_BEACON = 10
@@ -236,7 +237,7 @@ constructor(
     }
 
     private fun calculateRssiScore(samples: List<Int>, explanations: MutableList<String>): Int {
-        val score = rssiAnalyzer.calculateStabilityScore(samples)
+        val score = rssiAnalyzer.calculateStabilityScore(samples).coerceAtMost(SCORE_RSSI_MAX)
         if (score > SCORE_RSSI_STABLE_THRESHOLD) {
             explanations.add("RSSI stayed stable during movement window")
         }
