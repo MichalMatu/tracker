@@ -106,30 +106,31 @@ class FollowMeSessionManager @Inject constructor() {
         currentAccuracyM: Float? = null,
         now: Long = System.currentTimeMillis(),
     ): Boolean {
-        if (currentLat == null || currentLon == null) return userHasMoved
-        if (!currentLat.isValidLatitude() || !currentLon.isValidLongitude()) return userHasMoved
+        val fix = usableLocationFix(currentLat, currentLon, currentAccuracyM) ?: return userHasMoved
+        val latitude = fix.latitude
+        val longitude = fix.longitude
+        val accuracyM = fix.accuracyM
 
-        val accuracyM = currentAccuracyM.normalizedAccuracy() ?: return userHasMoved
         if (startLocationLat == null || startLocationLon == null) {
-            startLocationLat = currentLat
-            startLocationLon = currentLon
+            startLocationLat = latitude
+            startLocationLon = longitude
             startLocationAccuracyM = accuracyM
-            movementAnchorLat = currentLat
-            movementAnchorLon = currentLon
+            movementAnchorLat = latitude
+            movementAnchorLon = longitude
             movementAnchorAccuracyM = accuracyM
         } else if (!userHasMoved) {
             val distanceFromStart =
                 calculateDistance(
                     startLocationLat!!,
                     startLocationLon!!,
-                    currentLat,
-                    currentLon,
+                    latitude,
+                    longitude,
                 )
             val requiredDistance = requiredMovementDistance(startLocationAccuracyM, accuracyM)
             if (distanceFromStart >= requiredDistance) {
                 userHasMoved = true
-                movementAnchorLat = currentLat
-                movementAnchorLon = currentLon
+                movementAnchorLat = latitude
+                movementAnchorLon = longitude
                 movementAnchorAccuracyM = accuracyM
                 lastConfirmedMovementAt = now
                 Log.i(
@@ -142,11 +143,11 @@ class FollowMeSessionManager @Inject constructor() {
             val anchorLat = movementAnchorLat
             val anchorLon = movementAnchorLon
             if (anchorLat != null && anchorLon != null) {
-                val distanceFromAnchor = calculateDistance(anchorLat, anchorLon, currentLat, currentLon)
+                val distanceFromAnchor = calculateDistance(anchorLat, anchorLon, latitude, longitude)
                 val requiredDistance = requiredMovementDistance(movementAnchorAccuracyM, accuracyM)
                 if (distanceFromAnchor >= requiredDistance) {
-                    movementAnchorLat = currentLat
-                    movementAnchorLon = currentLon
+                    movementAnchorLat = latitude
+                    movementAnchorLon = longitude
                     movementAnchorAccuracyM = accuracyM
                     lastConfirmedMovementAt = now
                 }
@@ -267,6 +268,34 @@ private fun calculateDistance(
             kotlin.math.sin(dLon / 2)
     val c = 2 * kotlin.math.atan2(kotlin.math.sqrt(a), kotlin.math.sqrt(1 - a))
     return EarthRadiusMeters * c
+}
+
+private data class UsableLocationFix(
+    val latitude: Double,
+    val longitude: Double,
+    val accuracyM: Double,
+)
+
+private fun usableLocationFix(
+    latitude: Double?,
+    longitude: Double?,
+    accuracyM: Float?,
+): UsableLocationFix? {
+    val normalizedAccuracy = accuracyM.normalizedAccuracy()
+    val isUsable =
+        latitude?.isValidLatitude() == true &&
+            longitude?.isValidLongitude() == true &&
+            normalizedAccuracy != null
+
+    return if (isUsable) {
+        UsableLocationFix(
+            latitude = requireNotNull(latitude),
+            longitude = requireNotNull(longitude),
+            accuracyM = requireNotNull(normalizedAccuracy),
+        )
+    } else {
+        null
+    }
 }
 
 private fun Float?.normalizedAccuracy(): Double? =
