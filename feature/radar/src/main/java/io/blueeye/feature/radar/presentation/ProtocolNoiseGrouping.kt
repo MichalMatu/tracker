@@ -1,6 +1,7 @@
 package io.blueeye.feature.radar.presentation
 
 import io.blueeye.core.model.DeviceCalibrationLabel
+import io.blueeye.core.model.DeviceType
 import io.blueeye.core.model.TrackingStatus
 
 enum class ProtocolNoiseFamily(val title: String) {
@@ -35,7 +36,10 @@ object ProtocolNoiseClassifier {
 
     fun family(item: RadarUiItem): ProtocolNoiseFamily? = family(item.beaconType, item.displayName)
 
-    fun canGroup(item: RadarUiItem): Boolean = family(item) != null && !mustStayStandalone(item)
+    fun canGroup(item: RadarUiItem): Boolean =
+        family(item) != null &&
+            item.deviceType !in PHYSICAL_DEVICES_TO_KEEP_VISIBLE &&
+            !mustStayStandalone(item)
 
     fun mustStayStandalone(item: RadarUiItem): Boolean {
         val hasNonTrackerAttentionEvidence =
@@ -51,6 +55,19 @@ object ProtocolNoiseClassifier {
             hasNonTrackerAttentionEvidence
     }
 
+    private val PHYSICAL_DEVICES_TO_KEEP_VISIBLE =
+        setOf(
+            DeviceType.HEADPHONES,
+            DeviceType.TV,
+            DeviceType.PHONE,
+            DeviceType.TABLET,
+            DeviceType.LAPTOP,
+            DeviceType.PC,
+            DeviceType.WEARABLE,
+            DeviceType.WATCH,
+            DeviceType.SPEAKER,
+            DeviceType.AUDIO_VIDEO,
+        )
     private const val ATTENTION_SCORE_THRESHOLD = 51f
     private val ATTENTION_LABELS = setOf(DeviceCalibrationLabel.TRUE_POSITIVE, DeviceCalibrationLabel.SUSPICIOUS)
 }
