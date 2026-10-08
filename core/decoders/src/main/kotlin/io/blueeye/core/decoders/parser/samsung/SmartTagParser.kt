@@ -10,7 +10,7 @@ import javax.inject.Singleton
  *
  * Typical Structure:
  * Type: 0x42 (often used for SmartThings / Find)
- * Payload contains obscure/encrypted data, but presence indicates a SmartTag.
+ * Payloads are shared across Samsung categories; this is NOT a unique SmartTag signature.
  */
 @Singleton
 class SmartTagParser
@@ -25,7 +25,7 @@ constructor() {
         // SmartTag+ (EI-T7300) with UWB
     }
 
-    fun parse(data: ByteArray): SamsungDeviceData? {
+    fun parse(data: ByteArray, advertisedName: String? = null): SamsungDeviceData? {
         if (data.isEmpty()) return null
 
         // Check for SmartThings Find packet type
@@ -33,16 +33,23 @@ constructor() {
         // The first byte often indicates the subtype/version logic
 
         // Heuristic detection based on packet length and some structure
-        val isSmartTagPacket = data.size >= 8 && data[0].toInt() and 0xFF == TYPE_SMART_THINGS_FIND
+        // Samsung manufacturer data (0x0075 / 0x42) is shared by TVs, phones and tags.
+        // Never assert a SmartTag solely from this byte: require an advertised model identity.
+        val isKnownSmartTagName = advertisedName?.lowercase()?.let { name ->
+            name.contains("smarttag") ||
+                name.contains("ei-t5300") ||
+                name.contains("ei-t7300") ||
+                name.contains("ei-t5600")
+        } == true
+        val isSmartTagPacket =
+            data.size >= 12 &&
+                (data[0].toInt() and 0xFF) == TYPE_SMART_THINGS_FIND &&
+                isKnownSmartTagName
 
         if (isSmartTagPacket) {
             // Encrypted identification data usually follows
             // We can extract a snippet as a "Tag ID" for tracking
-            val tagId = if (data.size >= 12) {
-                data.copyOfRange(4, 12).joinToString("") { "%02X".format(it) }
-            } else {
-                data.joinToString("") { "%02X".format(it) }
-            }
+            val tagId = data.copyOfRange(4, 12).joinToString("") { "%02X".format(it) }
 
             return SamsungDeviceData(
                 deviceModel = "Samsung SmartTag",
