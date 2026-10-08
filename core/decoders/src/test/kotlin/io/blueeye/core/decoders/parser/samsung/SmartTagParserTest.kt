@@ -4,6 +4,7 @@ import io.blueeye.core.model.DeviceType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -26,6 +27,6 @@ class SmartTagParserTest {
         assertEquals(DeviceType.UNKNOWN, result.deviceType)
         assertTrue(result.isOfflineFinding)
         assertFalse(result.isSmartTag)
-        assertEquals(null, result.smartTagId)
+        assertNull(result.smartTagId)
     }
 }
