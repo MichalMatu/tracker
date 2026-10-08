@@ -12,10 +12,6 @@ class ProbeResultHandler @Inject constructor(
     private val deviceDao: DeviceDao,
     private val deviceClassifier: DeviceClassifier,
 ) {
-    companion object {
-        private const val MIN_SERVICES_LEN = 20
-    }
-
     suspend fun handle(
         fingerprint: String,
         params: io.blueeye.core.domain.repository.RepoProbeParams
@@ -44,12 +40,9 @@ class ProbeResultHandler @Inject constructor(
             newDeviceType = refinedType,
         )
 
-        // 3. GATT Correlation (Merge devices if GATT structure matches)
-        services?.let {
-            if (it.length > MIN_SERVICES_LEN) { // Basic sanity check for non-empty service list
-                attemptGattCorrelation(fingerprint, it)
-            }
-        }
+        // Never auto-merge devices based on shared GATT service UUIDs: many unrelated
+        // devices expose identical 180A/180F services. Identity correlation must use
+        // independent, device-specific evidence and an explicit review path.
     }
 
     private fun refineClassification(
@@ -62,7 +55,7 @@ class ProbeResultHandler @Inject constructor(
         // Try explicit GATT classification
         val gattResult = deviceClassifier.classifyByGattServices(services, model)
         if (gattResult != null) {
-            if (gattResult.deviceType != DeviceType.UNKNOWN) {
+            if (newType == DeviceType.UNKNOWN && gattResult.deviceType != DeviceType.UNKNOWN) {
                 newType = gattResult.deviceType
             }
             if (gattResult.modelName != null) {
@@ -72,18 +65,4 @@ class ProbeResultHandler @Inject constructor(
         return Pair(newType, newModel)
     }
 
-    private suspend fun attemptGattCorrelation(fingerprint: String, services: String) {
-        val matchingDevice = deviceDao.findDeviceByGattServices(services, fingerprint)
-        if (matchingDevice != null) {
-             try {
-                // Merge this device into the older one (matchingDevice is the original)
-                deviceDao.mergeDevices(
-                    targetFingerprint = matchingDevice.fingerprint,
-                    duplicateFingerprint = fingerprint,
-                )
-            } catch (e: Exception) {
-                android.util.Log.e("ProbeResultHandler", "Failed to merge ${fingerprint} into ${matchingDevice.fingerprint}: ${e.message}")
-            }
-        }
-    }
 }
