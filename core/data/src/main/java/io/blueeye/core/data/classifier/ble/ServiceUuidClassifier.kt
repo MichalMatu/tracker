@@ -176,8 +176,8 @@ object ServiceUuidClassifier {
     fun isKnownTracker(serviceUuids: List<String>?): Boolean {
         if (serviceUuids.isNullOrEmpty()) return false
         val normalized = serviceUuids.map { normalizeUuid(it) }
-        return normalized.contains(ServiceUuids.UUID_TILE) ||
-            false // FD5A is a protocol capability, not a confirmed SmartTag model
+        // FD5A is a capability, not proof of a physical SmartTag.
+        return normalized.contains(ServiceUuids.UUID_TILE)
     }
 
     /** Quick check: Is this Exposure Notification (should potentially filter)? */
