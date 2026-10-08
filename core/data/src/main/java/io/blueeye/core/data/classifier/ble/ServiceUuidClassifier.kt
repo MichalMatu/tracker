@@ -71,10 +71,10 @@ object ServiceUuidClassifier {
     private fun checkSpecialServices(normalizedUuids: List<String>): UuidClassification? {
         return when {
             normalizedUuids.contains(ServiceUuids.UUID_EDDYSTONE) -> UuidClassification(
-                deviceType = DeviceType.BEACON,
-                isBeacon = true,
-                serviceName = "Google Eddystone",
-                confidence = 1.0f,
+                deviceType = DeviceType.UNKNOWN,
+                isBeacon = false,
+                serviceName = "Google FEAA service (Eddystone / Find Hub)",
+                confidence = 0.3f,
             )
             normalizedUuids.any { it in ServiceUuids.FITNESS_UUIDS } -> UuidClassification(
                 deviceType = DeviceType.WEARABLE,
