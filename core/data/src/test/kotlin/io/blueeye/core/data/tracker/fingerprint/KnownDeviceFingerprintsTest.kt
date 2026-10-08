@@ -32,11 +32,22 @@ class KnownDeviceFingerprintsTest {
     fun `identify distinguishes Google Find Hub frame from Eddystone on shared FEAA uuid`() {
         val result =
             KnownDeviceFingerprints.identify(
+                serviceDataMap = mapOf(EDDYSTONE_UUID to FIND_HUB_160_BIT_FRAME),
+                manufacturerSpecificData = emptyMap(),
+            )
+
+        assertEquals("Google Find Hub", result)
+    }
+
+    @Test
+    fun `identify rejects truncated Find Hub frame`() {
+        val result =
+            KnownDeviceFingerprints.identify(
                 serviceDataMap = mapOf(EDDYSTONE_UUID to byteArrayOf(0x40, 0x01, 0x02)),
                 manufacturerSpecificData = emptyMap(),
             )
 
-        assertEquals("Google Find Hub Tracker", result)
+        assertNull(result)
     }
 
     @Test
@@ -66,5 +77,7 @@ class KnownDeviceFingerprintsTest {
         private const val EDDYSTONE_UUID = "0000feaa-0000-1000-8000-00805f9b34fb"
         private const val TILE_UUID = "0000feed-0000-1000-8000-00805f9b34fb"
         private val SONY_XM5_FAST_PAIR_PAYLOAD = byteArrayOf(0xD4.toByte(), 0x46, 0xA7.toByte())
+        private val FIND_HUB_160_BIT_FRAME =
+            byteArrayOf(0x40) + ByteArray(20) { 0x01 } + byteArrayOf(0x01)
     }
 }
