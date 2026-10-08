@@ -49,6 +49,13 @@ constructor() {
         private const val EXTREME_RSSI_DIFF = 50
         private const val RSSI_PENALTY_MULTIPLIER = 0.5f
         private const val SAME_NAME_MIN_PAYLOAD_SCORE = 0.8f
+        private const val SERVICE_DATA_16_AD_TYPE = 0x16
+        private const val FIND_HUB_UUID_LE_LOW = 0xAA
+        private const val FIND_HUB_UUID_LE_HIGH = 0xFE
+        private const val FIND_HUB_FRAME = 0x40
+        private const val FIND_HUB_FRAME_WITH_FLAGS = 0x41
+        private const val FIND_HUB_160_SERVICE_DATA_LENGTH = 22
+        private const val FIND_HUB_256_SERVICE_DATA_LENGTH = 34
 
         // Known Vendor Headers to strip (Little Endian Manufacturer ID)
         private val HEADER_APPLE = byteArrayOf(0x4C.toByte(), 0x00.toByte())
@@ -77,8 +84,11 @@ constructor() {
             val timeSinceLastSeen = input.data.timestamp - target.lastSeenAt
             val isSequentialCarryoverWindow =
                 timeSinceLastSeen in MIN_DESTRUCTIVE_CARRYOVER_GAP_MS..CARRYOVER_WINDOW_MS
+            val hasFindHubWidthConflict =
+                hasFindHubIdentityWidthConflict(input.rawData, target.lastPayload)
             val isEligibleTarget =
                 !hasNameFamilyConflict &&
+                    !hasFindHubWidthConflict &&
                     !isAmbiguousAppleShadowPair(input, target) &&
                     isSequentialCarryoverWindow
             if (!isEligibleTarget) continue
@@ -112,7 +122,9 @@ constructor() {
                     timeSinceLastSeen <= LONG_GAP_CANDIDATE_WINDOW_MS
             val hasNameFamilyConflict =
                 AppleIdentityConflictGuard.hasNameFamilyConflict(input.deviceName, target.lastDeviceName)
-            if (isWithinCandidateWindow && !hasNameFamilyConflict) {
+            val hasFindHubWidthConflict =
+                hasFindHubIdentityWidthConflict(input.rawData, target.lastPayload)
+            if (isWithinCandidateWindow && !hasNameFamilyConflict && !hasFindHubWidthConflict) {
                 val evidence = longGapSameNameEvidence(input, target)
                 if (evidence != null) {
                     return IdentityCandidateMatch(
@@ -492,6 +504,46 @@ constructor() {
             matchInterval(input.advertisingInterval, target.lastAdvertisingInterval) > 0f
     }
 
+    private fun hasFindHubIdentityWidthConflict(
+        firstPayload: ByteArray?,
+        secondPayload: ByteArray?,
+    ): Boolean {
+        val firstWidth = findHubIdentityWidth(firstPayload)
+        val secondWidth = findHubIdentityWidth(secondPayload)
+        return firstWidth != null && secondWidth != null && firstWidth != secondWidth
+    }
+
+    private fun findHubIdentityWidth(rawData: ByteArray?): Int? {
+        if (rawData == null) return null
+
+        var offset = 0
+        while (offset < rawData.size) {
+            val length = rawData[offset].toInt() and 0xFF
+            if (length == 0) break
+            if (offset + 1 + length > rawData.size) break
+
+            val type = rawData[offset + 1].toInt() and 0xFF
+            if (type == SERVICE_DATA_16_AD_TYPE && length >= 4) {
+                val uuidLow = rawData[offset + 2].toInt() and 0xFF
+                val uuidHigh = rawData[offset + 3].toInt() and 0xFF
+                val frameType = rawData[offset + 4].toInt() and 0xFF
+                if (
+                    uuidLow == FIND_HUB_UUID_LE_LOW &&
+                    uuidHigh == FIND_HUB_UUID_LE_HIGH &&
+                    frameType in setOf(FIND_HUB_FRAME, FIND_HUB_FRAME_WITH_FLAGS)
+                ) {
+                    return when (length - 3) {
+                        FIND_HUB_160_SERVICE_DATA_LENGTH -> 160
+                        FIND_HUB_256_SERVICE_DATA_LENGTH -> 256
+                        else -> null
+                    }
+                }
+            }
+            offset += 1 + length
+        }
+        return null
+    }
+
     private fun isGenericName(name: String?): Boolean {
         if (name.isNullOrBlank()) return true
         val lower = name.lowercase()
@@ -501,6 +553,7 @@ constructor() {
             "tv", "smart tv", "headphones", "headset", "earbuds", "speaker",
             "computer", "desktop", "laptop", "tablet", "phone", "watch",
             "le", "le device", "unknown", "accessory", "genericdevice",
+            "fmdn", "google find hub", "google find hub tracker", "find hub",
         )
     }
 
