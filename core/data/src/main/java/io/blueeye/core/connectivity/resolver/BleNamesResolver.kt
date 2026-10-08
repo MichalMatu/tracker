@@ -19,6 +19,8 @@ class BleNamesResolver @Inject constructor(
         const val SHORT_UUID_START = 4
         const val SHORT_UUID_END = 8
         const val BASE_UUID = "-0000-1000-8000-00805f9b34fb"
+        const val DULT_NON_OWNER_SERVICE = "15190001-12f4-c226-88ed-2ac5579f2a85"
+        const val DULT_NON_OWNER_CHARACTERISTIC = "8e0c0001-1d68-fb92-bf61-48377421680e"
     }
 
     init {
@@ -42,6 +44,7 @@ class BleNamesResolver @Inject constructor(
 
     override fun resolveServiceName(uuid: String): String {
         val lower = uuid.lowercase()
+        if (lower == DULT_NON_OWNER_SERVICE) return "DULT Non-owner Accessory Information"
         val mappedName = serviceMap[lower] ?: if (lower.length == FULL_UUID_LEN && lower[DASH_POS] == '-') {
             serviceMap[lower.substring(SHORT_UUID_START, SHORT_UUID_END)]
         } else {
@@ -53,6 +56,7 @@ class BleNamesResolver @Inject constructor(
 
     override fun resolveCharName(uuid: String): String {
         val lower = uuid.lowercase()
+        if (lower == DULT_NON_OWNER_CHARACTERISTIC) return "DULT Non-owner Control (write/indicate)"
         val mappedName = characteristicMap[lower]
             ?: if (lower.length == FULL_UUID_LEN && lower[DASH_POS] == '-') {
                 characteristicMap[lower.substring(SHORT_UUID_START, SHORT_UUID_END)]

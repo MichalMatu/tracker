@@ -33,20 +33,20 @@ class DeviceClassifierTest {
     }
 
     @Test
-    fun `classifyBle classifies Find Hub FEAA frame as tracker before generic Eddystone`() {
+    fun `classifyBle does not infer physical tracker from Find Hub advertisement`() {
         val result =
             classifier.classifyBle(
                 BleClassificationInput(
                     manufacturerRecords = emptyMap(),
                     serviceUuids = listOf(FIND_HUB_UUID),
-                    serviceDataByUuid = mapOf(FIND_HUB_UUID to byteArrayOf(0x40, 0x01, 0x02)),
+                    serviceDataByUuid = mapOf(FIND_HUB_UUID to FIND_HUB_160_BIT_FRAME),
                     appearance = null,
                     deviceName = "FMDN",
                     vendorName = null,
                 )
             )
 
-        assertEquals(DeviceType.TRACKER, result)
+        assertEquals(DeviceType.UNKNOWN, result)
     }
 
     @Test
@@ -137,6 +137,8 @@ class DeviceClassifierTest {
         private const val FAST_PAIR_UUID = ServiceUuids.UUID_GOOGLE_FAST_PAIR
         private const val FIND_HUB_UUID = ServiceUuids.UUID_EDDYSTONE
         private val SONY_XM5_FAST_PAIR_PAYLOAD = byteArrayOf(0xD4.toByte(), 0x46, 0xA7.toByte())
+        private val FIND_HUB_160_BIT_FRAME =
+            byteArrayOf(0x40) + ByteArray(20) { 0x01 } + byteArrayOf(0x01)
         private val APPLE_PAYLOAD = byteArrayOf(0x10, 0x02, 0x01, 0x02)
     }
 }

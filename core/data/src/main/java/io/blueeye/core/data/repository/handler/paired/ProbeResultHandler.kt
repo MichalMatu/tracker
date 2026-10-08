@@ -12,20 +12,14 @@ class ProbeResultHandler @Inject constructor(
     private val deviceDao: DeviceDao,
     private val deviceClassifier: DeviceClassifier,
 ) {
-    companion object {
-        private const val MIN_SERVICES_LEN = 20
-    }
-
     suspend fun handle(
         fingerprint: String,
-        params: io.blueeye.core.domain.repository.RepoProbeParams
+        params: io.blueeye.core.domain.repository.RepoProbeParams,
     ) {
         val model = params.model
         val services = params.services
-        // 1. Refine Device Type & Model
         val (refinedType, refinedModel) = refineClassification(model, services)
 
-        // 2. Persist Probe Data
         deviceDao.updateProbeData(
             fingerprint = fingerprint,
             status = params.status,
@@ -44,25 +38,20 @@ class ProbeResultHandler @Inject constructor(
             newDeviceType = refinedType,
         )
 
-        // 3. GATT Correlation (Merge devices if GATT structure matches)
-        services?.let {
-            if (it.length > MIN_SERVICES_LEN) { // Basic sanity check for non-empty service list
-                attemptGattCorrelation(fingerprint, it)
-            }
-        }
+        // Never merge identities solely because GATT service lists match. Generic services such as
+        // Device Information and Battery are shared by many unrelated products.
     }
 
     private fun refineClassification(
         model: String?,
-        services: String?
+        services: String?,
     ): Pair<DeviceType, String?> {
         var newType = ModelClassifier.classify(model)
         var newModel = model
-
-        // Try explicit GATT classification
         val gattResult = deviceClassifier.classifyByGattServices(services, model)
+
         if (gattResult != null) {
-            if (gattResult.deviceType != DeviceType.UNKNOWN) {
+            if (newType == DeviceType.UNKNOWN && gattResult.deviceType != DeviceType.UNKNOWN) {
                 newType = gattResult.deviceType
             }
             if (gattResult.modelName != null) {
@@ -70,20 +59,5 @@ class ProbeResultHandler @Inject constructor(
             }
         }
         return Pair(newType, newModel)
-    }
-
-    private suspend fun attemptGattCorrelation(fingerprint: String, services: String) {
-        val matchingDevice = deviceDao.findDeviceByGattServices(services, fingerprint)
-        if (matchingDevice != null) {
-             try {
-                // Merge this device into the older one (matchingDevice is the original)
-                deviceDao.mergeDevices(
-                    targetFingerprint = matchingDevice.fingerprint,
-                    duplicateFingerprint = fingerprint,
-                )
-            } catch (e: Exception) {
-                android.util.Log.e("ProbeResultHandler", "Failed to merge ${fingerprint} into ${matchingDevice.fingerprint}: ${e.message}")
-            }
-        }
     }
 }

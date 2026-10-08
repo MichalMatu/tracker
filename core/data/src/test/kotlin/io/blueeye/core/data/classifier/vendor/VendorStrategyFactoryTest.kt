@@ -26,6 +26,7 @@ import io.blueeye.core.decoders.parser.samsung.SamsungManufacturerParser
 import io.blueeye.core.model.DeviceType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
 
@@ -91,7 +92,7 @@ class VendorStrategyFactoryTest {
     }
 
     @Test
-    fun `decode uses service uuid strategy without manufacturer records`() {
+    fun `decode does not infer Samsung tag from SmartThings Find service alone`() {
         val result =
             factory.decode(
                 manufacturerRecords = emptyMap(),
@@ -99,9 +100,7 @@ class VendorStrategyFactoryTest {
                 name = null,
             )
 
-        assertNotNull(result)
-        assertEquals(DeviceType.SAMSUNG_TAG, result?.deviceType)
-        assertEquals("SmartThings Find.", result?.extraInfo)
+        assertNull(result)
     }
 
     private companion object {

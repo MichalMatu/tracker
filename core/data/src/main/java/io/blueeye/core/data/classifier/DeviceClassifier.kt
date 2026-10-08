@@ -150,7 +150,6 @@ class DeviceClassifier @Inject constructor(
                 FingerprintTypeRule(listOf("sony", "bose", "buds", "airpods"), DeviceType.HEADPHONES),
                 FingerprintTypeRule(listOf("tile"), DeviceType.TILE),
                 FingerprintTypeRule(listOf("chipolo"), DeviceType.TAG),
-                FingerprintTypeRule(listOf("find hub", "fmdn"), DeviceType.TRACKER),
                 FingerprintTypeRule(listOf("eddystone", "exposure notification", "altbeacon"), DeviceType.BEACON),
                 FingerprintTypeRule(listOf("tesla"), DeviceType.CAR),
                 FingerprintTypeRule(listOf("fitbit"), DeviceType.WEARABLE),

@@ -42,8 +42,11 @@ object ServiceUuids {
     /** Tile Tracker - 0000FEED-... */
     const val UUID_TILE = "feed"
 
-    /** Google Eddystone Beacon - 0000FEAA-... */
+    /** Eddystone and Google Find Hub share FEAA; frame bytes determine protocol. */
     const val UUID_EDDYSTONE = "feaa"
+
+    /** Detecting Unwanted Location Trackers location-enabled advertising. */
+    const val UUID_DULT = "fcb2"
 
     /** Exposure Notification (COVID-19) - 0000FD6F-... */
     const val UUID_EXPOSURE_NOTIFICATION = "fd6f"

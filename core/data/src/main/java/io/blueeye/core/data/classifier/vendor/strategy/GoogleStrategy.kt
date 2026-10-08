@@ -22,10 +22,8 @@ constructor() : VendorStrategy {
         return VendorScanResult(
             modelName = "Google Fast Pair Device",
             extraInfo = "Fast Pair Protocol",
-            // Fast Pair devices are mostly headphones, but can be watches or trackers
-            // We'll leave deviceType UNKNOWN unless we are sure,
-            // but often Fast Pair = Headphones
-            deviceType = DeviceType.HEADPHONES,
+            // Google manufacturer data alone does not identify hardware form factor.
+            deviceType = DeviceType.UNKNOWN,
         )
     }
 }

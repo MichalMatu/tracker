@@ -5,6 +5,7 @@ import io.blueeye.core.data.tracker.model.IdentityCandidateMatch
 import io.blueeye.core.model.DetectionEvidence
 import io.blueeye.core.model.DeviceType
 import io.blueeye.core.model.MacAddressType
+import io.blueeye.core.model.ProtocolCapability
 import io.blueeye.core.model.SensorData
 import io.blueeye.core.scanner.model.BleScanResultData
 
@@ -101,6 +102,9 @@ data class ScanDataContext(
 
     /** Detected beacon type (iBeacon, Eddystone, etc.) */
     var beaconType: String? = null,
+
+    /** Verified advertised protocols, independent of physical device type. */
+    var protocolCapabilities: Set<ProtocolCapability> = emptySet(),
 
     // Probe Results
     var probeManufacturer: String? = null,

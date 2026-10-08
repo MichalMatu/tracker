@@ -17,18 +17,12 @@ BlueEye reports observations and evidence. It does **not** claim to identify a p
 ## Current status
 
 - Source of truth: `main`.
-- Phase 3 scanner/ingest field reacceptance: **closed / accepted**.
-- Compact Radar, lightweight projection, decision-first Details, Live Nearby and the per-device sightings map are implemented on `main`.
-- A1 parser/data hardening, A2 Deterministic Analysis Reducer V1 and A3 Versioned Analysis Bundle V1 are closed on `main`.
-- Drive + Gmail T0 telemetry/AI developer bridge is implemented and accepted for debug use.
-- Physical S22+ validation for the Radar/Details/map runtime remains **closed / accepted** for the STABLE_CORE baseline.
-- The field-test baseline now also includes explicit opt-in **automatic GATT collection**: the existing one-device-at-a-time queue was re-enabled and physically verified on S22+. The accepted run persisted active probe data for 22 recently probed devices, including GATT services for 14 and characteristic data for 19, while the passive scanner continued recording samples; the Room snapshot passed `PRAGMA quick_check`, the app reported no crash/ANR, and the master-switch preference persisted across restart.
-- Automatic GATT remains read-oriented and explicit opt-in; periodic RFCOMM and opportunistic Classic discovery remain disabled. A4 optional analyst work and T1+ production telemetry are future product/architecture decisions, not active implementation work.
+- Scanner/ingest, compact Radar, decision-first Details, Live Nearby, the sightings map and A1-A3 deterministic analysis are accepted on `main`.
+- The 2026-10-08 BLE field-regression pass hardened Find Hub identity/capability handling, Samsung Offline Finding classification, Follow-Me scoring, GPS-quality gating and unsafe GATT-based identity correlation.
+- Explicit automatic GATT collection remains read-oriented and opt-in; periodic RFCOMM and opportunistic Classic discovery remain disabled.
+- Optional external analyst/production telemetry is not active and requires a new explicit product/architecture decision.
 
-Current references:
-
-- [UI/UX and analysis plan](docs/UI_UX_REDESIGN_PLAN.md)
-- [Telemetry & AI feedback bridge plan](docs/TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md)
+Field-derived regression anchors and owner-confirmed controlled devices are documented in [Detection Model](docs/DETECTION_MODEL.md).
 
 ## Architecture
 

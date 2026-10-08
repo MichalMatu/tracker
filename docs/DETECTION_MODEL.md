@@ -35,6 +35,9 @@ Confidence describes the **evidence-backed app classification**, not real-world 
 
 - Name-only tactical/public-safety-like matching cannot exceed `MEDIUM`.
 - Generic name/model/appearance/Class-of-Device/service clues are identity/classification context, not risk proof.
+- Physical `deviceType`, observed `ProtocolCapability` and tracking risk are separate dimensions. Find Hub, DULT, SmartThings Find, Eddystone or Fast Pair capability never changes hardware form factor by itself.
+- FEAA is shared by Eddystone and Google Find Hub. Only a frame-valid payload establishes the protocol; current FHN regression coverage distinguishes 160-bit and 256-bit identity frames and rejects truncated variants.
+- Shared GATT service lists are never sufficient evidence for destructive identity merging.
 - RSSI cannot prove distance.
 - Random/private address behavior lowers identity certainty unless stronger continuity evidence supports a merge.
 - Identity carryover remains continuity context; user review uses `IdentityCarryoverVerdict` (`UNREVIEWED`, `CONFIRMED_SAME_DEVICE`, `FALSE_MATCH`, `INCONCLUSIVE`) rather than inflating risk confidence.
@@ -46,6 +49,24 @@ Confidence describes the **evidence-backed app classification**, not real-world 
 - Phone GPS is observation context, not device location. Location samples are usable only when coordinates are finite/in-range and reported accuracy is finite, greater than 0 m and at most 100 m.
 - Missing/poor/invalid location must be rejected or represented as data-quality counts/flags rather than silently converted into a position.
 - Reduced analysis/bundle output must not expose exact coordinates.
+
+## Controlled field regression anchors — 2026-10-08
+
+The following devices were explicitly confirmed by the operator as **owned/controlled** during the field session. They are ground truth for regression behavior, not universal fingerprints:
+
+- **Garmin Forerunner 255 Music** — owned watch. Expected physical type: watch/wearable. Its presence is baseline context and must not become tracker risk solely because it moves with the phone.
+- **Sony WF-1000XM5, firmware 6.1.0** — owned headphones. They can participate in Google Find Hub and Fast Pair. Expected behavior: remain `HEADPHONES` while carrying `FIND_HUB`/Fast Pair capability; Find Hub advertising alone must never reclassify them as `TRACKER`.
+- **Lidl key tracker, Google Find Hub compatible** — owned dedicated key tracker. The exact retail/model identity was not recoverable from the export, so documentation must not invent one. The controlled field stream is consistent with FHN-160 behavior and is useful as a positive co-movement reference, but **FHN-160 alone is not proof that an arbitrary device is this tracker**.
+
+Negative/counter examples from the same review:
+
+- **Samsung Q60 Series TV** advertising Samsung manufacturer data `0x0075` / frame family `0x42` is not a SmartTag. SmartTag classification requires corroborating tag/model evidence.
+- Two Find Hub identities observed at the same time must remain separate physical candidates. Rotation carryover is sequential evidence; concurrent FHN observations are counter-evidence for a merge.
+- The Sony FHN-256 path and the controlled key-tracker FHN-160 path must remain distinct; frame width is a hard incompatibility for identity carryover.
+- Poor GPS fixes (>100 m reported accuracy), missing accuracy or invalid coordinates do not establish Follow-Me movement.
+- RSSI stability is supporting evidence only and is capped so a short weak encounter cannot outrank a substantially longer movement-correlated observation by stability alone.
+
+No exact MAC addresses, GPS coordinates or private export records belong in repository fixtures or documentation. Preserve only privacy-safe shapes and behavior.
 
 ## UI language
 

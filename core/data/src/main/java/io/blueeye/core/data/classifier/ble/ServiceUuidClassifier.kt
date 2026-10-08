@@ -46,12 +46,6 @@ object ServiceUuidClassifier {
                 serviceName = "Tile Tracker",
                 confidence = 1.0f,
             )
-            normalizedUuids.contains(ServiceUuids.UUID_SAMSUNG_SMARTTAG) -> UuidClassification(
-                deviceType = DeviceType.SAMSUNG_TAG,
-                isTracker = true,
-                serviceName = "Samsung SmartTag",
-                confidence = 0.8f,
-            )
             normalizedUuids.contains(ServiceUuids.UUID_TESLA_PHONE_KEY) -> UuidClassification(
                 deviceType = DeviceType.CAR,
                 serviceName = "Tesla Phone Key",
@@ -70,12 +64,6 @@ object ServiceUuidClassifier {
 
     private fun checkSpecialServices(normalizedUuids: List<String>): UuidClassification? {
         return when {
-            normalizedUuids.contains(ServiceUuids.UUID_EDDYSTONE) -> UuidClassification(
-                deviceType = DeviceType.UNKNOWN,
-                isBeacon = false,
-                serviceName = "Google FEAA service (Eddystone / Find Hub)",
-                confidence = 0.3f,
-            )
             normalizedUuids.any { it in ServiceUuids.FITNESS_UUIDS } -> UuidClassification(
                 deviceType = DeviceType.WEARABLE,
                 serviceName = "Fitness Device",
@@ -95,6 +83,18 @@ object ServiceUuidClassifier {
                 deviceType = DeviceType.UNKNOWN,
                 serviceName = "HID Device",
                 confidence = 0.7f,
+            )
+            // Protocol UUIDs describe capabilities, not physical hardware. Keep them
+            // below audio/fitness/HID so mixed advertisements retain their form factor.
+            normalizedUuids.contains(ServiceUuids.UUID_DULT) -> UuidClassification(
+                deviceType = DeviceType.UNKNOWN,
+                serviceName = "DULT location-enabled accessory",
+                confidence = 0.8f,
+            )
+            normalizedUuids.contains(ServiceUuids.UUID_EDDYSTONE) -> UuidClassification(
+                deviceType = DeviceType.UNKNOWN,
+                serviceName = "FEAA (Eddystone / Find Hub; inspect frame)",
+                confidence = 0.3f,
             )
             else -> null
         }
@@ -173,8 +173,8 @@ object ServiceUuidClassifier {
     fun isKnownTracker(serviceUuids: List<String>?): Boolean {
         if (serviceUuids.isNullOrEmpty()) return false
         val normalized = serviceUuids.map { normalizeUuid(it) }
-        return normalized.contains(ServiceUuids.UUID_TILE) ||
-            normalized.contains(ServiceUuids.UUID_SAMSUNG_SMARTTAG)
+        // FD5A/SmartThings Find is a capability and is not proof of SmartTag hardware.
+        return normalized.contains(ServiceUuids.UUID_TILE)
     }
 
     /** Quick check: Is this Exposure Notification (should potentially filter)? */

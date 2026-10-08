@@ -12,29 +12,26 @@ class SamsungStrategy
 constructor(
     private val manufacturerParser: io.blueeye.core.decoders.parser.samsung.SamsungManufacturerParser,
 ) : VendorStrategy {
-    override fun canHandle(input: VendorScanInput): Boolean {
-        return input.hasManufacturer(ManufacturerIds.SAMSUNG) ||
+    override fun canHandle(input: VendorScanInput): Boolean =
+        input.hasManufacturer(ManufacturerIds.SAMSUNG) ||
             input.hasServiceUuid(SMARTTHINGS_FIND_UUID)
-    }
 
     override fun decode(input: VendorScanInput): VendorScanResult {
-        val mfgResult = input.manufacturerData(ManufacturerIds.SAMSUNG)?.let(manufacturerParser::parse)
-
-        var deviceType = mfgResult?.deviceType ?: DeviceType.UNKNOWN
-        var modelName = mfgResult?.deviceModel ?: "Samsung Device"
+        val mfgResult =
+            input.manufacturerData(ManufacturerIds.SAMSUNG)?.let {
+                manufacturerParser.parse(it, input.deviceName)
+            }
+        val deviceType = mfgResult?.deviceType ?: DeviceType.UNKNOWN
+        val modelName = mfgResult?.deviceModel ?: "Samsung Device"
         var extraInfo = ""
 
         if (input.hasServiceUuid(SMARTTHINGS_FIND_UUID)) {
             extraInfo += "SmartThings Find. "
-            if (deviceType == DeviceType.UNKNOWN) deviceType = DeviceType.SAMSUNG_TAG
+        }
+        if (input.hasManufacturer(ManufacturerIds.SAMSUNG) && input.hasServiceUuid(FAST_PAIR_UUID)) {
+            extraInfo += "Fast Pair / Ecosystem (device type unknown). "
         }
 
-        if (input.hasManufacturer(ManufacturerIds.SAMSUNG) && input.hasServiceUuid(QUICK_SHARE_UUID)) {
-            extraInfo += "Quick Share / Ecosystem. "
-            if (deviceType == DeviceType.UNKNOWN) deviceType = DeviceType.PHONE
-        }
-
-        // Fallback or Merge
         return VendorScanResult(
             deviceType = deviceType,
             modelName = modelName,
@@ -44,6 +41,6 @@ constructor(
 
     private companion object {
         private const val SMARTTHINGS_FIND_UUID = "fd5a"
-        private const val QUICK_SHARE_UUID = "fe2c"
+        private const val FAST_PAIR_UUID = "fe2c"
     }
 }

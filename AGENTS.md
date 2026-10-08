@@ -8,8 +8,8 @@ Before substantial work read:
 
 1. `docs/README.md`;
 2. `docs/PRODUCT_GOAL.md`;
-3. the active plan relevant to the task (`docs/UI_UX_REDESIGN_PLAN.md` or `docs/TELEMETRY_AI_FEEDBACK_BRIDGE_PLAN.md`);
-4. `docs/ARCHITECTURE_CURRENT.md` when changing boundaries/data flow;
+3. `docs/ARCHITECTURE_CURRENT.md` when changing boundaries/data flow;
+4. `docs/DETECTION_MODEL.md` when changing classification, identity or risk semantics;
 5. `docs/QUALITY_GATE.md` and `docs/SANDBOX_EXECUTION_FLOW.md` before execution.
 
 Do not reconstruct current work from old commits or deleted phase handoffs. Git history is provenance, not an execution queue.
@@ -94,20 +94,9 @@ control branch: agent-control
 workspace:     ~/agent-workspace/repos/tracker/{control,work,checkpoints}
 ```
 
-Before execution read `.agent/binding.json` and `.agent/status/daemon.json` on `agent-control`; registry, control binding and task `agent_binding` must match exactly. Every executable task uses `resources: []`, including ADB/device tasks; detect and verify the intended device inside the task instead of declaring a named/machine resource.
+Before execution read `.agent/binding.json` and `.agent/status/daemon.json` on `agent-control`; registry, control binding and task `agent_binding` must match exactly. Declare resources honestly: software-only repository work uses `resources: []`; physical Android work uses the named `android:s22` resource so another task cannot operate the phone concurrently.
 
-Physical Android validation uses the user's Samsung Galaxy S22+ over **wireless ADB** by default. Persisted quick-connect facts:
-
-```text
-model:                   SM-S906B
-adb serial/device id:    RFCT70L7E8J
-current verified host:   Android-2.local
-current verified port:   40503
-known recent IP:         192.168.0.100
-older rotated ports:     34771, 39687, 34745
-```
-
-For device tasks, do not conclude that the phone is unavailable merely because no USB device is listed. Fast reconnect order: `adb start-server`, then try `adb connect Android-2.local:40503`; if hostname resolution fails, try `adb connect 192.168.0.100:40503`. Verify `ro.product.model=SM-S906B` before installation, launch, BLE, location or UI actions. Android Wireless debugging rotates its TCP port, so the current port is a fast-path hint rather than a permanent endpoint. If it no longer responds, try the older recorded ports on `192.168.0.100`, then use Bonjour/`adb mdns services` fallback and update this block with the newly verified endpoint.
+Physical Android validation uses the Samsung Galaxy S22+ (`SM-S906B`) over **wireless ADB** by default. Do not store device serials, private IP addresses or rotating wireless-debugging ports in repository documentation. Reconnect with `adb start-server`, then use the currently discoverable `Android-2.local:<port>` endpoint or `adb mdns services`. Verify `ro.product.model=SM-S906B` before installation, launch, BLE, location or UI actions. Wireless debugging ports rotate, so discovery is authoritative and any remembered endpoint is only a temporary local hint.
 
 Task ids/payloads are immutable. Inspect `.agent/runs/<id>.json` and terminal `.agent/results/<id>.json`. Do not edit the daemon control clone, launch local Codex from a task, restart the shared supervisor from repository work, or queue a duplicate while a healthy task is active.
 
