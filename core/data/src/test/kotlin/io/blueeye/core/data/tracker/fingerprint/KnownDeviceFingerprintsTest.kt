@@ -40,6 +40,19 @@ class KnownDeviceFingerprintsTest {
     }
 
     @Test
+    fun `identify recognizes 256 bit Find Hub frame`() {
+        val result =
+            KnownDeviceFingerprints.identify(
+                serviceDataMap = mapOf(
+                    EDDYSTONE_UUID to (byteArrayOf(0x41) + ByteArray(32) { 0x01 } + byteArrayOf(0x01)),
+                ),
+                manufacturerSpecificData = emptyMap(),
+            )
+
+        assertEquals("Google Find Hub", result)
+    }
+
+    @Test
     fun `identify rejects truncated Find Hub frame`() {
         val result =
             KnownDeviceFingerprints.identify(
