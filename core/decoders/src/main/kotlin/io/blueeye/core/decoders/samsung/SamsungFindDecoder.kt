@@ -80,10 +80,11 @@ constructor() : BleBeaconDecoder {
             val status = "State: $tagStateStr, Bat: $batteryVal, UWB: $uwb, Motion: $motion"
 
             return SensorData(
-                beaconType = "Samsung SmartTag ($tagStateStr)",
+                // FD5A can be emitted by different SmartThings Find-enabled devices.
+                beaconType = "SmartThings Find ($tagStateStr)",
                 batteryLevel = batteryPercent,
                 sensorStatus = status,
-                rawData = "ID: $privacyId, $status",
+                rawData = "Rotating privacy ID: $privacyId, $status",
                 // We can map motion to specific field if SensorData has one?
                 // SensorData has 'movementCounter' but not a boolean.
                 // We'll leave it in status.
