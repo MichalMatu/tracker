@@ -2,9 +2,11 @@ package io.blueeye.core.data.repository.handler.ble.enricher
 
 import android.util.Log
 import io.blueeye.core.data.classifier.AppleIdentityConflictGuard
+import io.blueeye.core.data.classifier.ProtocolCapabilityDetector
 import io.blueeye.core.data.classifier.vendor.VendorStrategyFactory
 import io.blueeye.core.data.repository.handler.ble.ScanDataContext
 import io.blueeye.core.model.DeviceType
+import io.blueeye.core.model.ProtocolCapability
 import javax.inject.Inject
 
 /**
@@ -15,6 +17,8 @@ class VendorEnricher @Inject constructor(
 ) : ScanEnricher {
 
     override fun enrich(ctx: ScanDataContext) {
+        ctx.protocolCapabilities =
+            ProtocolCapabilityDetector.fromAdvertisement(ctx.serviceUuids, ctx.serviceDataRecords())
         decodeVendorData(ctx)
         detectBeaconTypeFallback(ctx)
     }
@@ -53,16 +57,14 @@ class VendorEnricher @Inject constructor(
 
     @Suppress("MagicNumber")
     private fun detectBeaconTypeFallback(ctx: ScanDataContext) {
-        val feaaData =
-            ctx.serviceDataRecords()
-                .entries
+        val frame =
+            ctx.serviceDataRecords().entries
                 .firstOrNull { (uuid, _) -> uuid.contains("feaa", ignoreCase = true) }
-                ?.value
-        val frame = feaaData?.firstOrNull()?.toInt()?.and(0xFF)
+                ?.value?.firstOrNull()?.toInt()?.and(0xFF)
 
         // A validated Find Hub frame wins over generic "Sony", "Samsung" and FEAA labels.
         // This is a protocol capability, not an assertion that the hardware is a tracker.
-        if (frame in setOf(0x40, 0x41) && feaaData?.size in setOf(22, 34)) {
+        if (ProtocolCapability.FIND_HUB in ctx.protocolCapabilities) {
             ctx.beaconType = "Google Find Hub"
             return
         }
@@ -72,11 +74,9 @@ class VendorEnricher @Inject constructor(
         ctx.beaconType =
             when {
                 frame in setOf(0x00, 0x10, 0x20, 0x30) -> "Eddystone"
-                ctx.serviceDataRecords().keys.any { it.contains("fcb2", ignoreCase = true) } ->
+                ProtocolCapability.DULT in ctx.protocolCapabilities ->
                     "DULT location-enabled"
-                ctx.serviceUuids.any { it.contains("fcb2", ignoreCase = true) } ->
-                    "DULT location-enabled"
-                ctx.serviceUuids.any { it.contains("fd5a", ignoreCase = true) } ->
+                ProtocolCapability.SMARTTHINGS_FIND in ctx.protocolCapabilities ->
                     "SmartThings Find"
                 else -> null
             }
