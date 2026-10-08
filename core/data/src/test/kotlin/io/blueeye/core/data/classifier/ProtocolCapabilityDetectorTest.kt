@@ -23,6 +23,17 @@ class ProtocolCapabilityDetectorTest {
     }
 
     @Test
+    fun `256 bit Find Hub FEAA frame is recognized`() {
+        val capabilities = ProtocolCapabilityDetector.fromAdvertisement(
+            serviceUuids = listOf("feaa"),
+            serviceDataByUuid = mapOf(
+                "feaa" to (byteArrayOf(0x41) + ByteArray(32) { 0x01 } + byteArrayOf(0x01)),
+            ),
+        )
+        assertTrue(capabilities.contains(ProtocolCapability.FIND_HUB))
+    }
+
+    @Test
     fun `FEAA alone does not imply Eddystone or Find Hub`() {
         assertEquals(
             emptySet<ProtocolCapability>(),
