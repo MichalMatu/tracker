@@ -123,24 +123,26 @@ class DeviceClassifier @Inject constructor(
     private fun classifyKnownFingerprint(
         input: BleClassificationInput,
         nameType: DeviceType,
-    ): DeviceType {
-        val model = KnownDeviceFingerprints.identify(input.serviceDataByUuid, input.manufacturerRecords)
-            ?: return DeviceType.UNKNOWN
-        val normalizedModel = model.lowercase()
+    ): DeviceType =
+        KnownDeviceFingerprints
+            .identify(input.serviceDataByUuid, input.manufacturerRecords)
+            ?.lowercase()
+            ?.let { normalizedModel ->
+                val isSonyFindHubHeadphones =
+                    normalizedModel.contains("find hub") &&
+                        nameType == DeviceType.HEADPHONES &&
+                        input.deviceName?.contains("1000xm", ignoreCase = true) == true
 
-        if (
-            normalizedModel.contains("find hub") &&
-            nameType == DeviceType.HEADPHONES &&
-            input.deviceName?.contains("1000xm", ignoreCase = true) == true
-        ) {
-            return DeviceType.HEADPHONES
-        }
-
-        return fingerprintTypeRules
-            .firstOrNull { rule -> rule.keywords.any(normalizedModel::contains) }
-            ?.deviceType
+                if (isSonyFindHubHeadphones) {
+                    DeviceType.HEADPHONES
+                } else {
+                    fingerprintTypeRules
+                        .firstOrNull { rule -> rule.keywords.any(normalizedModel::contains) }
+                        ?.deviceType
+                        ?: DeviceType.UNKNOWN
+                }
+            }
             ?: DeviceType.UNKNOWN
-    }
 
     private companion object {
         private val fingerprintTypeRules =
