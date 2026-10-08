@@ -30,6 +30,12 @@ class ServiceUuidClassifierTest {
     }
 
     @Test
+    fun `LE Audio remains headphones even if FEAA and DULT are also advertised`() {
+        val result = ServiceUuidClassifier.classify(listOf("1843", "feaa", "fcb2"))
+        assertEquals(DeviceType.HEADPHONES, result.deviceType)
+    }
+
+    @Test
     fun `dedicated Tile service still classifies a Tile tracker`() {
         val result = ServiceUuidClassifier.classify(listOf("feed"))
         assertEquals(DeviceType.TILE, result.deviceType)
