@@ -16,11 +16,11 @@ constructor(
     private val quickShareParser: QuickShareParser,
     private val smartThingsParser: SmartThingsParser,
 ) {
-    fun parse(data: ByteArray?): SamsungDeviceData? {
+    fun parse(data: ByteArray?, advertisedName: String? = null): SamsungDeviceData? {
         if (data == null || data.isEmpty()) return null
 
         // Try SmartTag (Offline Finding) first (Type 0x42)
-        val smartTagData = smartTagParser.parse(data)
+        val smartTagData = smartTagParser.parse(data, advertisedName)
         if (smartTagData != null) return smartTagData
 
         // Try Quick Share (Type 0x12) - Placeholder ID check inside parser if implemented
@@ -28,8 +28,8 @@ constructor(
         if (quickShareData != null) return quickShareData
 
         // Try SmartThings (generic)
-        val smartThingsData = smartThingsParser.parse(data)
-        if (smartThingsData != null) return smartThingsData
+        // 0x0075 manufacturer bytes are not FD5A service data. Do not feed them to
+        // SmartThingsParser, which would otherwise label arbitrary Samsung devices as tags.
 
         // Unknown Samsung Device
         return SamsungDeviceData(
