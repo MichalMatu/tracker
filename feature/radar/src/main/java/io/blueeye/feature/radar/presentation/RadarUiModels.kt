@@ -26,6 +26,7 @@ data class RadarUiItem(
     val isProbing: Boolean = false,
     val beaconType: String? = null,
     val hasUserAlias: Boolean = false,
+    val deviceType: io.blueeye.core.model.DeviceType = io.blueeye.core.model.DeviceType.UNKNOWN,
 )
 
 data class RadarUiSignalInfo(
