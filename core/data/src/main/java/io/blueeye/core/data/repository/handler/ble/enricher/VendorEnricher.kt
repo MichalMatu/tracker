@@ -53,21 +53,31 @@ class VendorEnricher @Inject constructor(
 
     @Suppress("MagicNumber")
     private fun detectBeaconTypeFallback(ctx: ScanDataContext) {
-        if (ctx.beaconType != null) return
-
-        val feaaFrameType =
+        val feaaData =
             ctx.serviceDataRecords()
                 .entries
                 .firstOrNull { (uuid, _) -> uuid.contains("feaa", ignoreCase = true) }
                 ?.value
-                ?.firstOrNull()
-                ?.toInt()
-                ?.and(0xFF)
+        val frame = feaaData?.firstOrNull()?.toInt()?.and(0xFF)
+
+        // A validated Find Hub frame wins over generic "Sony", "Samsung" and FEAA labels.
+        // This is a protocol capability, not an assertion that the hardware is a tracker.
+        if (frame in setOf(0x40, 0x41) && feaaData?.size in setOf(22, 34)) {
+            ctx.beaconType = "Google Find Hub"
+            return
+        }
+
+        if (ctx.beaconType != null) return
 
         ctx.beaconType =
-            when (feaaFrameType) {
-                0x00, 0x10, 0x20, 0x30 -> "Eddystone"
-                0x40, 0x41 -> "Google Find Hub"
+            when {
+                frame in setOf(0x00, 0x10, 0x20, 0x30) -> "Eddystone"
+                ctx.serviceDataRecords().keys.any { it.contains("fcb2", ignoreCase = true) } ->
+                    "DULT location-enabled"
+                ctx.serviceUuids.any { it.contains("fcb2", ignoreCase = true) } ->
+                    "DULT location-enabled"
+                ctx.serviceUuids.any { it.contains("fd5a", ignoreCase = true) } ->
+                    "SmartThings Find"
                 else -> null
             }
     }
