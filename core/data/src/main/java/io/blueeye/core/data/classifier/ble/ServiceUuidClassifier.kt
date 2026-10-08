@@ -47,10 +47,9 @@ object ServiceUuidClassifier {
                 confidence = 1.0f,
             )
             normalizedUuids.contains(ServiceUuids.UUID_SAMSUNG_SMARTTAG) -> UuidClassification(
-                deviceType = DeviceType.SAMSUNG_TAG,
-                isTracker = true,
-                serviceName = "Samsung SmartTag",
-                confidence = 0.8f,
+                deviceType = DeviceType.UNKNOWN,
+                serviceName = "SmartThings Find (device type not established)",
+                confidence = 0.5f,
             )
             normalizedUuids.contains(ServiceUuids.UUID_TESLA_PHONE_KEY) -> UuidClassification(
                 deviceType = DeviceType.CAR,
@@ -71,10 +70,14 @@ object ServiceUuidClassifier {
     private fun checkSpecialServices(normalizedUuids: List<String>): UuidClassification? {
         return when {
             normalizedUuids.contains(ServiceUuids.UUID_EDDYSTONE) -> UuidClassification(
-                deviceType = DeviceType.BEACON,
-                isBeacon = true,
-                serviceName = "Google Eddystone",
-                confidence = 1.0f,
+                deviceType = DeviceType.UNKNOWN,
+                serviceName = "FEAA (Eddystone / Find Hub; inspect frame)",
+                confidence = 0.3f,
+            )
+            normalizedUuids.contains(ServiceUuids.UUID_DULT) -> UuidClassification(
+                deviceType = DeviceType.UNKNOWN,
+                serviceName = "DULT location-enabled accessory",
+                confidence = 0.8f,
             )
             normalizedUuids.any { it in ServiceUuids.FITNESS_UUIDS } -> UuidClassification(
                 deviceType = DeviceType.WEARABLE,
@@ -174,7 +177,7 @@ object ServiceUuidClassifier {
         if (serviceUuids.isNullOrEmpty()) return false
         val normalized = serviceUuids.map { normalizeUuid(it) }
         return normalized.contains(ServiceUuids.UUID_TILE) ||
-            normalized.contains(ServiceUuids.UUID_SAMSUNG_SMARTTAG)
+            false // FD5A is a protocol capability, not a confirmed SmartTag model
     }
 
     /** Quick check: Is this Exposure Notification (should potentially filter)? */
