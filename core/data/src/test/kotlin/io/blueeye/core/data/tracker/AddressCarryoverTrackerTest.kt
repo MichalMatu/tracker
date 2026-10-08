@@ -295,7 +295,7 @@ class AddressCarryoverTrackerTest {
                 mac = "10:20:30:40:50:60",
                 name = "FMDN",
                 timestamp = 1_000_000L,
-                identityBytes = ByteArray(21) { 0x11 },
+                identityBytes = ByteArray(21) { 0x11.toByte() },
                 serviceDataLength = 22,
             )
         val second =
@@ -303,7 +303,7 @@ class AddressCarryoverTrackerTest {
                 mac = "10:20:30:40:50:61",
                 name = "FMDN",
                 timestamp = 1_005_000L,
-                identityBytes = ByteArray(21) { 0x66 },
+                identityBytes = ByteArray(21) { 0x66.toByte() },
                 serviceDataLength = 22,
             )
 
@@ -323,7 +323,7 @@ class AddressCarryoverTrackerTest {
                 mac = "20:30:40:50:60:70",
                 name = "My Locator",
                 timestamp = 2_000_000L,
-                identityBytes = ByteArray(21) { 0x22 },
+                identityBytes = ByteArray(21) { 0x22.toByte() },
                 serviceDataLength = 22,
             )
         val second =
@@ -331,7 +331,7 @@ class AddressCarryoverTrackerTest {
                 mac = "20:30:40:50:60:71",
                 name = "My Locator",
                 timestamp = 2_005_000L,
-                identityBytes = ByteArray(33) { 0x22 },
+                identityBytes = ByteArray(33) { 0x22.toByte() },
                 serviceDataLength = 34,
             )
 
