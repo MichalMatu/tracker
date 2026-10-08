@@ -22,9 +22,10 @@ object ProtocolCapabilityDetector {
             .forEach { (_, frame) ->
                 val frameType = frame.firstOrNull()?.toInt()?.and(0xFF)
                 when {
-                    frameType in setOf(0x40, 0x41) && frame.size in setOf(22, 34) ->
+                    frameType != null && frameType in setOf(0x40, 0x41) &&
+                        frame.size in setOf(22, 34) ->
                         add(ProtocolCapability.FIND_HUB)
-                    frameType in setOf(0x00, 0x10, 0x20, 0x30) ->
+                    frameType != null && frameType in setOf(0x00, 0x10, 0x20, 0x30) ->
                         add(ProtocolCapability.EDDYSTONE)
                 }
             }
