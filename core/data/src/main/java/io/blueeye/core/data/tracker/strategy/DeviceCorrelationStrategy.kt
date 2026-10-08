@@ -6,6 +6,7 @@ import io.blueeye.core.data.tracker.model.CarryoverMatchEvidence
 import io.blueeye.core.data.tracker.model.CarryoverMatchReason
 import io.blueeye.core.data.tracker.model.IdentityCandidateMatch
 import io.blueeye.core.data.tracker.model.TrackedTarget
+import io.blueeye.core.decoders.parser.generic.ServiceDataExtractor
 import io.blueeye.core.scanner.model.BleScanResultData
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -49,13 +50,13 @@ constructor() {
         private const val EXTREME_RSSI_DIFF = 50
         private const val RSSI_PENALTY_MULTIPLIER = 0.5f
         private const val SAME_NAME_MIN_PAYLOAD_SCORE = 0.8f
-        private const val SERVICE_DATA_16_AD_TYPE = 0x16
-        private const val FIND_HUB_UUID_LE_LOW = 0xAA
-        private const val FIND_HUB_UUID_LE_HIGH = 0xFE
+        private const val FIND_HUB_SERVICE_UUID = 0xFEAA
         private const val FIND_HUB_FRAME = 0x40
         private const val FIND_HUB_FRAME_WITH_FLAGS = 0x41
         private const val FIND_HUB_160_SERVICE_DATA_LENGTH = 22
         private const val FIND_HUB_256_SERVICE_DATA_LENGTH = 34
+        private const val FIND_HUB_IDENTITY_BITS_160 = 160
+        private const val FIND_HUB_IDENTITY_BITS_256 = 256
 
         // Known Vendor Headers to strip (Little Endian Manufacturer ID)
         private val HEADER_APPLE = byteArrayOf(0x4C.toByte(), 0x00.toByte())
@@ -514,34 +515,15 @@ constructor() {
     }
 
     private fun findHubIdentityWidth(rawData: ByteArray?): Int? {
-        if (rawData == null) return null
+        val serviceData = ServiceDataExtractor.extract16(rawData)[FIND_HUB_SERVICE_UUID]
+        val frameType = serviceData?.firstOrNull()?.toInt()?.and(0xFF)
+        if (frameType !in setOf(FIND_HUB_FRAME, FIND_HUB_FRAME_WITH_FLAGS)) return null
 
-        var offset = 0
-        while (offset < rawData.size) {
-            val length = rawData[offset].toInt() and 0xFF
-            if (length == 0) break
-            if (offset + 1 + length > rawData.size) break
-
-            val type = rawData[offset + 1].toInt() and 0xFF
-            if (type == SERVICE_DATA_16_AD_TYPE && length >= 4) {
-                val uuidLow = rawData[offset + 2].toInt() and 0xFF
-                val uuidHigh = rawData[offset + 3].toInt() and 0xFF
-                val frameType = rawData[offset + 4].toInt() and 0xFF
-                if (
-                    uuidLow == FIND_HUB_UUID_LE_LOW &&
-                    uuidHigh == FIND_HUB_UUID_LE_HIGH &&
-                    frameType in setOf(FIND_HUB_FRAME, FIND_HUB_FRAME_WITH_FLAGS)
-                ) {
-                    return when (length - 3) {
-                        FIND_HUB_160_SERVICE_DATA_LENGTH -> 160
-                        FIND_HUB_256_SERVICE_DATA_LENGTH -> 256
-                        else -> null
-                    }
-                }
-            }
-            offset += 1 + length
+        return when (serviceData?.size) {
+            FIND_HUB_160_SERVICE_DATA_LENGTH -> FIND_HUB_IDENTITY_BITS_160
+            FIND_HUB_256_SERVICE_DATA_LENGTH -> FIND_HUB_IDENTITY_BITS_256
+            else -> null
         }
-        return null
     }
 
     private fun isGenericName(name: String?): Boolean {
