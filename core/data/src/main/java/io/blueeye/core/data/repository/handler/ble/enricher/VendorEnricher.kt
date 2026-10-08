@@ -73,7 +73,7 @@ class VendorEnricher @Inject constructor(
 
         ctx.beaconType =
             when {
-                frame in setOf(0x00, 0x10, 0x20, 0x30) -> "Eddystone"
+                frame != null && frame in setOf(0x00, 0x10, 0x20, 0x30) -> "Eddystone"
                 ProtocolCapability.DULT in ctx.protocolCapabilities ->
                     "DULT location-enabled"
                 ProtocolCapability.SMARTTHINGS_FIND in ctx.protocolCapabilities ->
