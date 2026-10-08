@@ -52,6 +52,7 @@ object RadarUiMapper {
             evidenceSignals = device.evidenceSignals,
             beaconType = device.beaconType,
             hasUserAlias = !device.userAlias.isNullOrBlank(),
+            deviceType = device.deviceType,
         )
     }
 
