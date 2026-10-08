@@ -46,11 +46,6 @@ object ServiceUuidClassifier {
                 serviceName = "Tile Tracker",
                 confidence = 1.0f,
             )
-            normalizedUuids.contains(ServiceUuids.UUID_SAMSUNG_SMARTTAG) -> UuidClassification(
-                deviceType = DeviceType.UNKNOWN,
-                serviceName = "SmartThings Find (device type not established)",
-                confidence = 0.5f,
-            )
             normalizedUuids.contains(ServiceUuids.UUID_TESLA_PHONE_KEY) -> UuidClassification(
                 deviceType = DeviceType.CAR,
                 serviceName = "Tesla Phone Key",
@@ -69,16 +64,6 @@ object ServiceUuidClassifier {
 
     private fun checkSpecialServices(normalizedUuids: List<String>): UuidClassification? {
         return when {
-            normalizedUuids.contains(ServiceUuids.UUID_EDDYSTONE) -> UuidClassification(
-                deviceType = DeviceType.UNKNOWN,
-                serviceName = "FEAA (Eddystone / Find Hub; inspect frame)",
-                confidence = 0.3f,
-            )
-            normalizedUuids.contains(ServiceUuids.UUID_DULT) -> UuidClassification(
-                deviceType = DeviceType.UNKNOWN,
-                serviceName = "DULT location-enabled accessory",
-                confidence = 0.8f,
-            )
             normalizedUuids.any { it in ServiceUuids.FITNESS_UUIDS } -> UuidClassification(
                 deviceType = DeviceType.WEARABLE,
                 serviceName = "Fitness Device",
@@ -98,6 +83,18 @@ object ServiceUuidClassifier {
                 deviceType = DeviceType.UNKNOWN,
                 serviceName = "HID Device",
                 confidence = 0.7f,
+            )
+            // These UUIDs signal protocols, not a physical device category. Do not let
+            // them shadow LE Audio or fitness when multiple services are advertised.
+            normalizedUuids.contains(ServiceUuids.UUID_DULT) -> UuidClassification(
+                deviceType = DeviceType.UNKNOWN,
+                serviceName = "DULT location-enabled accessory",
+                confidence = 0.8f,
+            )
+            normalizedUuids.contains(ServiceUuids.UUID_EDDYSTONE) -> UuidClassification(
+                deviceType = DeviceType.UNKNOWN,
+                serviceName = "FEAA (Eddystone / Find Hub; inspect frame)",
+                confidence = 0.3f,
             )
             else -> null
         }
