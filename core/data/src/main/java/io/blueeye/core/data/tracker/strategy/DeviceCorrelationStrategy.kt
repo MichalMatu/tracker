@@ -50,6 +50,7 @@ constructor() {
         private const val EXTREME_RSSI_DIFF = 50
         private const val RSSI_PENALTY_MULTIPLIER = 0.5f
         private const val SAME_NAME_MIN_PAYLOAD_SCORE = 0.8f
+        private const val BYTE_MASK = 0xFF
         private const val FIND_HUB_SERVICE_UUID = 0xFEAA
         private const val FIND_HUB_FRAME = 0x40
         private const val FIND_HUB_FRAME_WITH_FLAGS = 0x41
@@ -516,7 +517,7 @@ constructor() {
 
     private fun findHubIdentityWidth(rawData: ByteArray?): Int? {
         val serviceData = ServiceDataExtractor.extract16(rawData)[FIND_HUB_SERVICE_UUID]
-        val frameType = serviceData?.firstOrNull()?.toInt()?.and(0xFF)
+        val frameType = serviceData?.firstOrNull()?.toInt()?.and(BYTE_MASK)
         if (frameType !in setOf(FIND_HUB_FRAME, FIND_HUB_FRAME_WITH_FLAGS)) return null
 
         return when (serviceData?.size) {
