@@ -55,6 +55,17 @@ class KnownDeviceFingerprintsTest {
     }
 
     @Test
+    fun `identify rejects truncated Find Hub frame`() {
+        val result =
+            KnownDeviceFingerprints.identify(
+                serviceDataMap = mapOf(EDDYSTONE_UUID to byteArrayOf(0x40, 0x01, 0x02)),
+                manufacturerSpecificData = emptyMap(),
+            )
+
+        assertNull(result)
+    }
+
+    @Test
     fun `identify does not treat non-discovery Fast Pair payload as a model id`() {
         val result =
             KnownDeviceFingerprints.identify(

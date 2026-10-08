@@ -26,7 +26,7 @@ class SamsungStrategyTest {
 
         val result = strategy.decode(input)
 
-        assertEquals(DeviceType.SAMSUNG_TAG, result.deviceType)
+        assertEquals(DeviceType.UNKNOWN, result.deviceType)
         assertEquals("Samsung Device", result.modelName)
         assertEquals("SmartThings Find.", result.extraInfo)
         verifyNoInteractions(manufacturerParser)

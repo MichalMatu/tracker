@@ -26,7 +26,7 @@ ScannerService
   -> BleScanner (BLE + opportunistic Classic discovery)
   -> ScanIngestPipeline (bounded ingest/coalescing)
   -> BLE / Classic handlers
-  -> classification + enrichment + identity / Follow-Me analysis
+  -> physical classification + protocol capabilities + identity / Follow-Me analysis
   -> DevicePersister / SignalSamplePersister / event history
   -> domain Device/evidence projections
   -> Radar / Details / Watchlist / export / alerts
@@ -43,9 +43,20 @@ Radar uses a lightweight projection rather than loading the full technical/evide
 - BLE hardware lifecycle and ingest processing are separated so queue/accounting behavior is testable without changing scanner ownership.
 - Device/tracking persistence and signal-sample persistence are separated.
 - High-attention classifications must surface evidence; final device labels alone are not sufficient.
+- Physical device type, protocol capability and tracking risk are separate state. Protocol support must not silently turn headphones/TVs/phones into tracker hardware.
 - Alert-relevant events and Follow-Me observations have durable history; ordinary latest-state evidence may still be derived from persisted device state.
 
 See [DETECTION_MODEL.md](DETECTION_MODEL.md) for evidence/confidence semantics.
+
+## Device identity and protocol capability boundary
+
+- `Device.deviceType` describes physical form factor when known.
+- `ProtocolCapability` records independently observed protocols such as `FIND_HUB`, `DULT`, `SMARTTHINGS_FIND`, `EDDYSTONE` and `FAST_PAIR`.
+- FEAA is ambiguous until its service-data frame is validated. FHN-160 and FHN-256 are distinct identity shapes; truncated/unknown-width Find Hub frames are not accepted as valid fingerprints.
+- Samsung manufacturer `0x0075` and SmartThings Find capability do not by themselves identify SmartTag hardware.
+- Active GATT model/service data may refine an unknown physical type, but generic GATT service-list equality never triggers automatic identity merge.
+- Address carryover remains sequential/corroborated. Concurrent aliases and incompatible Find Hub frame widths are hard merge guards.
+- Radar protocol-noise grouping must not hide a known physical device merely because it also emits a high-volume protocol.
 
 ## Active collection under `STABLE_CORE`
 
@@ -63,24 +74,9 @@ Do not describe the current profile as "GATT removed" or "active probing not imp
 
 The current field-test baseline keeps automatic GATT at concurrency 1. Physical S22+ validation on the 2026-10-07 runtime baseline persisted 22 recent probe outcomes, including 14 devices with discovered services and 19 with characteristic data; the Room snapshot passed `PRAGMA quick_check`, passive scanning continued, and no crash/ANR was observed. Any future concurrency >1 experiment must use independent GATT session state rather than sharing the current singleton connection state.
 
-## Privacy-safe field reference: Lime legacy BLE family
+## Field-regression policy
 
-A September 2026 field capture provides a useful regression/reference case without committing private location, exact MAC, raw capture files or full vehicle identifiers:
-
-- 11 devices used names matching `lime-931303XXXXXX`.
-- 232 persisted BLE samples shared one advertisement schema.
-- Every Android `ScanRecord` was 59 bytes and is best interpreted as 31 bytes of legacy advertising data plus 28 bytes of scan-response data.
-- The legacy advertising portion is exactly 31 bytes: Flags (`0x01`, value `0x06`) followed by a 26-byte AD structure using unassigned/reserved type `0x00`.
-- The scan-response portion contains Complete Local Name (`0x09`, 17 bytes), Peripheral Connection Interval Range (`0x12`, 4 bytes) and Tx Power (`0x0A`, value 0 dBm).
-- For each individual device the 59-byte record stayed byte-for-byte stable across the capture. Across all 11 devices only byte positions 44-49 varied, corresponding to the final six digits of the local name. No dynamic battery/lock/status field was visible in passive advertising.
-- No advertised service UUIDs, Service Data or Manufacturer Specific Data were present in these records.
-- All observed devices were connectable on LE 1M PHY. The captured device rows had `connectionAttempts = 0` and no persisted GATT services/characteristics, so the session is passive-only evidence; it does **not** imply that GATT is absent.
-- Five observed address prefixes map publicly to Texas Instruments. Together with the `lime-931303XXXXXX` name pattern and public teardown/reference material, the working hardware identification is the older Lime **LBCAT-S family**, likely European LBCAT-S/LBCATSL revisions using TI CC2540-class BLE. Treat this as high-confidence family identification, not proof of the exact CCU revision or scooter chassis.
-- Different scooter chassis may share this CCU/BLE family. Do not infer a vehicle generation solely from this radio fingerprint.
-
-This case is useful for parser/regression work because it separates three claims that must remain distinct: passive advertisement structure, probable CCU family, and active GATT evidence. Future authorized field validation can compare the same passive fingerprint with explicit per-device GATT discovery without enabling automatic fleet-wide probing.
-
-A1 parser/data hardening is closed around this boundary: privacy-safe Lime-shaped scan fixtures, service-data truncation tests and advertisement-evidence boundary tests prevent malformed/reserved records from fabricating structured evidence. Existing carryover regressions preserve the coexistence-vs-rotation and identity-conflict safeguards.
+Detailed captures do not live in the architecture document. Confirmed field defects become privacy-safe tests and concise regression anchors in [DETECTION_MODEL.md](DETECTION_MODEL.md); historical capture detail remains available in Git/PR evidence.
 
 ## Location/data-quality boundary
 

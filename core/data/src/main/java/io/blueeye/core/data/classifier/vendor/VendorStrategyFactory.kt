@@ -89,7 +89,7 @@ class VendorStrategyFactory @Inject constructor(
         serviceUuids: List<String>,
         name: String? = null
     ): VendorScanResult? {
-        val input = VendorScanInput(manufacturerRecords, serviceUuids)
+        val input = VendorScanInput(manufacturerRecords, serviceUuids, name)
         val result = allStrategies.filter { it.canHandle(input) }.firstNotNullOfOrNull {
             val res = it.decode(input)
             if (res.deviceType != DeviceType.UNKNOWN) res else null

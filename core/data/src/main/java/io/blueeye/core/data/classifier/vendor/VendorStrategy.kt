@@ -13,6 +13,7 @@ data class VendorScanResult(
 data class VendorScanInput(
     val manufacturerRecords: Map<Int, ByteArray>,
     val serviceUuids: List<String>,
+    val deviceName: String? = null,
 ) {
     fun hasManufacturer(manufacturerId: Int): Boolean = manufacturerRecords.containsKey(manufacturerId)
 

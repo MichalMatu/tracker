@@ -40,7 +40,7 @@ internal object FingerprintMatcher {
                 when (serviceData.size) {
                     FIND_HUB_160_SERVICE_DATA_LENGTH -> "Google Find Hub (FHN-160)"
                     FIND_HUB_256_SERVICE_DATA_LENGTH -> "Google Find Hub (FHN-256)"
-                    else -> "Google Find Hub"
+                    else -> null
                 }
             else -> null
         }

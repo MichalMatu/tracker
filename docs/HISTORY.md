@@ -1,6 +1,6 @@
 # Project history
 
-Concise provenance only. Current work always starts from `docs/README.md` and the active plans.
+Concise provenance only. Current work always starts from `docs/README.md` and the current contracts it links.
 
 ## 2026-09
 
@@ -22,5 +22,7 @@ Concise provenance only. Current work always starts from `docs/README.md` and th
 - **2026-10-06 — current implementation baseline closed:** scanner/ingest remains accepted, Radar/Details/map implementation and A1-A3 are on `main`; A4 optional analyst integration and T1+ production telemetry require a new product/architecture decision.
 - **2026-10-07 — STABLE_CORE S22+ physical acceptance closed:** manual GATT read/discovery/disconnect succeeded without characteristic writes; Radar scanner→Room freshness, protocol grouping and scroll/process health were verified; an active Details target received fresh signal samples with no crash/ANR; Technical/Raw access was physically confirmed; and the per-device good-GPS sightings map was verified with privacy wording, usable-observation/group counts, explicit Show/Hide behavior, repeated map toggling and Home/return lifecycle. Final foreground health reported app focus present, crash/ANR count zero and the process alive. The session contained no natural poor/no-GPS targets, so those fallback states remain covered by deterministic software tests rather than synthetic field telemetry.
 - **2026-10-07 — automatic GATT field-test baseline accepted:** the explicit master switch was re-enabled without reopening automatic RFCOMM or opportunistic Classic discovery. S22+ validation confirmed the existing sequential queue, per-device cooldown, persisted service/characteristic evidence and standard GATT fields across a 22-device active-probe set while passive scanning continued. The quiescent database passed `PRAGMA quick_check`, the opt-in preference persisted across restart, and no crash/ANR was observed. Concurrency remains 1 for the accepted field baseline; parallel GATT is a separate future experiment.
+
+- **2026-10-08 — BLE field-regression closeout:** an owner-confirmed session with Garmin Forerunner 255 Music, Sony WF-1000XM5 and a Lidl/Google Find Hub key tracker exposed several classification/identity failures. The closeout separates physical type from protocol capability/risk, validates FHN-160/FHN-256 instead of treating FEAA as a device type, prevents concurrent/incompatible FHN carryover, stops Samsung Q60 `0x0075/0x42` traffic from becoming SmartTag, removes generic-GATT-list identity merging, rejects poor GPS for Follow-Me movement and reduces RSSI stability dominance. The controlled-device identities are documented without private MAC/GPS data in `DETECTION_MODEL.md`.
 
 Full historical phase reports/hand-offs remain available in repository history before the 2026-09-14 documentation cleanup. They are intentionally not current instructions.

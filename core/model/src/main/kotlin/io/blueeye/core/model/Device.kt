@@ -60,6 +60,8 @@ data class Device(
     val calibrationLabel: DeviceCalibrationLabel = DeviceCalibrationLabel.UNKNOWN,
     val identityCarryoverVerdict: IdentityCarryoverVerdict = IdentityCarryoverVerdict.UNREVIEWED,
     val evidence: List<DetectionEvidence> = emptyList(),
+    /** Observed BLE protocols, independent of deviceType and tracking risk. */
+    val protocolCapabilities: Set<ProtocolCapability> = emptySet(),
 ) {
     /** Zwraca najlepszą dostępną nazwę do wyświetlenia */
     fun getDisplayName(): String {

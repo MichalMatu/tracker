@@ -1,5 +1,6 @@
 package io.blueeye.core.data.mapper
 
+import io.blueeye.core.data.classifier.ProtocolCapabilityDetector
 import io.blueeye.core.data.db.entity.DeviceEntity
 import io.blueeye.core.data.evidence.DeviceEvidenceFactory
 import io.blueeye.core.model.Device
@@ -51,7 +52,8 @@ fun DeviceEntity.toDomain(): Device {
         characteristicData = characteristicData,
         probeError = probeError,
         lastRawData = lastRawData,
-        evidence = DeviceEvidenceFactory.build(this)
+        evidence = DeviceEvidenceFactory.build(this),
+        protocolCapabilities = ProtocolCapabilityDetector.fromPersisted(beaconType, gattServices)
     )
 }
 
