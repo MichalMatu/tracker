@@ -126,7 +126,7 @@ class DevicePersister @Inject constructor(
             )
         }
 
-        val currentServices = ctx.serviceUuids.toSet()
+        val currentServices = (ctx.serviceUuids + ctx.serviceDataRecords().keys).toSet()
         val existingServices = existing.gattServices?.split(",")?.toSet() ?: emptySet()
         val mergedServices = (existingServices + currentServices)
             .filter { it.isNotBlank() }
@@ -223,7 +223,7 @@ class DevicePersister @Inject constructor(
         classifier: ScanResultClassifier,
     ) {
         val resolvedType = classifier.resolveType(ctx)
-        val services = ctx.serviceUuids.joinToString(",")
+        val services = (ctx.serviceUuids + ctx.serviceDataRecords().keys).distinct().joinToString(",")
 
         deviceDao.updateScanData(
             fingerprint = ctx.fingerprint,
@@ -297,7 +297,9 @@ class DevicePersister @Inject constructor(
             followMeUserMoved = ctx.followMeUserMoved,
             followMeBaselineDevice = ctx.followMeBaselineDevice,
 
-            gattServices = ctx.serviceUuids.joinToString(",").ifBlank { null },
+            gattServices =
+                (ctx.serviceUuids + ctx.serviceDataRecords().keys).distinct()
+                    .joinToString(",").ifBlank { null },
             probeError = ctx.probeError,
         )
         deviceDao.upsert(newDevice)
