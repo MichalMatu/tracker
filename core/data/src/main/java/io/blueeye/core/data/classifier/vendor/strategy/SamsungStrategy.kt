@@ -18,20 +18,18 @@ constructor(
     }
 
     override fun decode(input: VendorScanInput): VendorScanResult {
-        val mfgResult = input.manufacturerData(ManufacturerIds.SAMSUNG)?.let(manufacturerParser::parse)
+        val mfgResult = input.manufacturerData(ManufacturerIds.SAMSUNG)?.let { manufacturerParser.parse(it, input.deviceName) }
 
-        var deviceType = mfgResult?.deviceType ?: DeviceType.UNKNOWN
-        var modelName = mfgResult?.deviceModel ?: "Samsung Device"
+        val deviceType = mfgResult?.deviceType ?: DeviceType.UNKNOWN
+        val modelName = mfgResult?.deviceModel ?: "Samsung Device"
         var extraInfo = ""
 
         if (input.hasServiceUuid(SMARTTHINGS_FIND_UUID)) {
             extraInfo += "SmartThings Find. "
-            if (deviceType == DeviceType.UNKNOWN) deviceType = DeviceType.SAMSUNG_TAG
         }
 
         if (input.hasManufacturer(ManufacturerIds.SAMSUNG) && input.hasServiceUuid(QUICK_SHARE_UUID)) {
-            extraInfo += "Quick Share / Ecosystem. "
-            if (deviceType == DeviceType.UNKNOWN) deviceType = DeviceType.PHONE
+            extraInfo += "Fast Pair / Ecosystem (device type unknown). "
         }
 
         // Fallback or Merge
