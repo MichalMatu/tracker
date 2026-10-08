@@ -91,7 +91,7 @@ class DeviceClassifier @Inject constructor(
         // 2. Precise service/manufacturer-data fingerprints. This must run before generic
         // service UUID classification because Google Find Hub frames share FEAA with Eddystone.
         if (result == DeviceType.UNKNOWN) {
-            result = classifyKnownFingerprint(input)
+            result = classifyKnownFingerprint(input, nameType)
             AppleIdentityConflictGuard
                 .preferredNameTypeForConflict(input.deviceName, result)
                 ?.let { result = it }
@@ -120,10 +120,21 @@ class DeviceClassifier @Inject constructor(
         return result
     }
 
-    private fun classifyKnownFingerprint(input: BleClassificationInput): DeviceType {
+    private fun classifyKnownFingerprint(
+        input: BleClassificationInput,
+        nameType: DeviceType,
+    ): DeviceType {
         val model = KnownDeviceFingerprints.identify(input.serviceDataByUuid, input.manufacturerRecords)
             ?: return DeviceType.UNKNOWN
         val normalizedModel = model.lowercase()
+
+        if (
+            normalizedModel.contains("find hub") &&
+            nameType == DeviceType.HEADPHONES &&
+            input.deviceName?.contains("1000xm", ignoreCase = true) == true
+        ) {
+            return DeviceType.HEADPHONES
+        }
 
         return fingerprintTypeRules
             .firstOrNull { rule -> rule.keywords.any(normalizedModel::contains) }
