@@ -77,6 +77,33 @@ class FollowMeSessionManagerTest {
     }
 
     @Test
+    fun `poor GPS accuracy does not establish movement reference`() {
+        manager.updateMovement(52.0, 21.0, 101f, NOW)
+
+        val moved = manager.updateMovement(52.01, 21.0, 150f, NOW + 10_000L)
+
+        assertFalse(moved)
+        assertFalse(manager.hasMovementReference())
+        assertFalse(manager.hasUserMoved())
+    }
+
+    @Test
+    fun `missing GPS accuracy does not establish movement reference`() {
+        manager.updateMovement(52.0, 21.0, null, NOW)
+
+        assertFalse(manager.hasMovementReference())
+        assertFalse(manager.hasUserMoved())
+    }
+
+    @Test
+    fun `invalid coordinates do not establish movement reference`() {
+        manager.updateMovement(95.0, 21.0, 5f, NOW)
+
+        assertFalse(manager.hasMovementReference())
+        assertFalse(manager.hasUserMoved())
+    }
+
+    @Test
     fun `real displacement with good accuracy latches historical movement`() {
         manager.updateMovement(52.0, 21.0, 5f, NOW)
 
