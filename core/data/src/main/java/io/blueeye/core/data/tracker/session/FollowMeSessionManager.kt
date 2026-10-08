@@ -107,8 +107,9 @@ class FollowMeSessionManager @Inject constructor() {
         now: Long = System.currentTimeMillis(),
     ): Boolean {
         if (currentLat == null || currentLon == null) return userHasMoved
+        if (!currentLat.isValidLatitude() || !currentLon.isValidLongitude()) return userHasMoved
 
-        val accuracyM = currentAccuracyM.normalizedAccuracy()
+        val accuracyM = currentAccuracyM.normalizedAccuracy() ?: return userHasMoved
         if (startLocationLat == null || startLocationLon == null) {
             startLocationLat = currentLat
             startLocationLon = currentLon
@@ -236,6 +237,11 @@ class FollowMeSessionManager @Inject constructor() {
 
 private const val EarthRadiusMeters = 6_371_000.0
 private const val MovementThresholdMeters = 50.0
+private const val MaxLocationAccuracyMeters = 100f
+private const val MinLatitude = -90.0
+private const val MaxLatitude = 90.0
+private const val MinLongitude = -180.0
+private const val MaxLongitude = 180.0
 
 private fun requiredMovementDistance(
     firstAccuracyM: Double?,
@@ -265,5 +271,11 @@ private fun calculateDistance(
 
 private fun Float?.normalizedAccuracy(): Double? =
     this
-        ?.takeIf { it.isFinite() && it > 0f }
+        ?.takeIf { it.isFinite() && it > 0f && it <= MaxLocationAccuracyMeters }
         ?.toDouble()
+
+private fun Double.isValidLatitude(): Boolean =
+    isFinite() && this in MinLatitude..MaxLatitude
+
+private fun Double.isValidLongitude(): Boolean =
+    isFinite() && this in MinLongitude..MaxLongitude
