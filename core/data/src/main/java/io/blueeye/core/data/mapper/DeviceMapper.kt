@@ -32,7 +32,7 @@ fun DeviceEntity.toDomain(): Device {
         rssi = normalizedDomainRssi,
         encounterCount = encounterCount,
         sensorData = sensorData,
-        txPower = txPower,
+        txPower = txPower?.takeUnless { it == Int.MIN_VALUE },
         isConnectable = isConnectable,
         primaryPhy = primaryPhy,
         secondaryPhy = secondaryPhy,

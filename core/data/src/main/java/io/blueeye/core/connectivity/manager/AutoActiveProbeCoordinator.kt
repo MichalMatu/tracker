@@ -232,8 +232,21 @@ class AutoActiveProbeCoordinator @Inject constructor(
         }
         timeoutJob = null
         probeStateManager.setActiveProbe(null)
-        if (markFailed) {
-            markProbeFailed(request.fingerprint, error)
+        // Only change an unfinished probe. ConnectionProbeRecorder may already
+        // have persisted CONNECTED with actual GATT services/characteristics.
+        val unresolvedReason = error ?: if (markFailed) {
+            "GATT probe ended before establishing a connection"
+        } else {
+            "GATT probe ended before service discovery was persisted"
+        }
+        runCatching {
+            deviceDao.failAutoProbeIfStillProbing(
+                fingerprint = request.fingerprint,
+                timestamp = System.currentTimeMillis(),
+                error = unresolvedReason,
+            )
+        }.onFailure { failure ->
+            Log.w(TAG, "Failed to finalize auto GATT probe: ${failure.message}")
         }
         drainQueue()
     }
@@ -273,17 +286,6 @@ class AutoActiveProbeCoordinator @Inject constructor(
         )
     }
 
-    private suspend fun markProbeFailed(
-        mac: String,
-        error: String?,
-    ) {
-        updateProbeStatus(
-            mac = mac,
-            status = STATUS_FAILED,
-            error = error,
-        )
-    }
-
     private suspend fun updateProbeStatus(
         mac: String,
         status: String,
@@ -316,7 +318,6 @@ class AutoActiveProbeCoordinator @Inject constructor(
         private const val TAG = "AutoActiveProbe"
         private const val STARTUP_GRACE_MS = 1_000L
         private const val STATUS_PROBING = "PROBING"
-        private const val STATUS_FAILED = "FAILED"
     }
 }
 

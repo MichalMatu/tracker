@@ -22,7 +22,7 @@ fun SignalSampleEntity.toDomain(): SignalSample {
         serviceUuids = serviceUuids,
         serviceDataByUuidHex = serviceDataByUuidHex,
         appearance = appearance,
-        txPower = txPower,
+        txPower = txPower?.takeUnless { it == Int.MIN_VALUE },
         isConnectable = isConnectable,
         primaryPhy = primaryPhy,
         secondaryPhy = secondaryPhy,

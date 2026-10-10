@@ -97,10 +97,14 @@ class DatabaseExporter
                     sessionStartedAt = sessionStartedAt,
                 )
             val sessionIdentityCandidates =
-                runCatching {
-                    deviceRepository.getIdentityCandidatesSince(sessionStartedAt)
-                        .getOrDefault(emptyList())
-                }.getOrDefault(emptyList())
+                if (sessionStartedAt > 0L) {
+                    runCatching {
+                        deviceRepository.getIdentityCandidatesSince(sessionStartedAt)
+                            .getOrDefault(emptyList())
+                    }.getOrDefault(emptyList())
+                } else {
+                    emptyList()
+                }
 
             return DatabaseExportData(
                 devices = devices,
@@ -190,6 +194,7 @@ internal object DatabaseExportJsonMapper {
         buildJsonObject {
             put("schemaVersion", SCHEMA_VERSION)
             put("exportDate", data.exportDate)
+            put("dataScope", "ALL_HISTORY")
             put("deviceCount", data.devices.size)
             put("sampleCount", data.samples.size)
             putSampleQuality(data.samples)
@@ -238,6 +243,8 @@ internal object DatabaseExportJsonMapper {
 
             put("label", session.label.name)
             put("notes", session.notes)
+            put("scope", "SINCE_SESSION_START")
+            put("hasStarted", session.startedAt > 0L)
             put("activeCollectionEnabled", session.activeCollectionEnabled)
             put("startedAt", session.startedAt)
             put("exportedAt", exportDate)

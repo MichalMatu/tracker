@@ -6,15 +6,18 @@ import io.blueeye.core.data.preferences.WatchlistPreferences
 import io.blueeye.core.data.repository.ProbeStateManager
 import org.junit.Test
 import org.mockito.kotlin.mock
+import kotlinx.coroutines.flow.flowOf
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 class AutoActiveProbeCoordinatorStableCoreTest {
     @Test
-    fun `persisted auto probe preference cannot bypass stable core`() {
+    fun `automatic GATT never probes without explicit preference opt in`() {
         val connectionManager: Lazy<BleConnectionManager> = mock()
         val deviceDao: DeviceDao = mock()
         val probeStateManager: ProbeStateManager = mock()
         val preferences: WatchlistPreferences = mock()
+        whenever(preferences.autoActiveProbeEnabled).thenReturn(flowOf(false))
         val coordinator =
             AutoActiveProbeCoordinator(
                 bleConnectionManager = connectionManager,
@@ -34,6 +37,7 @@ class AutoActiveProbeCoordinatorStableCoreTest {
             )
         )
 
-        verifyNoInteractions(connectionManager, deviceDao, probeStateManager, preferences)
+        // Reading the preference and clearing an empty queue are expected.
+        verifyNoInteractions(connectionManager, deviceDao)
     }
 }

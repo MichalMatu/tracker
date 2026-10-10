@@ -75,6 +75,41 @@ class DatabaseExportJsonMapperTest {
     }
 
     @Test
+    fun `unstarted session keeps global history separate`() {
+        val device = device(
+            fingerprint = "history-only",
+            lastSeenAt = SESSION_STARTED_AT + 10_000L,
+            calibrationLabel = DeviceCalibrationLabel.UNKNOWN,
+        )
+        val sample = sample(deviceFingerprint = device.fingerprint, timestamp = SESSION_STARTED_AT + 12_000L)
+        val data = DatabaseExportData(
+            devices = listOf(device),
+            samples = listOf(sample),
+            session = DatabaseExportSessionData(
+                devices = emptyList(),
+                samples = emptyList(),
+                label = DeviceCalibrationLabel.UNKNOWN,
+                startedAt = 0L,
+                notes = "",
+                activeCollectionEnabled = false,
+                followMeObservations = emptyList(),
+                alertEvidenceEvents = emptyList(),
+            ),
+            exportDate = EXPORT_DATE,
+        )
+        val export = DatabaseExportJsonMapper.buildExport(data)
+        val session = export.getValue("session").jsonObject
+
+        assertEquals("ALL_HISTORY", export.getValue("dataScope").jsonPrimitive.content)
+        assertEquals("SINCE_SESSION_START", session.getValue("scope").jsonPrimitive.content)
+        assertFalse(session.getValue("hasStarted").jsonPrimitive.boolean)
+        assertEquals(1, export.getValue("deviceCount").jsonPrimitive.int)
+        assertEquals(1, export.getValue("sampleCount").jsonPrimitive.int)
+        assertEquals(0, session.getValue("deviceCount").jsonPrimitive.int)
+        assertEquals(0, session.getValue("sampleCount").jsonPrimitive.int)
+    }
+
+    @Test
     fun `export includes session summary counters`() {
         val fixture = structuredExportFixture()
         val export = fixture.export
@@ -86,6 +121,9 @@ class DatabaseExportJsonMapperTest {
         val reviewDeviceQueue = session.getValue("reviewDeviceQueue").jsonArray.single().jsonObject
 
         assertEquals(20, export.getValue("schemaVersion").jsonPrimitive.int)
+        assertEquals("ALL_HISTORY", export.getValue("dataScope").jsonPrimitive.content)
+        assertEquals("SINCE_SESSION_START", session.getValue("scope").jsonPrimitive.content)
+        assertTrue(session.getValue("hasStarted").jsonPrimitive.boolean)
         assertEquals(EXPORT_DATE, export.getValue("exportDate").jsonPrimitive.long)
         assertEquals(2, export.getValue("deviceCount").jsonPrimitive.int)
         assertEquals(2, export.getValue("sampleCount").jsonPrimitive.int)

@@ -155,14 +155,13 @@ constructor(private val scanRecordParser: ScanRecordParser) {
         result: ScanResult,
         recordTxPower: Int?,
     ): Int? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (result.txPower != android.bluetooth.le.ScanResult.TX_POWER_NOT_PRESENT) {
-                result.txPower
-            } else {
-                recordTxPower
-            }
-        } else {
-            recordTxPower
-        }
+        val resultTxPower =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) result.txPower else null
+        return normalizeBleTxPower(resultTxPower, recordTxPower)
     }
 }
+
+/** Android uses Int.MIN_VALUE for unavailable Tx power in both scan and record metadata. */
+internal fun normalizeBleTxPower(resultTxPower: Int?, recordTxPower: Int?): Int? =
+    resultTxPower?.takeUnless { it == Int.MIN_VALUE }
+        ?: recordTxPower?.takeUnless { it == Int.MIN_VALUE }

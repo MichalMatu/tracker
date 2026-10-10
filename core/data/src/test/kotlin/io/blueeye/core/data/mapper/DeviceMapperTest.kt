@@ -2,7 +2,9 @@ package io.blueeye.core.data.mapper
 
 import io.blueeye.core.data.db.entity.DeviceEntity
 import io.blueeye.core.model.IdentityCarryoverVerdict
+import io.blueeye.core.scanner.extractor.normalizeBleTxPower
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class DeviceMapperTest {
@@ -30,6 +32,26 @@ class DeviceMapperTest {
             ).toDomain()
 
         assertEquals(-50, device.rssi)
+    }
+
+    @Test
+    fun `unavailable Android Tx power stays unknown`() {
+        assertNull(normalizeBleTxPower(Int.MIN_VALUE, Int.MIN_VALUE))
+        assertNull(normalizeBleTxPower(null, Int.MIN_VALUE))
+        assertEquals(-55, normalizeBleTxPower(Int.MIN_VALUE, -55))
+        assertEquals(-42, normalizeBleTxPower(-42, -55))
+    }
+
+    @Test
+    fun `toDomain suppresses legacy Tx power not present sentinel`() {
+        val device =
+            deviceEntity(
+                technology = "BLE",
+                classOfDevice = null,
+                connectionStatus = "NONE",
+                lastRssi = -61,
+            ).copy(txPower = Int.MIN_VALUE).toDomain()
+        assertNull(device.txPower)
     }
 
     @Test

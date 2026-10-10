@@ -447,6 +447,21 @@ class AppleDeduplicationScenariosTest {
         }
 
         // ... stubs ...
+        override suspend fun failAutoProbeIfStillProbing(
+            fingerprint: String,
+            timestamp: Long,
+            error: String,
+        ): Int {
+            val existing = db[fingerprint] ?: return 0
+            if (existing.connectionStatus != "PROBING") return 0
+            db[fingerprint] = existing.copy(
+                connectionStatus = "FAILED",
+                probeError = error,
+                lastProbeTimestamp = timestamp,
+            )
+            return 1
+        }
+
         override suspend fun updateIsPaired(fingerprint: String, isPaired: Boolean) {}
         override suspend fun updateLastSeen(fingerprint: String, timestamp: Long) {}
         override suspend fun setWatchlistStatus(fingerprint: String, isWatchlisted: Boolean) {}
