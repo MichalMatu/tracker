@@ -1,0 +1,14 @@
+{
+  "event": "task_started",
+  "task_id": "20261010-blueeye-detekt-quality-repair-r1",
+  "task_digest": "31bb134fe70b123c03d0468755b663709de029216b7a19f6ab66d4add896c609",
+  "idle_timeout": 300,
+  "task_timeout": 2100,
+  "memory_limit_mb": 3072,
+  "started_at": "2026-10-10T19:26:51.939745+00:00",
+  "attempt_id": "9291f1665268ce6262149716",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 23301,
+  "updated_at": "2026-10-10T19:26:51.939811+00:00",
+  "pid": 23301
+}
