@@ -80,10 +80,15 @@ constructor() : BleBeaconDecoder {
             // Humidity: Byte after temp
             val hum = (payload[offset + 2].toInt() and 0xFF).toDouble()
 
-            // Battery: Byte after humidity (if available)
+            // TP35x stores a two-bit battery status, not a literal percentage.
+            // Match the field-tested Growclip mapping; 3 means unknown.
             val battery = if (payload.size > offset + 3) {
-                val bat = payload[offset + 3].toInt() and 0xFF
-                if (bat in 0..100) bat else null
+                when (payload[offset + 3].toInt() and 0x03) {
+                    0 -> 1
+                    1 -> 50
+                    2 -> 100
+                    else -> null
+                }
             } else {
                 null
             }
