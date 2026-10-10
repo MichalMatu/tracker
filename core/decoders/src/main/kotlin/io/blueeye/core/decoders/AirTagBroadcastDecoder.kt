@@ -24,7 +24,7 @@ constructor() : BleBeaconDecoder {
 
         // Status Byte (index 2):
         // Bits 6-7: Battery Level (00=Full, 01=Medium, 10=Low, 11=Critical)
-        // Bit 2: Maintainer / State
+        // Bit 2: Maintained. Battery bits are valid only when this bit is set.
 
         var batteryStatus = "Unknown"
         var statusByte = 0
@@ -32,12 +32,16 @@ constructor() : BleBeaconDecoder {
         if (data.size > 2) {
             statusByte = data[2].toInt() and 0xFF
             batteryStatus =
-                when ((statusByte shr 6) and 0x03) {
-                    0x00 -> "Full"
-                    0x01 -> "Medium"
-                    0x02 -> "Low"
-                    0x03 -> "Critical"
-                    else -> "Unknown"
+                if ((statusByte and 0x04) == 0) {
+                    "Unknown"
+                } else {
+                    when ((statusByte shr 6) and 0x03) {
+                        0x00 -> "Full"
+                        0x01 -> "Medium"
+                        0x02 -> "Low"
+                        0x03 -> "Critical"
+                        else -> "Unknown"
+                    }
                 }
         }
 
