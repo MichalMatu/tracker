@@ -1,0 +1,121 @@
+{
+  "allow_write": true,
+  "attempt_id": "f11b04a9695251c65bb35689",
+  "command_timeout": 900,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 0,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 15931fa8341784a308f8a8b9ea6ebd68279241fc\ngit diff --check",
+      "elapsed_seconds": 0.391,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": null,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {
+    "patch": {
+      "applied": true,
+      "apply": {
+        "elapsed_seconds": 0.068,
+        "exit_code": 0,
+        "output": ""
+      }
+    },
+    "writes": [
+      {
+        "bytes": 1510,
+        "path": "core/decoders/src/test/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoderTest.kt"
+      }
+    ]
+  },
+  "finished_at": "2026-10-10T11:36:43.223028+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.072,
+    "exit_code": 0,
+    "output": "diff --git a/core/decoders/src/main/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoder.kt b/core/decoders/src/main/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoder.kt\nindex 326b8ae..1cc3dd1 100644\n--- a/core/decoders/src/main/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoder.kt\n+++ b/core/decoders/src/main/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoder.kt\n@@ -80,10 +80,15 @@ constructor() : BleBeaconDecoder {\n             // Humidity: Byte after temp\n             val hum = (payload[offset + 2].toInt() and 0xFF).toDouble()\n \n-            // Battery: Byte after humidity (if available)\n+            // TP35x stores a two-bit battery status, not a literal percentage.\n+            // Match the field-tested Growclip mapping; 3 means unknown.\n             val battery = if (payload.size > offset + 3) {\n-                val bat = payload[offset + 3].toInt() and 0xFF\n-                if (bat in 0..100) bat else null\n+                when (payload[offset + 3].toInt() and 0x03) {\n+                    0 -> 1\n+                    1 -> 50\n+                    2 -> 100\n+                    else -> null\n+                }\n             } else {\n                 null\n             }\n"
+  },
+  "git_status": {
+    "elapsed_seconds": 0.125,
+    "exit_code": 0,
+    "output": " M core/decoders/src/main/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoder.kt\n?? core/decoders/src/test/kotlin/io/blueeye/core/decoders/environmental/\n"
+  },
+  "id": "20261010-blueeye-thermopro-battery-r2",
+  "idle_timeout": 300,
+  "memory_limit_mb": 3072,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.391,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2
+    },
+    {
+      "elapsed_seconds": 53.491,
+      "outcome": "passed",
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2
+    }
+  ],
+  "started_at": "2026-10-10T11:35:47.650152+00:00",
+  "status": "done",
+  "task_digest": "94ddf2b9bfcc09c2687e31932b36c573387e478dd44f20644474667c6e027c96",
+  "task_timeout": 1800,
+  "verification": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 3428,
+      "command": "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :core:decoders:testDebugUnitTest --tests io.blueeye.core.decoders.environmental.ThermoProDecoderTest --no-daemon --console=plain",
+      "current_rss_mb": 23.95,
+      "elapsed_seconds": 53.491,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \nCalculating task graph as no cached configuration is available for tasks: :core:decoders:testDebugUnitTest --tests io.blueeye.core.decoders.environmental.ThermoProDecoderTest\nWarning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:decoders:preBuild UP-TO-DATE\n> Task :core:decoders:preDebugBuild UP-TO-DATE\n> Task :core:decoders:checkKotlinGradlePluginConfigurationErrors\n> Task :core:decoders:generateDebugResValues UP-TO-DATE\n> Task :core:decoders:generateDebugResources UP-TO-DATE\n> Task :core:decoders:packageDebugResources UP-TO-DATE\n> Task :core:decoders:parseDebugLocalResources UP-TO-DATE\n> Task :core:decoders:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:kaptGenerateStubsDebugKotlin\n> Task :core:decoders:kaptDebugKotlin UP-TO-DATE\n> Task :core:decoders:compileDebugKotlin\n> Task :core:decoders:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:compileDebugJavaWithJavac\n> Task :core:decoders:transformDebugClassesWithAsm\n> Task :core:decoders:bundleLibRuntimeToJarDebug\n> Task :core:decoders:preDebugUnitTestBuild UP-TO-DATE\n> Task :core:decoders:generateDebugUnitTestStubRFile\n> Task :core:decoders:processDebugJavaRes UP-TO-DATE\n> Task :core:decoders:bundleLibCompileToJarDebug\n> Task :core:decoders:kaptGenerateStubsDebugUnitTestKotlin\n\n> Task :core:decoders:kaptDebugUnitTestKotlin\nwarning: The following options were not recognized by any processor: '[dagger.fastInit, dagger.hilt.android.internal.disableAndroidSuperclassValidation, dagger.hilt.android.internal.projectType, dagger.hilt.internal.useAggregatingRootProcessor, kapt.kotlin.generated]'\n\n> Task :core:decoders:compileDebugUnitTestKotlin\n> Task :core:decoders:javaPreCompileDebugUnitTest FROM-CACHE\n> Task :core:decoders:compileDebugUnitTestJavaWithJavac NO-SOURCE\n> Task :core:decoders:hiltAggregateDepsDebugUnitTest\n> Task :core:decoders:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :core:decoders:processDebugUnitTestJavaRes\n> Task :core:decoders:transformDebugUnitTestClassesWithAsm\n> Task :core:decoders:testDebugUnitTest\n[Incubating] Problems report is available at: file:///Users/michal/agent-workspace/repos/tracker/work/build/reports/problems/problems-report.html\n\nDeprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.\n\nYou can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.\n\nFor more on this, please refer to https://docs.gradle.org/8.11.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.\n\nBUILD SUCCESSFUL in 52s\n27 actionable tasks: 16 executed, 1 from cache, 10 up-to-date\nConfiguration cache entry stored.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 193.08,
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "work_branch": "main",
+  "workspace_checkpoint": {
+    "base_head": "15931fa8341784a308f8a8b9ea6ebd68279241fc",
+    "created_at": "2026-10-10T11:36:43.551628+00:00",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/20261010-blueeye-thermopro-battery-r2/1791632203417099000-task-exit",
+    "reason": "task-exit",
+    "status": " M core/decoders/src/main/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoder.kt\n?? core/decoders/src/test/kotlin/io/blueeye/core/decoders/environmental/\n",
+    "task_id": "20261010-blueeye-thermopro-battery-r2",
+    "total_bytes": 2812,
+    "tracked_patch": "tracked.patch",
+    "tracked_patch_bytes": 1302,
+    "untracked_bytes": 1510,
+    "untracked_files": [
+      "core/decoders/src/test/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoderTest.kt"
+    ],
+    "untracked_root": "untracked",
+    "version": 2,
+    "work_branch": "agent-work"
+  }
+}

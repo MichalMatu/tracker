@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "b8ecb51fdb28700bb1eb801e",
+  "command_timeout": 150,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 1043,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 72f25d3f0073659d40d265195f89b54eac0685a1\npython3 - <<'PY'\nfrom pathlib import Path\nimport json\nimport xml.etree.ElementTree as ET\n\nroot = Path(\"core/data/build/reports\")\ncandidates = [p for p in root.rglob(\"*\") if p.is_file() and \"detekt\" in str(p).lower()]\nprint(\"DETEKT_REPORT_FILES\", [(str(p), p.stat().st_size) for p in candidates[:25]])\nfor p in candidates:\n    try:\n        if p.suffix == \".xml\":\n            tree = ET.parse(p)\n            for file in tree.iter(\"file\"):\n                for issue in file.findall(\"error\"):\n                    print(\"DETEKT_ISSUE\", file.attrib.get(\"name\"), issue.attrib.get(\"line\"),\n                          issue.attrib.get(\"source\"), issue.attrib.get(\"message\"))\n        elif p.suffix == \".sarif\":\n            data = json.loads(p.read_text())\n            for run in data.get(\"runs\", []):\n                for finding in run.get(\"results\", []):\n                    for place in finding.get(\"locations\", [])[:1]:\n                        loc = place.get(\"physicalLocation\", {})\n                        print(\"DETEKT_SARIF\", finding.get(\"ruleId\"),\n                              loc.get(\"artifactLocation\", {}).get(\"uri\"),\n                              loc.get(\"region\", {}).get(\"startLine\"),\n                              finding.get(\"message\", {}).get(\"text\"))\n    except (ValueError, ET.ParseError, OSError) as error:\n        print(\"REPORT_READ_FAILED\", p, type(error).__name__)\nPY",
+      "current_rss_mb": 4.44,
+      "elapsed_seconds": 0.355,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "DETEKT_REPORT_FILES [('core/data/build/reports/detekt/detekt.sarif', 140206), ('core/data/build/reports/detekt/detekt.txt', 1253)]\nDETEKT_SARIF detekt.complexity.TooManyFunctions file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt 10 Interface 'DeviceUpdateDao' with '11' functions detected. Defined threshold inside interfaces is set to '11'\nDETEKT_SARIF detekt.formatting.ImportOrdering file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/test/kotlin/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinatorStableCoreTest.kt 3 Imports must be ordered in lexicographic order without any empty lines in-between with \"java\", \"javax\", \"kotlin\" and aliases in the end\nDETEKT_SARIF detekt.style.ReturnCount file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt 450 Function failAutoProbeIfStillProbing has 3 return statements which exceeds the limit of 2.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 4.44,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-10T19:23:19.572905+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.065,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.084,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261010-blueeye-detekt-report-diagnostic-r1",
+  "idle_timeout": 90,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.355,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-10T19:23:17.772256+00:00",
+  "status": "done",
+  "task_digest": "c1d374b4a9462efda9dcbc7d0484d5d522f44d534aa6beb4c3720789e173c8dd",
+  "task_timeout": 360,
+  "verification": [],
+  "work_branch": "main"
+}

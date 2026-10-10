@@ -1,0 +1,10 @@
+{
+  "event": "cancelled_before_execution",
+  "status": "failed",
+  "failure_reason": "cancelled_by_operator",
+  "control_id": "cancel-blueeye-thermopro-battery-r1-20261010",
+  "updated_at": "2026-10-10T11:35:08.053352+00:00",
+  "task_id": "20261010-blueeye-thermopro-battery-r1",
+  "daemon_version": "4.20.6",
+  "pid": 32158
+}

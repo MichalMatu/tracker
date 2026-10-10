@@ -1,0 +1,19 @@
+{
+  "id": "20261008-s22-lan-path-diagnostic-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "s22:lan-path-diagnostic",
+  "dedupe_revision": 1,
+  "command_timeout": 40,
+  "idle_timeout": 30,
+  "task_timeout": 100,
+  "memory_limit_mb": 256,
+  "commands": [
+    "python3 - <<'PY'\nimport subprocess, json\nout={}\ndef cmd(args, timeout=5):\n    try:\n        p=subprocess.run(args,text=True,capture_output=True,timeout=timeout)\n        return {\"rc\":p.returncode,\"out\":p.stdout.strip(),\"err\":p.stderr.strip()}\n    except subprocess.TimeoutExpired:\n        return {\"timeout\":True}\n\nout[\"wifi_network\"]=cmd([\"networksetup\",\"-getairportnetwork\",\"en0\"],3)\nout[\"wifi_info\"]=cmd([\"networksetup\",\"-getinfo\",\"Wi-Fi\"],3)\nout[\"router\"]=cmd([\"ipconfig\",\"getoption\",\"en0\",\"router\"],3)\nout[\"subnet_mask\"]=cmd([\"ipconfig\",\"getoption\",\"en0\",\"subnet_mask\"],3)\nout[\"arp_all\"]=cmd([\"arp\",\"-a\"],4)\nout[\"gateway_ping\"]=cmd([\"ping\",\"-c\",\"1\",\"-W\",\"1000\",\"192.168.0.1\"],4)\nout[\"phone_ping\"]=cmd([\"ping\",\"-c\",\"1\",\"-W\",\"1000\",\"192.168.0.100\"],4)\nprint(json.dumps(out,indent=2))\nPY"
+  ]
+}

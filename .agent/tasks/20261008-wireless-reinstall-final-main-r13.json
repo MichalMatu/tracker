@@ -1,0 +1,19 @@
+{
+  "id": "20261008-wireless-reinstall-final-main-r13",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "main:wireless-reinstall-final",
+  "dedupe_revision": 13,
+  "command_timeout": 240,
+  "idle_timeout": 120,
+  "task_timeout": 360,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -e\nEXPECTED_SHA=\"15931fa8341784a308f8a8b9ea6ebd68279241fc\"\ngit fetch origin main --quiet\ngit checkout --detach \"$EXPECTED_SHA\" >/dev/null 2>&1\nAPK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\ntest -n \"$APK\"\n\nadb kill-server >/dev/null 2>&1 || true\nadb start-server >/dev/null\n\npython3 - <<'PY'\nimport subprocess,sys,time\ncandidates=[\n  \"Android-2.local:40503\",\n  \"192.168.0.100:40503\",\n  \"192.168.0.100:34771\",\n  \"192.168.0.100:39687\",\n  \"192.168.0.100:34745\",\n]\ndef run(args,timeout=5):\n    try: return subprocess.run(args,text=True,capture_output=True,timeout=timeout)\n    except subprocess.TimeoutExpired: return None\n\ndef verify():\n    p=run([\"adb\",\"devices\"],4)\n    if not p: return None\n    for line in p.stdout.splitlines()[1:]:\n        parts=line.split()\n        if len(parts)>=2 and parts[1]==\"device\":\n            serial=parts[0]\n            q=run([\"adb\",\"-s\",serial,\"shell\",\"getprop\",\"ro.product.model\"],4)\n            if q and q.stdout.strip()==\"SM-S906B\":\n                return serial\n    return None\n\nserial=verify()\nif not serial:\n    for ep in candidates:\n        p=run([\"adb\",\"connect\",ep],5)\n        if p:\n            print(p.stdout.strip() or p.stderr.strip())\n        time.sleep(.6)\n        serial=verify()\n        if serial:\n            break\nif not serial:\n    print(\"S22_KNOWN_ENDPOINTS_UNREACHABLE\")\n    sys.exit(42)\nopen(\"/tmp/tracker-s22-serial\",\"w\").write(serial)\nprint(\"S22_CONNECTED_BY_FALLBACK\")\nPY\n\nS=\"$(cat /tmp/tracker-s22-serial)\"\nOUT=\"$(adb -s \"$S\" install --no-streaming -r \"$APK\" 2>&1)\"\nprintf '%s\\n' \"$OUT\"\ntest -n \"$(adb -s \"$S\" shell pm path io.blueeye | tr -d '\r' | head -n1)\"\nadb -s \"$S\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null\nsleep 1\nPID=\"$(adb -s \"$S\" shell pidof io.blueeye | tr -d '\r' | head -n1)\"\ntest -n \"$PID\"\nprintf 'FINAL_INSTALL_OK sha=%s model=SM-S906B package=io.blueeye data_preserved=yes app_running=yes pid=%s\\n' \"$EXPECTED_SHA\" \"$PID\""
+  ]
+}

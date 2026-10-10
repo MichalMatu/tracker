@@ -1,0 +1,19 @@
+{
+  "id": "20261008-wireless-reinstall-final-main-r15",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "main:wireless-reinstall-final",
+  "dedupe_revision": 15,
+  "command_timeout": 240,
+  "idle_timeout": 120,
+  "task_timeout": 360,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -e\nEXPECTED_SHA=\"15931fa8341784a308f8a8b9ea6ebd68279241fc\"\nENDPOINT=\"192.168.0.100:36451\"\n\ngit fetch origin main --quiet\ngit checkout --detach \"$EXPECTED_SHA\" >/dev/null 2>&1\ntest \"$(git rev-parse HEAD)\" = \"$EXPECTED_SHA\"\n\nAPK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\nif [ -z \"$APK\" ]; then\n  export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n  ./gradlew --no-daemon :app:assembleDebug\n  APK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\nfi\ntest -n \"$APK\"\n\nadb start-server >/dev/null\nadb connect \"$ENDPOINT\"\nsleep 1\n\nMODEL=\"$(adb -s \"$ENDPOINT\" shell getprop ro.product.model | tr -d '\\r')\"\ntest \"$MODEL\" = \"SM-S906B\"\necho \"S22_CONNECTED endpoint=$ENDPOINT model=$MODEL\"\n\nOUT=\"$(adb -s \"$ENDPOINT\" install --no-streaming -r \"$APK\" 2>&1)\"\nprintf '%s\\n' \"$OUT\"\n\ntest -n \"$(adb -s \"$ENDPOINT\" shell pm path io.blueeye | tr -d '\\r' | head -n1)\"\nadb -s \"$ENDPOINT\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null\nsleep 1\nPID=\"$(adb -s \"$ENDPOINT\" shell pidof io.blueeye | tr -d '\\r' | head -n1)\"\ntest -n \"$PID\"\n\nprintf 'FINAL_INSTALL_OK sha=%s endpoint=%s model=SM-S906B package=io.blueeye data_preserved=yes app_running=yes pid=%s\\n' \"$EXPECTED_SHA\" \"$ENDPOINT\" \"$PID\""
+  ]
+}

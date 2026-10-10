@@ -1,0 +1,27 @@
+{
+  "id": "20261010-blueeye-thermopro-battery-r2",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "dedupe_key": "main:blueeye-thermopro-battery",
+  "dedupe_revision": 2,
+  "command_timeout": 900,
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 3072,
+  "patch": "diff --git a/core/decoders/src/main/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoder.kt b/core/decoders/src/main/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoder.kt\n--- a/core/decoders/src/main/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoder.kt\n+++ b/core/decoders/src/main/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoder.kt\n@@ -72,10 +72,15 @@\n             // Humidity: Byte after temp\n             val hum = (payload[offset + 2].toInt() and 0xFF).toDouble()\n \n-            // Battery: Byte after humidity (if available)\n+            // TP35x stores a two-bit battery status, not a literal percentage.\n+            // Match the field-tested Growclip mapping; 3 means unknown.\n             val battery = if (payload.size > offset + 3) {\n-                val bat = payload[offset + 3].toInt() and 0xFF\n-                if (bat in 0..100) bat else null\n+                when (payload[offset + 3].toInt() and 0x03) {\n+                    0 -> 1\n+                    1 -> 50\n+                    2 -> 100\n+                    else -> null\n+                }\n             } else {\n                 null\n             }\n",
+  "writes": [
+    {
+      "path": "core/decoders/src/test/kotlin/io/blueeye/core/decoders/environmental/ThermoProDecoderTest.kt",
+      "content": "package io.blueeye.core.decoders.environmental\n\nimport io.blueeye.core.decoders.BleBeaconScanInput\nimport org.junit.Assert.assertEquals\nimport org.junit.Assert.assertNull\nimport org.junit.Assert.assertTrue\nimport org.junit.Test\n\nclass ThermoProDecoderTest {\n    private val decoder = ThermoProDecoder()\n\n    @Test\n    fun tp357BatteryStatusUsesTwoBitMapping() {\n        val expectedByStatus = mapOf(\n            0x00 to 1,\n            0x01 to 50,\n            0x02 to 100,\n            0x03 to null,\n            0x82 to 100,\n        )\n\n        expectedByStatus.forEach { (status, expectedBattery) ->\n            val input = BleBeaconScanInput(\n                mac = \"\",\n                manufacturerRecords = emptyMap(),\n                serviceUuids = emptyList(),\n                rawData = (\"0D0954503335372028544553542907FFC2F2002E\" +\n                    \"%02X\".format(status) + \"2C\").hexToBytes(),\n            )\n\n            assertTrue(\"Should recognize TP357, status=$status\", decoder.supports(input))\n            val decoded = decoder.decode(input)\n            assertEquals(24.2, decoded.temperatureCelcius!!, 0.001)\n            assertEquals(46.0, decoded.humidityPercent!!, 0.001)\n            if (expectedBattery == null) {\n                assertNull(decoded.batteryLevel)\n            } else {\n                assertEquals(expectedBattery, decoded.batteryLevel)\n            }\n        }\n    }\n\n    private fun String.hexToBytes(): ByteArray =\n        chunked(2).map { it.toInt(16).toByte() }.toByteArray()\n}\n"
+    }
+  ],
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 15931fa8341784a308f8a8b9ea6ebd68279241fc\ngit diff --check"
+  ],
+  "verify_commands": [
+    "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :core:decoders:testDebugUnitTest --tests io.blueeye.core.decoders.environmental.ThermoProDecoderTest --no-daemon --console=plain"
+  ]
+}

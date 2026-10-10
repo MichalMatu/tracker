@@ -1,0 +1,10 @@
+{
+  "daemon_version": "4.20.6",
+  "error": "Task cancelled by operator before execution.",
+  "failure_reason": "cancelled_by_operator",
+  "finished_at": "2026-10-10T11:35:05.403025+00:00",
+  "id": "20261010-blueeye-thermopro-battery-r1",
+  "started_at": null,
+  "status": "failed",
+  "task_digest": "830721b2ea1233bd6bdaf8fe7d3d11922b7fc2a8e00cfe7b92fd43f71195a9d9"
+}

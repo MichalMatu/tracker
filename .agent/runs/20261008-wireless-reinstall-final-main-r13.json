@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261008-wireless-reinstall-final-main-r13",
+  "task_digest": "58b854da0ae2b38d4b86dc6fc693acab257f8622a050cab86b7d92058923bdb2",
+  "status": "failed",
+  "failure_reason": "command_failed",
+  "finished_at": "2026-10-08T05:44:08.993321+00:00",
+  "attempt_id": "41f02ed838cc8cf78a12c0bd",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 61201,
+  "updated_at": "2026-10-08T05:44:09.455036+00:00",
+  "pid": 61201
+}

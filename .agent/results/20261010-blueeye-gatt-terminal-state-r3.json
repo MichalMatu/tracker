@@ -1,0 +1,123 @@
+{
+  "allow_write": true,
+  "attempt_id": "533947e876939362f0d372ef",
+  "command_timeout": 900,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 0,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = bfe98305e385425babe3407a89600b5e13208cb2\ngit diff --check",
+      "elapsed_seconds": 5.171,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": null,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {
+    "writes": [
+      {
+        "bytes": 11087,
+        "path": "core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt"
+      },
+      {
+        "bytes": 9032,
+        "path": "core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt"
+      },
+      {
+        "bytes": 26077,
+        "path": "core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt"
+      },
+      {
+        "bytes": 1618,
+        "path": "core/data/src/test/kotlin/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinatorStableCoreTest.kt"
+      }
+    ]
+  },
+  "finished_at": "2026-10-10T19:07:23.645155+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.033,
+    "exit_code": 0,
+    "output": "diff --git a/core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt b/core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt\nindex 169c87c..cd343de 100644\n--- a/core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt\n+++ b/core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt\n@@ -232,8 +232,21 @@ class AutoActiveProbeCoordinator @Inject constructor(\n         }\n         timeoutJob = null\n         probeStateManager.setActiveProbe(null)\n-        if (markFailed) {\n-            markProbeFailed(request.fingerprint, error)\n+        // Only change an unfinished probe. ConnectionProbeRecorder may already\n+        // have persisted CONNECTED with actual GATT services/characteristics.\n+        val unresolvedReason = error ?: if (markFailed) {\n+            \"GATT probe ended before establishing a connection\"\n+        } else {\n+            \"GATT probe ended before service discovery was persisted\"\n+        }\n+        runCatching {\n+            deviceDao.failAutoProbeIfStillProbing(\n+                fingerprint = request.fingerprint,\n+                timestamp = System.currentTimeMillis(),\n+                error = unresolvedReason,\n+            )\n+        }.onFailure { failure ->\n+            Log.w(TAG, \"Failed to finalize auto GATT probe: ${failure.message}\")\n         }\n         drainQueue()\n     }\n@@ -273,17 +286,6 @@ class AutoActiveProbeCoordinator @Inject constructor(\n         )\n     }\n \n-    private suspend fun markProbeFailed(\n-        mac: String,\n-        error: String?,\n-    ) {\n-        updateProbeStatus(\n-            mac = mac,\n-            status = STATUS_FAILED,\n-            error = error,\n-        )\n-    }\n-\n     private suspend fun updateProbeStatus(\n         mac: String,\n         status: String,\n@@ -316,7 +318,6 @@ class AutoActiveProbeCoordinator @Inject constructor(\n         private const val TAG = \"AutoActiveProbe\"\n         private const val STARTUP_GRACE_MS = 1_000L\n         private const val STATUS_PROBING = \"PROBING\"\n-        private const val STATUS_FAILED = \"FAILED\"\n     }\n }\n \ndiff --git a/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt b/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt\nindex 8d4bccb..2fd44f4 100644\n--- a/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt\n+++ b/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt\n@@ -85,6 +85,26 @@ interface DeviceUpdateDao {\n         baselineDevice: Boolean?,\n     )\n \n+    /**\n+     * A probe completion may race a successful GATT persistence callback.\n+     * Finalize only the still-pending state, preserving CONNECTED evidence.\n+     */\n+    @Query(\n+        \"\"\"\n+        UPDATE devices\n+        SET connectionStatus = 'FAILED',\n+            probeError = :error,\n+            lastProbeTimestamp = :timestamp\n+        WHERE fingerprint = :fingerprint\n+          AND connectionStatus = 'PROBING'\n+        \"\"\",\n+    )\n+    suspend fun failAutoProbeIfStillProbing(\n+        fingerprint: String,\n+        timestamp: Long,\n+        error: String,\n+    ): Int\n+\n     @Suppress(\"LongParameterList\")\n     @Query(\n         \"\"\"\ndiff --git a/core/data/src/test/kotlin/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinatorStableCoreTest.kt b/core/data/src/test/kotlin/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinatorStableCoreTest.kt\nindex f892c13..6094cdc 100644\n--- a/core/data/src/test/kotlin/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinatorStableCoreTest.kt\n+++ b/core/data/src/test/kotlin/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinatorStableCoreTest.kt\n@@ -6,15 +6,18 @@ import io.blueeye.core.data.preferences.WatchlistPreferences\n import io.blueeye.core.data.repository.ProbeStateManager\n import org.junit.Test\n import org.mockito.kotlin.mock\n+import kotlinx.coroutines.flow.flowOf\n import org.mockito.kotlin.verifyNoInteractions\n+import org.mockito.kotlin.whenever\n \n class AutoActiveProbeCoordinatorStableCoreTest {\n     @Test\n-    fun `persisted auto probe preference cannot bypass stable core`() {\n+    fun `automatic GATT never probes without explicit preference opt in`() {\n         val connectionManager: Lazy<BleConnectionManager> = mock()\n         val deviceDao: DeviceDao = mock()\n         val probeStateManager: ProbeStateManager = mock()\n         val preferences: WatchlistPreferences = mock()\n+        whenever(preferences.autoActiveProbeEnabled).thenReturn(flowOf(false))\n         val coordinator =\n             AutoActiveProbeCoordinator(\n                 bleConnectionManager = connectionManager,\n@@ -34,6 +37,7 @@ class AutoActiveProbeCoordinatorStableCoreTest {\n             )\n         )\n \n-        verifyNoInteractions(connectionManager, deviceDao, probeStateManager, preferences)\n+        // Reading the preference and clearing an empty queue are expected.\n+        verifyNoInteractions(connectionManager, deviceDao)\n     }\n }\ndiff --git a/core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt b/core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt\nindex 659f294..e4f316b 100644\n--- a/core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt\n+++ b/core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt\n@@ -447,6 +447,21 @@ class AppleDeduplicationScenariosTest {\n         }\n \n         // ... stubs ...\n+        override suspend fun failAutoProbeIfStillProbing(\n+            fingerprint: String,\n+            timestamp: Long,\n+            error: String,\n+        ): Int {\n+            val existing = db[fingerprint] ?: return 0\n+            if (existing.connectionStatus != \"PROBING\") return 0\n+            db[fingerprint] = existing.copy(\n+                connectionStatus = \"FAILED\",\n+                probeError = error,\n+                lastProbeTimestamp = timestamp,\n+            )\n+            return 1\n+        }\n+\n         override suspend fun updateIsPaired(fingerprint: String, isPaired: Boolean) {}\n         override suspend fun updateLastSeen(fingerprint: String, timestamp: Long) {}\n         override suspend fun setWatchlistStatus(fingerprint: String, isWatchlisted: Boolean) {}\n"
+  },
+  "git_status": {
+    "elapsed_seconds": 0.761,
+    "exit_code": 0,
+    "output": " M core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt\n M core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt\n M core/data/src/test/kotlin/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinatorStableCoreTest.kt\n M core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt\n"
+  },
+  "id": "20261010-blueeye-gatt-terminal-state-r3",
+  "idle_timeout": 300,
+  "memory_limit_mb": 3072,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 5.171,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2
+    },
+    {
+      "elapsed_seconds": 500.987,
+      "outcome": "passed",
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2
+    }
+  ],
+  "started_at": "2026-10-10T18:58:50.307670+00:00",
+  "status": "done",
+  "task_digest": "6e07916a2381c368a5d9764c66be55403216d7c49faa36f5efe7e8ed3102abca",
+  "task_timeout": 1800,
+  "verification": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 13027,
+      "command": "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :core:data:testDebugUnitTest --tests io.blueeye.core.connectivity.manager.AutoActiveProbeCoordinatorStableCoreTest --tests io.blueeye.core.connectivity.manager.AutoActiveProbePolicyTest --no-daemon --console=plain",
+      "current_rss_mb": 22.33,
+      "elapsed_seconds": 500.987,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \nCalculating task graph as no cached configuration is available for tasks: :core:data:testDebugUnitTest --tests io.blueeye.core.connectivity.manager.AutoActiveProbeCoordinatorStableCoreTest --tests io.blueeye.core.connectivity.manager.AutoActiveProbePolicyTest\nWarning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.\n> Task :core:domain:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:domain:compileKotlin UP-TO-DATE\n> Task :core:domain:compileJava NO-SOURCE\n> Task :core:domain:processResources NO-SOURCE\n> Task :core:domain:classes UP-TO-DATE\n> Task :core:domain:jar UP-TO-DATE\n> Task :core:data:preBuild UP-TO-DATE\n> Task :core:data:preDebugBuild UP-TO-DATE\n> Task :core:data:checkKotlinGradlePluginConfigurationErrors\n> Task :core:data:generateDebugResValues UP-TO-DATE\n> Task :core:data:generateDebugResources UP-TO-DATE\n> Task :core:data:packageDebugResources UP-TO-DATE\n> Task :core:data:parseDebugLocalResources UP-TO-DATE\n> Task :core:data:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:preBuild UP-TO-DATE\n> Task :core:decoders:preDebugBuild UP-TO-DATE\n> Task :core:decoders:generateDebugResValues UP-TO-DATE\n> Task :core:decoders:generateDebugResources UP-TO-DATE\n> Task :core:decoders:packageDebugResources UP-TO-DATE\n> Task :core:decoders:parseDebugLocalResources UP-TO-DATE\n> Task :core:decoders:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:checkKotlinGradlePluginConfigurationErrors\n> Task :core:decoders:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :core:decoders:kaptDebugKotlin UP-TO-DATE\n> Task :core:decoders:compileDebugKotlin UP-TO-DATE\n> Task :core:decoders:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:transformDebugClassesWithAsm UP-TO-DATE\n> Task :core:decoders:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :core:data:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :core:data:kaptDebugKotlin UP-TO-DATE\n> Task :core:data:compileDebugKotlin UP-TO-DATE\n> Task :core:data:javaPreCompileDebug UP-TO-DATE\n> Task :core:data:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:data:transformDebugClassesWithAsm UP-TO-DATE\n> Task :core:data:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:data:preDebugUnitTestBuild UP-TO-DATE\n> Task :core:data:generateDebugUnitTestStubRFile UP-TO-DATE\n> Task :core:data:processDebugJavaRes UP-TO-DATE\n> Task :core:data:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :core:data:kaptGenerateStubsDebugUnitTestKotlin\ne: Daemon compilation failed: Could not connect to Kotlin compile daemon\njava.lang.RuntimeException: Could not connect to Kotlin compile daemon\n\tat org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemon(GradleKotlinCompilerWork.kt:218)\n\tat org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemonOrFallbackImpl(GradleKotlinCompilerWork.kt:175)\n\tat org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.run(GradleKotlinCompilerWork.kt:135)\n\tat org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction.execute(GradleCompilerRunnerWithWorkers.kt:73)\n\tat org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)\n\tat org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)\n\tat org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)\n\tat org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)\n\tat org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)\n\tat org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)\n\tat org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)\n\tat org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)\n\tat org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)\n\tat org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:174)\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)\n\tat org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:194)\n\tat org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:127)\n\tat org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:169)\n\tat org.gradle.internal.Factories$1.create(Factories.java:31)\n\tat org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:263)\n\tat org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:127)\n\tat org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:132)\n\tat org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:164)\n\tat org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:133)\n\tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)\n\tat org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)\n\tat org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)\n\tat java.base/java.lang.Thread.run(Thread.java:1583)\n\nFailed to compile with Kotlin daemon: java.lang.RuntimeException: Could not connect to Kotlin compile daemon\n\tat org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemon(GradleKotlinCompilerWork.kt:218)\n\tat org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemonOrFallbackImpl(GradleKotlinCompilerWork.kt:175)\n\tat org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.run(GradleKotlinCompilerWork.kt:135)\n\tat org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction.execute(GradleCompilerRunnerWithWorkers.kt:73)\n\tat org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)\n\tat org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)\n\tat org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)\n\tat org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)\n\tat org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)\n\tat org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)\n\tat org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)\n\tat org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)\n\tat org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)\n\tat org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)\n\tat org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:174)\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)\n\tat org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:194)\n\tat org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:127)\n\tat org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:169)\n\tat org.gradle.internal.Factories$1.create(Factories.java:31)\n\tat org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:263)\n\tat org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:127)\n\tat org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:132)\n\tat org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:164)\n\tat org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:133)\n\tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)\n\tat org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)\n\tat org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)\n\tat java.base/java.lang.Thread.run(Thread.java:1583)\nUsing fallback strategy: Compile without Kotlin daemon\nTry ./gradlew --stop if this issue persists.\n\n> Task :core:data:kaptDebugUnitTestKotlin\nwarning: The following options were not recognized by any processor: '[dagger.fastInit, dagger.hilt.android.internal.disableAndroidSuperclassValidation, dagger.hilt.android.internal.projectType, dagger.hilt.internal.useAggregatingRootProcessor, kapt.kotlin.generated]'\n\n> Task :core:data:compileDebugUnitTestKotlin\n> Task :core:data:javaPreCompileDebugUnitTest UP-TO-DATE\n> Task :core:data:compileDebugUnitTestJavaWithJavac UP-TO-DATE\n> Task :core:data:hiltAggregateDepsDebugUnitTest UP-TO-DATE\n> Task :core:data:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :core:data:processDebugUnitTestJavaRes UP-TO-DATE\n> Task :core:data:transformDebugUnitTestClassesWithAsm\n> Task :core:decoders:processDebugJavaRes UP-TO-DATE\n> Task :core:data:testDebugUnitTest\n[Incubating] Problems report is available at: file:///Users/michal/agent-workspace/repos/tracker/work/build/reports/problems/problems-report.html\n\nDeprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.\n\nYou can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.\n\nFor more on this, please refer to https://docs.gradle.org/8.11.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.\n\nBUILD SUCCESSFUL in 8m 12s\n46 actionable tasks: 9 executed, 37 up-to-date\nConfiguration cache entry stored.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 77.5,
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "work_branch": "main",
+  "workspace_checkpoint": {
+    "base_head": "bfe98305e385425babe3407a89600b5e13208cb2",
+    "created_at": "2026-10-10T19:07:24.285112+00:00",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/20261010-blueeye-gatt-terminal-state-r3/1791659244065461000-task-exit",
+    "reason": "task-exit",
+    "status": " M core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt\n M core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt\n M core/data/src/test/kotlin/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinatorStableCoreTest.kt\n M core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt\n",
+    "task_id": "20261010-blueeye-gatt-terminal-state-r3",
+    "total_bytes": 6598,
+    "tracked_patch": "tracked.patch",
+    "tracked_patch_bytes": 6598,
+    "untracked_bytes": 0,
+    "untracked_files": [],
+    "untracked_root": "untracked",
+    "version": 2,
+    "work_branch": "agent-work"
+  }
+}

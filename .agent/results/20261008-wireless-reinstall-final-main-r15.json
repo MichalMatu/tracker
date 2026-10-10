@@ -1,0 +1,61 @@
+{
+  "allow_write": false,
+  "attempt_id": "82d6b6682997665da604979f",
+  "command_timeout": 240,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 185,
+      "command": "set -e\nEXPECTED_SHA=\"15931fa8341784a308f8a8b9ea6ebd68279241fc\"\nENDPOINT=\"192.168.0.100:36451\"\n\ngit fetch origin main --quiet\ngit checkout --detach \"$EXPECTED_SHA\" >/dev/null 2>&1\ntest \"$(git rev-parse HEAD)\" = \"$EXPECTED_SHA\"\n\nAPK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\nif [ -z \"$APK\" ]; then\n  export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n  ./gradlew --no-daemon :app:assembleDebug\n  APK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\nfi\ntest -n \"$APK\"\n\nadb start-server >/dev/null\nadb connect \"$ENDPOINT\"\nsleep 1\n\nMODEL=\"$(adb -s \"$ENDPOINT\" shell getprop ro.product.model | tr -d '\\r')\"\ntest \"$MODEL\" = \"SM-S906B\"\necho \"S22_CONNECTED endpoint=$ENDPOINT model=$MODEL\"\n\nOUT=\"$(adb -s \"$ENDPOINT\" install --no-streaming -r \"$APK\" 2>&1)\"\nprintf '%s\\n' \"$OUT\"\n\ntest -n \"$(adb -s \"$ENDPOINT\" shell pm path io.blueeye | tr -d '\\r' | head -n1)\"\nadb -s \"$ENDPOINT\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null\nsleep 1\nPID=\"$(adb -s \"$ENDPOINT\" shell pidof io.blueeye | tr -d '\\r' | head -n1)\"\ntest -n \"$PID\"\n\nprintf 'FINAL_INSTALL_OK sha=%s endpoint=%s model=SM-S906B package=io.blueeye data_preserved=yes app_running=yes pid=%s\\n' \"$EXPECTED_SHA\" \"$ENDPOINT\" \"$PID\"",
+      "current_rss_mb": 2.7,
+      "elapsed_seconds": 80.294,
+      "exit_code": 1,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\nfailed to connect to '192.168.0.100:36451': Operation timed out\nadb: device '192.168.0.100:36451' not found\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 9.58,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "failure_reason": "command_failed",
+  "finished_at": "2026-10-08T05:54:07.301693+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.077,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.143,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261008-wireless-reinstall-final-main-r15",
+  "idle_timeout": 120,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 80.294,
+      "outcome": "failed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-08T05:52:45.338841+00:00",
+  "status": "failed",
+  "task_digest": "2d7c91a102c9af34567b81740fbf07ffb91b6ca49ed1797e4a8f1992ff455fe6",
+  "task_timeout": 360,
+  "verification": [],
+  "work_branch": "main"
+}

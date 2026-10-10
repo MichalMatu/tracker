@@ -1,0 +1,58 @@
+{
+  "allow_write": false,
+  "attempt_id": "2d30aae7f3ef6421ca344c7a",
+  "command_timeout": 40,
+  "commands": [
+    {
+      "budget_exhausted": true,
+      "budget_remaining_seconds": 98.492,
+      "command": "python3 - <<'PY'\nimport subprocess, json\nout={}\ndef cmd(args, timeout=5):\n    try:\n        p=subprocess.run(args,text=True,capture_output=True,timeout=timeout)\n        return {\"rc\":p.returncode,\"out\":p.stdout.strip(),\"err\":p.stderr.strip()}\n    except subprocess.TimeoutExpired:\n        return {\"timeout\":True}\n\nout[\"wifi_network\"]=cmd([\"networksetup\",\"-getairportnetwork\",\"en0\"],3)\nout[\"wifi_info\"]=cmd([\"networksetup\",\"-getinfo\",\"Wi-Fi\"],3)\nout[\"router\"]=cmd([\"ipconfig\",\"getoption\",\"en0\",\"router\"],3)\nout[\"subnet_mask\"]=cmd([\"ipconfig\",\"getoption\",\"en0\",\"subnet_mask\"],3)\nout[\"arp_all\"]=cmd([\"arp\",\"-a\"],4)\nout[\"gateway_ping\"]=cmd([\"ping\",\"-c\",\"1\",\"-W\",\"1000\",\"192.168.0.1\"],4)\nout[\"phone_ping\"]=cmd([\"ping\",\"-c\",\"1\",\"-W\",\"1000\",\"192.168.0.100\"],4)\nprint(json.dumps(out,indent=2))\nPY",
+      "elapsed_seconds": 0.0,
+      "exit_code": 125,
+      "idle_timed_out": false,
+      "memory_limited": false,
+      "not_started": true,
+      "output": "",
+      "required_budget_seconds": 100.0,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "failure_reason": "task_budget_exhausted",
+  "finished_at": "2026-10-08T05:57:20.077670+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.071,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.109,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261008-s22-lan-path-diagnostic-r1",
+  "idle_timeout": 30,
+  "memory_limit_mb": 256,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.0,
+      "outcome": "not_started",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-08T05:57:18.389518+00:00",
+  "status": "failed",
+  "task_digest": "81fbcf6f0c4b48cf08d91ffe1eed00a596746cb8963afc3d7a5d93f44e127d1a",
+  "task_timeout": 100,
+  "verification": [],
+  "work_branch": "main"
+}

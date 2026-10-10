@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261010-blueeye-thermopro-battery-r2",
+  "task_digest": "94ddf2b9bfcc09c2687e31932b36c573387e478dd44f20644474667c6e027c96",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-10T11:36:43.223028+00:00",
+  "attempt_id": "f11b04a9695251c65bb35689",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 33700,
+  "updated_at": "2026-10-10T11:36:43.772249+00:00",
+  "pid": 33700
+}

@@ -1,0 +1,11 @@
+{
+  "attempt_id": "bce48508b6e8780be638b59d",
+  "daemon_version": "4.20.6",
+  "error": "Previous daemon instance ended while this task was claimed. Automatic replay was blocked.",
+  "failure_reason": "interrupted_previous_attempt",
+  "finished_at": "2026-10-08T05:51:50.927968+00:00",
+  "id": "20261008-wireless-reinstall-final-main-r14",
+  "started_at": "2026-10-08T05:49:04.295785+00:00",
+  "status": "failed",
+  "task_digest": "065ea26aeb9a5b08063b020a3e32b0cba9bd785d4b5403111981a2af871a9174"
+}

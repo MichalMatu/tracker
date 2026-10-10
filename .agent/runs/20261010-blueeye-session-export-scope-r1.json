@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261010-blueeye-session-export-scope-r1",
+  "task_digest": "356c5f1ab2de14c3886537122eb490ef9bdf989efd320bb6da41a2c67a86bd06",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-10T19:09:17.276674+00:00",
+  "attempt_id": "326f06dd7282da2387d6393c",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 80359,
+  "updated_at": "2026-10-10T19:09:17.856177+00:00",
+  "pid": 80359
+}

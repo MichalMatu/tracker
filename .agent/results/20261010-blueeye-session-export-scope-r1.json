@@ -1,0 +1,113 @@
+{
+  "allow_write": true,
+  "attempt_id": "326f06dd7282da2387d6393c",
+  "command_timeout": 900,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 0,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = bfe98305e385425babe3407a89600b5e13208cb2\ngit diff --check",
+      "elapsed_seconds": 0.445,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": null,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {
+    "patch": {
+      "applied": true,
+      "apply": {
+        "elapsed_seconds": 0.076,
+        "exit_code": 0,
+        "output": ""
+      }
+    }
+  },
+  "finished_at": "2026-10-10T19:09:17.276674+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.024,
+    "exit_code": 0,
+    "output": "diff --git a/feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt b/feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt\nindex 516a2ba..4c2ff9b 100644\n--- a/feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt\n+++ b/feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt\n@@ -97,10 +97,14 @@ class DatabaseExporter\n                     sessionStartedAt = sessionStartedAt,\n                 )\n             val sessionIdentityCandidates =\n-                runCatching {\n-                    deviceRepository.getIdentityCandidatesSince(sessionStartedAt)\n-                        .getOrDefault(emptyList())\n-                }.getOrDefault(emptyList())\n+                if (sessionStartedAt > 0L) {\n+                    runCatching {\n+                        deviceRepository.getIdentityCandidatesSince(sessionStartedAt)\n+                            .getOrDefault(emptyList())\n+                    }.getOrDefault(emptyList())\n+                } else {\n+                    emptyList()\n+                }\n \n             return DatabaseExportData(\n                 devices = devices,\n@@ -190,6 +194,7 @@ internal object DatabaseExportJsonMapper {\n         buildJsonObject {\n             put(\"schemaVersion\", SCHEMA_VERSION)\n             put(\"exportDate\", data.exportDate)\n+            put(\"dataScope\", \"ALL_HISTORY\")\n             put(\"deviceCount\", data.devices.size)\n             put(\"sampleCount\", data.samples.size)\n             putSampleQuality(data.samples)\n@@ -238,6 +243,8 @@ internal object DatabaseExportJsonMapper {\n \n             put(\"label\", session.label.name)\n             put(\"notes\", session.notes)\n+            put(\"scope\", \"SINCE_SESSION_START\")\n+            put(\"hasStarted\", session.startedAt > 0L)\n             put(\"activeCollectionEnabled\", session.activeCollectionEnabled)\n             put(\"startedAt\", session.startedAt)\n             put(\"exportedAt\", exportDate)\ndiff --git a/feature/settings/src/test/java/io/blueeye/feature/settings/DatabaseExportJsonMapperTest.kt b/feature/settings/src/test/java/io/blueeye/feature/settings/DatabaseExportJsonMapperTest.kt\nindex 047213f..2f8fe56 100644\n--- a/feature/settings/src/test/java/io/blueeye/feature/settings/DatabaseExportJsonMapperTest.kt\n+++ b/feature/settings/src/test/java/io/blueeye/feature/settings/DatabaseExportJsonMapperTest.kt\n@@ -74,6 +74,41 @@ class DatabaseExportJsonMapperTest {\n         )\n     }\n \n+    @Test\n+    fun `unstarted session keeps global history separate`() {\n+        val device = device(\n+            fingerprint = \"history-only\",\n+            lastSeenAt = SESSION_STARTED_AT + 10_000L,\n+            calibrationLabel = DeviceCalibrationLabel.UNKNOWN,\n+        )\n+        val sample = sample(deviceFingerprint = device.fingerprint, timestamp = SESSION_STARTED_AT + 12_000L)\n+        val data = DatabaseExportData(\n+            devices = listOf(device),\n+            samples = listOf(sample),\n+            session = DatabaseExportSessionData(\n+                devices = emptyList(),\n+                samples = emptyList(),\n+                label = DeviceCalibrationLabel.UNKNOWN,\n+                startedAt = 0L,\n+                notes = \"\",\n+                activeCollectionEnabled = false,\n+                followMeObservations = emptyList(),\n+                alertEvidenceEvents = emptyList(),\n+            ),\n+            exportDate = EXPORT_DATE,\n+        )\n+        val export = DatabaseExportJsonMapper.buildExport(data)\n+        val session = export.getValue(\"session\").jsonObject\n+\n+        assertEquals(\"ALL_HISTORY\", export.getValue(\"dataScope\").jsonPrimitive.content)\n+        assertEquals(\"SINCE_SESSION_START\", session.getValue(\"scope\").jsonPrimitive.content)\n+        assertFalse(session.getValue(\"hasStarted\").jsonPrimitive.boolean)\n+        assertEquals(1, export.getValue(\"deviceCount\").jsonPrimitive.int)\n+        assertEquals(1, export.getValue(\"sampleCount\").jsonPrimitive.int)\n+        assertEquals(0, session.getValue(\"deviceCount\").jsonPrimitive.int)\n+        assertEquals(0, session.getValue(\"sampleCount\").jsonPrimitive.int)\n+    }\n+\n     @Test\n     fun `export includes session summary counters`() {\n         val fixture = structuredExportFixture()\n@@ -86,6 +121,9 @@ class DatabaseExportJsonMapperTest {\n         val reviewDeviceQueue = session.getValue(\"reviewDeviceQueue\").jsonArray.single().jsonObject\n \n         assertEquals(20, export.getValue(\"schemaVersion\").jsonPrimitive.int)\n+        assertEquals(\"ALL_HISTORY\", export.getValue(\"dataScope\").jsonPrimitive.content)\n+        assertEquals(\"SINCE_SESSION_START\", session.getValue(\"scope\").jsonPrimitive.content)\n+        assertTrue(session.getValue(\"hasStarted\").jsonPrimitive.boolean)\n         assertEquals(EXPORT_DATE, export.getValue(\"exportDate\").jsonPrimitive.long)\n         assertEquals(2, export.getValue(\"deviceCount\").jsonPrimitive.int)\n         assertEquals(2, export.getValue(\"sampleCount\").jsonPrimitive.int)\n"
+  },
+  "git_status": {
+    "elapsed_seconds": 0.11,
+    "exit_code": 0,
+    "output": " M feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt\n M feature/settings/src/test/java/io/blueeye/feature/settings/DatabaseExportJsonMapperTest.kt\n"
+  },
+  "id": "20261010-blueeye-session-export-scope-r1",
+  "idle_timeout": 300,
+  "memory_limit_mb": 3072,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.445,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2
+    },
+    {
+      "elapsed_seconds": 86.91,
+      "outcome": "passed",
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2
+    }
+  ],
+  "started_at": "2026-10-10T19:07:47.602424+00:00",
+  "status": "done",
+  "task_digest": "356c5f1ab2de14c3886537122eb490ef9bdf989efd320bb6da41a2c67a86bd06",
+  "task_timeout": 1800,
+  "verification": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 4472,
+      "command": "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :feature:settings:testDebugUnitTest --tests io.blueeye.feature.settings.DatabaseExportJsonMapperTest --no-daemon --console=plain",
+      "current_rss_mb": 27.41,
+      "elapsed_seconds": 86.91,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \nCalculating task graph as no cached configuration is available for tasks: :feature:settings:testDebugUnitTest --tests io.blueeye.feature.settings.DatabaseExportJsonMapperTest\nWarning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.\n> Task :core:domain:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:domain:compileKotlin UP-TO-DATE\n> Task :core:domain:compileJava NO-SOURCE\n> Task :core:domain:processResources NO-SOURCE\n> Task :core:domain:classes UP-TO-DATE\n> Task :core:domain:jar UP-TO-DATE\n> Task :core:ui:checkKotlinGradlePluginConfigurationErrors\n> Task :core:ui:preBuild UP-TO-DATE\n> Task :core:ui:preDebugBuild UP-TO-DATE\n> Task :core:ui:generateDebugResValues UP-TO-DATE\n> Task :core:ui:generateDebugResources UP-TO-DATE\n> Task :core:ui:packageDebugResources UP-TO-DATE\n> Task :core:ui:parseDebugLocalResources UP-TO-DATE\n> Task :core:ui:generateDebugRFile UP-TO-DATE\n> Task :core:ui:compileDebugKotlin UP-TO-DATE\n> Task :core:ui:javaPreCompileDebug UP-TO-DATE\n> Task :core:ui:compileDebugJavaWithJavac NO-SOURCE\n> Task :core:ui:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:ui:processDebugJavaRes UP-TO-DATE\n> Task :feature:settings:preBuild UP-TO-DATE\n> Task :feature:settings:preDebugBuild UP-TO-DATE\n> Task :core:ui:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :feature:settings:checkKotlinGradlePluginConfigurationErrors\n> Task :feature:settings:generateDebugResValues UP-TO-DATE\n> Task :feature:settings:generateDebugResources UP-TO-DATE\n> Task :feature:settings:packageDebugResources UP-TO-DATE\n> Task :feature:settings:parseDebugLocalResources UP-TO-DATE\n> Task :feature:settings:generateDebugRFile UP-TO-DATE\n> Task :feature:settings:kaptGenerateStubsDebugKotlin\n> Task :feature:settings:kaptDebugKotlin UP-TO-DATE\n> Task :feature:settings:compileDebugKotlin\n> Task :feature:settings:javaPreCompileDebug UP-TO-DATE\n> Task :feature:settings:compileDebugJavaWithJavac\n> Task :feature:settings:transformDebugClassesWithAsm\n> Task :feature:settings:bundleLibRuntimeToJarDebug\n> Task :feature:settings:preDebugUnitTestBuild UP-TO-DATE\n> Task :feature:settings:generateDebugUnitTestStubRFile\n> Task :feature:settings:processDebugJavaRes UP-TO-DATE\n> Task :feature:settings:bundleLibCompileToJarDebug\n> Task :feature:settings:kaptGenerateStubsDebugUnitTestKotlin\n\n> Task :feature:settings:kaptDebugUnitTestKotlin\nwarning: The following options were not recognized by any processor: '[dagger.fastInit, dagger.hilt.android.internal.disableAndroidSuperclassValidation, dagger.hilt.android.internal.projectType, dagger.hilt.internal.useAggregatingRootProcessor, kapt.kotlin.generated]'\n\n> Task :feature:settings:compileDebugUnitTestKotlin\n> Task :feature:settings:javaPreCompileDebugUnitTest FROM-CACHE\n> Task :feature:settings:compileDebugUnitTestJavaWithJavac NO-SOURCE\n> Task :feature:settings:hiltAggregateDepsDebugUnitTest\n> Task :feature:settings:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :feature:settings:processDebugUnitTestJavaRes\n> Task :feature:settings:transformDebugUnitTestClassesWithAsm\n> Task :feature:settings:testDebugUnitTest\n[Incubating] Problems report is available at: file:///Users/michal/agent-workspace/repos/tracker/work/build/reports/problems/problems-report.html\n\nDeprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.\n\nYou can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.\n\nFor more on this, please refer to https://docs.gradle.org/8.11.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.\n\nBUILD SUCCESSFUL in 1m 25s\n41 actionable tasks: 18 executed, 1 from cache, 22 up-to-date\nConfiguration cache entry stored.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 128.8,
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "work_branch": "main",
+  "workspace_checkpoint": {
+    "base_head": "bfe98305e385425babe3407a89600b5e13208cb2",
+    "created_at": "2026-10-10T19:09:17.689888+00:00",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/20261010-blueeye-session-export-scope-r1/1791659357549600000-task-exit",
+    "reason": "task-exit",
+    "status": " M feature/settings/src/main/java/io/blueeye/feature/settings/DatabaseExporter.kt\n M feature/settings/src/test/java/io/blueeye/feature/settings/DatabaseExportJsonMapperTest.kt\n",
+    "task_id": "20261010-blueeye-session-export-scope-r1",
+    "total_bytes": 5130,
+    "tracked_patch": "tracked.patch",
+    "tracked_patch_bytes": 5130,
+    "untracked_bytes": 0,
+    "untracked_files": [],
+    "untracked_root": "untracked",
+    "version": 2,
+    "work_branch": "agent-work"
+  }
+}

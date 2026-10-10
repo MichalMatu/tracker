@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261010-blueeye-txpower-sentinel-r2",
+  "task_digest": "b6fe2f9fe6456b7192716ff332a4e7acaecdfc7f9b21f13070df630edbac518b",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-10T19:11:28.623382+00:00",
+  "attempt_id": "fba07c8edfb9bc8bdb981f05",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 86651,
+  "updated_at": "2026-10-10T19:11:29.217422+00:00",
+  "pid": 86651
+}

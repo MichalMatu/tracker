@@ -1,0 +1,17 @@
+{
+  "id": "20261010-blueeye-detekt-report-diagnostic-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "dedupe_key": "main:blueeye-detekt-diagnostic",
+  "dedupe_revision": 1,
+  "command_timeout": 150,
+  "idle_timeout": 90,
+  "task_timeout": 360,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 72f25d3f0073659d40d265195f89b54eac0685a1\npython3 - <<'PY'\nfrom pathlib import Path\nimport json\nimport xml.etree.ElementTree as ET\n\nroot = Path(\"core/data/build/reports\")\ncandidates = [p for p in root.rglob(\"*\") if p.is_file() and \"detekt\" in str(p).lower()]\nprint(\"DETEKT_REPORT_FILES\", [(str(p), p.stat().st_size) for p in candidates[:25]])\nfor p in candidates:\n    try:\n        if p.suffix == \".xml\":\n            tree = ET.parse(p)\n            for file in tree.iter(\"file\"):\n                for issue in file.findall(\"error\"):\n                    print(\"DETEKT_ISSUE\", file.attrib.get(\"name\"), issue.attrib.get(\"line\"),\n                          issue.attrib.get(\"source\"), issue.attrib.get(\"message\"))\n        elif p.suffix == \".sarif\":\n            data = json.loads(p.read_text())\n            for run in data.get(\"runs\", []):\n                for finding in run.get(\"results\", []):\n                    for place in finding.get(\"locations\", [])[:1]:\n                        loc = place.get(\"physicalLocation\", {})\n                        print(\"DETEKT_SARIF\", finding.get(\"ruleId\"),\n                              loc.get(\"artifactLocation\", {}).get(\"uri\"),\n                              loc.get(\"region\", {}).get(\"startLine\"),\n                              finding.get(\"message\", {}).get(\"text\"))\n    except (ValueError, ET.ParseError, OSError) as error:\n        print(\"REPORT_READ_FAILED\", p, type(error).__name__)\nPY"
+  ]
+}

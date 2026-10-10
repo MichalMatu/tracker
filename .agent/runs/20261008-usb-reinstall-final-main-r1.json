@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261008-usb-reinstall-final-main-r1",
+  "task_digest": "9aa7fa88bccb30013797905f34b39058e188249e2441562379ad72b7a06d0671",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-08T06:00:05.369055+00:00",
+  "attempt_id": "8dc0f10d5b6e2ada69131bfd",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 83961,
+  "updated_at": "2026-10-08T06:00:05.684169+00:00",
+  "pid": 83961
+}

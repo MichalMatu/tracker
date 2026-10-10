@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261008-s22-lan-path-diagnostic-r2",
+  "task_digest": "7586ad0764e9c6cd5c0f3b4f6664564742b1534fb2104959c9dd5260da66774e",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-08T05:58:05.151211+00:00",
+  "attempt_id": "c0b7edbaef19ab03e894b748",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 81896,
+  "updated_at": "2026-10-08T05:58:05.473220+00:00",
+  "pid": 81896
+}

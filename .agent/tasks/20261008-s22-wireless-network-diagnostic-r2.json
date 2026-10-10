@@ -1,0 +1,19 @@
+{
+  "id": "20261008-s22-wireless-network-diagnostic-r2",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "s22:wireless-network-diagnostic",
+  "dedupe_revision": 2,
+  "command_timeout": 45,
+  "idle_timeout": 30,
+  "task_timeout": 120,
+  "memory_limit_mb": 256,
+  "commands": [
+    "python3 - <<'PY'\nimport socket, subprocess, json\nhost=\"192.168.0.100\"\nport=36451\nout={}\ndef cmd(args, timeout=5):\n    try:\n        p=subprocess.run(args,text=True,capture_output=True,timeout=timeout)\n        return {\"rc\":p.returncode,\"out\":p.stdout.strip(),\"err\":p.stderr.strip()}\n    except subprocess.TimeoutExpired:\n        return {\"timeout\":True}\nfor iface in (\"en0\",\"en1\"):\n    out[f\"ip_{iface}\"]=cmd([\"ipconfig\",\"getifaddr\",iface],2)\nout[\"route\"]=cmd([\"route\",\"-n\",\"get\",host],3)\nout[\"arp\"]=cmd([\"arp\",\"-n\",host],3)\nout[\"ping\"]=cmd([\"ping\",\"-c\",\"1\",\"-W\",\"1000\",host],4)\ntry:\n    s=socket.create_connection((host,port),timeout=3)\n    out[\"tcp\"]={\"ok\":True,\"peer\":str(s.getpeername())}\n    s.close()\nexcept Exception as e:\n    out[\"tcp\"]={\"ok\":False,\"error\":repr(e)}\ntry:\n    out[\"android2_dns\"]=socket.gethostbyname(\"Android-2.local\")\nexcept Exception as e:\n    out[\"android2_dns_error\"]=repr(e)\nout[\"adb_devices\"]=cmd([\"adb\",\"devices\",\"-l\"],4)\ntry:\n    out[\"adb_mdns\"]=cmd([\"adb\",\"mdns\",\"services\"],5)\nexcept Exception as e:\n    out[\"adb_mdns_error\"]=repr(e)\nprint(json.dumps(out,indent=2))\nPY"
+  ]
+}

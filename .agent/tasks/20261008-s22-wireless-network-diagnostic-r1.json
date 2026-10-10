@@ -1,0 +1,19 @@
+{
+  "id": "20261008-s22-wireless-network-diagnostic-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "s22:wireless-network-diagnostic",
+  "dedupe_revision": 1,
+  "command_timeout": 120,
+  "idle_timeout": 60,
+  "task_timeout": 180,
+  "memory_limit_mb": 256,
+  "commands": [
+    "set -u\nHOST=\"192.168.0.100\"\nPORT=\"36451\"\n\necho \"=== LOCAL WIFI/IP ===\"\nnetworksetup -getinfo Wi-Fi 2>/dev/null || true\necho \"wifi_ip=$(ipconfig getifaddr en0 2>/dev/null || true)\"\n\necho \"=== ROUTE ===\"\nroute -n get \"$HOST\" 2>&1 || true\n\necho \"=== ARP ===\"\narp -n \"$HOST\" 2>&1 || true\n\necho \"=== PING ===\"\nping -c 3 -W 1000 \"$HOST\" 2>&1 || true\n\necho \"=== TCP PORT ===\"\nnc -vz -w 3 \"$HOST\" \"$PORT\" 2>&1 || true\n\necho \"=== HOSTNAME ===\"\ndscacheutil -q host -a name Android-2.local 2>&1 || true\n\necho \"=== ADB MDNS ===\"\nadb start-server >/dev/null 2>&1 || true\nadb mdns services 2>&1 || true\n\necho \"=== ADB DIRECT ===\"\nadb connect \"$HOST:$PORT\" 2>&1 || true\nadb devices -l 2>&1 || true\n"
+  ]
+}

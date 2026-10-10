@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261010-blueeye-detekt-report-diagnostic-r1",
+  "task_digest": "c1d374b4a9462efda9dcbc7d0484d5d522f44d534aa6beb4c3720789e173c8dd",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-10T19:23:19.572905+00:00",
+  "attempt_id": "b8ecb51fdb28700bb1eb801e",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 17108,
+  "updated_at": "2026-10-10T19:23:19.808583+00:00",
+  "pid": 17108
+}

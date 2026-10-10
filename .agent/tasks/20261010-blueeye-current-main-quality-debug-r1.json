@@ -1,0 +1,20 @@
+{
+  "id": "20261010-blueeye-current-main-quality-debug-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "dedupe_key": "main:blueeye-current-main-quality-debug",
+  "dedupe_revision": 1,
+  "command_timeout": 2400,
+  "idle_timeout": 300,
+  "task_timeout": 3000,
+  "memory_limit_mb": 3584,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 72f25d3f0073659d40d265195f89b54eac0685a1\ngit diff --check"
+  ],
+  "verify_commands": [
+    "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew qualityCheck :app:assembleDebug --no-daemon --console=plain --max-workers=2"
+  ]
+}

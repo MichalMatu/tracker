@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "7624b8261e0c8c4266357ace",
+  "command_timeout": 900,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 188,
+      "command": "set -e\ntest \"$(git rev-parse HEAD)\" = \"1348106d7a4ba867cef9a50d3819db098a204149\"\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\nAPK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\nif [ -z \"$APK\" ]; then\n  ./gradlew --no-daemon :app:assembleDebug\n  APK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\nfi\ntest -n \"$APK\"\nadb start-server >/dev/null\npython3 - <<'PY'\nimport subprocess,re,sys,time\ndef run(args,timeout=5):\n    try: return subprocess.run(args,text=True,capture_output=True,timeout=timeout)\n    except subprocess.TimeoutExpired: return None\ndef s22():\n    p=run([\"adb\",\"devices\"],3)\n    if not p: return None\n    for line in p.stdout.splitlines()[1:]:\n        parts=line.split()\n        if len(parts)>=2 and parts[1]==\"device\":\n            serial=parts[0]\n            q=run([\"adb\",\"-s\",serial,\"shell\",\"getprop\",\"ro.product.model\"],3)\n            if q and q.stdout.strip()==\"SM-S906B\": return serial\n    return None\nserial=s22()\nif not serial:\n    m=run([\"adb\",\"mdns\",\"services\"],6)\n    eps=[]\n    if m:\n        for line in m.stdout.splitlines():\n            if \"_adb-tls-connect._tcp\" in line:\n                for token in reversed(line.split()):\n                    if re.search(r\":\\d+$\",token):\n                        eps.append(token); break\n    for ep in eps:\n        run([\"adb\",\"connect\",ep],4); time.sleep(.4)\n        serial=s22()\n        if serial: break\nif not serial:\n    print(\"S22_ADB_UNREACHABLE\"); sys.exit(42)\nopen(\"/tmp/tracker-s22-serial\",\"w\").write(serial)\nprint(\"S22_ADB_CONNECTED model=SM-S906B\")\nPY\nS=\"$(cat /tmp/tracker-s22-serial)\"\nOUT=\"$(adb -s \"$S\" install -r \"$APK\")\"\nprintf '%s\\n' \"$OUT\"\ntest -n \"$(adb -s \"$S\" shell pm path io.blueeye | tr -d '\\r' | head -n1)\"\nprintf 'TRACKER_INSTALL_OK sha=1348106d7a4ba867cef9a50d3819db098a204149 model=SM-S906B data_mode=preserved package_present=yes\\n'",
+      "current_rss_mb": 8.27,
+      "elapsed_seconds": 21.546,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 2048,
+      "memory_limited": false,
+      "output": "S22_ADB_CONNECTED model=SM-S906B\nPerforming Streamed Install\nSuccess\nTRACKER_INSTALL_OK sha=1348106d7a4ba867cef9a50d3819db098a204149 model=SM-S906B data_mode=preserved package_present=yes\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 11.23,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-07T00:55:49.597275+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.071,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.107,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261007-wireless-reinstall-main-r6",
+  "idle_timeout": 180,
+  "memory_limit_mb": 2048,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 21.546,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-07T00:55:26.407538+00:00",
+  "status": "done",
+  "task_digest": "dd364e25e74cb617c980da4227df79f9b6570afce63905906c4a1b883257026a",
+  "task_timeout": 1200,
+  "verification": [],
+  "work_branch": "main"
+}

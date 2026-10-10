@@ -1,0 +1,17 @@
+{
+  "id": "20261008-branch-cleanup-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "dedupe_key": "main:branch-cleanup",
+  "dedupe_revision": 1,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 600,
+  "memory_limit_mb": 1024,
+  "commands": [
+    "set -e\nEXPECTED_MAIN=\"15931fa8341784a308f8a8b9ea6ebd68279241fc\"\ngit fetch origin main --quiet\ntest \"$(git rev-parse origin/main)\" = \"$EXPECTED_MAIN\"\nfor branch in   \"fix/ble-field-regressions-2026-10-08\"   \"fix/ble-device-identity-capabilities-20261008\"   \"chore/ble-field-closeout-20261008\"\ndo\n  if git ls-remote --exit-code --heads origin \"$branch\" >/dev/null 2>&1; then\n    git push origin --delete \"$branch\"\n  else\n    printf 'BRANCH_ALREADY_ABSENT %s\\n' \"$branch\"\n  fi\ndone\nprintf 'BRANCH_CLEANUP_OK main=%s\\n' \"$EXPECTED_MAIN\"\ngit ls-remote --heads origin | sed 's#.*refs/heads/##' | sort"
+  ]
+}

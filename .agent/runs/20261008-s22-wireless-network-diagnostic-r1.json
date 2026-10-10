@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261008-s22-wireless-network-diagnostic-r1",
+  "task_digest": "25db372425ad4e6535851e41437ada94e02fe3743261ef82c4c2152a06e89002",
+  "status": "failed",
+  "failure_reason": "task_budget_exhausted",
+  "finished_at": "2026-10-08T05:55:26.230058+00:00",
+  "attempt_id": "9aaf6c22ca3644d32419562a",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 77436,
+  "updated_at": "2026-10-08T05:55:26.489376+00:00",
+  "pid": 77436
+}

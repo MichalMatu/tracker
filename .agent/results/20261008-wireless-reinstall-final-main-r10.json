@@ -1,0 +1,61 @@
+{
+  "allow_write": false,
+  "attempt_id": "cca19bb9e1d017dd6745f8c8",
+  "command_timeout": 180,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 208,
+      "command": "set -e\nEXPECTED_SHA=\"15931fa8341784a308f8a8b9ea6ebd68279241fc\"\ngit fetch origin main --quiet\ngit checkout --detach \"$EXPECTED_SHA\" >/dev/null 2>&1\nAPK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\ntest -n \"$APK\"\n\nadb kill-server >/dev/null 2>&1 || true\nadb start-server >/dev/null\n\npython3 - <<'PY'\nimport subprocess,re,sys,time\n\ndef run(args,timeout=8):\n    try:\n        return subprocess.run(args,text=True,capture_output=True,timeout=timeout)\n    except subprocess.TimeoutExpired:\n        return None\n\ndef find_s22():\n    p=run([\"adb\",\"devices\"],4)\n    if not p: return None\n    for line in p.stdout.splitlines()[1:]:\n        parts=line.split()\n        if len(parts)>=2 and parts[1]==\"device\":\n            serial=parts[0]\n            q=run([\"adb\",\"-s\",serial,\"shell\",\"getprop\",\"ro.product.model\"],4)\n            if q and q.stdout.strip()==\"SM-S906B\":\n                return serial\n    return None\n\nfor attempt in range(8):\n    serial=find_s22()\n    if serial:\n        open(\"/tmp/tracker-s22-serial\",\"w\").write(serial)\n        print(f\"S22_REDISCOVERED attempt={attempt+1}\")\n        sys.exit(0)\n\n    mdns=run([\"adb\",\"mdns\",\"services\"],8)\n    endpoints=[]\n    if mdns:\n        print(\"MDNS_SCAN\", attempt+1)\n        for line in mdns.stdout.splitlines():\n            if \"_adb-tls-connect._tcp\" in line:\n                for token in reversed(line.split()):\n                    if re.search(r\":\\d+$\",token):\n                        endpoints.append(token)\n                        break\n    for ep in endpoints:\n        run([\"adb\",\"connect\",ep],5)\n        time.sleep(.5)\n        serial=find_s22()\n        if serial:\n            open(\"/tmp/tracker-s22-serial\",\"w\").write(serial)\n            print(f\"S22_REDISCOVERED attempt={attempt+1}\")\n            sys.exit(0)\n    time.sleep(5)\n\nprint(\"S22_NOT_DISCOVERABLE_AFTER_RETRIES\")\nsys.exit(42)\nPY\n\nS=\"$(cat /tmp/tracker-s22-serial)\"\nOUT=\"$(adb -s \"$S\" install --no-streaming -r \"$APK\" 2>&1)\"\nprintf '%s\\n' \"$OUT\"\ntest -n \"$(adb -s \"$S\" shell pm path io.blueeye | tr -d '\r' | head -n1)\"\nadb -s \"$S\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null\nsleep 1\nPID=\"$(adb -s \"$S\" shell pidof io.blueeye | tr -d '\r' | head -n1)\"\ntest -n \"$PID\"\nprintf 'FINAL_INSTALL_OK sha=%s model=SM-S906B package=io.blueeye data_preserved=yes app_running=yes pid=%s\\n' \"$EXPECTED_SHA\" \"$PID\"",
+      "current_rss_mb": 13.33,
+      "elapsed_seconds": 44.561,
+      "exit_code": 42,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\nMDNS_SCAN 1\nMDNS_SCAN 2\nMDNS_SCAN 3\nMDNS_SCAN 4\nMDNS_SCAN 5\nMDNS_SCAN 6\nMDNS_SCAN 7\nMDNS_SCAN 8\nS22_NOT_DISCOVERABLE_AFTER_RETRIES\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 18.05,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "failure_reason": "command_failed",
+  "finished_at": "2026-10-08T05:34:59.763260+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.07,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.145,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261008-wireless-reinstall-final-main-r10",
+  "idle_timeout": 120,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 44.561,
+      "outcome": "failed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-08T05:34:13.521454+00:00",
+  "status": "failed",
+  "task_digest": "11be3073226be0eed3a935f3a308eb0a88ea7526ca0774987a873734feeb7ab7",
+  "task_timeout": 300,
+  "verification": [],
+  "work_branch": "main"
+}

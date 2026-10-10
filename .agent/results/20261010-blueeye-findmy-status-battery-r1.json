@@ -1,0 +1,126 @@
+{
+  "allow_write": true,
+  "attempt_id": "d917dee81c2f02190c1b9705",
+  "command_timeout": 900,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 0,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 03651acd6f957ae7fd39844d395cfd926eb30b75\ngit diff --check",
+      "elapsed_seconds": 0.413,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": null,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {
+    "writes": [
+      {
+        "bytes": 1547,
+        "path": "core/decoders/src/main/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParser.kt"
+      },
+      {
+        "bytes": 2079,
+        "path": "core/decoders/src/main/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoder.kt"
+      },
+      {
+        "bytes": 1352,
+        "path": "core/decoders/src/test/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParserTest.kt"
+      },
+      {
+        "bytes": 1025,
+        "path": "core/decoders/src/test/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoderTest.kt"
+      }
+    ]
+  },
+  "finished_at": "2026-10-10T19:17:17.909737+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.018,
+    "exit_code": 0,
+    "output": "diff --git a/core/decoders/src/main/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoder.kt b/core/decoders/src/main/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoder.kt\nindex ed597b2..d2ecd74 100644\n--- a/core/decoders/src/main/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoder.kt\n+++ b/core/decoders/src/main/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoder.kt\n@@ -24,7 +24,7 @@ constructor() : BleBeaconDecoder {\n \n         // Status Byte (index 2):\n         // Bits 6-7: Battery Level (00=Full, 01=Medium, 10=Low, 11=Critical)\n-        // Bit 2: Maintainer / State\n+        // Bit 2: Maintained. Battery bits are valid only when this bit is set.\n \n         var batteryStatus = \"Unknown\"\n         var statusByte = 0\n@@ -32,12 +32,16 @@ constructor() : BleBeaconDecoder {\n         if (data.size > 2) {\n             statusByte = data[2].toInt() and 0xFF\n             batteryStatus =\n-                when ((statusByte shr 6) and 0x03) {\n-                    0x00 -> \"Full\"\n-                    0x01 -> \"Medium\"\n-                    0x02 -> \"Low\"\n-                    0x03 -> \"Critical\"\n-                    else -> \"Unknown\"\n+                if ((statusByte and 0x04) == 0) {\n+                    \"Unknown\"\n+                } else {\n+                    when ((statusByte shr 6) and 0x03) {\n+                        0x00 -> \"Full\"\n+                        0x01 -> \"Medium\"\n+                        0x02 -> \"Low\"\n+                        0x03 -> \"Critical\"\n+                        else -> \"Unknown\"\n+                    }\n                 }\n         }\n \ndiff --git a/core/decoders/src/main/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParser.kt b/core/decoders/src/main/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParser.kt\nindex 9bd858e..f242727 100644\n--- a/core/decoders/src/main/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParser.kt\n+++ b/core/decoders/src/main/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParser.kt\n@@ -17,11 +17,12 @@ constructor() {\n         // Byte 0: Status\n         val statusByte = data[0].toInt() and 0xFF\n \n-        // Status Flags (OpenHaystack / Reverse Engineering)\n-        // Bit 0: Low Battery\n-        // Bit 2: Separated from owner (Key rotation state?)\n-        val lowBattery = (statusByte and 0x01) != 0\n-        val separated = (statusByte and 0x04) != 0\n+        // Maintained means an owner connection occurred in the current key period.\n+        // Battery bits 6-7 are meaningful only when maintained is set.\n+        // Bits 0-1 are reserved and must not be interpreted as low battery.\n+        val maintained = (statusByte and 0x04) != 0\n+        val batteryCode = (statusByte ushr 6) and 0x03\n+        val lowBattery = maintained && batteryCode >= 2\n \n         // Public Key extraction\n         // The payload (bytes 1..end) represents the truncated public key.\n@@ -33,15 +34,15 @@ constructor() {\n                 null\n             }\n \n-        var debugInfo = \"Find My\"\n-        if (separated) debugInfo += \" [Separated]\"\n-        if (lowBattery) debugInfo += \" [Low Batt]\"\n+        var debugInfo = if (maintained) \"Find My [Maintained]\" else \"Find My [Not Maintained]\"\n+        if (lowBattery) {\n+            debugInfo += if (batteryCode == 3) \" [Critical Batt]\" else \" [Low Batt]\"\n+        }\n \n         return AppleDeviceData(\n             deviceModel = debugInfo,\n             statusFlags = statusByte,\n             findMyKey = publicKey,\n-            batteryLevelLeft = if (lowBattery) 10 else null, // Heuristic\n         )\n     }\n }\n"
+  },
+  "git_status": {
+    "elapsed_seconds": 0.09,
+    "exit_code": 0,
+    "output": " M core/decoders/src/main/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoder.kt\n M core/decoders/src/main/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParser.kt\n?? core/decoders/src/test/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoderTest.kt\n?? core/decoders/src/test/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParserTest.kt\n"
+  },
+  "id": "20261010-blueeye-findmy-status-battery-r1",
+  "idle_timeout": 300,
+  "memory_limit_mb": 3072,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.413,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2
+    },
+    {
+      "elapsed_seconds": 26.339,
+      "outcome": "passed",
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2
+    }
+  ],
+  "started_at": "2026-10-10T19:16:49.535326+00:00",
+  "status": "done",
+  "task_digest": "312c3f31e91f440b8bc166b847b4c9c5742ed7fb634ba4bf99742788effbe122",
+  "task_timeout": 1800,
+  "verification": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 3513,
+      "command": "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :core:decoders:testDebugUnitTest --tests io.blueeye.core.decoders.parser.apple.FindMyParserTest --tests io.blueeye.core.decoders.AirTagBroadcastDecoderTest --no-daemon --console=plain --max-workers=2",
+      "current_rss_mb": 44.75,
+      "elapsed_seconds": 26.339,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \nCalculating task graph as no cached configuration is available for tasks: :core:decoders:testDebugUnitTest --tests io.blueeye.core.decoders.parser.apple.FindMyParserTest --tests io.blueeye.core.decoders.AirTagBroadcastDecoderTest\nWarning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:decoders:preBuild UP-TO-DATE\n> Task :core:decoders:preDebugBuild UP-TO-DATE\n> Task :core:decoders:checkKotlinGradlePluginConfigurationErrors\n> Task :core:decoders:generateDebugResValues UP-TO-DATE\n> Task :core:decoders:generateDebugResources UP-TO-DATE\n> Task :core:decoders:packageDebugResources UP-TO-DATE\n> Task :core:decoders:parseDebugLocalResources UP-TO-DATE\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:decoders:generateDebugRFile UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:decoders:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:preDebugUnitTestBuild UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:decoders:generateDebugUnitTestStubRFile UP-TO-DATE\n> Task :core:decoders:javaPreCompileDebugUnitTest UP-TO-DATE\n> Task :core:decoders:kaptGenerateStubsDebugKotlin\n> Task :core:decoders:kaptDebugKotlin UP-TO-DATE\n> Task :core:decoders:compileDebugKotlin\n> Task :core:decoders:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:processDebugJavaRes UP-TO-DATE\n> Task :core:decoders:transformDebugClassesWithAsm\n> Task :core:decoders:bundleLibRuntimeToJarDebug\n> Task :core:decoders:bundleLibCompileToJarDebug\n> Task :core:decoders:kaptGenerateStubsDebugUnitTestKotlin\n\n> Task :core:decoders:kaptDebugUnitTestKotlin\nwarning: The following options were not recognized by any processor: '[dagger.fastInit, dagger.hilt.android.internal.disableAndroidSuperclassValidation, dagger.hilt.android.internal.projectType, dagger.hilt.internal.useAggregatingRootProcessor, kapt.kotlin.generated]'\n\n> Task :core:decoders:compileDebugUnitTestKotlin\n> Task :core:decoders:compileDebugUnitTestJavaWithJavac NO-SOURCE\n> Task :core:decoders:hiltAggregateDepsDebugUnitTest UP-TO-DATE\n> Task :core:decoders:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :core:decoders:processDebugUnitTestJavaRes UP-TO-DATE\n> Task :core:decoders:transformDebugUnitTestClassesWithAsm\n> Task :core:decoders:testDebugUnitTest\n[Incubating] Problems report is available at: file:///Users/michal/agent-workspace/repos/tracker/work/build/reports/problems/problems-report.html\n\nDeprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.\n\nYou can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.\n\nFor more on this, please refer to https://docs.gradle.org/8.11.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.\n\nBUILD SUCCESSFUL in 25s\n27 actionable tasks: 12 executed, 15 up-to-date\nConfiguration cache entry stored.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 112.98,
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "work_branch": "main",
+  "workspace_checkpoint": {
+    "base_head": "03651acd6f957ae7fd39844d395cfd926eb30b75",
+    "created_at": "2026-10-10T19:17:18.250432+00:00",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/20261010-blueeye-findmy-status-battery-r1/1791659838098584000-task-exit",
+    "reason": "task-exit",
+    "status": " M core/decoders/src/main/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoder.kt\n M core/decoders/src/main/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParser.kt\n?? core/decoders/src/test/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoderTest.kt\n?? core/decoders/src/test/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParserTest.kt\n",
+    "task_id": "20261010-blueeye-findmy-status-battery-r1",
+    "total_bytes": 6043,
+    "tracked_patch": "tracked.patch",
+    "tracked_patch_bytes": 3666,
+    "untracked_bytes": 2377,
+    "untracked_files": [
+      "core/decoders/src/test/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoderTest.kt",
+      "core/decoders/src/test/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParserTest.kt"
+    ],
+    "untracked_root": "untracked",
+    "version": 2,
+    "work_branch": "agent-work"
+  }
+}

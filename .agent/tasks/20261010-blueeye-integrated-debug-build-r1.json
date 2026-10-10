@@ -1,0 +1,20 @@
+{
+  "id": "20261010-blueeye-integrated-debug-build-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "dedupe_key": "main:blueeye-integrated-debug-build",
+  "dedupe_revision": 1,
+  "command_timeout": 1800,
+  "idle_timeout": 300,
+  "task_timeout": 2400,
+  "memory_limit_mb": 3584,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 03651acd6f957ae7fd39844d395cfd926eb30b75\ngit diff --check"
+  ],
+  "verify_commands": [
+    "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :app:assembleDebug --no-daemon --console=plain --max-workers=2"
+  ]
+}

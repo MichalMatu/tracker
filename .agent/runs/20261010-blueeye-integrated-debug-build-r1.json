@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261010-blueeye-integrated-debug-build-r1",
+  "task_digest": "5759364c4e435f5440389f8a93e7c962246f499beb31b0359d38283606ea94c2",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-10T19:16:18.866410+00:00",
+  "attempt_id": "b1f44e310e212e2e49cd1651",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 98478,
+  "updated_at": "2026-10-10T19:16:19.134938+00:00",
+  "pid": 98478
+}

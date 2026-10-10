@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "8dc0f10d5b6e2ada69131bfd",
+  "command_timeout": 300,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 644,
+      "command": "set -e\nEXPECTED_SHA=\"15931fa8341784a308f8a8b9ea6ebd68279241fc\"\n\ngit fetch origin main --quiet\ngit checkout --detach \"$EXPECTED_SHA\" >/dev/null 2>&1\ntest \"$(git rev-parse HEAD)\" = \"$EXPECTED_SHA\"\n\nAPK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\nif [ -z \"$APK\" ]; then\n  export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n  ./gradlew --no-daemon :app:assembleDebug\n  APK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\nfi\ntest -n \"$APK\"\n\nadb kill-server >/dev/null 2>&1 || true\nadb start-server >/dev/null\nadb devices -l\n\nUSB_SERIAL=\"$(adb devices | awk 'NR>1 && $2==\"device\" && $1 !~ /:/ {print $1; exit}')\"\ntest -n \"$USB_SERIAL\"\n\nMODEL=\"$(adb -s \"$USB_SERIAL\" shell getprop ro.product.model | tr -d '\\r')\"\ntest \"$MODEL\" = \"SM-S906B\"\necho \"S22_USB_CONNECTED serial=$USB_SERIAL model=$MODEL\"\n\nOUT=\"$(adb -s \"$USB_SERIAL\" install -r \"$APK\" 2>&1)\"\nprintf '%s\\n' \"$OUT\"\n\ntest -n \"$(adb -s \"$USB_SERIAL\" shell pm path io.blueeye | tr -d '\\r' | head -n1)\"\nadb -s \"$USB_SERIAL\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null\nsleep 1\nPID=\"$(adb -s \"$USB_SERIAL\" shell pidof io.blueeye | tr -d '\\r' | head -n1)\"\ntest -n \"$PID\"\n\nprintf 'USB_FINAL_INSTALL_OK sha=%s model=SM-S906B package=io.blueeye data_preserved=yes app_running=yes pid=%s\\n' \"$EXPECTED_SHA\" \"$PID\"",
+      "current_rss_mb": 9.72,
+      "elapsed_seconds": 17.714,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 1024,
+      "memory_limited": false,
+      "output": "* daemon not running; starting now at tcp:5037\n* daemon started successfully\nList of devices attached\nRFCT70L7E8J            device usb:1-2 product:g0sxeea model:SM_S906B device:g0s transport_id:1\n\nS22_USB_CONNECTED serial=RFCT70L7E8J model=SM-S906B\nPerforming Streamed Install\nSuccess\nargs: [-p, io.blueeye, -c, android.intent.category.LAUNCHER, 1]\n arg: \"-p\"\n arg: \"io.blueeye\"\n arg: \"-c\"\n arg: \"android.intent.category.LAUNCHER\"\n arg: \"1\"\ndata=\"io.blueeye\"\ndata=\"android.intent.category.LAUNCHER\"\nUSB_FINAL_INSTALL_OK sha=15931fa8341784a308f8a8b9ea6ebd68279241fc model=SM-S906B package=io.blueeye data_preserved=yes app_running=yes pid=4829\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 11.25,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-08T06:00:05.369055+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.072,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.136,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261008-usb-reinstall-final-main-r1",
+  "idle_timeout": 120,
+  "memory_limit_mb": 1024,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 17.714,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-08T05:59:45.816939+00:00",
+  "status": "done",
+  "task_digest": "9aa7fa88bccb30013797905f34b39058e188249e2441562379ad72b7a06d0671",
+  "task_timeout": 480,
+  "verification": [],
+  "work_branch": "main"
+}

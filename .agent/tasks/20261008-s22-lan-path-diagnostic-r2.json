@@ -1,0 +1,19 @@
+{
+  "id": "20261008-s22-lan-path-diagnostic-r2",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "s22:lan-path-diagnostic",
+  "dedupe_revision": 2,
+  "command_timeout": 20,
+  "idle_timeout": 20,
+  "task_timeout": 150,
+  "memory_limit_mb": 256,
+  "commands": [
+    "set -e\necho \"SSID:\"\nnetworksetup -getairportnetwork en0 || true\necho \"WIFI_INFO:\"\nnetworksetup -getinfo Wi-Fi || true\necho \"ROUTER:\"\nipconfig getoption en0 router || true\necho \"EN0:\"\nifconfig en0 | egrep 'status:|inet ' || true\necho \"ARP_PHONE:\"\narp -n 192.168.0.100 || true\necho \"PING_GATEWAY:\"\nping -c 1 -W 1000 192.168.0.1 || true\necho \"PING_PHONE:\"\nping -c 1 -W 1000 192.168.0.100 || true"
+  ]
+}

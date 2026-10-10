@@ -1,0 +1,14 @@
+{
+  "id": "cancel-blueeye-thermopro-battery-r1-20261010",
+  "action": "cancel_task",
+  "status": "completed",
+  "daemon_version": "4.20.6",
+  "updated_at": "2026-10-10T11:35:10.844421+00:00",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "control_branch": "agent-control",
+  "default_branch": "main",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "task_id": "20261010-blueeye-thermopro-battery-r1",
+  "result": "cancelled_before_execution"
+}

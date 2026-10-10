@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "54e8e07e81547d0eb566d830",
+  "command_timeout": 120,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 157,
+      "command": "set -e\ntest \"$(git rev-parse HEAD)\" = \"1348106d7a4ba867cef9a50d3819db098a204149\"\npython3 - <<'PY'\nimport sqlite3,os,statistics,subprocess,sys\n\ndb=\"/tmp/tracker-auto-gatt-quiescent/db\"\nif not os.path.exists(db):\n    print(\"SNAPSHOT_MISSING\"); sys.exit(41)\ncon=sqlite3.connect(f\"file:{db}?mode=ro\",uri=True)\nrows=list(con.execute(\"\"\"\n select lastProbeTimestamp\n from devices\n where lastProbeTimestamp > (strftime('%s','now')*1000 - 30*60*1000)\n order by lastProbeTimestamp asc\n\"\"\"))\nts=[int(r[0]) for r in rows if r[0] is not None]\ngaps=[b-a for a,b in zip(ts,ts[1:])]\nprint(\"SEQUENTIALITY probe_count=%d distinct_timestamps=%d span_ms=%d min_gap_ms=%d median_gap_ms=%d max_gap_ms=%d\" % (\n    len(ts),len(set(ts)),0 if len(ts)<2 else ts[-1]-ts[0],\n    -1 if not gaps else min(gaps),\n    -1 if not gaps else int(statistics.median(gaps)),\n    -1 if not gaps else max(gaps),\n))\ncon.close()\n\n# Read only the single persisted preference from Preferences DataStore protobuf.\np=subprocess.run([\"adb\",\"exec-out\",\"run-as\",\"io.blueeye\",\"cat\",\"files/datastore/settings.preferences_pb\"],capture_output=True,timeout=10)\ndata=p.stdout\ndef varint(buf,i):\n    v=0;s=0\n    while i<len(buf):\n        b=buf[i]; i+=1; v|=(b&0x7f)<<s\n        if not (b&0x80): return v,i\n        s+=7\n    raise ValueError\ndef fields(buf):\n    out=[];i=0\n    while i<len(buf):\n        tag,i=varint(buf,i); fn=tag>>3; wt=tag&7\n        if wt==0:\n            v,i=varint(buf,i); out.append((fn,wt,v))\n        elif wt==2:\n            n,i=varint(buf,i); v=buf[i:i+n]; i+=n; out.append((fn,wt,v))\n        elif wt==5: i+=4\n        elif wt==1: i+=8\n        else: break\n    return out\nvalue=None\ntry:\n    for fn,wt,entry in fields(data):\n        if fn!=1 or wt!=2: continue\n        key=None; valmsg=None\n        for efn,ewt,ev in fields(entry):\n            if efn==1 and ewt==2: key=ev.decode(\"utf-8\",\"ignore\")\n            elif efn==2 and ewt==2: valmsg=ev\n        if key==\"auto_active_probe_enabled\" and valmsg is not None:\n            for vfn,vwt,vv in fields(valmsg):\n                if vfn==1 and vwt==0:\n                    value=bool(vv)\n                    break\nexcept Exception:\n    pass\nprint(\"PREF auto_active_probe_enabled=\"+(\"true\" if value is True else \"false\" if value is False else \"unknown\"))\nPY",
+      "current_rss_mb": 4.48,
+      "elapsed_seconds": 0.858,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "SEQUENTIALITY probe_count=21 distinct_timestamps=21 span_ms=621129 min_gap_ms=6839 median_gap_ms=16113 max_gap_ms=208074\nPREF auto_active_probe_enabled=true\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 4.48,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-07T01:05:18.713273+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.076,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.154,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261007-auto-gatt-sequentiality-pref-r1",
+  "idle_timeout": 60,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.858,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-07T01:05:16.006290+00:00",
+  "status": "done",
+  "task_digest": "339577b5f15a268f115a9e610514d2672365b4bb1dbf56d4443b8b90d5ebb2ea",
+  "task_timeout": 240,
+  "verification": [],
+  "work_branch": "main"
+}

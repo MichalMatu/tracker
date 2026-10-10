@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261010-blueeye-gatt-read-callback-isolation-r1",
+  "task_digest": "93917bb9c9c09d20cc2b8cc6c8e320623fe9e572568f9af596406d4cc1e02aab",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-10T19:19:56.050433+00:00",
+  "attempt_id": "8ff7d99c9ec7dc143a295c54",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 8225,
+  "updated_at": "2026-10-10T19:19:56.540211+00:00",
+  "pid": 8225
+}

@@ -1,0 +1,19 @@
+{
+  "id": "20261008-wireless-reinstall-final-main-r12",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "main:wireless-reinstall-final",
+  "dedupe_revision": 12,
+  "command_timeout": 300,
+  "idle_timeout": 120,
+  "task_timeout": 420,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -e\nEXPECTED_SHA=\"15931fa8341784a308f8a8b9ea6ebd68279241fc\"\ngit fetch origin main --quiet\ngit checkout --detach \"$EXPECTED_SHA\" >/dev/null 2>&1\ntest \"$(git rev-parse HEAD)\" = \"$EXPECTED_SHA\"\n\nAPK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\nif [ -z \"$APK\" ]; then\n  export JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n  ./gradlew --no-daemon :app:assembleDebug\n  APK=\"$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n1)\"\nfi\ntest -n \"$APK\"\n\nadb kill-server >/dev/null 2>&1 || true\nadb start-server >/dev/null\n\npython3 - <<'PY'\nimport subprocess,re,sys,time\n\ndef run(args,timeout=8):\n    try:\n        return subprocess.run(args,text=True,capture_output=True,timeout=timeout)\n    except subprocess.TimeoutExpired:\n        return None\n\ndef find_s22():\n    p=run([\"adb\",\"devices\"],4)\n    if not p: return None\n    for line in p.stdout.splitlines()[1:]:\n        parts=line.split()\n        if len(parts)>=2 and parts[1]==\"device\":\n            serial=parts[0]\n            q=run([\"adb\",\"-s\",serial,\"shell\",\"getprop\",\"ro.product.model\"],4)\n            if q and q.stdout.strip()==\"SM-S906B\":\n                return serial\n    return None\n\nfor attempt in range(10):\n    serial=find_s22()\n    if serial:\n        open(\"/tmp/tracker-s22-serial\",\"w\").write(serial)\n        print(f\"S22_CONNECTED attempt={attempt+1}\")\n        sys.exit(0)\n    mdns=run([\"adb\",\"mdns\",\"services\"],8)\n    endpoints=[]\n    if mdns:\n        for line in mdns.stdout.splitlines():\n            if \"_adb-tls-connect._tcp\" in line:\n                for token in reversed(line.split()):\n                    if re.search(r\":\\d+$\",token):\n                        endpoints.append(token)\n                        break\n    for ep in endpoints:\n        run([\"adb\",\"connect\",ep],5)\n        time.sleep(.5)\n        serial=find_s22()\n        if serial:\n            open(\"/tmp/tracker-s22-serial\",\"w\").write(serial)\n            print(f\"S22_CONNECTED attempt={attempt+1}\")\n            sys.exit(0)\n    time.sleep(3)\n\nprint(\"S22_NOT_DISCOVERABLE\")\nsys.exit(42)\nPY\n\nS=\"$(cat /tmp/tracker-s22-serial)\"\ntest \"$(adb -s \"$S\" shell getprop ro.product.model | tr -d '\r')\" = \"SM-S906B\"\nOUT=\"$(adb -s \"$S\" install --no-streaming -r \"$APK\" 2>&1)\"\nprintf '%s\\n' \"$OUT\"\ntest -n \"$(adb -s \"$S\" shell pm path io.blueeye | tr -d '\r' | head -n1)\"\nadb -s \"$S\" shell monkey -p io.blueeye -c android.intent.category.LAUNCHER 1 >/dev/null\nsleep 1\nPID=\"$(adb -s \"$S\" shell pidof io.blueeye | tr -d '\r' | head -n1)\"\ntest -n \"$PID\"\nprintf 'FINAL_INSTALL_OK sha=%s model=SM-S906B package=io.blueeye data_preserved=yes app_running=yes pid=%s\\n' \"$EXPECTED_SHA\" \"$PID\""
+  ]
+}

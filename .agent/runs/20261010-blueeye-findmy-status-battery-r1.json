@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261010-blueeye-findmy-status-battery-r1",
+  "task_digest": "312c3f31e91f440b8bc166b847b4c9c5742ed7fb634ba4bf99742788effbe122",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-10T19:17:17.909737+00:00",
+  "attempt_id": "d917dee81c2f02190c1b9705",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 2849,
+  "updated_at": "2026-10-10T19:17:18.387627+00:00",
+  "pid": 2849
+}

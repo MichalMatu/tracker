@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261007-auto-gatt-sequentiality-pref-r1",
+  "task_digest": "339577b5f15a268f115a9e610514d2672365b4bb1dbf56d4443b8b90d5ebb2ea",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-07T01:05:18.713273+00:00",
+  "attempt_id": "54e8e07e81547d0eb566d830",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 73689,
+  "updated_at": "2026-10-07T01:05:19.031507+00:00",
+  "pid": 73689
+}

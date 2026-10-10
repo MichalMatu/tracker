@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261008-branch-cleanup-r1",
+  "task_digest": "dacde3956d636a5945e7db6f6a08b991c5ac4bc1fda77a13f2a88f0136630c5a",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-08T05:19:03.571210+00:00",
+  "attempt_id": "754035747cf2c7d9ad826ac9",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 28678,
+  "updated_at": "2026-10-08T05:19:03.889048+00:00",
+  "pid": 28678
+}

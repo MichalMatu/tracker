@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261010-blueeye-gatt-terminal-state-r2",
+  "task_digest": "894c1786ec3820310a24f4e757d7333b024323194e30b21899bc2ac96eea1acb",
+  "status": "failed",
+  "failure_reason": "verification_failed",
+  "finished_at": "2026-10-10T11:50:48.276320+00:00",
+  "attempt_id": "2660d2af1bc52a4057d67d47",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 49465,
+  "updated_at": "2026-10-10T11:50:48.859349+00:00",
+  "pid": 49465
+}

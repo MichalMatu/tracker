@@ -1,0 +1,58 @@
+{
+  "allow_write": false,
+  "attempt_id": "9aaf6c22ca3644d32419562a",
+  "command_timeout": 120,
+  "commands": [
+    {
+      "budget_exhausted": true,
+      "budget_remaining_seconds": 178.655,
+      "command": "set -u\nHOST=\"192.168.0.100\"\nPORT=\"36451\"\n\necho \"=== LOCAL WIFI/IP ===\"\nnetworksetup -getinfo Wi-Fi 2>/dev/null || true\necho \"wifi_ip=$(ipconfig getifaddr en0 2>/dev/null || true)\"\n\necho \"=== ROUTE ===\"\nroute -n get \"$HOST\" 2>&1 || true\n\necho \"=== ARP ===\"\narp -n \"$HOST\" 2>&1 || true\n\necho \"=== PING ===\"\nping -c 3 -W 1000 \"$HOST\" 2>&1 || true\n\necho \"=== TCP PORT ===\"\nnc -vz -w 3 \"$HOST\" \"$PORT\" 2>&1 || true\n\necho \"=== HOSTNAME ===\"\ndscacheutil -q host -a name Android-2.local 2>&1 || true\n\necho \"=== ADB MDNS ===\"\nadb start-server >/dev/null 2>&1 || true\nadb mdns services 2>&1 || true\n\necho \"=== ADB DIRECT ===\"\nadb connect \"$HOST:$PORT\" 2>&1 || true\nadb devices -l 2>&1 || true\n",
+      "elapsed_seconds": 0.0,
+      "exit_code": 125,
+      "idle_timed_out": false,
+      "memory_limited": false,
+      "not_started": true,
+      "output": "",
+      "required_budget_seconds": 180.0,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "failure_reason": "task_budget_exhausted",
+  "finished_at": "2026-10-08T05:55:26.230058+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.065,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.091,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261008-s22-wireless-network-diagnostic-r1",
+  "idle_timeout": 60,
+  "memory_limit_mb": 256,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.0,
+      "outcome": "not_started",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-08T05:55:24.728116+00:00",
+  "status": "failed",
+  "task_digest": "25db372425ad4e6535851e41437ada94e02fe3743261ef82c4c2152a06e89002",
+  "task_timeout": 180,
+  "verification": [],
+  "work_branch": "main"
+}

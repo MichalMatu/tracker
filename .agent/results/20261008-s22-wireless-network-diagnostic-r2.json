@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "6d695dfd2f808847dd5ef82b",
+  "command_timeout": 45,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 1239,
+      "command": "python3 - <<'PY'\nimport socket, subprocess, json\nhost=\"192.168.0.100\"\nport=36451\nout={}\ndef cmd(args, timeout=5):\n    try:\n        p=subprocess.run(args,text=True,capture_output=True,timeout=timeout)\n        return {\"rc\":p.returncode,\"out\":p.stdout.strip(),\"err\":p.stderr.strip()}\n    except subprocess.TimeoutExpired:\n        return {\"timeout\":True}\nfor iface in (\"en0\",\"en1\"):\n    out[f\"ip_{iface}\"]=cmd([\"ipconfig\",\"getifaddr\",iface],2)\nout[\"route\"]=cmd([\"route\",\"-n\",\"get\",host],3)\nout[\"arp\"]=cmd([\"arp\",\"-n\",host],3)\nout[\"ping\"]=cmd([\"ping\",\"-c\",\"1\",\"-W\",\"1000\",host],4)\ntry:\n    s=socket.create_connection((host,port),timeout=3)\n    out[\"tcp\"]={\"ok\":True,\"peer\":str(s.getpeername())}\n    s.close()\nexcept Exception as e:\n    out[\"tcp\"]={\"ok\":False,\"error\":repr(e)}\ntry:\n    out[\"android2_dns\"]=socket.gethostbyname(\"Android-2.local\")\nexcept Exception as e:\n    out[\"android2_dns_error\"]=repr(e)\nout[\"adb_devices\"]=cmd([\"adb\",\"devices\",\"-l\"],4)\ntry:\n    out[\"adb_mdns\"]=cmd([\"adb\",\"mdns\",\"services\"],5)\nexcept Exception as e:\n    out[\"adb_mdns_error\"]=repr(e)\nprint(json.dumps(out,indent=2))\nPY",
+      "current_rss_mb": 23.48,
+      "elapsed_seconds": 13.686,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 256,
+      "memory_limited": false,
+      "output": "{\n  \"ip_en0\": {\n    \"rc\": 0,\n    \"out\": \"192.168.0.14\",\n    \"err\": \"\"\n  },\n  \"ip_en1\": {\n    \"rc\": 1,\n    \"out\": \"\",\n    \"err\": \"\"\n  },\n  \"route\": {\n    \"rc\": 0,\n    \"out\": \"route to: 192.168.0.100\\ndestination: 192.168.0.100\\n  interface: en0\\n      flags: <UP,HOST,DONE,LLINFO,WASCLONED,IFSCOPE,IFREF>\\n recvpipe  sendpipe  ssthresh  rtt,msec    rttvar  hopcount      mtu     expire\\n       0         0       120         0        36         0      1500      -133\",\n    \"err\": \"\"\n  },\n  \"arp\": {\n    \"rc\": 0,\n    \"out\": \"? (192.168.0.100) at (incomplete) on en0 ifscope [ethernet]\",\n    \"err\": \"\"\n  },\n  \"ping\": {\n    \"rc\": 2,\n    \"out\": \"PING 192.168.0.100 (192.168.0.100): 56 data bytes\\n\\n--- 192.168.0.100 ping statistics ---\\n1 packets transmitted, 0 packets received, 100.0% packet loss\",\n    \"err\": \"\"\n  },\n  \"tcp\": {\n    \"ok\": false,\n    \"error\": \"TimeoutError('timed out')\"\n  },\n  \"android2_dns_error\": \"gaierror(8, 'nodename nor servname provided, or not known')\",\n  \"adb_devices\": {\n    \"rc\": 0,\n    \"out\": \"List of devices attached\",\n    \"err\": \"* daemon not running; starting now at tcp:5037\\n* daemon started successfully\"\n  },\n  \"adb_mdns\": {\n    \"rc\": 0,\n    \"out\": \"List of discovered mdns services\",\n    \"err\": \"\"\n  }\n}\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 23.48,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-08T05:56:24.051881+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.074,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.123,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261008-s22-wireless-network-diagnostic-r2",
+  "idle_timeout": 30,
+  "memory_limit_mb": 256,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 13.686,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-08T05:56:08.723256+00:00",
+  "status": "done",
+  "task_digest": "7e5fa8fdc9bcf0e73748e0bd218c35819e39c4ee721641a2bf297d6b31b7c987",
+  "task_timeout": 120,
+  "verification": [],
+  "work_branch": "main"
+}

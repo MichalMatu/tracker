@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261007-auto-gatt-live-post-reinstall-r1",
+  "task_digest": "535cf3dcad7ecfac12ab75209801c26c1eeb97ecf4a2189cdcb6d2806deafd43",
+  "status": "failed",
+  "failure_reason": "command_failed",
+  "finished_at": "2026-10-07T01:00:22.650167+00:00",
+  "attempt_id": "9b47731aa17abd032af6b506",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 67079,
+  "updated_at": "2026-10-07T01:00:22.932080+00:00",
+  "pid": 67079
+}

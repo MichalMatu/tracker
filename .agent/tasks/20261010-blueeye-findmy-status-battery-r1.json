@@ -1,0 +1,38 @@
+{
+  "id": "20261010-blueeye-findmy-status-battery-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "dedupe_key": "main:blueeye-findmy-status-battery",
+  "dedupe_revision": 1,
+  "command_timeout": 900,
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 3072,
+  "writes": [
+    {
+      "path": "core/decoders/src/main/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParser.kt",
+      "content": "package io.blueeye.core.decoders.parser.apple\n\nimport javax.inject.Inject\nimport javax.inject.Singleton\n\n/**\n * Parser for Apple Find My / Offline Finding (Type 0x12). Based on OpenHaystack / Seemoo Lab\n * research.\n */\n@Singleton\nclass FindMyParser\n@Inject\nconstructor() {\n    fun parse(data: ByteArray): AppleDeviceData? {\n        if (data.size < 2) return null\n\n        // Byte 0: Status\n        val statusByte = data[0].toInt() and 0xFF\n\n        // Maintained means an owner connection occurred in the current key period.\n        // Battery bits 6-7 are meaningful only when maintained is set.\n        // Bits 0-1 are reserved and must not be interpreted as low battery.\n        val maintained = (statusByte and 0x04) != 0\n        val batteryCode = (statusByte ushr 6) and 0x03\n        val lowBattery = maintained && batteryCode >= 2\n\n        // Public Key extraction\n        // The payload (bytes 1..end) represents the truncated public key.\n        // Usually 22-28 bytes depending on protocol version.\n        val publicKey =\n            if (data.size > 1) {\n                data.copyOfRange(1, data.size)\n            } else {\n                null\n            }\n\n        var debugInfo = if (maintained) \"Find My [Maintained]\" else \"Find My [Not Maintained]\"\n        if (lowBattery) {\n            debugInfo += if (batteryCode == 3) \" [Critical Batt]\" else \" [Low Batt]\"\n        }\n\n        return AppleDeviceData(\n            deviceModel = debugInfo,\n            statusFlags = statusByte,\n            findMyKey = publicKey,\n        )\n    }\n}\n"
+    },
+    {
+      "path": "core/decoders/src/main/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoder.kt",
+      "content": "package io.blueeye.core.decoders\n\nimport io.blueeye.core.model.SensorData\nimport javax.inject.Inject\nimport javax.inject.Singleton\n\n@Singleton\nclass AirTagBroadcastDecoder\n@Inject\nconstructor() : BleBeaconDecoder {\n    override fun supports(input: BleBeaconScanInput): Boolean {\n        val manufacturerId = input.manufacturerId\n        val data = input.data\n        // Apple ID = 76 (0x004C)\n        if (manufacturerId != 76 || data == null || data.size < 2) return false\n\n        // Type 0x12 = Find My\n        return data[0] == 0x12.toByte()\n    }\n\n    override fun decode(input: BleBeaconScanInput): SensorData {\n        val data = input.data ?: byteArrayOf()\n        // Format: [12] [Len] [Status] [22 bytes Key Part] ...\n\n        // Status Byte (index 2):\n        // Bits 6-7: Battery Level (00=Full, 01=Medium, 10=Low, 11=Critical)\n        // Bit 2: Maintained. Battery bits are valid only when this bit is set.\n\n        var batteryStatus = \"Unknown\"\n        var statusByte = 0\n\n        if (data.size > 2) {\n            statusByte = data[2].toInt() and 0xFF\n            batteryStatus =\n                if ((statusByte and 0x04) == 0) {\n                    \"Unknown\"\n                } else {\n                    when ((statusByte shr 6) and 0x03) {\n                        0x00 -> \"Full\"\n                        0x01 -> \"Medium\"\n                        0x02 -> \"Low\"\n                        0x03 -> \"Critical\"\n                        else -> \"Unknown\"\n                    }\n                }\n        }\n\n        // Public Key Part (22 bytes starting at offset 3)\n        // This key part combined with MAC address forms the full tracking key.\n        val publicParts =\n            if (data.size >= 25) {\n                data.copyOfRange(3, 25).joinToString(\"\") { \"%02X\".format(it) }\n            } else {\n                \"Partial Data\"\n            }\n\n        return SensorData(\n            sensorStatus = \"Bat: $batteryStatus (St: 0x%02X)\".format(statusByte),\n            beaconType = \"Apple FindMy / AirTag\",\n            rawData = \"KeyPart: $publicParts\",\n        )\n    }\n}\n"
+    },
+    {
+      "path": "core/decoders/src/test/kotlin/io/blueeye/core/decoders/parser/apple/FindMyParserTest.kt",
+      "content": "package io.blueeye.core.decoders.parser.apple\n\nimport org.junit.Assert.assertEquals\nimport org.junit.Assert.assertFalse\nimport org.junit.Assert.assertNull\nimport org.junit.Assert.assertTrue\nimport org.junit.Test\n\nclass FindMyParserTest {\n    private val parser = FindMyParser()\n\n    @Test\n    fun `reserved low bit is not a low-battery flag`() {\n        val parsed = requireNotNull(parser.parse(byteArrayOf(0x25, 0x01)))\n        assertEquals(\"Find My [Maintained]\", parsed.deviceModel)\n        assertEquals(0x25, parsed.statusFlags)\n        assertNull(parsed.batteryLevelLeft)\n    }\n\n    @Test\n    fun `maintained battery bits distinguish low and critical`() {\n        val low = requireNotNull(parser.parse(byteArrayOf(0x84.toByte(), 0x01)))\n        val critical = requireNotNull(parser.parse(byteArrayOf(0xC4.toByte(), 0x01)))\n        assertTrue(low.deviceModel!!.contains(\"[Low Batt]\"))\n        assertTrue(critical.deviceModel!!.contains(\"[Critical Batt]\"))\n        assertNull(low.batteryLevelLeft)\n        assertNull(critical.batteryLevelLeft)\n    }\n\n    @Test\n    fun `battery state without maintained flag remains unknown`() {\n        val parsed = requireNotNull(parser.parse(byteArrayOf(0x80.toByte(), 0x01)))\n        assertEquals(\"Find My [Not Maintained]\", parsed.deviceModel)\n        assertFalse(parsed.deviceModel!!.contains(\"Batt\"))\n    }\n}\n"
+    },
+    {
+      "path": "core/decoders/src/test/kotlin/io/blueeye/core/decoders/AirTagBroadcastDecoderTest.kt",
+      "content": "package io.blueeye.core.decoders\n\nimport org.junit.Assert.assertEquals\nimport org.junit.Assert.assertTrue\nimport org.junit.Test\n\nclass AirTagBroadcastDecoderTest {\n    private val decoder = AirTagBroadcastDecoder()\n\n    @Test\n    fun `status 0x25 is maintained with full battery`() {\n        val input = input(0x25)\n        assertTrue(decoder.supports(input))\n        assertEquals(\"Bat: Full (St: 0x25)\", decoder.decode(input).sensorStatus)\n    }\n\n    @Test\n    fun `unmaintained flags cannot claim battery charge`() {\n        assertEquals(\"Bat: Unknown (St: 0x80)\", decoder.decode(input(0x80)).sensorStatus)\n    }\n\n    @Test\n    fun `maintained low battery is derived from high bits`() {\n        assertEquals(\"Bat: Low (St: 0x84)\", decoder.decode(input(0x84)).sensorStatus)\n    }\n\n    private fun input(status: Int) = BleBeaconScanInput(\n        mac = \"\",\n        manufacturerRecords = mapOf(\n            76 to byteArrayOf(0x12, 0x19, status.toByte()) + ByteArray(22),\n        ),\n        serviceUuids = emptyList(),\n    )\n}\n"
+    }
+  ],
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 03651acd6f957ae7fd39844d395cfd926eb30b75\ngit diff --check"
+  ],
+  "verify_commands": [
+    "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :core:decoders:testDebugUnitTest --tests io.blueeye.core.decoders.parser.apple.FindMyParserTest --tests io.blueeye.core.decoders.AirTagBroadcastDecoderTest --no-daemon --console=plain --max-workers=2"
+  ]
+}

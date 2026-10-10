@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261007-wireless-reinstall-main-r6",
+  "task_digest": "dd364e25e74cb617c980da4227df79f9b6570afce63905906c4a1b883257026a",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-07T00:55:49.597275+00:00",
+  "attempt_id": "7624b8261e0c8c4266357ace",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 61873,
+  "updated_at": "2026-10-07T00:55:49.933842+00:00",
+  "pid": 61873
+}

@@ -1,0 +1,41 @@
+{
+  "allow_write": true,
+  "attempt_id": "71a3034bea5ead3775b3675c",
+  "command_timeout": 900,
+  "commands": [],
+  "daemon_version": "4.20.6",
+  "edits": {
+    "patch": {
+      "applied": false,
+      "check": {
+        "elapsed_seconds": 0.063,
+        "exit_code": 1,
+        "output": "error: patch failed: core/data/src/main/java/io/blueeye/core/scanner/extractor/ScanResultExtractor.kt:151\nerror: core/data/src/main/java/io/blueeye/core/scanner/extractor/ScanResultExtractor.kt: patch does not apply\n"
+      },
+      "reason": "git_apply_check_failed"
+    }
+  },
+  "failure_reason": "patch_failed",
+  "finished_at": "2026-10-10T19:09:55.066766+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.07,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.077,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261010-blueeye-txpower-sentinel-r1",
+  "idle_timeout": 300,
+  "memory_limit_mb": 3072,
+  "mode": "commands",
+  "stages": [],
+  "started_at": "2026-10-10T19:09:53.548203+00:00",
+  "status": "failed",
+  "task_digest": "732b6618c173d4067f4f23243f8c95022758f82cade9d8437ee8077738483fef",
+  "task_timeout": 1800,
+  "verification": [],
+  "work_branch": "main"
+}

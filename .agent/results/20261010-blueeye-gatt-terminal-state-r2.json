@@ -1,0 +1,120 @@
+{
+  "allow_write": true,
+  "attempt_id": "2660d2af1bc52a4057d67d47",
+  "command_timeout": 900,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 0,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = bfe98305e385425babe3407a89600b5e13208cb2\ngit diff --check",
+      "elapsed_seconds": 1.071,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": null,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {
+    "writes": [
+      {
+        "bytes": 11087,
+        "path": "core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt"
+      },
+      {
+        "bytes": 9032,
+        "path": "core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt"
+      },
+      {
+        "bytes": 26077,
+        "path": "core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt"
+      }
+    ]
+  },
+  "failure_reason": "verification_failed",
+  "finished_at": "2026-10-10T11:50:48.276320+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.022,
+    "exit_code": 0,
+    "output": "diff --git a/core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt b/core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt\nindex 169c87c..cd343de 100644\n--- a/core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt\n+++ b/core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt\n@@ -232,8 +232,21 @@ class AutoActiveProbeCoordinator @Inject constructor(\n         }\n         timeoutJob = null\n         probeStateManager.setActiveProbe(null)\n-        if (markFailed) {\n-            markProbeFailed(request.fingerprint, error)\n+        // Only change an unfinished probe. ConnectionProbeRecorder may already\n+        // have persisted CONNECTED with actual GATT services/characteristics.\n+        val unresolvedReason = error ?: if (markFailed) {\n+            \"GATT probe ended before establishing a connection\"\n+        } else {\n+            \"GATT probe ended before service discovery was persisted\"\n+        }\n+        runCatching {\n+            deviceDao.failAutoProbeIfStillProbing(\n+                fingerprint = request.fingerprint,\n+                timestamp = System.currentTimeMillis(),\n+                error = unresolvedReason,\n+            )\n+        }.onFailure { failure ->\n+            Log.w(TAG, \"Failed to finalize auto GATT probe: ${failure.message}\")\n         }\n         drainQueue()\n     }\n@@ -273,17 +286,6 @@ class AutoActiveProbeCoordinator @Inject constructor(\n         )\n     }\n \n-    private suspend fun markProbeFailed(\n-        mac: String,\n-        error: String?,\n-    ) {\n-        updateProbeStatus(\n-            mac = mac,\n-            status = STATUS_FAILED,\n-            error = error,\n-        )\n-    }\n-\n     private suspend fun updateProbeStatus(\n         mac: String,\n         status: String,\n@@ -316,7 +318,6 @@ class AutoActiveProbeCoordinator @Inject constructor(\n         private const val TAG = \"AutoActiveProbe\"\n         private const val STARTUP_GRACE_MS = 1_000L\n         private const val STATUS_PROBING = \"PROBING\"\n-        private const val STATUS_FAILED = \"FAILED\"\n     }\n }\n \ndiff --git a/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt b/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt\nindex 8d4bccb..2fd44f4 100644\n--- a/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt\n+++ b/core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt\n@@ -85,6 +85,26 @@ interface DeviceUpdateDao {\n         baselineDevice: Boolean?,\n     )\n \n+    /**\n+     * A probe completion may race a successful GATT persistence callback.\n+     * Finalize only the still-pending state, preserving CONNECTED evidence.\n+     */\n+    @Query(\n+        \"\"\"\n+        UPDATE devices\n+        SET connectionStatus = 'FAILED',\n+            probeError = :error,\n+            lastProbeTimestamp = :timestamp\n+        WHERE fingerprint = :fingerprint\n+          AND connectionStatus = 'PROBING'\n+        \"\"\",\n+    )\n+    suspend fun failAutoProbeIfStillProbing(\n+        fingerprint: String,\n+        timestamp: Long,\n+        error: String,\n+    ): Int\n+\n     @Suppress(\"LongParameterList\")\n     @Query(\n         \"\"\"\ndiff --git a/core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt b/core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt\nindex 659f294..e4f316b 100644\n--- a/core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt\n+++ b/core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt\n@@ -447,6 +447,21 @@ class AppleDeduplicationScenariosTest {\n         }\n \n         // ... stubs ...\n+        override suspend fun failAutoProbeIfStillProbing(\n+            fingerprint: String,\n+            timestamp: Long,\n+            error: String,\n+        ): Int {\n+            val existing = db[fingerprint] ?: return 0\n+            if (existing.connectionStatus != \"PROBING\") return 0\n+            db[fingerprint] = existing.copy(\n+                connectionStatus = \"FAILED\",\n+                probeError = error,\n+                lastProbeTimestamp = timestamp,\n+            )\n+            return 1\n+        }\n+\n         override suspend fun updateIsPaired(fingerprint: String, isPaired: Boolean) {}\n         override suspend fun updateLastSeen(fingerprint: String, timestamp: Long) {}\n         override suspend fun setWatchlistStatus(fingerprint: String, isWatchlisted: Boolean) {}\n"
+  },
+  "git_status": {
+    "elapsed_seconds": 0.104,
+    "exit_code": 0,
+    "output": " M core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt\n M core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt\n M core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt\n"
+  },
+  "id": "20261010-blueeye-gatt-terminal-state-r2",
+  "idle_timeout": 300,
+  "memory_limit_mb": 3072,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 1.071,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2
+    },
+    {
+      "elapsed_seconds": 231.975,
+      "outcome": "failed",
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2
+    }
+  ],
+  "started_at": "2026-10-10T11:46:46.359010+00:00",
+  "status": "failed",
+  "task_digest": "894c1786ec3820310a24f4e757d7333b024323194e30b21899bc2ac96eea1acb",
+  "task_timeout": 1800,
+  "verification": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 6245,
+      "command": "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :core:data:testDebugUnitTest --tests io.blueeye.core.connectivity.manager.AutoActiveProbeCoordinatorStableCoreTest --no-daemon --console=plain",
+      "current_rss_mb": 34.91,
+      "elapsed_seconds": 231.975,
+      "exit_code": 1,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \nCalculating task graph as no cached configuration is available for tasks: :core:data:testDebugUnitTest --tests io.blueeye.core.connectivity.manager.AutoActiveProbeCoordinatorStableCoreTest\nWarning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.\n> Task :core:domain:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:domain:compileKotlin UP-TO-DATE\n> Task :core:domain:compileJava NO-SOURCE\n> Task :core:domain:processResources NO-SOURCE\n> Task :core:domain:classes UP-TO-DATE\n> Task :core:domain:jar UP-TO-DATE\n> Task :core:data:preBuild UP-TO-DATE\n> Task :core:data:preDebugBuild UP-TO-DATE\n> Task :core:data:checkKotlinGradlePluginConfigurationErrors\n> Task :core:data:generateDebugResValues UP-TO-DATE\n> Task :core:data:generateDebugResources UP-TO-DATE\n> Task :core:data:packageDebugResources UP-TO-DATE\n> Task :core:data:parseDebugLocalResources UP-TO-DATE\n> Task :core:data:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:preBuild UP-TO-DATE\n> Task :core:decoders:preDebugBuild UP-TO-DATE\n> Task :core:decoders:generateDebugResValues UP-TO-DATE\n> Task :core:decoders:generateDebugResources UP-TO-DATE\n> Task :core:decoders:packageDebugResources UP-TO-DATE\n> Task :core:decoders:parseDebugLocalResources UP-TO-DATE\n> Task :core:decoders:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:checkKotlinGradlePluginConfigurationErrors\n> Task :core:decoders:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :core:decoders:kaptDebugKotlin UP-TO-DATE\n> Task :core:decoders:compileDebugKotlin UP-TO-DATE\n> Task :core:decoders:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:transformDebugClassesWithAsm UP-TO-DATE\n> Task :core:decoders:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :core:data:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :core:data:kaptDebugKotlin UP-TO-DATE\n> Task :core:data:compileDebugKotlin UP-TO-DATE\n> Task :core:data:javaPreCompileDebug UP-TO-DATE\n> Task :core:data:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:data:transformDebugClassesWithAsm UP-TO-DATE\n> Task :core:data:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:data:preDebugUnitTestBuild UP-TO-DATE\n> Task :core:data:generateDebugUnitTestStubRFile UP-TO-DATE\n> Task :core:data:processDebugJavaRes UP-TO-DATE\n> Task :core:data:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :core:data:kaptGenerateStubsDebugUnitTestKotlin\n\n> Task :core:data:kaptDebugUnitTestKotlin\nwarning: The following options were not recognized by any processor: '[dagger.fastInit, dagger.hilt.android.internal.disableAndroidSuperclassValidation, dagger.hilt.android.internal.projectType, dagger.hilt.internal.useAggregatingRootProcessor, kapt.kotlin.generated]'\n\n> Task :core:data:compileDebugUnitTestKotlin\nw: file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/test/kotlin/io/blueeye/core/data/verify/CorrelationAnalysisTest.kt:115:9 Parameter 'strategy' is never used\nw: file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/test/kotlin/io/blueeye/core/data/verify/CorrelationAnalysisTest.kt:117:9 Parameter 'payloadHash' is never used\nw: file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/test/kotlin/io/blueeye/core/scanner/manager/BleScannerStableCoreTest.kt:60:9 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'\nw: file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/test/kotlin/io/blueeye/core/scanner/manager/BleScannerStableCoreTest.kt:61:9 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'\n\n> Task :core:data:javaPreCompileDebugUnitTest FROM-CACHE\n> Task :core:data:compileDebugUnitTestJavaWithJavac\n> Task :core:data:hiltAggregateDepsDebugUnitTest\n> Task :core:data:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :core:data:processDebugUnitTestJavaRes\n> Task :core:data:transformDebugUnitTestClassesWithAsm\n> Task :core:decoders:processDebugJavaRes UP-TO-DATE\n\n> Task :core:data:testDebugUnitTest\n\nAutoActiveProbeCoordinatorStableCoreTest > persisted auto probe preference cannot bypass stable core FAILED\n    org.mockito.exceptions.verification.NoInteractionsWanted at AutoActiveProbeCoordinatorStableCoreTest.kt:37\n\n1 test completed, 1 failed\n\n> Task :core:data:testDebugUnitTest FAILED\n[Incubating] Problems report is available at: file:///Users/michal/agent-workspace/repos/tracker/work/build/reports/problems/problems-report.html\n\nFAILURE: Build failed with an exception.\n\n* What went wrong:\nExecution failed for task ':core:data:testDebugUnitTest'.\n> There were failing tests. See the report at: file:///Users/michal/agent-workspace/repos/tracker/work/core/data/build/reports/tests/testDebugUnitTest/index.html\n\n* Try:\n> Run with --scan to get full insights.\n\nDeprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.\n\nYou can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.\n\nFor more on this, please refer to https://docs.gradle.org/8.11.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.\n\nBUILD FAILED in 3m 47s\n46 actionable tasks: 12 executed, 1 from cache, 33 up-to-date\nConfiguration cache entry stored.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 99.34,
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "work_branch": "main",
+  "workspace_checkpoint": {
+    "base_head": "bfe98305e385425babe3407a89600b5e13208cb2",
+    "created_at": "2026-10-10T11:50:48.685230+00:00",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/20261010-blueeye-gatt-terminal-state-r2/1791633048547488000-task-exit",
+    "reason": "task-exit",
+    "status": " M core/data/src/main/java/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator.kt\n M core/data/src/main/java/io/blueeye/core/data/db/dao/DeviceUpdateDao.kt\n M core/data/src/test/kotlin/io/blueeye/core/data/verify/AppleDeduplicationScenariosTest.kt\n",
+    "task_id": "20261010-blueeye-gatt-terminal-state-r2",
+    "total_bytes": 4751,
+    "tracked_patch": "tracked.patch",
+    "tracked_patch_bytes": 4751,
+    "untracked_bytes": 0,
+    "untracked_files": [],
+    "untracked_root": "untracked",
+    "version": 2,
+    "work_branch": "agent-work"
+  }
+}

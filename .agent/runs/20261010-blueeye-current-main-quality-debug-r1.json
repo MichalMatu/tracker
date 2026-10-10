@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261010-blueeye-current-main-quality-debug-r1",
+  "task_digest": "b1a5528f92150a198ffced2893114fc07aba5ceedc89531b77d7da50f22ea67a",
+  "status": "failed",
+  "failure_reason": "verification_failed",
+  "finished_at": "2026-10-10T19:22:17.210975+00:00",
+  "attempt_id": "37ec365691d11f9d36bc956a",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 11450,
+  "updated_at": "2026-10-10T19:22:17.452848+00:00",
+  "pid": 11450
+}
