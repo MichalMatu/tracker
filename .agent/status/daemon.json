@@ -1,9 +1,9 @@
 {
   "version": 1,
   "daemon_version": "4.20.6",
-  "state": "running",
+  "state": "idle",
   "pid": 23301,
-  "updated_at": "2026-10-10T19:26:49.245193+00:00",
+  "updated_at": "2026-10-10T19:27:50.280046+00:00",
   "self_revision": "f9f73e97a061d5ba590021ddae14b45f705cb7ae",
   "poll_seconds": 15,
   "self_update_seconds": 60,
@@ -14,7 +14,7 @@
   "task_timeout_default": 1800,
   "task_timeout_max": 21600,
   "memory_limit_mb_default": 4096,
-  "current_task_id": "20261010-blueeye-detekt-quality-repair-r1",
+  "current_task_id": null,
   "current_attempt_id": null,
   "current_task_digest": null,
   "repository_id": "tracker",
@@ -25,6 +25,6 @@
   "execution_model": "multi_repository_worker",
   "worker_pid": 23301,
   "supervisor_pid": 60792,
-  "active_resources": [],
+  "last_task_id": "20261010-blueeye-detekt-quality-repair-r1",
   "execution_variant": "parallel"
 }
