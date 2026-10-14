@@ -1,6 +1,7 @@
 package io.blueeye.feature.settings
 
 import io.blueeye.core.model.Device
+import io.blueeye.core.model.DeviceCalibrationLabel
 import io.blueeye.core.model.DeviceType
 import io.blueeye.core.model.MacAddressType
 import io.blueeye.core.model.TrackingStatus
@@ -28,6 +29,24 @@ class SessionExportReviewCategoryTest {
             ).sessionExportReviewCategory()
 
         assertEquals(SessionExportReviewCategory.NEARBY, category)
+    }
+
+    @Test
+    fun `manual suspicious label without tracking evidence is a review not auto detection`() {
+        val marked = device(DeviceType.UNKNOWN, "Shared scooter").copy(
+            calibrationLabel = DeviceCalibrationLabel.SUSPICIOUS,
+        )
+        assertEquals(SessionExportReviewCategory.MANUAL_REVIEW, marked.sessionExportReviewCategory())
+        assertEquals(TrackingStatus.SAFE, marked.trackingStatus)
+    }
+
+    @Test
+    fun `auto tracking evidence takes precedence over the manual label`() {
+        val marked = device(DeviceType.UNKNOWN, "Unidentified").copy(
+            calibrationLabel = DeviceCalibrationLabel.SUSPICIOUS,
+            trackingStatus = TrackingStatus.SUSPICIOUS,
+        )
+        assertEquals(SessionExportReviewCategory.SUSPICIOUS, marked.sessionExportReviewCategory())
     }
 
     private fun device(

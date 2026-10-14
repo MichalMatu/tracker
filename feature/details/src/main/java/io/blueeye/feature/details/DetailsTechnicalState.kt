@@ -92,12 +92,11 @@ internal fun DetailsTechnicalSection(
                 )
             }
 
-            if (state.services.isNotEmpty()) {
-                InfoSection(
-                    title = "Services (${state.services.size})",
-                    items = state.services.map { service -> service.uuid to service.name },
-                )
-            }
+            DetailsGattServiceExplorer(
+                liveServices = state.services,
+                savedServices = device.gattServices,
+                savedCharacteristics = device.characteristicData,
+            )
 
             OutlinedButton(
                 onClick = onOpenRawData,

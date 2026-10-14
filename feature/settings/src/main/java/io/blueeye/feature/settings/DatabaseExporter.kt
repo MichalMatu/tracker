@@ -316,19 +316,11 @@ internal object DatabaseExportJsonMapper {
             )
             put(
                 "followMeObservations",
-                JsonArray(
-                    session.followMeObservations.map(
-                        SessionHistoryExportJsonMapper::mapFollowMeObservation,
-                    ),
-                ),
+                JsonArray(session.followMeObservations.map(SessionHistoryExportJsonMapper::mapFollowMeObservation)),
             )
             put(
                 "alertEvidenceEvents",
-                JsonArray(
-                    session.alertEvidenceEvents.map(
-                        SessionHistoryExportJsonMapper::mapAlertEvidenceEvent,
-                    ),
-                ),
+                JsonArray(session.alertEvidenceEvents.map(SessionHistoryExportJsonMapper::mapAlertEvidenceEvent)),
             )
             put("identityContinuityCandidates", SessionIdentityCandidateExportMapper.map(session.identityCandidates))
             put(

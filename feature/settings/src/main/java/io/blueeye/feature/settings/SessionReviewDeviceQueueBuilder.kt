@@ -114,6 +114,13 @@ internal object SessionReviewDeviceQueueBuilder {
                     actionText = sessionExportReviewAction(category),
                     decisions = SessionReviewDeviceQueueDecisions.SUSPICIOUS_REVIEW,
                 )
+            category == SessionExportReviewCategory.MANUAL_REVIEW ->
+                SessionReviewDeviceQueueReason(
+                    priority = SessionReviewDeviceQueuePriority.MANUAL_REVIEW,
+                    text = "Manually marked for review (not a tracking alert)",
+                    actionText = sessionExportReviewAction(category),
+                    decisions = SessionReviewDeviceQueueDecisions.MANUAL_REVIEW,
+                )
             samples.hasStrengtheningRssiTrend() ->
                 SessionReviewDeviceQueueReason(
                     priority = SessionReviewDeviceQueuePriority.STRENGTHENING_RSSI,
@@ -185,6 +192,7 @@ private object SessionReviewDeviceQueuePriority {
     const val IDENTITY_CARRYOVER = 20
     const val SUSPICIOUS = 30
     const val STRENGTHENING_RSSI = 40
+    const val MANUAL_REVIEW = 85
     const val WATCHLIST_RETURN = 50
     const val PUBLIC_SAFETY_ALERT = 60
     const val WATCHLIST = 70
@@ -197,6 +205,17 @@ private object SessionReviewDeviceQueueLimits {
 }
 
 private object SessionReviewDeviceQueueDecisions {
+    val MANUAL_REVIEW =
+        listOf(
+            SessionReviewDeviceQueueDecision(
+                text = "Clear review label",
+                deviceCalibrationLabel = DeviceCalibrationLabel.UNKNOWN,
+            ),
+            SessionReviewDeviceQueueDecision(
+                text = "Known safe",
+                deviceCalibrationLabel = DeviceCalibrationLabel.KNOWN_SAFE,
+            ),
+        )
     val SUSPICIOUS_REVIEW =
         listOf(
             SessionReviewDeviceQueueDecision(

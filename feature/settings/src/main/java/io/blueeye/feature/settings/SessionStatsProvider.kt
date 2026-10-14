@@ -85,6 +85,7 @@ data class SessionStats(
 data class SessionReviewCategoryCounts(
     val watchlist: Int = 0,
     val suspicious: Int = 0,
+    val manualReview: Int = 0,
     val publicSafety: Int = 0,
     val nearby: Int = 0,
     val unknownNoise: Int = 0,
@@ -159,6 +160,8 @@ internal object SessionStatsCalculator {
                 count { device -> device.sessionExportReviewCategory() == SessionExportReviewCategory.WATCHLIST },
             suspicious =
                 count { device -> device.sessionExportReviewCategory() == SessionExportReviewCategory.SUSPICIOUS },
+            manualReview =
+                count { device -> device.sessionExportReviewCategory() == SessionExportReviewCategory.MANUAL_REVIEW },
             publicSafety =
                 count { device -> device.sessionExportReviewCategory() == SessionExportReviewCategory.PUBLIC_SAFETY },
             nearby =

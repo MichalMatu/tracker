@@ -44,6 +44,8 @@ class DetailsCalibrationUiFormatterTest {
 
         assertEquals("Suspicious", info.statusText)
         assertSelected(info, DeviceCalibrationLabel.SUSPICIOUS)
+        assertTrue(info.description.contains("Manual review label only"))
+        assertTrue(info.description.contains("not an automatic Follow-Me"))
     }
 
     private fun assertSelected(

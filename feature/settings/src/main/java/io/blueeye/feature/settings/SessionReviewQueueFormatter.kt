@@ -66,6 +66,12 @@ internal object SessionReviewQueueFormatter {
                 actionText = SessionReviewQueueCopy.SUSPICIOUS,
             ),
             SessionReviewQueueCandidate(
+                count = stats.reviewCategoryCounts.manualReview,
+                singularTitle = "Manually flagged device",
+                pluralTitle = "Manually flagged devices",
+                actionText = SessionReviewQueueCopy.MANUAL_REVIEW,
+            ),
+            SessionReviewQueueCandidate(
                 count = stats.rssiTrendSummary.strengtheningCount,
                 singularTitle = "Strengthening RSSI trend",
                 pluralTitle = "Strengthening RSSI trends",

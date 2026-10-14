@@ -64,5 +64,6 @@ private val DeviceCalibrationLabel.description: String
             DeviceCalibrationLabel.UNKNOWN ->
                 "No user verdict yet. This device can still contribute to Follow-Me scoring and evidence review."
             DeviceCalibrationLabel.SUSPICIOUS ->
-                "User-marked suspicious signal. The device stays active for future evidence review."
+                "Manual review label only, not an automatic Follow-Me or tracking verdict. " +
+                    "The device remains available for evidence inspection."
         }

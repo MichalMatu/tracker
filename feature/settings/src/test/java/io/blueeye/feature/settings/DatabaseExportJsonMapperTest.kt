@@ -36,13 +36,13 @@ class DatabaseExportJsonMapperTest {
         val device =
             device(
                 fingerprint = "stream-device",
-                lastSeenAt = SESSION_STARTED_AT + 10_000L,
+                lastSeenAt = SessionStartedAt + 10_000L,
                 calibrationLabel = DeviceCalibrationLabel.UNKNOWN,
             )
         val sample =
             sample(
                 deviceFingerprint = device.fingerprint,
-                timestamp = SESSION_STARTED_AT + 12_000L,
+                timestamp = SessionStartedAt + 12_000L,
                 latitude = 51.1,
                 longitude = 17.0,
             )
@@ -55,13 +55,13 @@ class DatabaseExportJsonMapperTest {
                         devices = listOf(device),
                         samples = listOf(sample),
                         label = DeviceCalibrationLabel.UNKNOWN,
-                        startedAt = SESSION_STARTED_AT,
+                        startedAt = SessionStartedAt,
                         notes = "stream-test",
                         activeCollectionEnabled = false,
                         followMeObservations = emptyList(),
                         alertEvidenceEvents = emptyList(),
                     ),
-                exportDate = EXPORT_DATE,
+                exportDate = ExportDate,
             )
         val writer = StringWriter()
         val json = Json { prettyPrint = true }
@@ -78,10 +78,10 @@ class DatabaseExportJsonMapperTest {
     fun `unstarted session keeps global history separate`() {
         val device = device(
             fingerprint = "history-only",
-            lastSeenAt = SESSION_STARTED_AT + 10_000L,
+            lastSeenAt = SessionStartedAt + 10_000L,
             calibrationLabel = DeviceCalibrationLabel.UNKNOWN,
         )
-        val sample = sample(deviceFingerprint = device.fingerprint, timestamp = SESSION_STARTED_AT + 12_000L)
+        val sample = sample(deviceFingerprint = device.fingerprint, timestamp = SessionStartedAt + 12_000L)
         val data = DatabaseExportData(
             devices = listOf(device),
             samples = listOf(sample),
@@ -95,7 +95,7 @@ class DatabaseExportJsonMapperTest {
                 followMeObservations = emptyList(),
                 alertEvidenceEvents = emptyList(),
             ),
-            exportDate = EXPORT_DATE,
+            exportDate = ExportDate,
         )
         val export = DatabaseExportJsonMapper.buildExport(data)
         val session = export.getValue("session").jsonObject
@@ -124,13 +124,13 @@ class DatabaseExportJsonMapperTest {
         assertEquals("ALL_HISTORY", export.getValue("dataScope").jsonPrimitive.content)
         assertEquals("SINCE_SESSION_START", session.getValue("scope").jsonPrimitive.content)
         assertTrue(session.getValue("hasStarted").jsonPrimitive.boolean)
-        assertEquals(EXPORT_DATE, export.getValue("exportDate").jsonPrimitive.long)
+        assertEquals(ExportDate, export.getValue("exportDate").jsonPrimitive.long)
         assertEquals(2, export.getValue("deviceCount").jsonPrimitive.int)
         assertEquals(2, export.getValue("sampleCount").jsonPrimitive.int)
         assertEquals(1, export.getValue("samplesWithGps").jsonPrimitive.int)
 
         assertEquals(DeviceCalibrationLabel.SUSPICIOUS.name, session.getValue("label").jsonPrimitive.content)
-        assertEquals(SESSION_NOTES, session.getValue("notes").jsonPrimitive.content)
+        assertEquals(SessionNotes, session.getValue("notes").jsonPrimitive.content)
         assertEquals(true, session.getValue("activeCollectionEnabled").jsonPrimitive.boolean)
         assertEquals(21_000L, session.getValue("durationMs").jsonPrimitive.long)
         assertEquals(1, session.getValue("deviceCount").jsonPrimitive.int)
@@ -161,11 +161,7 @@ class DatabaseExportJsonMapperTest {
         assertEquals(1, calibrationCounts.getValue(DeviceCalibrationLabel.SUSPICIOUS.name).jsonPrimitive.int)
         assertEquals(0, calibrationCounts.getValue(DeviceCalibrationLabel.KNOWN_SAFE.name).jsonPrimitive.int)
         assertIdentityCarryoverVerdictCounts(session, IdentityCarryoverVerdict.UNREVIEWED)
-        assertEquals(1, reviewCategoryCounts.getValue("SUSPICIOUS").jsonPrimitive.int)
-        assertEquals(0, reviewCategoryCounts.getValue("WATCHLIST").jsonPrimitive.int)
-        assertEquals(0, reviewCategoryCounts.getValue("PUBLIC_SAFETY").jsonPrimitive.int)
-        assertEquals(0, reviewCategoryCounts.getValue("NEARBY").jsonPrimitive.int)
-        assertEquals(0, reviewCategoryCounts.getValue("UNKNOWN_NOISE").jsonPrimitive.int)
+        assertManualReviewCounts(reviewCategoryCounts)
         assertTrue(reviewReadiness.getValue("readyForHeuristicReview").jsonPrimitive.boolean)
         assertTrue(reviewReadiness.getValue("hasUserVerdict").jsonPrimitive.boolean)
         assertTrue(reviewReadiness.getValue("hasNotes").jsonPrimitive.boolean)
@@ -254,9 +250,9 @@ class DatabaseExportJsonMapperTest {
             IdentityCarryoverVerdict.UNREVIEWED.name,
             sessionDeviceSummary.getValue("identityCarryoverVerdict").jsonPrimitive.content,
         )
-        assertEquals("SUSPICIOUS", sessionDeviceSummary.getValue("reviewCategory").jsonPrimitive.content)
+        assertEquals("MANUAL_REVIEW", sessionDeviceSummary.getValue("reviewCategory").jsonPrimitive.content)
         assertEquals(
-            "Tracker-like, Follow-Me, or RSSI-pattern evidence needs review.",
+            "User-marked device for review; not an automatic tracking verdict.",
             sessionDeviceSummary.getValue("reviewReason").jsonPrimitive.content,
         )
         assertEquals(
@@ -329,14 +325,14 @@ class DatabaseExportJsonMapperTest {
         val device =
             device(
                 fingerprint = "flat-rssi",
-                lastSeenAt = SESSION_STARTED_AT + 60_000L,
+                lastSeenAt = SessionStartedAt + 60_000L,
                 calibrationLabel = DeviceCalibrationLabel.SUSPICIOUS,
             )
         val samples =
             List(6) { index ->
                 sample(
                     deviceFingerprint = device.fingerprint,
-                    timestamp = SESSION_STARTED_AT + index * 1_000L,
+                    timestamp = SessionStartedAt + index * 1_000L,
                     rssi = -50,
                 )
             }
@@ -350,13 +346,13 @@ class DatabaseExportJsonMapperTest {
                             devices = listOf(device),
                             samples = samples,
                             label = DeviceCalibrationLabel.SUSPICIOUS,
-                            startedAt = SESSION_STARTED_AT,
-                            notes = SESSION_NOTES,
+                            startedAt = SessionStartedAt,
+                            notes = SessionNotes,
                             activeCollectionEnabled = false,
                             followMeObservations = emptyList(),
                             alertEvidenceEvents = emptyList(),
                         ),
-                    exportDate = EXPORT_DATE,
+                    exportDate = ExportDate,
                 ),
             )
         val session = export.getValue("session").jsonObject
@@ -411,7 +407,7 @@ class DatabaseExportJsonMapperTest {
         val device =
             device(
                 fingerprint = "classic-audio",
-                lastSeenAt = SESSION_STARTED_AT + 10_000L,
+                lastSeenAt = SessionStartedAt + 10_000L,
                 calibrationLabel = DeviceCalibrationLabel.UNKNOWN,
                 evidence =
                     listOf(
@@ -440,13 +436,13 @@ class DatabaseExportJsonMapperTest {
                             devices = listOf(device),
                             samples = emptyList(),
                             label = DeviceCalibrationLabel.UNKNOWN,
-                            startedAt = SESSION_STARTED_AT,
+                            startedAt = SessionStartedAt,
                             notes = "",
                             activeCollectionEnabled = false,
                             followMeObservations = emptyList(),
                             alertEvidenceEvents = emptyList(),
                         ),
-                    exportDate = EXPORT_DATE,
+                    exportDate = ExportDate,
                 ),
             )
 
@@ -466,7 +462,7 @@ class DatabaseExportJsonMapperTest {
         val publicSafetyDevice =
             device(
                 fingerprint = "axon-like",
-                lastSeenAt = SESSION_STARTED_AT + 15_000L,
+                lastSeenAt = SessionStartedAt + 15_000L,
                 calibrationLabel = DeviceCalibrationLabel.UNKNOWN,
                 evidence =
                     listOf(
@@ -492,13 +488,13 @@ class DatabaseExportJsonMapperTest {
                             devices = listOf(publicSafetyDevice),
                             samples = emptyList(),
                             label = DeviceCalibrationLabel.UNKNOWN,
-                            startedAt = SESSION_STARTED_AT,
+                            startedAt = SessionStartedAt,
                             notes = "",
                             activeCollectionEnabled = false,
                             followMeObservations = emptyList(),
                             alertEvidenceEvents = emptyList(),
                         ),
-                    exportDate = EXPORT_DATE,
+                    exportDate = ExportDate,
                 ),
             )
         val session = export.getValue("session").jsonObject
@@ -512,188 +508,186 @@ class DatabaseExportJsonMapperTest {
             deviceSummary.getValue("reviewReason").jsonPrimitive.content,
         )
     }
-
-    private fun structuredExportFixture(): StructuredExportFixture {
-        val sessionDevice =
-            device(
-                fingerprint = "session-device",
-                lastSeenAt = SESSION_STARTED_AT + 10_000L,
-                calibrationLabel = DeviceCalibrationLabel.SUSPICIOUS,
-                evidence =
-                    listOf(
-                        evidence(
-                            source = EvidenceSource.USER_CONFIRMATION,
-                            confidence = DetectionConfidence.MEDIUM,
-                            spec =
-                                EvidenceSpec(
-                                    reason = "User marked this device as suspicious for future evidence review.",
-                                    rawValue = DeviceCalibrationLabel.SUSPICIOUS.name,
-                                    parsedValue = "Suspicious",
-                                ),
-                        ),
-                    ),
-            ).copy(
-                serialNumber = "AXN12345",
-                lastRawData = "0201061AFF",
-            )
-        val oldDevice =
-            device(
-                fingerprint = "old-device",
-                lastSeenAt = SESSION_STARTED_AT - 10_000L,
-                calibrationLabel = DeviceCalibrationLabel.KNOWN_SAFE,
-            )
-        val sessionSample =
-            sample(
-                deviceFingerprint = sessionDevice.fingerprint,
-                timestamp = SESSION_STARTED_AT + 12_000L,
-            )
-        val oldSample =
-            sample(
-                deviceFingerprint = oldDevice.fingerprint,
-                timestamp = SESSION_STARTED_AT - 12_000L,
-                latitude = 52.2,
-                longitude = 21.0,
-            )
-        val followMeObservation = followMeObservation(sessionDevice)
-        val alertEvidenceEvent = followMeAlertEvent(sessionDevice)
-
-        return StructuredExportFixture(
-            export =
-                DatabaseExportJsonMapper.buildExport(
-                    DatabaseExportData(
-                        devices = listOf(sessionDevice, oldDevice),
-                        samples = listOf(sessionSample, oldSample),
-                        session =
-                            DatabaseExportSessionData(
-                                devices = listOf(sessionDevice),
-                                samples = listOf(sessionSample),
-                                label = DeviceCalibrationLabel.SUSPICIOUS,
-                                startedAt = SESSION_STARTED_AT,
-                                notes = SESSION_NOTES,
-                                activeCollectionEnabled = true,
-                                followMeObservations = listOf(followMeObservation),
-                                alertEvidenceEvents = listOf(alertEvidenceEvent),
-                            ),
-                        exportDate = EXPORT_DATE,
-                    ),
-                ),
-            sessionDevice = sessionDevice,
-            sessionSample = sessionSample,
-            followMeObservation = followMeObservation,
-            alertEvidenceEvent = alertEvidenceEvent,
-        )
-    }
-
-    private fun device(
-        fingerprint: String,
-        lastSeenAt: Long,
-        calibrationLabel: DeviceCalibrationLabel,
-        evidence: List<DetectionEvidence> = emptyList(),
-    ): Device =
-        Device(
-            fingerprint = fingerprint,
-            macAddress = "AA:BB:CC:11:22:33",
-            macAddressType = MacAddressType.PUBLIC,
-            technology = "BLE",
-            name = "Device $fingerprint",
-            deviceType = DeviceType.UNKNOWN,
-            vendorName = "Unknown Vendor",
-            predictedModel = null,
-            trackingStatus = TrackingStatus.SAFE,
-            followingScore = 0f,
-            isSafeBeacon = false,
-            isInWatchlist = false,
-            userAlias = null,
-            userNotes = null,
-            alertSound = false,
-            alertVibration = false,
-            firstSeenAt = lastSeenAt - 60_000L,
-            lastSeenAt = lastSeenAt,
-            rssi = -55,
-            encounterCount = 1,
-            calibrationLabel = calibrationLabel,
-            evidence = evidence,
-        )
-
-    private fun followMeObservation(device: Device): SessionFollowMeObservation =
-        SessionFollowMeObservation(
-            deviceFingerprint = device.fingerprint,
-            observation =
-                FollowMeHistorySample(
-                    timestamp = SESSION_STARTED_AT + 20_000L,
-                    observedMac = device.macAddress,
-                    trackingStatus = TrackingStatus.SUSPICIOUS,
-                    score = 72f,
-                    explanation = "Seen while moving with stable RSSI.",
-                    rssi = -57,
-                    encounterCount = 4,
-                    durationScore = 20,
-                    rssiStabilityScore = 15,
-                    deviceTypeScore = 10,
-                    macBehaviorScore = 12,
-                    encounterScore = 15,
-                    userMoved = true,
-                    baselineDevice = false,
-                ),
-        )
-
-    private fun followMeAlertEvent(device: Device): AlertEvidenceEvent =
-        AlertEvidenceEvent(
-            timestamp = SESSION_STARTED_AT + 21_000L,
-            deviceFingerprint = device.fingerprint,
-            observedMac = device.macAddress,
-            eventType = AlertEvidenceEventType.FOLLOW_ME_ALERT,
-            evidence =
-                evidence(
-                    source = EvidenceSource.FOLLOW_ME_SCORE,
-                    confidence = DetectionConfidence.HIGH,
-                    spec =
-                        EvidenceSpec(
-                            reason = "Follow-Me alert fired after movement correlation.",
-                            rawValue = "72",
-                            parsedValue = TrackingStatus.SUSPICIOUS.name,
-                        ),
-                ),
-        )
-
-    private fun evidence(
-        source: EvidenceSource,
-        confidence: DetectionConfidence,
-        spec: EvidenceSpec,
-    ): DetectionEvidence =
-        DetectionEvidence(
-            source = source,
-            confidence = confidence,
-            reasonText = spec.reason,
-            timestamp = SESSION_STARTED_AT + 10_000L,
-            rawValue = spec.rawValue,
-            parsedValue = spec.parsedValue,
-            isPassive = true,
-            provenance = spec.provenance,
-        )
-
-    private fun sample(
-        deviceFingerprint: String,
-        timestamp: Long,
-        latitude: Double? = null,
-        longitude: Double? = null,
-        rssi: Int = -57,
-    ): SignalSample =
-        SignalSample(
-            deviceFingerprint = deviceFingerprint,
-            rssi = rssi,
-            latitude = latitude,
-            longitude = longitude,
-            locationAccuracy = null,
-            timestamp = timestamp,
-        )
-
-    private companion object {
-        private const val SESSION_STARTED_AT = 1_789_000_000_000L
-        private const val EXPORT_DATE = SESSION_STARTED_AT + 120_000L
-        private const val SESSION_NOTES = "Home baseline near known headphones."
-    }
 }
+
+private const val SessionStartedAt = 1_789_000_000_000L
+private const val ExportDate = SessionStartedAt + 120_000L
+private const val SessionNotes = "Home baseline near known headphones."
+
+private fun structuredExportFixture(): StructuredExportFixture {
+    val sessionDevice =
+        device(
+            fingerprint = "session-device",
+            lastSeenAt = SessionStartedAt + 10_000L,
+            calibrationLabel = DeviceCalibrationLabel.SUSPICIOUS,
+            evidence =
+                listOf(
+                    evidence(
+                        source = EvidenceSource.USER_CONFIRMATION,
+                        confidence = DetectionConfidence.MEDIUM,
+                        spec =
+                            EvidenceSpec(
+                                reason = "User marked this device as suspicious for future evidence review.",
+                                rawValue = DeviceCalibrationLabel.SUSPICIOUS.name,
+                                parsedValue = "Suspicious",
+                            ),
+                    ),
+                ),
+        ).copy(
+            serialNumber = "AXN12345",
+            lastRawData = "0201061AFF",
+        )
+    val oldDevice =
+        device(
+            fingerprint = "old-device",
+            lastSeenAt = SessionStartedAt - 10_000L,
+            calibrationLabel = DeviceCalibrationLabel.KNOWN_SAFE,
+        )
+    val sessionSample =
+        sample(
+            deviceFingerprint = sessionDevice.fingerprint,
+            timestamp = SessionStartedAt + 12_000L,
+        )
+    val oldSample =
+        sample(
+            deviceFingerprint = oldDevice.fingerprint,
+            timestamp = SessionStartedAt - 12_000L,
+            latitude = 52.2,
+            longitude = 21.0,
+        )
+    val followMeObservation = followMeObservation(sessionDevice)
+    val alertEvidenceEvent = followMeAlertEvent(sessionDevice)
+
+    return StructuredExportFixture(
+        export =
+            DatabaseExportJsonMapper.buildExport(
+                DatabaseExportData(
+                    devices = listOf(sessionDevice, oldDevice),
+                    samples = listOf(sessionSample, oldSample),
+                    session =
+                        DatabaseExportSessionData(
+                            devices = listOf(sessionDevice),
+                            samples = listOf(sessionSample),
+                            label = DeviceCalibrationLabel.SUSPICIOUS,
+                            startedAt = SessionStartedAt,
+                            notes = SessionNotes,
+                            activeCollectionEnabled = true,
+                            followMeObservations = listOf(followMeObservation),
+                            alertEvidenceEvents = listOf(alertEvidenceEvent),
+                        ),
+                    exportDate = ExportDate,
+                ),
+            ),
+        sessionDevice = sessionDevice,
+        sessionSample = sessionSample,
+        followMeObservation = followMeObservation,
+        alertEvidenceEvent = alertEvidenceEvent,
+    )
+}
+
+private fun device(
+    fingerprint: String,
+    lastSeenAt: Long,
+    calibrationLabel: DeviceCalibrationLabel,
+    evidence: List<DetectionEvidence> = emptyList(),
+): Device =
+    Device(
+        fingerprint = fingerprint,
+        macAddress = "AA:BB:CC:11:22:33",
+        macAddressType = MacAddressType.PUBLIC,
+        technology = "BLE",
+        name = "Device $fingerprint",
+        deviceType = DeviceType.UNKNOWN,
+        vendorName = "Unknown Vendor",
+        predictedModel = null,
+        trackingStatus = TrackingStatus.SAFE,
+        followingScore = 0f,
+        isSafeBeacon = false,
+        isInWatchlist = false,
+        userAlias = null,
+        userNotes = null,
+        alertSound = false,
+        alertVibration = false,
+        firstSeenAt = lastSeenAt - 60_000L,
+        lastSeenAt = lastSeenAt,
+        rssi = -55,
+        encounterCount = 1,
+        calibrationLabel = calibrationLabel,
+        evidence = evidence,
+    )
+
+private fun followMeObservation(device: Device): SessionFollowMeObservation =
+    SessionFollowMeObservation(
+        deviceFingerprint = device.fingerprint,
+        observation =
+            FollowMeHistorySample(
+                timestamp = SessionStartedAt + 20_000L,
+                observedMac = device.macAddress,
+                trackingStatus = TrackingStatus.SUSPICIOUS,
+                score = 72f,
+                explanation = "Seen while moving with stable RSSI.",
+                rssi = -57,
+                encounterCount = 4,
+                durationScore = 20,
+                rssiStabilityScore = 15,
+                deviceTypeScore = 10,
+                macBehaviorScore = 12,
+                encounterScore = 15,
+                userMoved = true,
+                baselineDevice = false,
+            ),
+    )
+
+private fun followMeAlertEvent(device: Device): AlertEvidenceEvent =
+    AlertEvidenceEvent(
+        timestamp = SessionStartedAt + 21_000L,
+        deviceFingerprint = device.fingerprint,
+        observedMac = device.macAddress,
+        eventType = AlertEvidenceEventType.FOLLOW_ME_ALERT,
+        evidence =
+            evidence(
+                source = EvidenceSource.FOLLOW_ME_SCORE,
+                confidence = DetectionConfidence.HIGH,
+                spec =
+                    EvidenceSpec(
+                        reason = "Follow-Me alert fired after movement correlation.",
+                        rawValue = "72",
+                        parsedValue = TrackingStatus.SUSPICIOUS.name,
+                    ),
+            ),
+    )
+
+private fun evidence(
+    source: EvidenceSource,
+    confidence: DetectionConfidence,
+    spec: EvidenceSpec,
+): DetectionEvidence =
+    DetectionEvidence(
+        source = source,
+        confidence = confidence,
+        reasonText = spec.reason,
+        timestamp = SessionStartedAt + 10_000L,
+        rawValue = spec.rawValue,
+        parsedValue = spec.parsedValue,
+        isPassive = true,
+        provenance = spec.provenance,
+    )
+
+private fun sample(
+    deviceFingerprint: String,
+    timestamp: Long,
+    latitude: Double? = null,
+    longitude: Double? = null,
+    rssi: Int = -57,
+): SignalSample =
+    SignalSample(
+        deviceFingerprint = deviceFingerprint,
+        rssi = rssi,
+        latitude = latitude,
+        longitude = longitude,
+        locationAccuracy = null,
+        timestamp = timestamp,
+    )
 
 private data class EvidenceSpec(
     val reason: String,
@@ -740,3 +734,12 @@ private fun JsonObject.stringArray(key: String): List<String> =
     getValue(key).jsonArray.map { item ->
         item.jsonPrimitive.content
     }
+
+private fun assertManualReviewCounts(counts: JsonObject) {
+    assertEquals(1, counts.getValue("MANUAL_REVIEW").jsonPrimitive.int)
+    assertEquals(0, counts.getValue("SUSPICIOUS").jsonPrimitive.int)
+    assertEquals(0, counts.getValue("WATCHLIST").jsonPrimitive.int)
+    assertEquals(0, counts.getValue("PUBLIC_SAFETY").jsonPrimitive.int)
+    assertEquals(0, counts.getValue("NEARBY").jsonPrimitive.int)
+    assertEquals(0, counts.getValue("UNKNOWN_NOISE").jsonPrimitive.int)
+}

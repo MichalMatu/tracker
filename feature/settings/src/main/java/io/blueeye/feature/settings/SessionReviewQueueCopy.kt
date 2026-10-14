@@ -7,6 +7,8 @@ internal object SessionReviewQueueCopy {
         "Verify merged history in Details before trusting identity continuity."
     const val SUSPICIOUS =
         "Compare evidence in Details, then choose Suspicious, False Positive, or Known Safe."
+    const val MANUAL_REVIEW =
+        "User review marker only; inspect the evidence and clear the label when finished."
     const val STRENGTHENING_RSSI =
         "Compare with movement context; RSSI alone is not proof."
     const val WATCHLIST_RETURN =

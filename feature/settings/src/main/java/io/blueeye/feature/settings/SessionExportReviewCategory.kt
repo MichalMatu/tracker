@@ -14,6 +14,7 @@ internal enum class SessionExportReviewCategory(
 ) {
     WATCHLIST("Device is watchlisted or has watchlist evidence."),
     SUSPICIOUS("Tracker-like, Follow-Me, or RSSI-pattern evidence needs review."),
+    MANUAL_REVIEW("User-marked device for review; not an automatic tracking verdict."),
     PUBLIC_SAFETY("Signal is consistent with public-safety or tactical gear; not a confirmed presence."),
     NEARBY("Identified nearby device without attention evidence."),
     UNKNOWN_NOISE("Ignored, weak, or unidentified broadcast without attention evidence."),
@@ -24,6 +25,7 @@ internal fun Device.sessionExportReviewCategory(): SessionExportReviewCategory =
         hasWatchlistSignal() -> SessionExportReviewCategory.WATCHLIST
         isSessionReviewSuppressedByUser() -> SessionExportReviewCategory.UNKNOWN_NOISE
         hasSuspiciousTrackingSignal() -> SessionExportReviewCategory.SUSPICIOUS
+        calibrationLabel == DeviceCalibrationLabel.SUSPICIOUS -> SessionExportReviewCategory.MANUAL_REVIEW
         hasPublicSafetyLikeSignal() -> SessionExportReviewCategory.PUBLIC_SAFETY
         isUnknownNoise() -> SessionExportReviewCategory.UNKNOWN_NOISE
         else -> SessionExportReviewCategory.NEARBY
@@ -54,6 +56,8 @@ private fun SessionExportReviewCategory.reviewActionText(): String =
             "Confirm whether the return alert was useful; edit Watchlist or mark Known Safe if alerts are unwanted."
         SessionExportReviewCategory.SUSPICIOUS ->
             "Compare movement history with your route, then mark Suspicious, False Positive, or Known Safe."
+        SessionExportReviewCategory.MANUAL_REVIEW ->
+            "This is your manual review flag, not an app detection. Inspect GATT/evidence and clear it when done."
         SessionExportReviewCategory.PUBLIC_SAFETY ->
             "Treat as classification evidence only; keep Unknown unless you can verify the device context."
         SessionExportReviewCategory.NEARBY ->
@@ -67,8 +71,7 @@ private fun Device.hasWatchlistSignal(): Boolean =
         evidence.any { item -> item.source == EvidenceSource.WATCHLIST }
 
 private fun Device.hasSuspiciousTrackingSignal(): Boolean =
-    calibrationLabel == DeviceCalibrationLabel.SUSPICIOUS ||
-        evidence.any(DetectionEvidenceClassifier::isTrackerLikeEvidence) ||
+    evidence.any(DetectionEvidenceClassifier::isTrackerLikeEvidence) ||
         trackingStatus != TrackingStatus.SAFE ||
         followingScore >= SessionExportReviewThresholds.SUSPICIOUS_SCORE ||
         evidence.any { item ->
