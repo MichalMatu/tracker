@@ -76,27 +76,30 @@ class DatabaseExportJsonMapperTest {
 
     @Test
     fun `unstarted session keeps global history separate`() {
-        val device = device(
-            fingerprint = "history-only",
-            lastSeenAt = SessionStartedAt + 10_000L,
-            calibrationLabel = DeviceCalibrationLabel.UNKNOWN,
-        )
+        val device =
+            device(
+                fingerprint = "history-only",
+                lastSeenAt = SessionStartedAt + 10_000L,
+                calibrationLabel = DeviceCalibrationLabel.UNKNOWN,
+            )
         val sample = sample(deviceFingerprint = device.fingerprint, timestamp = SessionStartedAt + 12_000L)
-        val data = DatabaseExportData(
-            devices = listOf(device),
-            samples = listOf(sample),
-            session = DatabaseExportSessionData(
-                devices = emptyList(),
-                samples = emptyList(),
-                label = DeviceCalibrationLabel.UNKNOWN,
-                startedAt = 0L,
-                notes = "",
-                activeCollectionEnabled = false,
-                followMeObservations = emptyList(),
-                alertEvidenceEvents = emptyList(),
-            ),
-            exportDate = ExportDate,
-        )
+        val data =
+            DatabaseExportData(
+                devices = listOf(device),
+                samples = listOf(sample),
+                session =
+                    DatabaseExportSessionData(
+                        devices = emptyList(),
+                        samples = emptyList(),
+                        label = DeviceCalibrationLabel.UNKNOWN,
+                        startedAt = 0L,
+                        notes = "",
+                        activeCollectionEnabled = false,
+                        followMeObservations = emptyList(),
+                        alertEvidenceEvents = emptyList(),
+                    ),
+                exportDate = ExportDate,
+            )
         val export = DatabaseExportJsonMapper.buildExport(data)
         val session = export.getValue("session").jsonObject
 
@@ -256,7 +259,7 @@ class DatabaseExportJsonMapperTest {
             sessionDeviceSummary.getValue("reviewReason").jsonPrimitive.content,
         )
         assertEquals(
-            "Compare movement history with your route, then mark Suspicious, False Positive, or Known Safe.",
+            "This is your manual review flag, not an app detection. Inspect GATT/evidence and clear it when done.",
             sessionDeviceSummary.getValue("reviewAction").jsonPrimitive.content,
         )
         assertEquals(1, sessionDeviceSummary.getValue("evidenceCount").jsonPrimitive.int)
