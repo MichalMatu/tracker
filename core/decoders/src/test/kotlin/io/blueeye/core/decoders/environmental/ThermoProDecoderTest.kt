@@ -20,13 +20,16 @@ class ThermoProDecoderTest {
         )
 
         expectedByStatus.forEach { (status, expectedBattery) ->
-            val input = BleBeaconScanInput(
-                mac = "",
-                manufacturerRecords = emptyMap(),
-                serviceUuids = emptyList(),
-                rawData = ("0D0954503335372028544553542907FFC2F2002E" +
-                    "%02X".format(status) + "2C").hexToBytes(),
-            )
+            val payloadHex =
+                "0D0954503335372028544553542907FFC2F2002E" +
+                    "%02X".format(status) + "2C"
+            val input =
+                BleBeaconScanInput(
+                    mac = "",
+                    manufacturerRecords = emptyMap(),
+                    serviceUuids = emptyList(),
+                    rawData = payloadHex.hexToBytes(),
+                )
 
             assertTrue("Should recognize TP357, status=$status", decoder.supports(input))
             val decoded = decoder.decode(input)

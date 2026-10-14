@@ -14,6 +14,10 @@ import javax.inject.Singleton
 class ThermoProDecoder
 @Inject
 constructor() : BleBeaconDecoder {
+    private companion object {
+        const val BATTERY_STATUS_MASK = 0x03
+    }
+
     override fun supports(input: BleBeaconScanInput): Boolean {
         val rawData = input.rawData
         // Check for Local Name starting with TP35x
@@ -83,7 +87,7 @@ constructor() : BleBeaconDecoder {
             // TP35x stores a two-bit battery status, not a literal percentage.
             // Match the field-tested Growclip mapping; 3 means unknown.
             val battery = if (payload.size > offset + 3) {
-                when (payload[offset + 3].toInt() and 0x03) {
+                when (payload[offset + 3].toInt() and BATTERY_STATUS_MASK) {
                     0 -> 1
                     1 -> 50
                     2 -> 100

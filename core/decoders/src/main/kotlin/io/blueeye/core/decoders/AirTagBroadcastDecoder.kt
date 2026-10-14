@@ -8,6 +8,10 @@ import javax.inject.Singleton
 class AirTagBroadcastDecoder
 @Inject
 constructor() : BleBeaconDecoder {
+    private companion object {
+        const val MAINTAINED_MASK = 0x04
+    }
+
     override fun supports(input: BleBeaconScanInput): Boolean {
         val manufacturerId = input.manufacturerId
         val data = input.data
@@ -32,7 +36,7 @@ constructor() : BleBeaconDecoder {
         if (data.size > 2) {
             statusByte = data[2].toInt() and 0xFF
             batteryStatus =
-                if ((statusByte and 0x04) == 0) {
+                if ((statusByte and MAINTAINED_MASK) == 0) {
                     "Unknown"
                 } else {
                     when ((statusByte shr 6) and 0x03) {
