@@ -18,6 +18,7 @@ enum class AlertVibrationPattern {
 }
 
 enum class AlertDeliveryStatus {
+    NOT_ATTEMPTED,
     POSTED,
     BLOCKED_BY_POLICY,
     BLOCKED_BY_PERMISSION,
@@ -42,7 +43,7 @@ data class AlertRequest(
 data class AlertDeliveryResult(
     val category: AlertCategory = AlertCategory.TEST,
     val key: String = "initial",
-    val status: AlertDeliveryStatus = AlertDeliveryStatus.BLOCKED_BY_POLICY,
+    val status: AlertDeliveryStatus = AlertDeliveryStatus.NOT_ATTEMPTED,
     val postedNotification: Boolean = false,
     val soundPlayed: Boolean = false,
     val vibrationTriggered: Boolean = false,
@@ -64,6 +65,8 @@ data class AlertDeliveryDiagnostics(
     val headsUpChannel: AlertChannelDiagnostics = AlertChannelDiagnostics(channelId = "field_mvp_alerts_heads_up_v1"),
     val trayChannel: AlertChannelDiagnostics = AlertChannelDiagnostics(channelId = "field_mvp_alerts_tray_v1"),
     val lastResult: AlertDeliveryResult = AlertDeliveryResult(),
+    /** Recent delivery decisions in this process only. */
+    val recentResults: List<AlertDeliveryResult> = emptyList(),
 )
 
 interface AlertDispatcher {

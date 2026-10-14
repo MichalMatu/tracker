@@ -7,6 +7,9 @@ internal fun String.withFieldMvpDiagnostics(uiState: SettingsUiState): String {
     if (insertionPoint <= 0) return this
     val scanner = uiState.scannerDiagnostics
     val alerts = uiState.alertDeliveryDiagnostics
+    val recentAlertDecisions = alerts.recentResults.joinToString(",") { result ->
+        """{"category":"${result.category.name}","status":"${result.status.name}","timestamp":${result.timestamp}}"""
+    }
     val payload =
         """
         ,
@@ -62,6 +65,9 @@ internal fun String.withFieldMvpDiagnostics(uiState: SettingsUiState): String {
               "headsUpChannelBlocked": ${alerts.headsUpChannel.blocked},
               "trayChannelBlocked": ${alerts.trayChannel.blocked},
               "lastStatus": "${alerts.lastResult.status.name}",
+              "lastAttemptAt": ${alerts.lastResult.timestamp},
+              "recentDecisionCount": ${alerts.recentResults.size},
+              "recentDecisions": [$recentAlertDecisions],
               "lastMessage": ${alerts.lastResult.message.jsonStringOrNull()},
               "lastPostedNotification": ${alerts.lastResult.postedNotification},
               "lastSoundPlayed": ${alerts.lastResult.soundPlayed},

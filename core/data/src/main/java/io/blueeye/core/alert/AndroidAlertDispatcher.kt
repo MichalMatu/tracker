@@ -61,6 +61,7 @@ class AndroidAlertDispatcher
                 vibrationHandler = vibrationHandler,
             )
 
+        private val deliveryHistory = AlertDeliveryHistory()
         private val _diagnostics = MutableStateFlow(buildDiagnostics(AlertDeliveryResult()))
         override val diagnostics: StateFlow<AlertDeliveryDiagnostics> = _diagnostics.asStateFlow()
 
@@ -129,19 +130,20 @@ class AndroidAlertDispatcher
                         delivery
                     }
 
+                deliveryHistory.record(result)
                 _diagnostics.value = buildDiagnostics(result)
                 result
             }.onFailure { error ->
-                _diagnostics.value =
-                    buildDiagnostics(
-                        AlertDeliveryResult(
-                            category = request.category,
-                            key = request.key,
-                            status = AlertDeliveryStatus.FAILED,
-                            message = "Alert dispatch failed: ${error.message ?: error.javaClass.simpleName}",
-                            timestamp = System.currentTimeMillis(),
-                        ),
+                val failureResult =
+                    AlertDeliveryResult(
+                        category = request.category,
+                        key = request.key,
+                        status = AlertDeliveryStatus.FAILED,
+                        message = "Alert dispatch failed: ${error.message ?: error.javaClass.simpleName}",
+                        timestamp = System.currentTimeMillis(),
                     )
+                deliveryHistory.record(failureResult)
+                _diagnostics.value = buildDiagnostics(failureResult)
             }
 
         override fun acknowledge(
@@ -273,6 +275,7 @@ class AndroidAlertDispatcher
                 headsUpChannel = channelDiagnostics(HEADS_UP_CHANNEL_ID),
                 trayChannel = channelDiagnostics(TRAY_CHANNEL_ID),
                 lastResult = lastResult,
+                recentResults = deliveryHistory.snapshot(),
             )
 
         private fun channelDiagnostics(channelId: String): AlertChannelDiagnostics {
