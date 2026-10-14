@@ -111,7 +111,11 @@ interface DeviceUpdateDao {
             batteryLevel = CASE WHEN :battery IS NOT NULL THEN :battery ELSE batteryLevel END,
             gattServices = CASE WHEN :services IS NOT NULL THEN :services ELSE gattServices END,
             characteristicData = CASE WHEN :charData IS NOT NULL THEN :charData ELSE characteristicData END,
-            probeError = CASE WHEN :error IS NOT NULL THEN :error ELSE probeError END,
+            probeError = CASE
+                WHEN :status = 'CONNECTED' THEN NULL
+                WHEN :error IS NOT NULL THEN :error
+                ELSE probeError
+            END,
             deviceType = CASE WHEN :newDeviceType = 'UNKNOWN' THEN deviceType ELSE :newDeviceType END
         WHERE fingerprint = :fingerprint
     """,

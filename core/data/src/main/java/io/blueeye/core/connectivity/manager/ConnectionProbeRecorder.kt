@@ -108,7 +108,7 @@ class ConnectionProbeRecorder @Inject constructor(
                 deviceRepository.updateProbeData(mac, params)
             }
             uuid.contains("00002a19") -> {
-                val battery = if (value.isNotEmpty()) value[0].toInt() else null
+                val battery = GattBatteryLevelDecoder.parse(value)
                 val params = io.blueeye.core.domain.repository.RepoProbeParams(
                     status = "CONNECTED",
                     attempts = 1,
