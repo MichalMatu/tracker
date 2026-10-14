@@ -14,8 +14,10 @@ import io.blueeye.core.connectivity.mapper.BleServiceMapper
 import io.blueeye.core.domain.details.DeviceConnectionController
 import io.blueeye.core.model.DeviceConnectionState
 import io.blueeye.core.model.GattService
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -54,7 +57,8 @@ constructor(
     private val _currentRecordFingerprint = MutableStateFlow<String?>(null)
 
     // Collected characteristic data during live connection (SHORT_UUID -> HEX_VALUE)
-    private val collectedCharData = mutableMapOf<String, String>()
+    private val collectedCharData = ConcurrentHashMap<String, String>()
+    private var discoveryReadJob: Job? = null
 
     init {
         // Obserwuj zdarzenia z niskiego poziomu (GATT Client)
@@ -73,8 +77,11 @@ constructor(
                             message = "GATT connection failed/lost with status ${event.status}",
                             gattStatus = event.status,
                         )
+                    discoveryReadJob?.cancel()
+                    discoveryReadJob = null
                     bleGattClient.close() // Ważne: zamykamy gatt po błędzie
                     bleOperationManager.reset()
+                    _services.value = emptyList()
                 } else if (event.newState == android.bluetooth.BluetoothProfile.STATE_CONNECTED) {
                     _connectionState.value =
                         DeviceConnectionState.Connected(
@@ -91,30 +98,26 @@ constructor(
                     // Poprawne rozłączenie (status == 0)
                     _connectionState.value = DeviceConnectionState.Disconnected
                     _services.value = emptyList()
+                    discoveryReadJob?.cancel()
+                    discoveryReadJob = null
                     bleOperationManager.reset()
                     bleGattClient.close()
                 }
             }
             is BleGattEvent.ServicesDiscovered -> {
                 if (event.status == android.bluetooth.BluetoothGatt.GATT_SUCCESS) {
-                    val gattServices = bleGattClient.getServices()
-                    _services.value = bleServiceMapper.map(gattServices)
-
-                    // Czytamy wszystkie charakterystyki po kolei
-                    scope.launch {
-                        // 1. Zapisz podstawową strukturę (usługi) do bazy
-                        currentRecordFingerprint()?.let { fingerprint ->
-                            connectionProbeRecorder.recordServices(
-                                fingerprint,
-                                gattServices
-                            )
-                        }
-                        // 2. Czytaj wartości
-                        readAllReadableCharacteristics(gattServices)
-                    }
+                    startServiceRead()
                 } else {
+                    discoveryReadJob?.cancel()
+                    discoveryReadJob = null
+                    bleOperationManager.reset()
+                    bleGattClient.close()
+                    _services.value = emptyList()
                     _connectionState.value =
-                        DeviceConnectionState.Error("Service Discovery Failed: ${event.status}")
+                        DeviceConnectionState.Error(
+                            "Service Discovery Failed: ${event.status}",
+                            gattStatus = event.status,
+                        )
                 }
             }
             is BleGattEvent.CharacteristicRead -> {
@@ -165,6 +168,23 @@ constructor(
         }
     }
 
+    private fun startServiceRead() {
+        val gattServices = bleGattClient.getServices()
+        _services.value = bleServiceMapper.map(gattServices)
+
+        // Associate asynchronous work with the session that discovered the services.
+        discoveryReadJob?.cancel()
+        val epoch = bleGattClient.currentSessionEpoch()
+        val fingerprint = currentRecordFingerprint()
+        discoveryReadJob = scope.launch {
+            if (!GattEventSessionPolicy.isCurrent(epoch, bleGattClient.currentSessionEpoch())) {
+                return@launch
+            }
+            fingerprint?.let { connectionProbeRecorder.recordServices(it, gattServices) }
+            readAllReadableCharacteristics(gattServices, epoch, fingerprint)
+        }
+    }
+
     @SuppressLint("MissingPermission")
     override fun connect(
         macAddress: String,
@@ -212,6 +232,9 @@ constructor(
         }
 
     private fun disconnectInternal() {
+        discoveryReadJob?.cancel()
+        discoveryReadJob = null
+        bleOperationManager.reset()
         bleGattClient.disconnect()
         bleGattClient.close()
         _connectionState.value = DeviceConnectionState.Disconnected
@@ -220,19 +243,27 @@ constructor(
         _currentRecordFingerprint.value = null
     }
 
-    private suspend fun readAllReadableCharacteristics(services: List<android.bluetooth.BluetoothGattService>) {
+    private suspend fun readAllReadableCharacteristics(
+        services: List<android.bluetooth.BluetoothGattService>,
+        sessionEpoch: Long,
+        fingerprint: String?,
+    ) {
         Log.d("BleManager", "Reading ALL readable characteristics for ${services.size} services...")
-        services.forEach { service ->
+        for (service in services) {
+            if (!GattEventSessionPolicy.isCurrent(sessionEpoch, bleGattClient.currentSessionEpoch())) break
             val readableChars = service.characteristics.filter {
                 (it.properties and BluetoothGattCharacteristic.PROPERTY_READ) != 0
             }
             Log.d("BleManager", "Service ${service.uuid} has ${readableChars.size} readable chars")
 
-            readableChars.forEach { char ->
+            for (char in readableChars) {
+                if (!GattEventSessionPolicy.isCurrent(sessionEpoch, bleGattClient.currentSessionEpoch())) break
                 try {
                     Log.d("BleManager", "Initiating read for char: ${char.uuid}")
                     bleOperationManager.read(char)
                     delay(READ_OPERATION_DELAY_MS)
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
                 } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                     Log.w("BleManager", "Failed to read ${char.uuid}: ${e.message}")
                 }
@@ -240,9 +271,13 @@ constructor(
         }
         Log.d("BleManager", "Finished reading all characteristics. Total collected: ${collectedCharData.size}")
 
-        // Save all collected characteristic data to database
-        currentRecordFingerprint()?.let { fingerprint ->
-            connectionProbeRecorder.saveBufferedCharacteristics(fingerprint, collectedCharData)
+        // Never persist buffered values against a different GATT session/fingerprint.
+        if (
+            GattEventSessionPolicy.isCurrent(sessionEpoch, bleGattClient.currentSessionEpoch()) &&
+            fingerprint != null &&
+            fingerprint == currentRecordFingerprint()
+        ) {
+            connectionProbeRecorder.saveBufferedCharacteristics(fingerprint, collectedCharData.toMap())
         }
     }
 
