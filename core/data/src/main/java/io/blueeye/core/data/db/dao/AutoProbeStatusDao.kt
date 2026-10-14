@@ -42,4 +42,10 @@ interface AutoProbeStatusDao {
         """,
     )
     suspend fun failStaleProbesBefore(cutoff: Long, error: String): Int
+
+    @Query(
+        "UPDATE devices SET connectionAttempts = connectionAttempts + 1 " +
+            "WHERE fingerprint = :fingerprint AND connectionStatus = 'PROBING'",
+    )
+    suspend fun incrementAutoProbeAttemptIfStillProbing(fingerprint: String): Int
 }

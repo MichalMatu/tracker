@@ -12,5 +12,6 @@ sealed class DeviceConnectionState {
 
     data class Error(
         val message: String,
+        val gattStatus: Int? = null,
     ) : DeviceConnectionState()
 }

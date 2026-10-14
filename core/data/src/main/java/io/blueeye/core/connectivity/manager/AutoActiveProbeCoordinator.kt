@@ -57,6 +57,11 @@ class AutoActiveProbeCoordinator @Inject constructor(
 
     private var timeoutJob: Job? = null
 
+    @Volatile
+    private var retryPending = false
+
+    private var retriesStarted = 0
+
     init {
         if (ScannerRuntimePolicy.allowsAutomaticActiveProbe) {
             scope.launch {
@@ -153,6 +158,8 @@ class AutoActiveProbeCoordinator @Inject constructor(
                     activeRequest = next
                     activeStartedAt = System.currentTimeMillis()
                     activeProgressSeen = false
+                    retryPending = false
+                    retriesStarted = 0
                     next
                 }
             } ?: return
@@ -185,26 +192,76 @@ class AutoActiveProbeCoordinator @Inject constructor(
                 }
             }
             is DeviceConnectionState.Error -> {
-                finishActiveProbe(
-                    request = request,
-                    markFailed = !activeProgressSeen,
-                    error = state.message,
-                    cancelTimeout = true,
-                )
-            }
-            DeviceConnectionState.Disconnected -> {
-                val elapsed = System.currentTimeMillis() - activeStartedAt
-                if (activeProgressSeen || elapsed >= STARTUP_GRACE_MS) {
+                if (!retryPending && !shouldRetryConnectionError(request, state)) {
                     finishActiveProbe(
                         request = request,
-                        markFailed = false,
-                        error = null,
+                        markFailed = !activeProgressSeen,
+                        error = state.message,
                         cancelTimeout = true,
                     )
                 }
             }
-            DeviceConnectionState.Connecting -> Unit
+            DeviceConnectionState.Disconnected -> {
+                if (!retryPending) {
+                    val elapsed = System.currentTimeMillis() - activeStartedAt
+                    if (activeProgressSeen || elapsed >= STARTUP_GRACE_MS) {
+                        finishActiveProbe(
+                            request = request,
+                            markFailed = false,
+                            error = null,
+                            cancelTimeout = true,
+                        )
+                    }
+                }
+            }
+            DeviceConnectionState.Connecting -> retryPending = false
         }
+    }
+
+    private fun shouldRetryConnectionError(
+        request: AutoActiveProbeRequest,
+        error: DeviceConnectionState.Error,
+    ): Boolean {
+        val elapsed = System.currentTimeMillis() - activeStartedAt
+        if (!GattRetryPolicy.shouldRetry(
+                status = error.gattStatus,
+                retriesStarted = retriesStarted,
+                hadConnectionProgress = activeProgressSeen,
+                elapsedMs = elapsed,
+            )
+        ) {
+            return false
+        }
+
+        val canRetry = synchronized(lock) {
+            if (activeRequest != request || retryPending || !enabled.get()) {
+                false
+            } else {
+                retriesStarted++
+                retryPending = true
+                true
+            }
+        }
+        if (canRetry) {
+            scope.launch {
+            delay(GattRetryPolicy.RETRY_BACKOFF_MS)
+            if (!enabled.get() || synchronized(lock) { activeRequest != request || !retryPending }) {
+                return@launch
+            }
+            runCatching { deviceDao.incrementAutoProbeAttemptIfStillProbing(request.fingerprint) }
+                .onFailure { failure -> Log.w(TAG, "Failed to count GATT retry: ${failure.message}") }
+            val attempt = bleConnectionManager.get().connect(request.mac, request.fingerprint)
+            if (attempt.isFailure) {
+                finishActiveProbe(
+                    request = request,
+                    markFailed = true,
+                    error = "GATT retry could not start: ${attempt.exceptionOrNull()?.message}",
+                    cancelTimeout = true,
+                )
+            }
+            }
+        }
+        return canRetry
     }
 
     private suspend fun onProbeTimeout(request: AutoActiveProbeRequest) {
@@ -233,6 +290,7 @@ class AutoActiveProbeCoordinator @Inject constructor(
                     activeRequest = null
                     activeStartedAt = 0L
                     activeProgressSeen = false
+                    retryPending = false
                     true
                 }
             }
@@ -271,6 +329,7 @@ class AutoActiveProbeCoordinator @Inject constructor(
                 activeRequest = null
                 activeStartedAt = 0L
                 activeProgressSeen = false
+                retryPending = false
                 active
             }
 

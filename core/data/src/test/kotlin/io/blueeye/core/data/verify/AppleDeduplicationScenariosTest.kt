@@ -471,6 +471,8 @@ class AppleDeduplicationScenariosTest {
 
         override suspend fun failStaleProbesBefore(cutoff: Long, error: String): Int = 0
 
+        override suspend fun incrementAutoProbeAttemptIfStillProbing(fingerprint: String): Int = 0
+
         override suspend fun updateIsPaired(fingerprint: String, isPaired: Boolean) {}
         override suspend fun updateLastSeen(fingerprint: String, timestamp: Long) {}
         override suspend fun setWatchlistStatus(fingerprint: String, isWatchlisted: Boolean) {}

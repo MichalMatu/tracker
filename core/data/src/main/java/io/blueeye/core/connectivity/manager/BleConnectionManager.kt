@@ -68,7 +68,10 @@ constructor(
                     // Błąd połączenia (np. 133, 257, 8, 19, 22, 137...)
                     // Lub zewan po prostu
                     _connectionState.value =
-                        DeviceConnectionState.Error("Connection Failed/Lost. Status: ${event.status}")
+                        DeviceConnectionState.Error(
+                            message = "GATT connection failed/lost with status ${event.status}",
+                            gattStatus = event.status,
+                        )
                     bleGattClient.close() // Ważne: zamykamy gatt po błędzie
                     bleOperationManager.reset()
                 } else if (event.newState == android.bluetooth.BluetoothProfile.STATE_CONNECTED) {
