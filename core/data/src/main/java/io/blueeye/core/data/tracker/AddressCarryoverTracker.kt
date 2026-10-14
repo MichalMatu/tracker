@@ -73,9 +73,12 @@ constructor(
                     targetId = fingerprint, // Use fingerprint as stable ID
                     primaryMac = fingerprint,
                     macAliases = mutableSetOf(fingerprint, mac),
-                    lastPayloadHash = device.lastRawData?.hashCode() ?: 0,
+                    // String.hashCode of persisted hex is not the advertisement payload hash.
+                    // Do not substitute actively discovered GATT services for advertised UUIDs:
+                    // only a fresh passive scan may repopulate those identity features.
+                    lastPayloadHash = 0,
                     lastPayload = null,
-                    lastServiceUuids = device.gattServices?.split(",")?.toSet() ?: emptySet(),
+                    lastServiceUuids = emptySet(),
                     lastDeviceName = device.lastDeviceName,
                     lastRssi = device.lastRssi,
                     lastSeenAt = device.lastSeenAt,
