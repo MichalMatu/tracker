@@ -119,7 +119,14 @@ constructor(
             is BleGattEvent.CharacteristicRead -> {
                 // Przekazujemy wynik do OperationManager (żeby odblokował coroutine czekającą na
                 // wynik)
-                bleOperationManager.onReadResult(event.characteristic, event.value, event.status)
+                val accepted = bleOperationManager.onReadResult(
+                    event.characteristic,
+                    event.value,
+                    event.status,
+                )
+
+                // Ignore unsolicited/late callbacks from a previous session entirely.
+                if (!accepted) return
 
                 // Oraz aktualizujemy UI
                 if (event.status == android.bluetooth.BluetoothGatt.GATT_SUCCESS) {

@@ -53,22 +53,25 @@ constructor(private val bleGattClient: BleGattClient) {
         characteristic: BluetoothGattCharacteristic,
         value: ByteArray,
         status: Int,
-    ) {
+    ): Boolean {
         // A late callback for the previous characteristic must not finish a new read.
         val request =
             synchronized(stateLock) {
                 pendingRead?.takeIf { it.characteristic === characteristic }?.also {
                     pendingRead = null
                 }
-            } ?: return
-
-        if (!request.continuation.isActive) return
-        if (status == android.bluetooth.BluetoothGatt.GATT_SUCCESS) {
-            request.continuation.resume(value)
+            }
+        return if (request == null || !request.continuation.isActive) {
+            false
         } else {
-            request.continuation.resumeWithException(
-                IllegalStateException("GATT Read failed with status $status"),
-            )
+            if (status == android.bluetooth.BluetoothGatt.GATT_SUCCESS) {
+                request.continuation.resume(value)
+            } else {
+                request.continuation.resumeWithException(
+                    IllegalStateException("GATT Read failed with status $status"),
+                )
+            }
+            true
         }
     }
 

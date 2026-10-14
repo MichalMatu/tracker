@@ -24,10 +24,10 @@ class BleOperationManagerTest {
         val pending = async(start = CoroutineStart.UNDISPATCHED) {
             manager.read(expectedCharacteristic)
         }
-        manager.onReadResult(oldCharacteristic, byteArrayOf(9), 0)
+        assertFalse(manager.onReadResult(oldCharacteristic, byteArrayOf(9), 0))
         assertFalse(pending.isCompleted)
 
-        manager.onReadResult(expectedCharacteristic, byteArrayOf(7), 0)
+        assertTrue(manager.onReadResult(expectedCharacteristic, byteArrayOf(7), 0))
         assertArrayEquals(byteArrayOf(7), pending.await())
     }
 
@@ -48,9 +48,10 @@ class BleOperationManagerTest {
         val second = async(start = CoroutineStart.UNDISPATCHED) {
             manager.read(secondCharacteristic)
         }
-        manager.onReadResult(firstCharacteristic, byteArrayOf(9), 0)
+        assertFalse(manager.onReadResult(firstCharacteristic, byteArrayOf(9), 0))
         assertFalse(second.isCompleted)
-        manager.onReadResult(secondCharacteristic, byteArrayOf(4), 0)
+        assertTrue(manager.onReadResult(secondCharacteristic, byteArrayOf(4), 0))
         assertArrayEquals(byteArrayOf(4), second.await())
+        assertFalse(manager.onReadResult(secondCharacteristic, byteArrayOf(4), 0))
     }
 }
