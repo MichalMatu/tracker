@@ -23,7 +23,7 @@ internal fun DetailsGattServiceExplorer(
     savedServices: String?,
     savedCharacteristics: String?,
 ) {
-    if (liveServices.isEmpty() && savedServices.isNullOrBlank()) return
+    if (!DetailsGattEvidencePolicy.hasEvidence(liveServices, savedServices, savedCharacteristics)) return
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -57,7 +57,7 @@ internal fun DetailsGattServiceExplorer(
             }
         }
 
-        if (!savedServices.isNullOrBlank()) {
+        if (!savedServices.isNullOrBlank() || !savedCharacteristics.isNullOrBlank()) {
             var savedExpanded by rememberSaveable { mutableStateOf(false) }
             OutlinedButton(
                 onClick = { savedExpanded = !savedExpanded },
@@ -70,13 +70,25 @@ internal fun DetailsGattServiceExplorer(
                     text = "Previously discovered via active connection (not BLE advertising)",
                     style = MaterialTheme.typography.bodySmall,
                 )
-                Text(savedServices, style = MaterialTheme.typography.bodySmall)
+                savedServices?.takeIf { it.isNotBlank() }?.let { services ->
+                    Text(services, style = MaterialTheme.typography.bodySmall)
+                }
                 savedCharacteristics?.takeIf { it.isNotBlank() }?.let { data ->
                     Text("Saved characteristic values: $data", style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
     }
+}
+
+/** Recorded characteristic values are valid active evidence even if service-list persistence is absent. */
+internal object DetailsGattEvidencePolicy {
+    fun hasEvidence(
+        liveServices: List<GattService>,
+        savedServices: String?,
+        savedCharacteristics: String?,
+    ): Boolean =
+        liveServices.isNotEmpty() || !savedServices.isNullOrBlank() || !savedCharacteristics.isNullOrBlank()
 }
 
 internal data class DetailsGattCharacteristicInfo(
