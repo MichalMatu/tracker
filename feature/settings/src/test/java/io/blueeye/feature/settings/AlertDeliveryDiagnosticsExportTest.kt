@@ -11,8 +11,23 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.io.StringWriter
 
 class AlertDeliveryDiagnosticsExportTest {
+    @Test
+    fun `empty JSON object receives diagnostics in memory and streamed form`() {
+        val uiState = SettingsUiState()
+        val inline = Json.parseToJsonElement("{}".withFieldMvpDiagnostics(uiState)).jsonObject
+
+        val writer = StringWriter()
+        writer.writeWithFieldMvpDiagnostics("{  }", uiState)
+        val streamed = Json.parseToJsonElement(writer.toString()).jsonObject
+
+        assertEquals(inline, streamed)
+        assertEquals(1, inline.size)
+        assertEquals(true, inline.containsKey("fieldMvpDiagnostics"))
+    }
+
     @Test
     fun `untouched alert diagnostics are not misleading policy block`() {
         val root =

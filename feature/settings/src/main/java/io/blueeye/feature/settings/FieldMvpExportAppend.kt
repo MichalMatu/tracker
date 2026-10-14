@@ -79,12 +79,14 @@ internal fun String.withFieldMvpDiagnostics(uiState: SettingsUiState): String {
             }
           }
         """.trimIndent()
-    return substring(0, insertionPoint).trimEnd() + payload + substring(insertionPoint)
+    val prefix = substring(0, insertionPoint).trimEnd()
+    val diagnosticProperty = if (prefix.endsWith("{")) payload.removePrefix(",") else payload
+    return prefix + diagnosticProperty + substring(insertionPoint)
 }
 
 internal fun fieldMvpDiagnosticsAppendFragment(uiState: SettingsUiState): String {
     val decoratedEmptyObject = "{}".withFieldMvpDiagnostics(uiState)
-    return decoratedEmptyObject.substring(1, decoratedEmptyObject.length - 1)
+    return "," + decoratedEmptyObject.substring(1, decoratedEmptyObject.length - 1)
 }
 
 internal fun Writer.writeWithFieldMvpDiagnostics(
@@ -105,7 +107,13 @@ internal fun Writer.writeWithFieldMvpDiagnostics(
     }
 
     write(json, 0, prefixEnd)
-    write(diagnosticsFragment)
+    val fragment =
+        if (prefixEnd > 0 && json[prefixEnd - 1] == '{') {
+            diagnosticsFragment.removePrefix(",")
+        } else {
+            diagnosticsFragment
+        }
+    write(fragment)
     write(json, insertionPoint, json.length - insertionPoint)
 }
 
