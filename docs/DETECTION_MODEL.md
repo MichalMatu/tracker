@@ -41,6 +41,7 @@ Confidence describes the **evidence-backed app classification**, not real-world 
 - RSSI cannot prove distance.
 - Random/private address behavior lowers identity certainty unless stronger continuity evidence supports a merge.
 - Identity carryover remains continuity context; user review uses `IdentityCarryoverVerdict` (`UNREVIEWED`, `CONFIRMED_SAME_DEVICE`, `FALSE_MATCH`, `INCONCLUSIVE`) rather than inflating risk confidence.
+- Destructive MAC-rotation carryover requires exactly one eligible identity match. When multiple devices match, records remain separate; multiple plausible long-gap candidates also produce no arbitrary review candidate.
 - Watchlist confidence applies to the saved app fingerprint, not to the real-world owner.
 - Active GATT/RFCOMM evidence must be explicitly marked active.
 - Follow-Me score/components/movement suppression/RSSI behavior use `FOLLOW_ME_ANALYSIS` provenance so they remain distinguishable from direct radio observations.
