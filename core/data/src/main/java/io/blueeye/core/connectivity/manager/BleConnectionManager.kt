@@ -62,6 +62,7 @@ constructor(
     }
 
     private fun handleGattEvent(event: BleGattEvent) {
+        if (!GattEventSessionPolicy.isCurrent(event.sessionEpoch, bleGattClient.currentSessionEpoch())) return
         when (event) {
             is BleGattEvent.ConnectionStateChanged -> {
                 if (event.status != android.bluetooth.BluetoothGatt.GATT_SUCCESS) {

@@ -21,6 +21,13 @@ class BleGattClient
 constructor() {
     @Volatile
     private var bluetoothGatt: BluetoothGatt? = null
+    private val sessionLock = Any()
+    private var sessionEpoch = 0L
+
+    fun currentSessionEpoch(): Long = synchronized(sessionLock) { sessionEpoch }
+
+    private fun epochFor(gatt: BluetoothGatt): Long? =
+        synchronized(sessionLock) { sessionEpoch.takeIf { gatt === bluetoothGatt } }
 
     // Używamy SharedFlow z replay=0 i extraBufferCapacity, żeby nie gubić zdarzeń
     private val _events =
@@ -38,7 +45,7 @@ constructor() {
                 status: Int,
                 newState: Int,
             ) {
-                if (!isCurrentGatt(gatt)) {
+                val epoch = epochFor(gatt) ?: run {
                     Log.d(TAG, "Ignoring stale connection callback")
                     return
                 }
@@ -46,19 +53,19 @@ constructor() {
                     TAG,
                     "onConnectionStateChange: status=$status newState=$newState",
                 )
-                _events.tryEmit(BleGattEvent.ConnectionStateChanged(status, newState))
+                _events.tryEmit(BleGattEvent.ConnectionStateChanged(status, newState, epoch))
             }
 
             override fun onServicesDiscovered(
                 gatt: BluetoothGatt,
                 status: Int,
             ) {
-                if (!isCurrentGatt(gatt)) {
+                val epoch = epochFor(gatt) ?: run {
                     Log.d(TAG, "Ignoring stale services callback")
                     return
                 }
                 Log.d(TAG, "onServicesDiscovered: status=$status")
-                _events.tryEmit(BleGattEvent.ServicesDiscovered(status))
+                _events.tryEmit(BleGattEvent.ServicesDiscovered(status, epoch))
             }
 
             override fun onCharacteristicRead(
@@ -67,11 +74,11 @@ constructor() {
                 value: ByteArray,
                 status: Int,
             ) {
-                if (!isCurrentGatt(gatt)) {
+                val epoch = epochFor(gatt) ?: run {
                     Log.d(TAG, "Ignoring stale characteristic callback")
                     return
                 }
-                _events.tryEmit(BleGattEvent.CharacteristicRead(characteristic, value, status))
+                _events.tryEmit(BleGattEvent.CharacteristicRead(characteristic, value, status, epoch))
             }
 
             // Dla starszych Androidów
@@ -81,7 +88,7 @@ constructor() {
                 characteristic: BluetoothGattCharacteristic,
                 status: Int,
             ) {
-                if (!isCurrentGatt(gatt)) {
+                val epoch = epochFor(gatt) ?: run {
                     Log.d(TAG, "Ignoring stale legacy characteristic callback")
                     return
                 }
@@ -91,12 +98,11 @@ constructor() {
                         characteristic,
                         characteristic.value,
                         status,
+                        epoch,
                     ),
                 )
             }
         }
-
-    private fun isCurrentGatt(gatt: BluetoothGatt): Boolean = gatt === bluetoothGatt
 
     @SuppressLint("MissingPermission")
     fun connect(
@@ -104,7 +110,8 @@ constructor() {
         device: BluetoothDevice,
     ) {
         close() // Zamknij poprzednie jeśli istnieje
-        bluetoothGatt = device.connectGatt(context, false, callback, BluetoothDevice.TRANSPORT_LE)
+        val connectedGatt = device.connectGatt(context, false, callback, BluetoothDevice.TRANSPORT_LE)
+        synchronized(sessionLock) { bluetoothGatt = connectedGatt }
     }
 
     @SuppressLint("MissingPermission")
@@ -114,12 +121,17 @@ constructor() {
 
     @SuppressLint("MissingPermission")
     fun close() {
+        val oldGatt = synchronized(sessionLock) {
+            val previous = bluetoothGatt
+            bluetoothGatt = null
+            sessionEpoch++
+            previous
+        }
         try {
-            bluetoothGatt?.close()
+            oldGatt?.close()
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Log.e(TAG, "Error closing GATT", e)
         }
-        bluetoothGatt = null
     }
 
     @SuppressLint("MissingPermission")
