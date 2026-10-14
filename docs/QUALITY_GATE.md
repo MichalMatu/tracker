@@ -73,6 +73,10 @@ Before calling any artifact production-ready, verify the exact candidate SHA wit
 
 Repository hardening rules: `.gitignore` must cover signing material, local environment secrets and private capture/database artifacts; `CODEOWNERS` may define default review ownership. Dependency-update bots are intentionally not enabled.
 
-## Physical validation
+## Physical debug installation and validation
 
-Use a real phone for BLE, permission, background/screen-off, alert, location and device-specific runtime behavior. Record exact app/source SHA separately from the field observations.
+- CI debug APKs may be signed with a different ephemeral debug key from the APK already on a phone. GitHub CI success does **not** guarantee signature-compatible `adb install -r`.
+- For an update preserving app data, verify the target device, exact source SHA, installed certificate and candidate APK signing certificate. If signatures differ, rebuild the exact SHA with the existing compatible local key before using `adb install -r`.
+- **Never uninstall, clear app data, downgrade or change the signing key merely to bypass `INSTALL_FAILED_UPDATE_INCOMPATIBLE`**. A failed update leaves existing app data intact.
+- Keep separate verdicts for APK build, ADB installation, explicit activity launch/process health and actual BLE/background/Follow-Me field behavior. If an ADB launcher command fails, check manifest activity resolution and start the explicit component before claiming a runtime failure.
+- Use a real phone for BLE, permissions, background/screen-off, alerts, location and device-specific behavior. Record exact source SHA, APK provenance and privacy-safe observations; keep serials, exact GPS, Bluetooth addresses and raw logcat out of Git.

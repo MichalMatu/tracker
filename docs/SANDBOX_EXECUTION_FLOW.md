@@ -52,6 +52,8 @@ For code work, broaden verification only after focused checks are green. See `QU
 
 Before local execution verify the tracker repository binding and daemon state on `agent-control`. Do not race a healthy active task or create a duplicate. Local Agent is the executor, not the planner: changes/commands must be bounded and evidence-driven.
 
+For physical Samsung ADB work, reserve the declared `android:s22` resource, discover the currently attached authorized USB or wireless connection, and verify the expected model. Do not hard-code or commit transient endpoints/serials. For updates preserving data, follow the APK signature checks in `QUALITY_GATE.md`.
+
 A GitHub commit proves publication only. A Local Agent result proves only the commands/device evidence it actually reports. Keep those claims separate.
 
 ## Completion record

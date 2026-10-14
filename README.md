@@ -18,7 +18,9 @@ BlueEye reports observations and evidence. It does **not** claim to identify a p
 
 - Source of truth: `main`.
 - Scanner/ingest, compact Radar, decision-first Details, Live Nearby, the sightings map and A1-A3 deterministic analysis are accepted on `main`.
-- The 2026-10-08 BLE field-regression pass hardened Find Hub identity/capability handling, Samsung Offline Finding classification, Follow-Me scoring, GPS-quality gating and unsafe GATT-based identity correlation.
+- October 2026 regressions hardened Find Hub and Samsung identification, GPS-quality/Follow-Me evidence, ThermoPro and Apple Find My decoders, and conservative MAC-rotation carryover.
+- GATT reads now have bounded retries, terminal probe states, session/callback isolation and safeguards against stale characteristic persistence. History/session export scopes, review labels, alerts and saved GATT evidence are explicitly distinguished.
+- Software CI validates Android behavior on an emulator; real-phone Bluetooth, background, notifications and movement scenarios remain separate physical acceptance gates.
 - Explicit automatic GATT collection remains read-oriented and opt-in; periodic RFCOMM and opportunistic Classic discovery remain disabled.
 - Optional external analyst/production telemetry is not active and requires a new explicit product/architecture decision.
 

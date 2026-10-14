@@ -4,7 +4,7 @@ Use this for repeatable physical tests. It is a capture/validation checklist, no
 
 ## Before the session
 
-- Record the exact `main`/APK SHA.
+- Record the exact `main` SHA, APK provenance/signing compatibility and whether the APK was actually installed and launched.
 - Do not switch builds or major configuration during one comparison session.
 - Confirm required Bluetooth/Nearby, Location and Notification permissions for the scenario.
 - Verify scanner state and intended alert/active-collection settings before leaving.
@@ -35,6 +35,7 @@ Keep scenarios separate when possible so later analysis can explain what changed
 - phone model + Android version;
 - approximate start/end/duration;
 - screen-on/off and movement context;
+- explicit app launch/process health (distinct from successful APK installation);
 - scanner/process health;
 - supported session export when needed;
 - GPS availability/quality summary when relevant;

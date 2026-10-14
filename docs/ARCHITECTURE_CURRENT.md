@@ -23,7 +23,7 @@ Features should consume domain-facing contracts rather than `core:data` implemen
 
 ```text
 ScannerService
-  -> BleScanner (BLE + opportunistic Classic discovery)
+  -> BleScanner (BLE observations; Classic paths gated by runtime policy)
   -> ScanIngestPipeline (bounded ingest/coalescing)
   -> BLE / Classic handlers
   -> physical classification + protocol capabilities + identity / Follow-Me analysis

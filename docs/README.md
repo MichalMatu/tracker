@@ -7,7 +7,9 @@ This directory contains current engineering/product contracts, not a chronologic
 - `main` is the source of truth.
 - Scanner/ingest, Radar/Details/Live Nearby, the per-device sightings map and A1-A3 deterministic analysis are accepted.
 - Explicit automatic GATT collection is available only by opt-in, is read-oriented and remains sequential; RFCOMM and opportunistic Classic discovery stay disabled.
-- The 2026-10-08 field-regression closeout separates physical device type, protocol capability and tracking risk; fixes FHN identity carryover, Samsung Q60/SmartTag confusion, GPS movement quality and RSSI-dominated Follow-Me scoring.
+- October field regressions keep physical type, protocol capability, tracking risk and manual review separate; Find Hub and Samsung identity, GPS movement, RSSI weighting and BLE decoder behavior have privacy-safe regression coverage.
+- GATT connection/session failures, read callbacks and orphaned probes are bounded; live and saved evidence remain distinguishable from passive advertisements. Ambiguous MAC rotations are not silently merged.
+- GitHub Quality/emulator results and a successfully installed APK do not, by themselves, establish physical Bluetooth, background or Follow-Me acceptance.
 - Optional analyst integration and production telemetry are not active workstreams. Reopening either requires a new explicit product/architecture decision.
 
 Owner-confirmed controlled field devices and the privacy-safe regression expectations derived from them are recorded in [DETECTION_MODEL.md](DETECTION_MODEL.md).
