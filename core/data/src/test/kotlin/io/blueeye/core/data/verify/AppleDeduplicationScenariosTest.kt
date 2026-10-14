@@ -452,14 +452,17 @@ class AppleDeduplicationScenariosTest {
             timestamp: Long,
             error: String,
         ): Int {
-            val existing = db[fingerprint] ?: return 0
-            if (existing.connectionStatus != "PROBING") return 0
-            db[fingerprint] = existing.copy(
-                connectionStatus = "FAILED",
-                probeError = error,
-                lastProbeTimestamp = timestamp,
-            )
-            return 1
+            val existing = db[fingerprint]
+            return if (existing != null && existing.connectionStatus == "PROBING") {
+                db[fingerprint] = existing.copy(
+                    connectionStatus = "FAILED",
+                    probeError = error,
+                    lastProbeTimestamp = timestamp,
+                )
+                1
+            } else {
+                0
+            }
         }
 
         override suspend fun updateIsPaired(fingerprint: String, isPaired: Boolean) {}

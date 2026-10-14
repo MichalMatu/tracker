@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 /** Data Access Object dla tabeli devices. */
 @Dao
-interface DeviceDao : DeviceUpdateDao, DeviceActionDao, DeviceSearchDao {
+interface DeviceDao : DeviceUpdateDao, DeviceActionDao, DeviceSearchDao, AutoProbeStatusDao {
     // === Queries ===
 
     /** Pobierz wszystkie urządzenia jako Flow (live updates) */

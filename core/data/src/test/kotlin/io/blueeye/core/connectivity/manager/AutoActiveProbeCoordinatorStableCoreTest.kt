@@ -4,9 +4,9 @@ import dagger.Lazy
 import io.blueeye.core.data.db.dao.DeviceDao
 import io.blueeye.core.data.preferences.WatchlistPreferences
 import io.blueeye.core.data.repository.ProbeStateManager
+import kotlinx.coroutines.flow.flowOf
 import org.junit.Test
 import org.mockito.kotlin.mock
-import kotlinx.coroutines.flow.flowOf
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
