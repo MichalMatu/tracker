@@ -87,8 +87,9 @@ internal object DetailsGattEvidencePolicy {
         liveServices: List<GattService>,
         savedServices: String?,
         savedCharacteristics: String?,
-    ): Boolean =
-        liveServices.isNotEmpty() || !savedServices.isNullOrBlank() || !savedCharacteristics.isNullOrBlank()
+    ): Boolean {
+        return liveServices.isNotEmpty() || !savedServices.isNullOrBlank() || !savedCharacteristics.isNullOrBlank()
+    }
 }
 
 internal data class DetailsGattCharacteristicInfo(
