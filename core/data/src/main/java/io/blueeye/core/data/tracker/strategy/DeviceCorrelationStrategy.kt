@@ -77,8 +77,7 @@ constructor() {
     ): CarryoverMatch? {
         val input = buildMatchInput(data, deviceName, advertisingInterval)
 
-        var bestMatch: CarryoverMatch? = null
-        var highestScore = 0f
+        var uniqueMatch: CarryoverMatch? = null
 
         for (target in targets) {
             val hasNameFamilyConflict =
@@ -95,15 +94,15 @@ constructor() {
                     isSequentialCarryoverWindow
             if (!isEligibleTarget) continue
 
-            immediateMatchForTarget(input, target)?.let { return it }
-            val weightedMatch = weightedMatchForTarget(input, target)
-            if (weightedMatch != null && weightedMatch.evidence.confidence > highestScore) {
-                highestScore = weightedMatch.evidence.confidence
-                bestMatch = weightedMatch
+            val match = immediateMatchForTarget(input, target) ?: weightedMatchForTarget(input, target)
+            if (match != null) {
+                // An equally plausible second target makes destructive identity carryover unsafe.
+                if (uniqueMatch != null) return null
+                uniqueMatch = match
             }
         }
 
-        return bestMatch
+        return uniqueMatch
     }
 
     /**
@@ -117,6 +116,7 @@ constructor() {
         targets: Collection<TrackedTarget>,
     ): IdentityCandidateMatch? {
         val input = buildMatchInput(data, deviceName, advertisingInterval)
+        var uniqueCandidate: IdentityCandidateMatch? = null
         for (target in targets) {
             val timeSinceLastSeen = input.data.timestamp - target.lastSeenAt
             val isWithinCandidateWindow =
@@ -126,17 +126,22 @@ constructor() {
                 AppleIdentityConflictGuard.hasNameFamilyConflict(input.deviceName, target.lastDeviceName)
             val hasFindHubWidthConflict =
                 hasFindHubIdentityWidthConflict(input.rawData, target.lastPayload)
-            if (isWithinCandidateWindow && !hasNameFamilyConflict && !hasFindHubWidthConflict) {
-                val evidence = longGapSameNameEvidence(input, target)
-                if (evidence != null) {
-                    return IdentityCandidateMatch(
+            val evidence =
+                if (isWithinCandidateWindow && !hasNameFamilyConflict && !hasFindHubWidthConflict) {
+                    longGapSameNameEvidence(input, target)
+                } else {
+                    null
+                }
+            if (evidence != null) {
+                if (uniqueCandidate != null) return null
+                uniqueCandidate =
+                    IdentityCandidateMatch(
                         candidateFingerprint = target.primaryMac,
                         evidence = evidence,
                     )
-                }
             }
         }
-        return null
+        return uniqueCandidate
     }
 
     private fun buildMatchInput(

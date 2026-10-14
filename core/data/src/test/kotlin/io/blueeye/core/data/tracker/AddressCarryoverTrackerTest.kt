@@ -97,6 +97,56 @@ class AddressCarryoverTrackerTest {
     }
 
     @Test
+    fun `two plausible targets cannot absorb a third rotating address`() {
+        val now = System.currentTimeMillis()
+        val uuids = listOf("0000fe2c-0000-1000-8000-00805f9b34fb")
+        val first =
+            createScanData("39:11:11:11:11:11", "JBL Tune 520BT-LE", null, null)
+                .copy(timestamp = now, serviceUuids = uuids)
+        val second =
+            createScanData("39:22:22:22:22:22", "JBL Tune 520BT-LE", null, null)
+                .copy(timestamp = now + 500L, serviceUuids = uuids)
+        val third =
+            createScanData("39:33:33:33:33:33", "JBL Tune 520BT-LE", null, null)
+                .copy(timestamp = now + 3_000L, serviceUuids = uuids)
+
+        val firstResult = tracker.processScan(first, first.name)
+        val secondResult = tracker.processScan(second, second.name)
+        val thirdResult = tracker.processScan(third, third.name)
+
+        assertTrue(firstResult.isNewTarget)
+        assertTrue(secondResult.isNewTarget)
+        assertTrue(thirdResult.isNewTarget)
+        assertFalse(thirdResult.isCarryover)
+        assertNull(thirdResult.correlatedMac)
+        assertNotEquals(firstResult.targetId, thirdResult.targetId)
+        assertNotEquals(secondResult.targetId, thirdResult.targetId)
+    }
+
+    @Test
+    fun `long gap with two corroborated targets is not an arbitrary identity candidate`() {
+        val now = System.currentTimeMillis()
+        val uuids = listOf("0000fe2c-0000-1000-8000-00805f9b34fb")
+        val first =
+            createScanData("49:11:11:11:11:11", "JBL Tune 520BT-LE", null, null)
+                .copy(timestamp = now, serviceUuids = uuids)
+        val second =
+            createScanData("49:22:22:22:22:22", "JBL Tune 520BT-LE", null, null)
+                .copy(timestamp = now + 500L, serviceUuids = uuids)
+        val third =
+            createScanData("49:33:33:33:33:33", "JBL Tune 520BT-LE", null, null)
+                .copy(timestamp = now + 108_000L, serviceUuids = uuids)
+
+        tracker.processScan(first, first.name)
+        tracker.processScan(second, second.name)
+        val result = tracker.processScan(third, third.name)
+
+        assertTrue(result.isNewTarget)
+        assertFalse(result.isCarryover)
+        assertNull(result.identityCandidate)
+    }
+
+    @Test
     fun `same corroborated device seen under two addresses concurrently stays separate`() {
         val now = System.currentTimeMillis()
         val serviceUuids = listOf("0000fe2c-0000-1000-8000-00805f9b34fb")
