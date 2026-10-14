@@ -7,9 +7,13 @@ internal fun String.withFieldMvpDiagnostics(uiState: SettingsUiState): String {
     if (insertionPoint <= 0) return this
     val scanner = uiState.scannerDiagnostics
     val alerts = uiState.alertDeliveryDiagnostics
-    val recentAlertDecisions = alerts.recentResults.joinToString(",") { result ->
-        """{"category":"${result.category.name}","status":"${result.status.name}","timestamp":${result.timestamp}}"""
-    }
+    val recentAlertDecisions =
+        alerts.recentResults.joinToString(",") { result ->
+            val category = result.category.name
+            val status = result.status.name
+            val timestamp = result.timestamp
+            """{"category":"$category","status":"$status","timestamp":$timestamp}"""
+        }
     val payload =
         """
         ,
