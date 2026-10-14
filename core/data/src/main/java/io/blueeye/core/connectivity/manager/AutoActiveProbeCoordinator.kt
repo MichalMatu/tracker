@@ -65,6 +65,17 @@ class AutoActiveProbeCoordinator @Inject constructor(
                     Log.i(TAG, "Auto active GATT collection ${if (isEnabled) "enabled" else "disabled"}")
                     if (!isEnabled) {
                         clearQueue(disconnectActive = true)
+                    } else {
+                        // Recover interrupted probes only after explicit automatic-GATT opt in.
+                        // Leave the original timestamp so normal cooldown logic can re-evaluate them.
+                        runCatching {
+                            deviceDao.failStaleProbesBefore(
+                                cutoff = System.currentTimeMillis() - AutoActiveProbePolicy.PROBE_COOLDOWN_MS,
+                                error = STALE_PROBE_ERROR,
+                            )
+                        }.onFailure { failure ->
+                            Log.w(TAG, "Failed to recover stale GATT probes: ${failure.message}")
+                        }
                     }
                 }
             }
@@ -268,6 +279,18 @@ class AutoActiveProbeCoordinator @Inject constructor(
         probeStateManager.setActiveProbe(null)
         if (disconnectActive && request != null) {
             disconnectIfCurrent(request)
+            // Disabling/resetting an unfinished auto probe must not strand PROBING in Room.
+            scope.launch {
+                runCatching {
+                    deviceDao.failAutoProbeIfStillProbing(
+                        fingerprint = request.fingerprint,
+                        timestamp = System.currentTimeMillis(),
+                        error = CANCELLED_PROBE_ERROR,
+                    )
+                }.onFailure { failure ->
+                    Log.w(TAG, "Failed to finalize cancelled GATT probe: ${failure.message}")
+                }
+            }
         }
     }
 
@@ -318,6 +341,8 @@ class AutoActiveProbeCoordinator @Inject constructor(
         private const val TAG = "AutoActiveProbe"
         private const val STARTUP_GRACE_MS = 1_000L
         private const val STATUS_PROBING = "PROBING"
+        private const val STALE_PROBE_ERROR = "Automatic GATT probe interrupted before completion"
+        private const val CANCELLED_PROBE_ERROR = "Automatic GATT probe cancelled"
     }
 }
 

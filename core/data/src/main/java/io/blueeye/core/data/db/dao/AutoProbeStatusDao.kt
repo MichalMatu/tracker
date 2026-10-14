@@ -18,6 +18,7 @@ interface AutoProbeStatusDao {
             lastProbeTimestamp = :timestamp
         WHERE fingerprint = :fingerprint
           AND connectionStatus = 'PROBING'
+          AND lastProbeTimestamp <= :timestamp
         """,
     )
     suspend fun failAutoProbeIfStillProbing(
@@ -25,4 +26,20 @@ interface AutoProbeStatusDao {
         timestamp: Long,
         error: String,
     ): Int
+
+    /**
+     * Handles stale records after process death. Preserve original probe time
+     * so an old interrupted request is not put on a new 15-minute cooldown.
+     */
+    @Query(
+        """
+        UPDATE devices
+        SET connectionStatus = 'FAILED',
+            probeError = :error
+        WHERE connectionStatus = 'PROBING'
+          AND lastProbeTimestamp > 0
+          AND lastProbeTimestamp < :cutoff
+        """,
+    )
+    suspend fun failStaleProbesBefore(cutoff: Long, error: String): Int
 }
