@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "la-mac-b1c-lane-smoke-tracker-20261016-v1",
+  "task_digest": "58fcb636368f004c1f50fc49a30f5affe9e626f8934bb4cc755e7c7947db9cec",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-16T16:37:57.065640+00:00",
+  "attempt_id": "f7176a9f7692946a851a0db2",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 34223,
+  "updated_at": "2026-10-16T16:37:57.331864+00:00",
+  "pid": 34223
+}

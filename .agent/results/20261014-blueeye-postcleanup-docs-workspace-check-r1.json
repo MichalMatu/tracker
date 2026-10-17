@@ -1,0 +1,60 @@
+{
+  "allow_write": true,
+  "attempt_id": "35f60a420ee5eccfa56de460",
+  "command_timeout": 120,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 157,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 01d57efbc914d380d5c3d1bad9f92e7746b8e52d\ngit diff --check HEAD^ HEAD\npython3 - <<'PY'\nfrom pathlib import Path\nimport shutil\nroot=Path.cwd().resolve()\ntarget=(root/\"build\"/\"adb-install\"/\"2141d6f41816f70997df42b54bcc85b2c72a92c8\")\nexpected=root/\"build\"/\"adb-install\"/\"2141d6f41816f70997df42b54bcc85b2c72a92c8\"\nif target != expected:\n    raise SystemExit(\"UNSAFE_TEMP_PATH\")\nif target.is_symlink():\n    raise SystemExit(\"SYMLINK_TEMP_PATH_REFUSED\")\nif target.is_dir():\n    shutil.rmtree(target)\n    print(\"OWNED_ADB_TEMP_ARTIFACTS_REMOVED\",True)\nelse:\n    print(\"OWNED_ADB_TEMP_ARTIFACTS_REMOVED\",False)\nPY\nprintf 'CURRENT_BRANCH='\ngit branch --show-current\nprintf 'EXACT_HEAD='\ngit rev-parse HEAD\nprintf 'WORKTREE_STATUS\\n'\ngit status --porcelain=v1\nprintf 'DOCUMENT_DIFF_CHECK=PASS\\n'",
+      "current_rss_mb": 9.06,
+      "elapsed_seconds": 1.096,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "OWNED_ADB_TEMP_ARTIFACTS_REMOVED True\nCURRENT_BRANCH=agent-work\nEXACT_HEAD=01d57efbc914d380d5c3d1bad9f92e7746b8e52d\nWORKTREE_STATUS\nDOCUMENT_DIFF_CHECK=PASS\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 9.06,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-14T19:10:43.966094+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.079,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.124,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261014-blueeye-postcleanup-docs-workspace-check-r1",
+  "idle_timeout": 90,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 1.096,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-14T19:10:40.633413+00:00",
+  "status": "done",
+  "task_digest": "844b9a7bf06fbacbcc646ce94cba6fc2fe9e90490f08c651403cbaccdab99207",
+  "task_timeout": 300,
+  "verification": [],
+  "work_branch": "main"
+}

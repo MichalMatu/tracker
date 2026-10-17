@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "fa6b9427d4b6b6d0266cd5be",
+  "command_timeout": 90,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 230,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 1e67b9b0d2cb4bd322b05a8f4dc34cb0c042c033\npython3 - <<'PY'\nimport json\nfrom pathlib import Path\ndata=json.loads(Path(\"core/data/build/reports/detekt/detekt.sarif\").read_text())\nfor run in data.get(\"runs\", []):\n for x in run.get(\"results\", []):\n  l=x.get(\"locations\",[{}])[0].get(\"physicalLocation\",{})\n  print(x.get(\"ruleId\"),l.get(\"artifactLocation\",{}).get(\"uri\"),l.get(\"region\",{}).get(\"startLine\"),x.get(\"message\",{}).get(\"text\"))\nPY",
+      "current_rss_mb": 8.02,
+      "elapsed_seconds": 0.426,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "detekt.formatting.ModifierListSpacing file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/main/java/io/blueeye/core/connectivity/client/BleGattClient.kt 107 Single whitespace or newline expected after annotation\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 8.02,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-14T16:18:58.743817+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.086,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.083,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261014-blueeye-gatt-epoch-detekt-diagnostic-r1",
+  "idle_timeout": 90,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.426,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-14T16:18:56.687516+00:00",
+  "status": "done",
+  "task_digest": "3991cc67f3eacd5251f4cd7d5709327bd0ec5b6464802b31b40d046f7f78d871",
+  "task_timeout": 300,
+  "verification": [],
+  "work_branch": "main"
+}

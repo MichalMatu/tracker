@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-gatt-stale-read-detekt-report-r1",
+  "task_digest": "f89f0411b942183cc20909a229a6ce1185b8889549d9517925920b27d1eccf33",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T16:11:10.370005+00:00",
+  "attempt_id": "fe94495af61aa25c4dea112f",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 23898,
+  "updated_at": "2026-10-14T16:11:10.557045+00:00",
+  "pid": 23898
+}

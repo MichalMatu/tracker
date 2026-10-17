@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "89284452eb0a0ce1ae969400",
+  "command_timeout": 90,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 310,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 07f65d7e623c5e7740a742665a294fb8f5ac9a8b\npython3 - <<'PY'\nimport json\nfrom pathlib import Path\nfor run in json.loads(Path('core/data/build/reports/detekt/detekt.sarif').read_text()).get('runs',[]):\n for e in run.get('results',[]):\n  loc=e.get('locations',[{}])[0].get('physicalLocation',{})\n  print(e.get('ruleId'),loc.get('artifactLocation',{}).get('uri'),loc.get('region',{}).get('startLine'),e.get('message',{}).get('text'))\nPY",
+      "current_rss_mb": 3.03,
+      "elapsed_seconds": 0.556,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "detekt.style.LoopWithTooManyJumpStatements file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt 120 The loop contains more than one break or continue statement. The code should be refactored to increase readability.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 3.03,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-14T18:11:50.567108+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.084,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.125,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261014-blueeye-identity-ambiguity-detekt-report-r2",
+  "idle_timeout": 90,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.556,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-14T18:11:48.097032+00:00",
+  "status": "done",
+  "task_digest": "357d40e022f75492686b4ab0ed7d43665919b36cd666d8aa13af4e7f72815151",
+  "task_timeout": 300,
+  "verification": [],
+  "work_branch": "main"
+}

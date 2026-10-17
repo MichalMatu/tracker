@@ -1,0 +1,14 @@
+{
+  "id": "cancel-wireless-reinstall-final-main-r14",
+  "action": "cancel_task",
+  "status": "accepted",
+  "daemon_version": "4.20.6",
+  "updated_at": "2026-10-08T05:50:38.575098+00:00",
+  "repository_id": "tracker",
+  "repository": "MichalMatu/tracker",
+  "control_branch": "agent-control",
+  "default_branch": "main",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "task_id": "20261008-wireless-reinstall-final-main-r14",
+  "result": "terminating_active_task"
+}

@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-usb-installed-signer-match-r1",
+  "task_digest": "6d13965bec504c9cc1e878a79bd4462e0048fb307276cf746f7cbc910b51c7ba",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T18:39:18.156773+00:00",
+  "attempt_id": "9bcdfa23ce1549171167f4f4",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 5805,
+  "updated_at": "2026-10-14T18:39:18.411983+00:00",
+  "pid": 5805
+}

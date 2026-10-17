@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "fe94495af61aa25c4dea112f",
+  "command_timeout": 90,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 243,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 0033f6413c6ec0a014265320ab75d959c720171a\npython3 - <<'PY'\nimport json\nfrom pathlib import Path\np=Path(\"core/data/build/reports/detekt/detekt.sarif\")\nfor run in json.loads(p.read_text()).get(\"runs\",[]):\n for entry in run.get(\"results\",[]):\n  loc=entry.get(\"locations\",[{}])[0].get(\"physicalLocation\",{})\n  print(entry.get(\"ruleId\"),loc.get(\"artifactLocation\",{}).get(\"uri\"),loc.get(\"region\",{}).get(\"startLine\"),entry.get(\"message\",{}).get(\"text\"))\nPY",
+      "current_rss_mb": 9.02,
+      "elapsed_seconds": 0.415,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "detekt.style.ReturnCount file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/main/java/io/blueeye/core/connectivity/client/BleOperationManager.kt 52 Function onReadResult has 3 return statements which exceeds the limit of 2.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 9.02,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-14T16:11:10.370005+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.073,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.08,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261014-blueeye-gatt-stale-read-detekt-report-r1",
+  "idle_timeout": 90,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.415,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-14T16:11:08.476324+00:00",
+  "status": "done",
+  "task_digest": "f89f0411b942183cc20909a229a6ce1185b8889549d9517925920b27d1eccf33",
+  "task_timeout": 300,
+  "verification": [],
+  "work_branch": "main"
+}

@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "f9b30e35f7bf57c46f8d83f2",
+  "command_timeout": 90,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 922,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 41adb5700d2b2522cf67e5044466d80e04019e23\npython3 - <<'PY'\nimport json\nfrom pathlib import Path\ndata=json.loads(Path('core/data/build/reports/detekt/detekt.sarif').read_text())\nfor run in data.get('runs',[]):\n for z in run.get('results',[]):\n  x=z.get('locations',[{}])[0].get('physicalLocation',{})\n  print(z.get('ruleId'),x.get('artifactLocation',{}).get('uri'),x.get('region',{}).get('startLine'),z.get('message',{}).get('text'))\nPY",
+      "current_rss_mb": 4.47,
+      "elapsed_seconds": 0.441,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "detekt.complexity.CyclomaticComplexMethod file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt 68 The function handleGattEvent appears to be too complex based on Cyclomatic Complexity (complexity: 15). Defined complexity threshold for methods is set to '15'\ndetekt.formatting.ImportOrdering file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt 3 Imports must be ordered in lexicographic order without any empty lines in-between with \"java\", \"javax\", \"kotlin\" and aliases in the end\ndetekt.style.ReturnCount file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt 242 Function readAllReadableCharacteristics has 3 return statements which exceeds the limit of 2.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 4.47,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-14T16:29:29.229495+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.065,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.081,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261014-blueeye-gatt-read-job-detekt-diagnostic-r1",
+  "idle_timeout": 90,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.441,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-14T16:29:27.178090+00:00",
+  "status": "done",
+  "task_digest": "6acfde04fd9fb36781c0be5b85a435520b393ba164f1944fa522c046fca4f966",
+  "task_timeout": 300,
+  "verification": [],
+  "work_branch": "main"
+}

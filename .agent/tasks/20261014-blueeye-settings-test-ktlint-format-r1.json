@@ -1,0 +1,20 @@
+{
+  "id": "20261014-blueeye-settings-test-ktlint-format-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "dedupe_key": "main:blueeye-settings-test-ktlint-format",
+  "dedupe_revision": 1,
+  "command_timeout": 900,
+  "idle_timeout": 300,
+  "task_timeout": 1800,
+  "memory_limit_mb": 3072,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 89faa8b8ee6a34889a6318a440e23fcfe5c99fb8\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :feature:settings:ktlintTestSourceSetFormat --no-daemon --console=plain --max-workers=2\ngit diff --check\nprintf 'FORMATTED_FILES\\n'\ngit diff --name-only"
+  ],
+  "verify_commands": [
+    "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :feature:settings:ktlintTestSourceSetCheck :feature:settings:testDebugUnitTest --tests io.blueeye.feature.settings.AlertDeliveryDiagnosticsExportTest --tests io.blueeye.feature.settings.DatabaseExportJsonMapperTest --tests io.blueeye.feature.settings.SessionExportReviewCategoryTest --no-daemon --console=plain --max-workers=2"
+  ]
+}

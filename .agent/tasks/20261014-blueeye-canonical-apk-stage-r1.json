@@ -1,0 +1,17 @@
+{
+  "id": "20261014-blueeye-canonical-apk-stage-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "dedupe_key": "main:blueeye-stage-debug-ci-artifact-20261014",
+  "dedupe_revision": 1,
+  "command_timeout": 200,
+  "idle_timeout": 120,
+  "task_timeout": 360,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 2141d6f41816f70997df42b54bcc85b2c72a92c8\nif ! command -v gh >/dev/null; then\n  echo \"GH_CLI_UNAVAILABLE\"\n  exit 0\nfi\nif ! gh auth status >/dev/null 2>&1; then\n  echo \"GH_CLI_AUTH_UNAVAILABLE\"\n  exit 0\nfi\necho \"GH_CLI_AUTH_OK\"\nmkdir -p \"build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8\"\nif ! gh run download 38614632455 --repo MichalMatu/tracker --name tracker-debug-2141d6f41816f70997df42b54bcc85b2c72a92c8 --dir \"build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8\" >/dev/null 2>&1; then\n  echo \"CANONICAL_APK_DOWNLOAD_FAILED\"\n  exit 0\nfi\npython3 - <<'PY'\nfrom pathlib import Path\nroot=Path(\"build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8\")\napks=list(root.rglob(\"*.apk\"))\nprint(\"CANONICAL_APK_COUNT\",len(apks))\nfor apk in apks: print(\"CANONICAL_APK_RELATIVE\", apk.relative_to(Path.cwd()) if apk.is_absolute() else str(apk),\"BYTES\",apk.stat().st_size)\nPY"
+  ]
+}

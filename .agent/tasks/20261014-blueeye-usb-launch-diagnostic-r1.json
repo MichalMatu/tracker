@@ -1,0 +1,19 @@
+{
+  "id": "20261014-blueeye-usb-launch-diagnostic-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "main:blueeye-usb-launch-diagnostic-20261014",
+  "dedupe_revision": 1,
+  "command_timeout": 150,
+  "idle_timeout": 100,
+  "task_timeout": 300,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 2141d6f41816f70997df42b54bcc85b2c72a92c8\npython3 - <<'PY'\nimport subprocess, time, re\ndef adb(*args, timeout=35):\n    return subprocess.run([\"adb\",*args],capture_output=True,text=True,timeout=timeout)\ndevices=adb(\"devices\",\"-l\")\nusb=[]\nfor line in devices.stdout.splitlines()[1:]:\n    parts=line.split()\n    if len(parts)>=2 and parts[1]==\"device\" and (\"usb:\" in line or (\":\" not in parts[0] and not parts[0].startswith(\"emulator-\"))):\n        usb.append(parts[0])\nif len(usb)!=1:raise SystemExit(\"NO_UNIQUE_USB_DEVICE\")\nserial=usb[0]\ndef shell(*args,timeout=35):\n    return adb(\"-s\",serial,\"shell\",*args,timeout=timeout)\nmodel=shell(\"getprop\",\"ro.product.model\").stdout.strip()\nif model!=\"SM-S906B\":raise SystemExit(\"WRONG_TARGET_MODEL\")\nres=shell(\"cmd\",\"package\",\"resolve-activity\",\"--brief\",\"-a\",\"android.intent.action.MAIN\",\"-c\",\"android.intent.category.LAUNCHER\",\"io.blueeye\")\nprint(\"RESOLVE_ACTIVITY_OK\",res.returncode==0)\nprint(\"EXPECTED_ACTIVITY\", \"io.blueeye/.MainActivity\" in res.stdout or \"io.blueeye.MainActivity\" in res.stdout)\nlaunch=shell(\"am\",\"start\",\"-n\",\"io.blueeye/.MainActivity\")\ninfo=(launch.stdout+\" \"+launch.stderr)\nprint(\"EXPLICIT_ACTIVITY_LAUNCH_COMMAND_OK\",launch.returncode==0 and not re.search(r\"Error:|Exception|not found\",info,re.I))\nprint(\"LAUNCH_DIAGNOSTIC\",info.strip().splitlines()[-2:] if info else [])\ntime.sleep(4)\nprocess=shell(\"pidof\",\"io.blueeye\")\nprint(\"PROCESS_RUNNING_AFTER_4S\",bool(process.stdout.strip()))\nfocus=shell(\"dumpsys\",\"activity\",\"activities\")\nfocused=\"io.blueeye\" in \"\\n\".join(x for x in focus.stdout.splitlines() if \"mResumed\" in x or \"topResumedActivity\" in x or \"mFocusedApp\" in x)\nprint(\"BLUEEYE_RESUMED\",focused)\nif not process.stdout.strip():\n    lines=shell(\"logcat\",\"-d\",\"-t\",\"350\",\"-s\",\"AndroidRuntime:E\",\"ActivityTaskManager:E\",timeout=45).stdout.splitlines()\n    extracted=[ln for ln in lines if (\"io.blueeye\" in ln or \"FATAL EXCEPTION\" in ln or \"Process:\" in ln or \"Exception:\" in ln)]\n    print(\"RUNTIME_FATAL_SUMMARY\", [re.sub(r\"([0-9]{1,3}\\.){3}[0-9]{1,3}\",\"[redacted]\",ln[:250]) for ln in extracted[-9:]])\nprint(\"DIAGNOSTIC_COMPLETE\")\nPY"
+  ]
+}

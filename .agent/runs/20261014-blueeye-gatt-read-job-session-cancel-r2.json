@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-gatt-read-job-session-cancel-r2",
+  "task_digest": "1a52f0e6c5847b9a4b915dfa761d5cd8e20335b1359050541e3f0d42b303f4c4",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T16:31:39.213896+00:00",
+  "attempt_id": "38d816f08a33d30e749bb788",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 50370,
+  "updated_at": "2026-10-14T16:31:39.783385+00:00",
+  "pid": 50370
+}

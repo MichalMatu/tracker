@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-identity-ambiguity-detekt-report-r2",
+  "task_digest": "357d40e022f75492686b4ab0ed7d43665919b36cd666d8aa13af4e7f72815151",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T18:11:50.567108+00:00",
+  "attempt_id": "89284452eb0a0ce1ae969400",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 64072,
+  "updated_at": "2026-10-14T18:11:50.940968+00:00",
+  "pid": 64072
+}

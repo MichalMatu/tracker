@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-export-empty-object-json-r1",
+  "task_digest": "185a0ef2e6c5a84af98de830f8d09c2b736f99d3b80f2fa27ff58e50fbf86504",
+  "status": "failed",
+  "failure_reason": "verification_failed",
+  "finished_at": "2026-10-14T18:20:23.406057+00:00",
+  "attempt_id": "627a5143d59e792f59865932",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 75709,
+  "updated_at": "2026-10-14T18:20:24.453513+00:00",
+  "pid": 75709
+}

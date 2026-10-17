@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-usb-adb-preflight-r1",
+  "task_digest": "9f1dd1f59a2ec7d88df7352ac8dc9c13009606db93b27341ac9ef358068732b2",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T18:34:31.159629+00:00",
+  "attempt_id": "88a7ad11774747118afefdf9",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 98623,
+  "updated_at": "2026-10-14T18:34:31.545493+00:00",
+  "pid": 98623
+}

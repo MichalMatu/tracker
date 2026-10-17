@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-gatt-stale-read-persistence-r2",
+  "task_digest": "77031e3d5d2330a2c618a3a190a33f5eb4dd759d5a891874d5b6a88ff485bd2f",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T16:12:13.459414+00:00",
+  "attempt_id": "65d4afbc990e6c07070bf4c1",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 24798,
+  "updated_at": "2026-10-14T16:12:14.089759+00:00",
+  "pid": 24798
+}

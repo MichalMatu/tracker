@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-settings-detekt-diagnostic-r1",
+  "task_digest": "e4fb97370d64d9c5ed23161895930c5ae88318894c2501261c57fffc61485791",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T16:22:18.699554+00:00",
+  "attempt_id": "124155d361e8400364d677dc",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 38872,
+  "updated_at": "2026-10-14T16:22:18.943522+00:00",
+  "pid": 38872
+}

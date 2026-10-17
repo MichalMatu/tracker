@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-settings-export-ktlint-r1",
+  "task_digest": "6dab417eaf297139dc8e51f4c8f3817d8e9bb5e558bc83e8a4ad8409d920ab8e",
+  "status": "failed",
+  "failure_reason": "verification_failed",
+  "finished_at": "2026-10-14T16:21:44.244302+00:00",
+  "attempt_id": "609a451281e770e8fcd21363",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 37560,
+  "updated_at": "2026-10-14T16:21:45.142638+00:00",
+  "pid": 37560
+}

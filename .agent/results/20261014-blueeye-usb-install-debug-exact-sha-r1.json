@@ -1,0 +1,61 @@
+{
+  "allow_write": false,
+  "attempt_id": "0ade2b3eed145dec619c7b36",
+  "command_timeout": 340,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 580,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 2141d6f41816f70997df42b54bcc85b2c72a92c8\npython3 - <<'PY'\nfrom pathlib import Path\nimport subprocess, sys, time, hashlib\napk=Path(\"build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8/app-debug.apk\")\nif not apk.is_file() or apk.stat().st_size < 1_000_000:\n    raise SystemExit(\"ERROR_CANONICAL_APK_MISSING\")\nprint(\"APK_BYTES\",apk.stat().st_size)\nprint(\"APK_SHA256\",hashlib.sha256(apk.read_bytes()).hexdigest())\ndef adb(*args, timeout=90):\n    return subprocess.run([\"adb\",*args],capture_output=True,text=True,timeout=timeout)\np=adb(\"devices\",\"-l\")\nif p.returncode: raise SystemExit(\"ADB_DEVICES_FAILED\")\nconnected=[]\nfor line in p.stdout.splitlines()[1:]:\n    parts=line.split()\n    if len(parts) < 2 or parts[1]!=\"device\": continue\n    serial=parts[0]\n    if \"usb:\" in line or (\":\" not in serial and not serial.startswith(\"emulator-\")):\n        connected.append(serial)\nprint(\"AUTHORIZED_USB_COUNT\",len(connected))\nif len(connected)!=1: raise SystemExit(\"NOT_EXACTLY_ONE_USB_DEVICE\")\nserial=connected[0]\ndef shell(*args):\n    r=adb(\"-s\",serial,\"shell\",*args)\n    if r.returncode: raise SystemExit(\"ADB_SHELL_ERROR\")\n    return r.stdout.strip()\nmodel=shell(\"getprop\",\"ro.product.model\")\nprint(\"MODEL\",model)\nif model!=\"SM-S906B\":raise SystemExit(\"WRONG_MODEL_DO_NOT_INSTALL\")\noriginal_present=shell(\"pm\",\"path\",\"io.blueeye\").startswith(\"package:\")\nprint(\"APP_INSTALLED_BEFORE\",original_present)\nprint(\"INSTALL_MODE\",\"UPDATE_PRESERVE_DATA\")\nresult=adb(\"-s\",serial,\"install\",\"-r\",str(apk.resolve()),timeout=240)\nmessage=(result.stdout+\" \"+result.stderr).strip()\nprint(\"ADB_INSTALL_STATUS\", \"SUCCESS\" if result.returncode==0 and \"Success\" in message else \"FAILED\")\nif result.returncode or \"Success\" not in message:\n    allowed=message.splitlines()[-3:]\n    print(\"ADB_INSTALL_ERROR\", \" | \".join(allowed)[:650])\n    print(\"APPLICATION_NOT_UNINSTALLED_DATA_PRESERVED\")\n    raise SystemExit(3)\ninstalled=shell(\"pm\",\"path\",\"io.blueeye\").startswith(\"package:\")\nprint(\"PACKAGE_PRESENT_AFTER\",installed)\nif not installed:raise SystemExit(\"APP_PACKAGE_MISSING_AFTER_INSTALL\")\nlaunch=adb(\"-s\",serial,\"shell\",\"am\",\"start\",\"-a\",\"android.intent.action.MAIN\",\"-c\",\"android.intent.category.LAUNCHER\",\"-p\",\"io.blueeye\",timeout=30)\nprint(\"LAUNCH_EXIT\",launch.returncode)\nprint(\"LAUNCH_RESULT\", \"OK\" if launch.returncode==0 and \"Error\" not in (launch.stdout+launch.stderr) else \"FAILED\")\ntime.sleep(3)\npid=shell(\"pidof\",\"io.blueeye\")\nprint(\"APP_PROCESS_RUNNING\",bool(pid.strip()))\nif launch.returncode!=0 or not pid.strip():raise SystemExit(\"INSTALL_OK_BUT_LAUNCH_NOT_CONFIRMED\")\nprint(\"USB_INSTALL_AND_LAUNCH_PASS\")\nPY",
+      "current_rss_mb": 18.14,
+      "elapsed_seconds": 2.865,
+      "exit_code": 3,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "APK_BYTES 56169937\nAPK_SHA256 780c667b548cd736d9041663e144a15e6acbd5dfe7054b27b12934b93a2a1b57\nAUTHORIZED_USB_COUNT 1\nMODEL SM-S906B\nAPP_INSTALLED_BEFORE True\nINSTALL_MODE UPDATE_PRESERVE_DATA\nADB_INSTALL_STATUS FAILED\nADB_INSTALL_ERROR Performing Streamed Install |  adb: failed to install /Users/michal/agent-workspace/repos/tracker/work/build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8/app-debug.apk: Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package io.blueeye signatures do not match newer version; ignoring!]\nAPPLICATION_NOT_UNINSTALLED_DATA_PRESERVED\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 18.14,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "failure_reason": "command_failed",
+  "finished_at": "2026-10-14T18:37:58.647255+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.119,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.304,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261014-blueeye-usb-install-debug-exact-sha-r1",
+  "idle_timeout": 240,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 2.865,
+      "outcome": "failed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-14T18:37:53.770052+00:00",
+  "status": "failed",
+  "task_digest": "921f120cadeece00646e6ad330b934a84d6ac901e58d50e0cd5f86b33bb50890",
+  "task_timeout": 540,
+  "verification": [],
+  "work_branch": "main"
+}

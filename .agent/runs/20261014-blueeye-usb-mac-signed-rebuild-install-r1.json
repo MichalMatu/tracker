@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-usb-mac-signed-rebuild-install-r1",
+  "task_digest": "b75dbd988f38332899a410666a6226f96d9db073b72f2ed0b4e00f8cb0b5095e",
+  "status": "failed",
+  "failure_reason": "command_failed",
+  "finished_at": "2026-10-14T18:47:49.283719+00:00",
+  "attempt_id": "0e60df8b61ee6b864be2cb22",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 8369,
+  "updated_at": "2026-10-14T18:47:49.811002+00:00",
+  "pid": 8369
+}

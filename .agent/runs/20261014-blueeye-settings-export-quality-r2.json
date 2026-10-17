@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-settings-export-quality-r2",
+  "task_digest": "52105922bd91d033e3fe4da23ab7cf87d207ce4e54adda042ed9a1d424746d9b",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T16:23:37.336691+00:00",
+  "attempt_id": "0d8b8d7f26a6205b44d9f8cb",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 40077,
+  "updated_at": "2026-10-14T16:23:38.133768+00:00",
+  "pid": 40077
+}
