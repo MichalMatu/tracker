@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-identity-ambiguous-carryover-r3",
+  "task_digest": "1cabe838ad67a15abace55166e456d66476bc1c348738dc0a22059ce7f4aaf94",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T18:15:00.572021+00:00",
+  "attempt_id": "5ca1ec4aa2756dbefd0bcc06",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 65346,
+  "updated_at": "2026-10-14T18:15:01.639926+00:00",
+  "pid": 65346
+}

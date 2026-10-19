@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-usb-launch-diagnostic-r1",
+  "task_digest": "0a70a7776b5b0653f423bf3b68cbb6e51f5b8a4e2c0779246a9a7f53f22ccf55",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T19:07:24.956773+00:00",
+  "attempt_id": "3fc15a87610f75011ce22fd5",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 39991,
+  "updated_at": "2026-10-14T19:07:25.218906+00:00",
+  "pid": 39991
+}

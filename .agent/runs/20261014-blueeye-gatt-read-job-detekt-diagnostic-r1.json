@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-gatt-read-job-detekt-diagnostic-r1",
+  "task_digest": "6acfde04fd9fb36781c0be5b85a435520b393ba164f1944fa522c046fca4f966",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T16:29:29.229495+00:00",
+  "attempt_id": "f9b30e35f7bf57c46f8d83f2",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 47915,
+  "updated_at": "2026-10-14T16:29:29.474507+00:00",
+  "pid": 47915
+}

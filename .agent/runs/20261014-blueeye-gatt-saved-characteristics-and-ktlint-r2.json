@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-gatt-saved-characteristics-and-ktlint-r2",
+  "task_digest": "0497a93d22c1891a6ef092eb354fe7dbc26e674c144feebe4eb2d2a1455fbc99",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T16:07:03.620661+00:00",
+  "attempt_id": "94060fbbd47b9673906976af",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 18061,
+  "updated_at": "2026-10-14T16:07:04.181799+00:00",
+  "pid": 18061
+}

@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-usb-install-debug-exact-sha-r1",
+  "task_digest": "921f120cadeece00646e6ad330b934a84d6ac901e58d50e0cd5f86b33bb50890",
+  "status": "failed",
+  "failure_reason": "command_failed",
+  "finished_at": "2026-10-14T18:37:58.647255+00:00",
+  "attempt_id": "0ade2b3eed145dec619c7b36",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 4037,
+  "updated_at": "2026-10-14T18:37:59.329977+00:00",
+  "pid": 4037
+}

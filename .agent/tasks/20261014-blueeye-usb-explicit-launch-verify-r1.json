@@ -1,0 +1,19 @@
+{
+  "id": "20261014-blueeye-usb-explicit-launch-verify-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "main:blueeye-usb-explicit-launch-verify-20261014",
+  "dedupe_revision": 1,
+  "command_timeout": 130,
+  "idle_timeout": 110,
+  "task_timeout": 300,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 2141d6f41816f70997df42b54bcc85b2c72a92c8\npython3 - <<'PY'\nimport subprocess,time,re\ndef run(*args,timeout=55): return subprocess.run([\"adb\",*args],capture_output=True,text=True,timeout=timeout)\nr=run(\"devices\",\"-l\")\nusb=[]\nfor line in r.stdout.splitlines()[1:]:\n    p=line.split()\n    if len(p)>=2 and p[1]==\"device\" and (\"usb:\" in line or (\":\" not in p[0] and not p[0].startswith(\"emulator-\"))):usb.append(p[0])\nif len(usb)!=1:raise SystemExit(\"UNEXPECTED_USB_DEVICE_COUNT\")\nserial=usb[0]\ndef shell(*args):\n    return run(\"-s\",serial,\"shell\",*args)\nmodel=shell(\"getprop\",\"ro.product.model\")\nif model.stdout.strip()!=\"SM-S906B\":raise SystemExit(\"WRONG_PHONE\")\ninstalled=shell(\"pm\",\"path\",\"io.blueeye\")\nprint(\"PACKAGE_PRESENT\",installed.returncode==0 and \"package:\" in installed.stdout)\nlaunch=shell(\"am\",\"start\",\"-W\",\"-n\",\"io.blueeye/.MainActivity\")\nprint(\"EXPLICIT_START_EXIT\",launch.returncode)\nprint(\"EXPLICIT_START_OUTPUT\", \" | \".join((launch.stdout+\" \"+launch.stderr).splitlines())[:1000])\ntime.sleep(5)\np=shell(\"pidof\",\"io.blueeye\")\nprint(\"PROCESS_ALIVE\",p.returncode==0 and bool(p.stdout.strip()))\nfocused=shell(\"dumpsys\",\"activity\",\"activities\")\nlines=focused.stdout.splitlines()\nmatching=[l.strip() for l in lines if \"mResumedActivity:\" in l or \"topResumedActivity=\" in l]\nprint(\"APP_FOREGROUND\",any(\"io.blueeye\" in l for l in matching))\nif p.returncode!=0 or not p.stdout.strip():\n    logs=shell(\"logcat\",\"-d\",\"-t\",\"2000\",\"-s\",\"AndroidRuntime:E\")\n    relevant=logs.stdout.splitlines()\n    fatal=[i for i,l in enumerate(relevant) if \"FATAL EXCEPTION\" in l]\n    if fatal:\n        i=fatal[-1]\n        excerpt=relevant[i:i+18]\n        cleaned=[]\n        for line in excerpt:\n            if \"io.blueeye\" in line or \"Exception\" in line or re.search(r\"at io\\\\.blueeye\",line):\n                cleaned.append(line[:250])\n        print(\"LATEST_ANDROID_RUNTIME_CRASH\", \" | \".join(cleaned[:12])[:1300])\n    else:\n        print(\"ANDROID_RUNTIME_FATAL_NOT_FOUND\")\nprint(\"EXPLICIT_LAUNCH_VALIDATION\", \"PASS\" if p.returncode==0 and bool(p.stdout.strip()) else \"FAIL\")\nPY"
+  ]
+}

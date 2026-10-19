@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-canonical-apk-stage-r1",
+  "task_digest": "cc34a35f5e2ceae157668c33ab5c9b756c3c7748480787bcce128b6c53b29fa3",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T18:36:37.434619+00:00",
+  "attempt_id": "e9ba027cb216b56f43b2e287",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 2011,
+  "updated_at": "2026-10-14T18:36:37.756950+00:00",
+  "pid": 2011
+}

@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "72e86fb7e10fb27bb0002fef",
+  "command_timeout": 90,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 238,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 07f65d7e623c5e7740a742665a294fb8f5ac9a8b\npython3 - <<'PY'\nimport json\nfrom pathlib import Path\np=Path('core/data/build/reports/detekt/detekt.sarif')\nfor run in json.loads(p.read_text()).get('runs',[]):\n for item in run.get('results',[]):\n  loc=item.get('locations',[{}])[0].get('physicalLocation',{})\n  print(item.get('ruleId'),loc.get('artifactLocation',{}).get('uri'),loc.get('region',{}).get('startLine'),item.get('message',{}).get('text'))\nPY",
+      "current_rss_mb": 4.41,
+      "elapsed_seconds": 0.453,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "detekt.complexity.NestedBlockDepth file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt 112 Function findLongGapCandidate is nested too deeply.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 4.41,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-14T18:09:14.314340+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.082,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.11,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261014-blueeye-identity-ambiguity-detekt-report-r1",
+  "idle_timeout": 90,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.453,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-14T18:09:12.000231+00:00",
+  "status": "done",
+  "task_digest": "b2050b1be54d6d5dfa4d7a0ec2c6b9ea943ac6de78abafe63bdac498725b477f",
+  "task_timeout": 300,
+  "verification": [],
+  "work_branch": "main"
+}

@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-details-ktlint-main-fix-r1",
+  "task_digest": "f6ca7211a1d227e353b5825ec5fc0ca9af3ad30bc4b32161ace1e99dd202c8bb",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T16:14:05.399311+00:00",
+  "attempt_id": "da7d1c907bfda8e012674883",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 27382,
+  "updated_at": "2026-10-14T16:14:05.978915+00:00",
+  "pid": 27382
+}

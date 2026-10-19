@@ -1,0 +1,111 @@
+{
+  "allow_write": true,
+  "attempt_id": "38d816f08a33d30e749bb788",
+  "command_timeout": 900,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 0,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 41adb5700d2b2522cf67e5044466d80e04019e23\ngit diff --check",
+      "elapsed_seconds": 0.407,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": null,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {
+    "writes": [
+      {
+        "bytes": 13385,
+        "path": "core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt"
+      }
+    ]
+  },
+  "finished_at": "2026-10-14T16:31:39.213896+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.027,
+    "exit_code": 0,
+    "output": "diff --git a/core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt b/core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt\nindex 5735577..81e8fac 100644\n--- a/core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt\n+++ b/core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt\n@@ -14,8 +14,10 @@ import io.blueeye.core.connectivity.mapper.BleServiceMapper\n import io.blueeye.core.domain.details.DeviceConnectionController\n import io.blueeye.core.model.DeviceConnectionState\n import io.blueeye.core.model.GattService\n+import kotlinx.coroutines.CancellationException\n import kotlinx.coroutines.CoroutineScope\n import kotlinx.coroutines.Dispatchers\n+import kotlinx.coroutines.Job\n import kotlinx.coroutines.SupervisorJob\n import kotlinx.coroutines.delay\n import kotlinx.coroutines.flow.MutableStateFlow\n@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.StateFlow\n import kotlinx.coroutines.flow.asStateFlow\n import kotlinx.coroutines.flow.collect\n import kotlinx.coroutines.launch\n+import java.util.concurrent.ConcurrentHashMap\n import javax.inject.Inject\n import javax.inject.Singleton\n \n@@ -54,7 +57,8 @@ constructor(\n     private val _currentRecordFingerprint = MutableStateFlow<String?>(null)\n \n     // Collected characteristic data during live connection (SHORT_UUID -> HEX_VALUE)\n-    private val collectedCharData = mutableMapOf<String, String>()\n+    private val collectedCharData = ConcurrentHashMap<String, String>()\n+    private var discoveryReadJob: Job? = null\n \n     init {\n         // Obserwuj zdarzenia z niskiego poziomu (GATT Client)\n@@ -73,8 +77,11 @@ constructor(\n                             message = \"GATT connection failed/lost with status ${event.status}\",\n                             gattStatus = event.status,\n                         )\n+                    discoveryReadJob?.cancel()\n+                    discoveryReadJob = null\n                     bleGattClient.close() // Ważne: zamykamy gatt po błędzie\n                     bleOperationManager.reset()\n+                    _services.value = emptyList()\n                 } else if (event.newState == android.bluetooth.BluetoothProfile.STATE_CONNECTED) {\n                     _connectionState.value =\n                         DeviceConnectionState.Connected(\n@@ -91,30 +98,26 @@ constructor(\n                     // Poprawne rozłączenie (status == 0)\n                     _connectionState.value = DeviceConnectionState.Disconnected\n                     _services.value = emptyList()\n+                    discoveryReadJob?.cancel()\n+                    discoveryReadJob = null\n                     bleOperationManager.reset()\n                     bleGattClient.close()\n                 }\n             }\n             is BleGattEvent.ServicesDiscovered -> {\n                 if (event.status == android.bluetooth.BluetoothGatt.GATT_SUCCESS) {\n-                    val gattServices = bleGattClient.getServices()\n-                    _services.value = bleServiceMapper.map(gattServices)\n-\n-                    // Czytamy wszystkie charakterystyki po kolei\n-                    scope.launch {\n-                        // 1. Zapisz podstawową strukturę (usługi) do bazy\n-                        currentRecordFingerprint()?.let { fingerprint ->\n-                            connectionProbeRecorder.recordServices(\n-                                fingerprint,\n-                                gattServices\n-                            )\n-                        }\n-                        // 2. Czytaj wartości\n-                        readAllReadableCharacteristics(gattServices)\n-                    }\n+                    startServiceRead()\n                 } else {\n+                    discoveryReadJob?.cancel()\n+                    discoveryReadJob = null\n+                    bleOperationManager.reset()\n+                    bleGattClient.close()\n+                    _services.value = emptyList()\n                     _connectionState.value =\n-                        DeviceConnectionState.Error(\"Service Discovery Failed: ${event.status}\")\n+                        DeviceConnectionState.Error(\n+                            \"Service Discovery Failed: ${event.status}\",\n+                            gattStatus = event.status,\n+                        )\n                 }\n             }\n             is BleGattEvent.CharacteristicRead -> {\n@@ -165,6 +168,23 @@ constructor(\n         }\n     }\n \n+    private fun startServiceRead() {\n+        val gattServices = bleGattClient.getServices()\n+        _services.value = bleServiceMapper.map(gattServices)\n+\n+        // Associate asynchronous work with the session that discovered the services.\n+        discoveryReadJob?.cancel()\n+        val epoch = bleGattClient.currentSessionEpoch()\n+        val fingerprint = currentRecordFingerprint()\n+        discoveryReadJob = scope.launch {\n+            if (!GattEventSessionPolicy.isCurrent(epoch, bleGattClient.currentSessionEpoch())) {\n+                return@launch\n+            }\n+            fingerprint?.let { connectionProbeRecorder.recordServices(it, gattServices) }\n+            readAllReadableCharacteristics(gattServices, epoch, fingerprint)\n+        }\n+    }\n+\n     @SuppressLint(\"MissingPermission\")\n     override fun connect(\n         macAddress: String,\n@@ -212,6 +232,9 @@ constructor(\n         }\n \n     private fun disconnectInternal() {\n+        discoveryReadJob?.cancel()\n+        discoveryReadJob = null\n+        bleOperationManager.reset()\n         bleGattClient.disconnect()\n         bleGattClient.close()\n         _connectionState.value = DeviceConnectionState.Disconnected\n@@ -220,19 +243,27 @@ constructor(\n         _currentRecordFingerprint.value = null\n     }\n \n-    private suspend fun readAllReadableCharacteristics(services: List<android.bluetooth.BluetoothGattService>) {\n+    private suspend fun readAllReadableCharacteristics(\n+        services: List<android.bluetooth.BluetoothGattService>,\n+        sessionEpoch: Long,\n+        fingerprint: String?,\n+    ) {\n         Log.d(\"BleManager\", \"Reading ALL readable characteristics for ${services.size} services...\")\n-        services.forEach { service ->\n+        for (service in services) {\n+            if (!GattEventSessionPolicy.isCurrent(sessionEpoch, bleGattClient.currentSessionEpoch())) break\n             val readableChars = service.characteristics.filter {\n                 (it.properties and BluetoothGattCharacteristic.PROPERTY_READ) != 0\n             }\n             Log.d(\"BleManager\", \"Service ${service.uuid} has ${readableChars.size} readable chars\")\n \n-            readableChars.forEach { char ->\n+            for (char in readableChars) {\n+                if (!GattEventSessionPolicy.isCurrent(sessionEpoch, bleGattClient.currentSessionEpoch())) break\n                 try {\n                     Log.d(\"BleManager\", \"Initiating read for char: ${char.uuid}\")\n                     bleOperationManager.read(char)\n                     delay(READ_OPERATION_DELAY_MS)\n+                } catch (cancelled: CancellationException) {\n+                    throw cancelled\n                 } catch (@Suppress(\"TooGenericExceptionCaught\") e: Exception) {\n                     Log.w(\"BleManager\", \"Failed to read ${char.uuid}: ${e.message}\")\n                 }\n@@ -240,9 +271,13 @@ constructor(\n         }\n         Log.d(\"BleManager\", \"Finished reading all characteristics. Total collected: ${collectedCharData.size}\")\n \n-        // Save all collected characteristic data to database\n-        currentRecordFingerprint()?.let { fingerprint ->\n-            connectionProbeRecorder.saveBufferedCharacteristics(fingerprint, collectedCharData)\n+        // Never persist buffered values against a different GATT session/fingerprint.\n+        if (\n+            GattEventSessionPolicy.isCurrent(sessionEpoch, bleGattClient.currentSessionEpoch()) &&\n+            fingerprint != null &&\n+            fingerprint == currentRecordFingerprint()\n+        ) {\n+            connectionProbeRecorder.saveBufferedCharacteristics(fingerprint, collectedCharData.toMap())\n         }\n     }\n \n"
+  },
+  "git_status": {
+    "elapsed_seconds": 0.339,
+    "exit_code": 0,
+    "output": " M core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt\n"
+  },
+  "id": "20261014-blueeye-gatt-read-job-session-cancel-r2",
+  "idle_timeout": 300,
+  "memory_limit_mb": 3072,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.407,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2
+    },
+    {
+      "elapsed_seconds": 24.203,
+      "outcome": "passed",
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2
+    }
+  ],
+  "started_at": "2026-10-14T16:31:12.830814+00:00",
+  "status": "done",
+  "task_digest": "1a52f0e6c5847b9a4b915dfa761d5cd8e20335b1359050541e3f0d42b303f4c4",
+  "task_timeout": 1800,
+  "verification": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 3803,
+      "command": "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :core:data:detekt :core:data:testDebugUnitTest --tests io.blueeye.core.connectivity.client.BleOperationManagerTest --tests io.blueeye.core.connectivity.manager.GattEventSessionPolicyTest --no-daemon --console=plain --max-workers=2",
+      "current_rss_mb": 33.25,
+      "elapsed_seconds": 24.203,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \nReusing configuration cache.\n> Task :core:domain:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:domain:compileKotlin UP-TO-DATE\n> Task :core:domain:compileJava NO-SOURCE\n> Task :core:domain:processResources NO-SOURCE\n> Task :core:domain:classes UP-TO-DATE\n> Task :core:domain:jar UP-TO-DATE\n> Task :core:data:preBuild UP-TO-DATE\n> Task :core:data:preDebugBuild UP-TO-DATE\n> Task :core:data:checkKotlinGradlePluginConfigurationErrors\n> Task :core:data:generateDebugResValues UP-TO-DATE\n> Task :core:data:generateDebugResources UP-TO-DATE\n> Task :core:data:packageDebugResources UP-TO-DATE\n> Task :core:data:parseDebugLocalResources UP-TO-DATE\n> Task :core:data:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:preBuild UP-TO-DATE\n> Task :core:decoders:preDebugBuild UP-TO-DATE\n> Task :core:decoders:generateDebugResValues UP-TO-DATE\n> Task :core:decoders:generateDebugResources UP-TO-DATE\n> Task :core:decoders:packageDebugResources UP-TO-DATE\n> Task :core:decoders:parseDebugLocalResources UP-TO-DATE\n> Task :core:decoders:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:checkKotlinGradlePluginConfigurationErrors\n> Task :core:decoders:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :core:decoders:kaptDebugKotlin UP-TO-DATE\n> Task :core:decoders:compileDebugKotlin UP-TO-DATE\n> Task :core:decoders:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:transformDebugClassesWithAsm UP-TO-DATE\n> Task :core:decoders:bundleLibCompileToJarDebug UP-TO-DATE\n\n> Task :core:data:detekt\n\n\n285 kotlin files were analyzed.\n\n> Task :core:data:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:data:preDebugUnitTestBuild UP-TO-DATE\n> Task :core:data:generateDebugUnitTestStubRFile UP-TO-DATE\n> Task :core:data:javaPreCompileDebugUnitTest UP-TO-DATE\n> Task :core:decoders:processDebugJavaRes UP-TO-DATE\n> Task :core:data:kaptGenerateStubsDebugKotlin\n> Task :core:data:kaptDebugKotlin\n> Task :core:data:compileDebugKotlin\n\n> Task :core:data:compileDebugJavaWithJavac\nNote: /Users/michal/agent-workspace/repos/tracker/work/core/data/build/generated/source/kapt/debug/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator_Factory.java uses or overrides a deprecated API.\nNote: Recompile with -Xlint:deprecation for details.\n\n> Task :core:data:processDebugJavaRes UP-TO-DATE\n> Task :core:data:transformDebugClassesWithAsm\n> Task :core:data:bundleLibRuntimeToJarDebug\n> Task :core:data:bundleLibCompileToJarDebug\n> Task :core:data:kaptGenerateStubsDebugUnitTestKotlin\n> Task :core:data:kaptDebugUnitTestKotlin\n> Task :core:data:compileDebugUnitTestKotlin\n> Task :core:data:compileDebugUnitTestJavaWithJavac UP-TO-DATE\n> Task :core:data:hiltAggregateDepsDebugUnitTest UP-TO-DATE\n> Task :core:data:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :core:data:processDebugUnitTestJavaRes UP-TO-DATE\n> Task :core:data:transformDebugUnitTestClassesWithAsm\n> Task :core:data:testDebugUnitTest\n[Incubating] Problems report is available at: file:///Users/michal/agent-workspace/repos/tracker/work/build/reports/problems/problems-report.html\n\nBUILD SUCCESSFUL in 23s\n47 actionable tasks: 17 executed, 30 up-to-date\nConfiguration cache entry reused.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 91.42,
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "work_branch": "main",
+  "workspace_checkpoint": {
+    "base_head": "41adb5700d2b2522cf67e5044466d80e04019e23",
+    "created_at": "2026-10-14T16:31:39.593738+00:00",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/20261014-blueeye-gatt-read-job-session-cancel-r2/1791995499456520000-task-exit",
+    "reason": "task-exit",
+    "status": " M core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt\n",
+    "task_id": "20261014-blueeye-gatt-read-job-session-cancel-r2",
+    "total_bytes": 8215,
+    "tracked_patch": "tracked.patch",
+    "tracked_patch_bytes": 8215,
+    "untracked_bytes": 0,
+    "untracked_files": [],
+    "untracked_root": "untracked",
+    "version": 2,
+    "work_branch": "agent-work"
+  }
+}

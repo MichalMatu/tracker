@@ -1,0 +1,19 @@
+{
+  "id": "20261014-blueeye-usb-installed-signer-match-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "main:blueeye-usb-installed-signer-match-20261014",
+  "dedupe_revision": 1,
+  "command_timeout": 300,
+  "idle_timeout": 180,
+  "task_timeout": 480,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 2141d6f41816f70997df42b54bcc85b2c72a92c8\npython3 - <<'PY'\nimport glob, os, re, subprocess, sys\nfrom pathlib import Path\ndef run(args, timeout=120):\n    return subprocess.run(args,capture_output=True,text=True,timeout=timeout)\nr=run([\"adb\",\"devices\",\"-l\"])\nusb=[]\nfor l in r.stdout.splitlines()[1:]:\n    p=l.split()\n    if len(p)>=2 and p[1]==\"device\" and (\"usb:\" in l or (\":\" not in p[0] and not p[0].startswith(\"emulator-\"))):\n        usb.append(p[0])\nif len(usb)!=1:raise SystemExit(\"USB_DEVICE_COUNT_NOT_ONE\")\nserial=usb[0]\ndef shell(*args):\n    x=run([\"adb\",\"-s\",serial,\"shell\",*args])\n    if x.returncode:raise SystemExit(\"ADB_SHELL_FAILED\")\n    return x.stdout.strip()\nif shell(\"getprop\",\"ro.product.model\")!=\"SM-S906B\":raise SystemExit(\"DEVICE_MODEL_MISMATCH\")\npackages=shell(\"pm\",\"path\",\"io.blueeye\").splitlines()\nbase=next((p[len(\"package:\"):] for p in packages if p.startswith(\"package:\") and p.endswith(\"/base.apk\")),None)\nif not base:raise SystemExit(\"INSTALLED_APK_NOT_FOUND\")\nlocal=Path(\"app/build/outputs/apk/debug/app-debug.apk\")\nci=Path(\"build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8/app-debug.apk\")\nroot=Path(\"build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8\")\nroot.mkdir(parents=True,exist_ok=True)\ninstalled=root/\"phone-installed-base.apk\"\npull=run([\"adb\",\"-s\",serial,\"pull\",base,str(installed)],timeout=180)\nif pull.returncode:raise SystemExit(\"CANNOT_PULL_INSTALLED_APK\")\ntools=[]\nfor rootp in (os.environ.get(\"ANDROID_HOME\"),os.environ.get(\"ANDROID_SDK_ROOT\"),str(Path.home()/\"Library/Android/sdk\")):\n    if rootp:tools+=glob.glob(str(Path(rootp)/\"build-tools\"/\"*\"/\"apksigner\"))\nif not tools:raise SystemExit(\"APKSIGNER_NOT_FOUND\")\nsigner=sorted(tools)[-1]\ndef fingerprint(path):\n    if not path.is_file():return None\n    r=run([signer,\"verify\",\"--print-certs\",str(path)],timeout=90)\n    if r.returncode:raise SystemExit(\"APK_SIGNATURE_INSPECTION_FAILED\")\n    m=re.search(r\"Signer #1 certificate SHA-256 digest:\\s*([0-9a-fA-F:]+)\",r.stdout)\n    if not m:raise SystemExit(\"CERT_FINGERPRINT_MISSING\")\n    return m.group(1).lower().replace(\":\",\"\")\ninstalledSig=fingerprint(installed)\nlocalSig=fingerprint(local)\nciSig=fingerprint(ci)\nprint(\"EXACT_HEAD\",\"2141d6f41816f70997df42b54bcc85b2c72a92c8\")\nprint(\"PHONE_APK_INSPECTED\",True)\nprint(\"LOCAL_APK_PRESENT\",local.is_file())\nprint(\"CI_APK_PRESENT\",ci.is_file())\nprint(\"LOCAL_SIGNATURE_MATCHES_INSTALLED\",localSig==installedSig if localSig else False)\nprint(\"CI_SIGNATURE_MATCHES_INSTALLED\",ciSig==installedSig if ciSig else False)\nprint(\"LOCAL_SIGNER_MATCH_RESOLUTION\", \"REBUILD_LOCAL\" if localSig==installedSig else \"DO_NOT_UPDATE_WITHOUT_COMPATIBLE_KEY\")\nPY"
+  ]
+}

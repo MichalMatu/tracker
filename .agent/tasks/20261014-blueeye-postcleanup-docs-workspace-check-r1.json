@@ -1,0 +1,17 @@
+{
+  "id": "20261014-blueeye-postcleanup-docs-workspace-check-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": true,
+  "resources": [],
+  "dedupe_key": "main:blueeye-postcleanup-docs-workspace-check",
+  "dedupe_revision": 1,
+  "command_timeout": 120,
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 01d57efbc914d380d5c3d1bad9f92e7746b8e52d\ngit diff --check HEAD^ HEAD\npython3 - <<'PY'\nfrom pathlib import Path\nimport shutil\nroot=Path.cwd().resolve()\ntarget=(root/\"build\"/\"adb-install\"/\"2141d6f41816f70997df42b54bcc85b2c72a92c8\")\nexpected=root/\"build\"/\"adb-install\"/\"2141d6f41816f70997df42b54bcc85b2c72a92c8\"\nif target != expected:\n    raise SystemExit(\"UNSAFE_TEMP_PATH\")\nif target.is_symlink():\n    raise SystemExit(\"SYMLINK_TEMP_PATH_REFUSED\")\nif target.is_dir():\n    shutil.rmtree(target)\n    print(\"OWNED_ADB_TEMP_ARTIFACTS_REMOVED\",True)\nelse:\n    print(\"OWNED_ADB_TEMP_ARTIFACTS_REMOVED\",False)\nPY\nprintf 'CURRENT_BRANCH='\ngit branch --show-current\nprintf 'EXACT_HEAD='\ngit rev-parse HEAD\nprintf 'WORKTREE_STATUS\\n'\ngit status --porcelain=v1\nprintf 'DOCUMENT_DIFF_CHECK=PASS\\n'"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "20261014-blueeye-usb-adb-preflight-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "main:blueeye-usb-adb-preflight-20261014",
+  "dedupe_revision": 1,
+  "command_timeout": 150,
+  "idle_timeout": 100,
+  "task_timeout": 300,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 2141d6f41816f70997df42b54bcc85b2c72a92c8\ncommand -v adb >/dev/null\nadb start-server >/dev/null\npython3 - <<'PY'\nimport os, subprocess\ndef adb(*args):\n    return subprocess.run([\"adb\", *args], capture_output=True, text=True, timeout=25)\nresult = adb(\"devices\", \"-l\")\nif result.returncode:\n    raise SystemExit(\"ADB_DEVICE_LIST_ERROR: \"+result.stderr[:200])\nentries = []\nfor line in result.stdout.splitlines()[1:]:\n    parts = line.split()\n    if len(parts) < 2: continue\n    serial, state = parts[:2]\n    props = parts[2:]\n    if state == \"device\" and any(x.startswith(\"usb:\") for x in props):\n        entries.append(serial)\n    elif state == \"device\" and \":\" not in serial and not serial.startswith(\"emulator-\"):\n        entries.append(serial)\nprint(\"ADB_USB_AUTHORIZED_COUNT\", len(entries))\nif len(entries) != 1:\n    print(\"ADB_STATES_ONLY\", [line.split()[1] for line in result.stdout.splitlines()[1:] if len(line.split()) >= 2])\n    raise SystemExit(\"EXPECTED_EXACTLY_ONE_AUTHORIZED_USB_DEVICE\")\nserial = entries[0]\ndef safe_shell(*args):\n    p=adb(\"-s\",serial,\"shell\",*args)\n    if p.returncode: raise SystemExit(\"ADB_SHELL_FAILED\")\n    return p.stdout.strip()\nmodel=safe_shell(\"getprop\",\"ro.product.model\")\nrelease=safe_shell(\"getprop\",\"ro.build.version.release\")\nprint(\"ADB_MODEL\",model)\nprint(\"ADB_ANDROID_VERSION\",release)\nif model!=\"SM-S906B\": raise SystemExit(\"WRONG_USB_MODEL\")\npackage=safe_shell(\"pm\",\"path\",\"io.blueeye\")\nprint(\"BLUEEYE_PREVIOUSLY_INSTALLED\", package.startswith(\"package:\"))\nprint(\"EXACT_SOURCE_SHA\", \"2141d6f41816f70997df42b54bcc85b2c72a92c8\")\napk=\"app/build/outputs/apk/debug/app-debug.apk\"\nprint(\"LOCAL_DEBUG_APK_EXISTS\", os.path.isfile(apk))\nif os.path.isfile(apk): print(\"LOCAL_DEBUG_APK_SIZE_BYTES\",os.path.getsize(apk))\nprint(\"ADB_PREFLIGHT_OK\")\nPY"
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "allow_write": true,
+  "attempt_id": "94060fbbd47b9673906976af",
+  "command_timeout": 900,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 0,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 4ed7c463b3a11c54dd1117180561a743b23be084\ngit diff --check",
+      "elapsed_seconds": 0.392,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": null,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {
+    "writes": [
+      {
+        "bytes": 4628,
+        "path": "feature/details/src/main/java/io/blueeye/feature/details/DetailsGattServiceExplorer.kt"
+      },
+      {
+        "bytes": 1705,
+        "path": "feature/details/src/test/java/io/blueeye/feature/details/DetailsGattCharacteristicFormatterTest.kt"
+      }
+    ]
+  },
+  "finished_at": "2026-10-14T16:07:03.620661+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.018,
+    "exit_code": 0,
+    "output": "diff --git a/feature/details/src/main/java/io/blueeye/feature/details/DetailsGattServiceExplorer.kt b/feature/details/src/main/java/io/blueeye/feature/details/DetailsGattServiceExplorer.kt\nindex e571c23..cf2aa2f 100644\n--- a/feature/details/src/main/java/io/blueeye/feature/details/DetailsGattServiceExplorer.kt\n+++ b/feature/details/src/main/java/io/blueeye/feature/details/DetailsGattServiceExplorer.kt\n@@ -23,7 +23,7 @@ internal fun DetailsGattServiceExplorer(\n     savedServices: String?,\n     savedCharacteristics: String?,\n ) {\n-    if (liveServices.isEmpty() && savedServices.isNullOrBlank()) return\n+    if (!DetailsGattEvidencePolicy.hasEvidence(liveServices, savedServices, savedCharacteristics)) return\n \n     Column(\n         modifier = Modifier.fillMaxWidth(),\n@@ -57,7 +57,7 @@ internal fun DetailsGattServiceExplorer(\n             }\n         }\n \n-        if (!savedServices.isNullOrBlank()) {\n+        if (!savedServices.isNullOrBlank() || !savedCharacteristics.isNullOrBlank()) {\n             var savedExpanded by rememberSaveable { mutableStateOf(false) }\n             OutlinedButton(\n                 onClick = { savedExpanded = !savedExpanded },\n@@ -70,7 +70,9 @@ internal fun DetailsGattServiceExplorer(\n                     text = \"Previously discovered via active connection (not BLE advertising)\",\n                     style = MaterialTheme.typography.bodySmall,\n                 )\n-                Text(savedServices, style = MaterialTheme.typography.bodySmall)\n+                savedServices?.takeIf { it.isNotBlank() }?.let { services ->\n+                    Text(services, style = MaterialTheme.typography.bodySmall)\n+                }\n                 savedCharacteristics?.takeIf { it.isNotBlank() }?.let { data ->\n                     Text(\"Saved characteristic values: $data\", style = MaterialTheme.typography.bodySmall)\n                 }\n@@ -79,6 +81,16 @@ internal fun DetailsGattServiceExplorer(\n     }\n }\n \n+/** Recorded characteristic values are valid active evidence even if service-list persistence is absent. */\n+internal object DetailsGattEvidencePolicy {\n+    fun hasEvidence(\n+        liveServices: List<GattService>,\n+        savedServices: String?,\n+        savedCharacteristics: String?,\n+    ): Boolean =\n+        liveServices.isNotEmpty() || !savedServices.isNullOrBlank() || !savedCharacteristics.isNullOrBlank()\n+}\n+\n internal data class DetailsGattCharacteristicInfo(\n     val heading: String,\n     val properties: String,\ndiff --git a/feature/details/src/test/java/io/blueeye/feature/details/DetailsGattCharacteristicFormatterTest.kt b/feature/details/src/test/java/io/blueeye/feature/details/DetailsGattCharacteristicFormatterTest.kt\nindex 142e303..fff6a94 100644\n--- a/feature/details/src/test/java/io/blueeye/feature/details/DetailsGattCharacteristicFormatterTest.kt\n+++ b/feature/details/src/test/java/io/blueeye/feature/details/DetailsGattCharacteristicFormatterTest.kt\n@@ -6,14 +6,23 @@ import org.junit.Assert.assertNull\n import org.junit.Test\n \n class DetailsGattCharacteristicFormatterTest {\n+    @Test\n+    fun `saved characteristic data remains visible without saved service list`() {\n+        assertEquals(true, DetailsGattEvidencePolicy.hasEvidence(emptyList(), null, \"2A19=64\"))\n+        assertEquals(true, DetailsGattEvidencePolicy.hasEvidence(emptyList(), \"180F\", null))\n+        assertEquals(false, DetailsGattEvidencePolicy.hasEvidence(emptyList(), null, null))\n+        assertEquals(false, DetailsGattEvidencePolicy.hasEvidence(emptyList(), \" \", \"\"))\n+    }\n+\n     @Test\n     fun `shows UUID properties and read values without hiding capabilities`() {\n-        val source = GattCharacteristic(\n-            uuid = \"00002a19-0000-1000-8000-00805f9b34fb\",\n-            name = \"Battery Level\",\n-            properties = listOf(\"READ\", \"NOTIFY\"),\n-            value = \"0xHex:64\",\n-        )\n+        val source =\n+            GattCharacteristic(\n+                uuid = \"00002a19-0000-1000-8000-00805f9b34fb\",\n+                name = \"Battery Level\",\n+                properties = listOf(\"READ\", \"NOTIFY\"),\n+                value = \"0xHex:64\",\n+            )\n         val result = DetailsGattCharacteristicFormatter.format(source)\n         assertEquals(\"Battery Level — 00002a19-0000-1000-8000-00805f9b34fb\", result.heading)\n         assertEquals(\"Properties: READ, NOTIFY\", result.properties)\n@@ -22,9 +31,10 @@ class DetailsGattCharacteristicFormatterTest {\n \n     @Test\n     fun `does not invent a read value for inaccessible characteristic`() {\n-        val result = DetailsGattCharacteristicFormatter.format(\n-            GattCharacteristic(\"test\", \"Restricted\", listOf(\"WRITE\"), null),\n-        )\n+        val result =\n+            DetailsGattCharacteristicFormatter.format(\n+                GattCharacteristic(\"test\", \"Restricted\", listOf(\"WRITE\"), null),\n+            )\n         assertEquals(\"Properties: WRITE\", result.properties)\n         assertNull(result.value)\n     }\n"
+  },
+  "git_status": {
+    "elapsed_seconds": 0.089,
+    "exit_code": 0,
+    "output": " M feature/details/src/main/java/io/blueeye/feature/details/DetailsGattServiceExplorer.kt\n M feature/details/src/test/java/io/blueeye/feature/details/DetailsGattCharacteristicFormatterTest.kt\n"
+  },
+  "id": "20261014-blueeye-gatt-saved-characteristics-and-ktlint-r2",
+  "idle_timeout": 300,
+  "memory_limit_mb": 3072,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.392,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2
+    },
+    {
+      "elapsed_seconds": 16.611,
+      "outcome": "passed",
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2
+    }
+  ],
+  "started_at": "2026-10-14T16:06:45.188660+00:00",
+  "status": "done",
+  "task_digest": "0497a93d22c1891a6ef092eb354fe7dbc26e674c144feebe4eb2d2a1455fbc99",
+  "task_timeout": 1800,
+  "verification": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 4475,
+      "command": "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :feature:details:ktlintTestSourceSetCheck :feature:details:testDebugUnitTest --tests io.blueeye.feature.details.DetailsGattCharacteristicFormatterTest --no-daemon --console=plain --max-workers=2",
+      "current_rss_mb": 52.48,
+      "elapsed_seconds": 16.611,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \nCalculating task graph as no cached configuration is available for tasks: :feature:details:ktlintTestSourceSetCheck :feature:details:testDebugUnitTest --tests io.blueeye.feature.details.DetailsGattCharacteristicFormatterTest\nWarning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.\n> Task :core:domain:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :feature:details:loadKtlintReporters UP-TO-DATE\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:domain:compileKotlin UP-TO-DATE\n> Task :core:domain:compileJava NO-SOURCE\n> Task :core:domain:processResources NO-SOURCE\n> Task :core:domain:classes UP-TO-DATE\n> Task :core:domain:jar UP-TO-DATE\n> Task :core:ui:checkKotlinGradlePluginConfigurationErrors\n> Task :core:ui:preBuild UP-TO-DATE\n> Task :core:ui:preDebugBuild UP-TO-DATE\n> Task :core:ui:generateDebugResValues UP-TO-DATE\n> Task :core:ui:generateDebugResources UP-TO-DATE\n> Task :core:ui:packageDebugResources UP-TO-DATE\n> Task :core:ui:parseDebugLocalResources UP-TO-DATE\n> Task :core:ui:generateDebugRFile UP-TO-DATE\n> Task :core:ui:compileDebugKotlin UP-TO-DATE\n> Task :core:ui:javaPreCompileDebug UP-TO-DATE\n> Task :core:ui:compileDebugJavaWithJavac NO-SOURCE\n> Task :core:ui:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:ui:processDebugJavaRes UP-TO-DATE\n> Task :feature:details:preBuild UP-TO-DATE\n> Task :feature:details:preDebugBuild UP-TO-DATE\n> Task :core:ui:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :feature:details:checkKotlinGradlePluginConfigurationErrors\n> Task :feature:details:generateDebugResValues UP-TO-DATE\n> Task :feature:details:generateDebugResources UP-TO-DATE\n> Task :feature:details:packageDebugResources UP-TO-DATE\n> Task :feature:details:parseDebugLocalResources UP-TO-DATE\n> Task :feature:details:generateDebugRFile UP-TO-DATE\n> Task :feature:details:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :feature:details:kaptDebugKotlin UP-TO-DATE\n> Task :feature:details:compileDebugKotlin UP-TO-DATE\n> Task :feature:details:javaPreCompileDebug UP-TO-DATE\n> Task :feature:details:compileDebugJavaWithJavac UP-TO-DATE\n> Task :feature:details:transformDebugClassesWithAsm UP-TO-DATE\n> Task :feature:details:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :feature:details:preDebugUnitTestBuild UP-TO-DATE\n> Task :feature:details:generateDebugUnitTestStubRFile UP-TO-DATE\n> Task :feature:details:processDebugJavaRes UP-TO-DATE\n> Task :feature:details:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :feature:details:runKtlintCheckOverTestSourceSet\n> Task :feature:details:ktlintTestSourceSetCheck\n> Task :feature:details:javaPreCompileDebugUnitTest UP-TO-DATE\n> Task :feature:details:kaptGenerateStubsDebugUnitTestKotlin\n> Task :feature:details:kaptDebugUnitTestKotlin UP-TO-DATE\n> Task :feature:details:compileDebugUnitTestKotlin\n> Task :feature:details:compileDebugUnitTestJavaWithJavac NO-SOURCE\n> Task :feature:details:hiltAggregateDepsDebugUnitTest UP-TO-DATE\n> Task :feature:details:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :feature:details:processDebugUnitTestJavaRes UP-TO-DATE\n> Task :feature:details:transformDebugUnitTestClassesWithAsm\n> Task :feature:details:testDebugUnitTest\n[Incubating] Problems report is available at: file:///Users/michal/agent-workspace/repos/tracker/work/build/reports/problems/problems-report.html\n\nDeprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.\n\nYou can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.\n\nFor more on this, please refer to https://docs.gradle.org/8.11.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.\n\nBUILD SUCCESSFUL in 15s\n44 actionable tasks: 10 executed, 34 up-to-date\nConfiguration cache entry stored.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 110.59,
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "work_branch": "main",
+  "workspace_checkpoint": {
+    "base_head": "4ed7c463b3a11c54dd1117180561a743b23be084",
+    "created_at": "2026-10-14T16:07:04.001441+00:00",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/20261014-blueeye-gatt-saved-characteristics-and-ktlint-r2/1791994023863394000-task-exit",
+    "reason": "task-exit",
+    "status": " M feature/details/src/main/java/io/blueeye/feature/details/DetailsGattServiceExplorer.kt\n M feature/details/src/test/java/io/blueeye/feature/details/DetailsGattCharacteristicFormatterTest.kt\n",
+    "task_id": "20261014-blueeye-gatt-saved-characteristics-and-ktlint-r2",
+    "total_bytes": 5082,
+    "tracked_patch": "tracked.patch",
+    "tracked_patch_bytes": 5082,
+    "untracked_bytes": 0,
+    "untracked_files": [],
+    "untracked_root": "untracked",
+    "version": 2,
+    "work_branch": "agent-work"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "20261014-blueeye-usb-install-debug-exact-sha-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [
+    "android:s22"
+  ],
+  "dedupe_key": "main:blueeye-usb-install-debug-exact-sha-20261014",
+  "dedupe_revision": 1,
+  "command_timeout": 340,
+  "idle_timeout": 240,
+  "task_timeout": 540,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 2141d6f41816f70997df42b54bcc85b2c72a92c8\npython3 - <<'PY'\nfrom pathlib import Path\nimport subprocess, sys, time, hashlib\napk=Path(\"build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8/app-debug.apk\")\nif not apk.is_file() or apk.stat().st_size < 1_000_000:\n    raise SystemExit(\"ERROR_CANONICAL_APK_MISSING\")\nprint(\"APK_BYTES\",apk.stat().st_size)\nprint(\"APK_SHA256\",hashlib.sha256(apk.read_bytes()).hexdigest())\ndef adb(*args, timeout=90):\n    return subprocess.run([\"adb\",*args],capture_output=True,text=True,timeout=timeout)\np=adb(\"devices\",\"-l\")\nif p.returncode: raise SystemExit(\"ADB_DEVICES_FAILED\")\nconnected=[]\nfor line in p.stdout.splitlines()[1:]:\n    parts=line.split()\n    if len(parts) < 2 or parts[1]!=\"device\": continue\n    serial=parts[0]\n    if \"usb:\" in line or (\":\" not in serial and not serial.startswith(\"emulator-\")):\n        connected.append(serial)\nprint(\"AUTHORIZED_USB_COUNT\",len(connected))\nif len(connected)!=1: raise SystemExit(\"NOT_EXACTLY_ONE_USB_DEVICE\")\nserial=connected[0]\ndef shell(*args):\n    r=adb(\"-s\",serial,\"shell\",*args)\n    if r.returncode: raise SystemExit(\"ADB_SHELL_ERROR\")\n    return r.stdout.strip()\nmodel=shell(\"getprop\",\"ro.product.model\")\nprint(\"MODEL\",model)\nif model!=\"SM-S906B\":raise SystemExit(\"WRONG_MODEL_DO_NOT_INSTALL\")\noriginal_present=shell(\"pm\",\"path\",\"io.blueeye\").startswith(\"package:\")\nprint(\"APP_INSTALLED_BEFORE\",original_present)\nprint(\"INSTALL_MODE\",\"UPDATE_PRESERVE_DATA\")\nresult=adb(\"-s\",serial,\"install\",\"-r\",str(apk.resolve()),timeout=240)\nmessage=(result.stdout+\" \"+result.stderr).strip()\nprint(\"ADB_INSTALL_STATUS\", \"SUCCESS\" if result.returncode==0 and \"Success\" in message else \"FAILED\")\nif result.returncode or \"Success\" not in message:\n    allowed=message.splitlines()[-3:]\n    print(\"ADB_INSTALL_ERROR\", \" | \".join(allowed)[:650])\n    print(\"APPLICATION_NOT_UNINSTALLED_DATA_PRESERVED\")\n    raise SystemExit(3)\ninstalled=shell(\"pm\",\"path\",\"io.blueeye\").startswith(\"package:\")\nprint(\"PACKAGE_PRESENT_AFTER\",installed)\nif not installed:raise SystemExit(\"APP_PACKAGE_MISSING_AFTER_INSTALL\")\nlaunch=adb(\"-s\",serial,\"shell\",\"am\",\"start\",\"-a\",\"android.intent.action.MAIN\",\"-c\",\"android.intent.category.LAUNCHER\",\"-p\",\"io.blueeye\",timeout=30)\nprint(\"LAUNCH_EXIT\",launch.returncode)\nprint(\"LAUNCH_RESULT\", \"OK\" if launch.returncode==0 and \"Error\" not in (launch.stdout+launch.stderr) else \"FAILED\")\ntime.sleep(3)\npid=shell(\"pidof\",\"io.blueeye\")\nprint(\"APP_PROCESS_RUNNING\",bool(pid.strip()))\nif launch.returncode!=0 or not pid.strip():raise SystemExit(\"INSTALL_OK_BUT_LAUNCH_NOT_CONFIRMED\")\nprint(\"USB_INSTALL_AND_LAUNCH_PASS\")\nPY"
+  ]
+}

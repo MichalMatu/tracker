@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-gatt-epoch-detekt-diagnostic-r1",
+  "task_digest": "3991cc67f3eacd5251f4cd7d5709327bd0ec5b6464802b31b40d046f7f78d871",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T16:18:58.743817+00:00",
+  "attempt_id": "fa6b9427d4b6b6d0266cd5be",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 33993,
+  "updated_at": "2026-10-14T16:18:58.985907+00:00",
+  "pid": 33993
+}

@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-gatt-session-epoch-guard-r1",
+  "task_digest": "d15122b61c98e7e844c8cb2edb0a54a1dd7b5d83d69bfa1ad6a4835efbe004be",
+  "status": "failed",
+  "failure_reason": "verification_failed",
+  "finished_at": "2026-10-14T16:18:25.389862+00:00",
+  "attempt_id": "25eb6be3925f48c65f2d9f06",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 32583,
+  "updated_at": "2026-10-14T16:18:26.147445+00:00",
+  "pid": 32583
+}

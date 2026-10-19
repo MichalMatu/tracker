@@ -1,0 +1,17 @@
+{
+  "id": "20261014-blueeye-gatt-epoch-detekt-diagnostic-r1",
+  "agent_binding": "be481b25-9d97-4205-b93f-95f5c5827441",
+  "mode": "commands",
+  "work_branch": "main",
+  "allow_write": false,
+  "resources": [],
+  "dedupe_key": "main:blueeye-gatt-epoch-detekt-diagnostic",
+  "dedupe_revision": 1,
+  "command_timeout": 90,
+  "idle_timeout": 90,
+  "task_timeout": 300,
+  "memory_limit_mb": 512,
+  "commands": [
+    "set -eu\ntest \"$(git rev-parse HEAD)\" = 1e67b9b0d2cb4bd322b05a8f4dc34cb0c042c033\npython3 - <<'PY'\nimport json\nfrom pathlib import Path\ndata=json.loads(Path(\"core/data/build/reports/detekt/detekt.sarif\").read_text())\nfor run in data.get(\"runs\", []):\n for x in run.get(\"results\", []):\n  l=x.get(\"locations\",[{}])[0].get(\"physicalLocation\",{})\n  print(x.get(\"ruleId\"),l.get(\"artifactLocation\",{}).get(\"uri\"),l.get(\"region\",{}).get(\"startLine\"),x.get(\"message\",{}).get(\"text\"))\nPY"
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "88a7ad11774747118afefdf9",
+  "command_timeout": 150,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 242,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 2141d6f41816f70997df42b54bcc85b2c72a92c8\ncommand -v adb >/dev/null\nadb start-server >/dev/null\npython3 - <<'PY'\nimport os, subprocess\ndef adb(*args):\n    return subprocess.run([\"adb\", *args], capture_output=True, text=True, timeout=25)\nresult = adb(\"devices\", \"-l\")\nif result.returncode:\n    raise SystemExit(\"ADB_DEVICE_LIST_ERROR: \"+result.stderr[:200])\nentries = []\nfor line in result.stdout.splitlines()[1:]:\n    parts = line.split()\n    if len(parts) < 2: continue\n    serial, state = parts[:2]\n    props = parts[2:]\n    if state == \"device\" and any(x.startswith(\"usb:\") for x in props):\n        entries.append(serial)\n    elif state == \"device\" and \":\" not in serial and not serial.startswith(\"emulator-\"):\n        entries.append(serial)\nprint(\"ADB_USB_AUTHORIZED_COUNT\", len(entries))\nif len(entries) != 1:\n    print(\"ADB_STATES_ONLY\", [line.split()[1] for line in result.stdout.splitlines()[1:] if len(line.split()) >= 2])\n    raise SystemExit(\"EXPECTED_EXACTLY_ONE_AUTHORIZED_USB_DEVICE\")\nserial = entries[0]\ndef safe_shell(*args):\n    p=adb(\"-s\",serial,\"shell\",*args)\n    if p.returncode: raise SystemExit(\"ADB_SHELL_FAILED\")\n    return p.stdout.strip()\nmodel=safe_shell(\"getprop\",\"ro.product.model\")\nrelease=safe_shell(\"getprop\",\"ro.build.version.release\")\nprint(\"ADB_MODEL\",model)\nprint(\"ADB_ANDROID_VERSION\",release)\nif model!=\"SM-S906B\": raise SystemExit(\"WRONG_USB_MODEL\")\npackage=safe_shell(\"pm\",\"path\",\"io.blueeye\")\nprint(\"BLUEEYE_PREVIOUSLY_INSTALLED\", package.startswith(\"package:\"))\nprint(\"EXACT_SOURCE_SHA\", \"2141d6f41816f70997df42b54bcc85b2c72a92c8\")\napk=\"app/build/outputs/apk/debug/app-debug.apk\"\nprint(\"LOCAL_DEBUG_APK_EXISTS\", os.path.isfile(apk))\nif os.path.isfile(apk): print(\"LOCAL_DEBUG_APK_SIZE_BYTES\",os.path.getsize(apk))\nprint(\"ADB_PREFLIGHT_OK\")\nPY",
+      "current_rss_mb": 3.45,
+      "elapsed_seconds": 1.191,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "ADB_USB_AUTHORIZED_COUNT 1\nADB_MODEL SM-S906B\nADB_ANDROID_VERSION 16\nBLUEEYE_PREVIOUSLY_INSTALLED True\nEXACT_SOURCE_SHA 2141d6f41816f70997df42b54bcc85b2c72a92c8\nLOCAL_DEBUG_APK_EXISTS True\nLOCAL_DEBUG_APK_SIZE_BYTES 56677206\nADB_PREFLIGHT_OK\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 3.45,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-14T18:34:31.159629+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.082,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.107,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261014-blueeye-usb-adb-preflight-r1",
+  "idle_timeout": 100,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 1.191,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-14T18:34:27.811852+00:00",
+  "status": "done",
+  "task_digest": "9f1dd1f59a2ec7d88df7352ac8dc9c13009606db93b27341ac9ef358068732b2",
+  "task_timeout": 300,
+  "verification": [],
+  "work_branch": "main"
+}

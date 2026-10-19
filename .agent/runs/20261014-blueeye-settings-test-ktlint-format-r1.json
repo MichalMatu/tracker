@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-settings-test-ktlint-format-r1",
+  "task_digest": "01b54d0d0f140e728e77bd257dbc06f47e707b8ee1edc5ec75781259631a8869",
+  "status": "failed",
+  "failure_reason": "verification_failed",
+  "finished_at": "2026-10-14T16:33:54.499259+00:00",
+  "attempt_id": "8c91b0fdd2f1749b27921022",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 53286,
+  "updated_at": "2026-10-14T16:33:55.275950+00:00",
+  "pid": 53286
+}

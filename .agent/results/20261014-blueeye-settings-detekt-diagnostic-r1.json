@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "124155d361e8400364d677dc",
+  "command_timeout": 90,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 209,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 83ff68b3debeb75e4e88bf42471380df9e2f3eeb\npython3 - <<'PY'\nimport json\nfrom pathlib import Path\np=Path('feature/settings/build/reports/detekt/detekt.sarif')\nfor run in json.loads(p.read_text()).get('runs',[]):\n for e in run.get('results',[]):\n  q=e.get('locations',[{}])[0].get('physicalLocation',{})\n  print(e.get('ruleId'),q.get('artifactLocation',{}).get('uri'),q.get('region',{}).get('startLine'),e.get('message',{}).get('text'))\nPY",
+      "current_rss_mb": 2.92,
+      "elapsed_seconds": 0.412,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "detekt.formatting.MaximumLineLength file:///Users/michal/agent-workspace/repos/tracker/work/feature/settings/src/main/java/io/blueeye/feature/settings/FieldMvpExportAppend.kt 12 Exceeded max line length (120)\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 2.92,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-14T16:22:18.699554+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.075,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.084,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261014-blueeye-settings-detekt-diagnostic-r1",
+  "idle_timeout": 90,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.412,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-14T16:22:16.705325+00:00",
+  "status": "done",
+  "task_digest": "e4fb97370d64d9c5ed23161895930c5ae88318894c2501261c57fffc61485791",
+  "task_timeout": 300,
+  "verification": [],
+  "work_branch": "main"
+}

@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-usb-explicit-launch-verify-r1",
+  "task_digest": "c2b17c4d5255496edf1c849cc3d449bd9dce840db7408c3676cb9c2253182927",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T18:49:21.270817+00:00",
+  "attempt_id": "6585c59eada4f2af9b1c57df",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 16517,
+  "updated_at": "2026-10-14T18:49:21.588933+00:00",
+  "pid": 16517
+}

@@ -1,0 +1,60 @@
+{
+  "allow_write": false,
+  "attempt_id": "e9ba027cb216b56f43b2e287",
+  "command_timeout": 200,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 148,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 2141d6f41816f70997df42b54bcc85b2c72a92c8\nif ! command -v gh >/dev/null; then\n  echo \"GH_CLI_UNAVAILABLE\"\n  exit 0\nfi\nif ! gh auth status >/dev/null 2>&1; then\n  echo \"GH_CLI_AUTH_UNAVAILABLE\"\n  exit 0\nfi\necho \"GH_CLI_AUTH_OK\"\nmkdir -p \"build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8\"\nif ! gh run download 38614632455 --repo MichalMatu/tracker --name tracker-debug-2141d6f41816f70997df42b54bcc85b2c72a92c8 --dir \"build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8\" >/dev/null 2>&1; then\n  echo \"CANONICAL_APK_DOWNLOAD_FAILED\"\n  exit 0\nfi\npython3 - <<'PY'\nfrom pathlib import Path\nroot=Path(\"build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8\")\napks=list(root.rglob(\"*.apk\"))\nprint(\"CANONICAL_APK_COUNT\",len(apks))\nfor apk in apks: print(\"CANONICAL_APK_RELATIVE\", apk.relative_to(Path.cwd()) if apk.is_absolute() else str(apk),\"BYTES\",apk.stat().st_size)\nPY",
+      "current_rss_mb": 32.12,
+      "elapsed_seconds": 10.763,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 512,
+      "memory_limited": false,
+      "output": "GH_CLI_AUTH_OK\nCANONICAL_APK_COUNT 1\nCANONICAL_APK_RELATIVE build/adb-install/2141d6f41816f70997df42b54bcc85b2c72a92c8/app-debug.apk BYTES 56169937\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 40.36,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {},
+  "finished_at": "2026-10-14T18:36:37.434619+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.289,
+    "exit_code": 0,
+    "output": ""
+  },
+  "git_status": {
+    "elapsed_seconds": 0.608,
+    "exit_code": 0,
+    "output": ""
+  },
+  "id": "20261014-blueeye-canonical-apk-stage-r1",
+  "idle_timeout": 120,
+  "memory_limit_mb": 512,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 10.763,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 1
+    }
+  ],
+  "started_at": "2026-10-14T18:36:24.135591+00:00",
+  "status": "done",
+  "task_digest": "cc34a35f5e2ceae157668c33ab5c9b756c3c7748480787bcce128b6c53b29fa3",
+  "task_timeout": 360,
+  "verification": [],
+  "work_branch": "main"
+}

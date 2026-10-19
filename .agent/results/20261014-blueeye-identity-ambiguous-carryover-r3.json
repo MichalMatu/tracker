@@ -1,0 +1,115 @@
+{
+  "allow_write": true,
+  "attempt_id": "5ca1ec4aa2756dbefd0bcc06",
+  "command_timeout": 900,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 0,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 07f65d7e623c5e7740a742665a294fb8f5ac9a8b\ngit diff --check",
+      "elapsed_seconds": 0.471,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": null,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {
+    "writes": [
+      {
+        "bytes": 25760,
+        "path": "core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt"
+      },
+      {
+        "bytes": 21424,
+        "path": "core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt"
+      }
+    ]
+  },
+  "finished_at": "2026-10-14T18:15:00.572021+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.042,
+    "exit_code": 0,
+    "output": "diff --git a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt b/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt\nindex 56926f5..4f5b319 100644\n--- a/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt\n+++ b/core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt\n@@ -77,8 +77,7 @@ constructor() {\n     ): CarryoverMatch? {\n         val input = buildMatchInput(data, deviceName, advertisingInterval)\n \n-        var bestMatch: CarryoverMatch? = null\n-        var highestScore = 0f\n+        var uniqueMatch: CarryoverMatch? = null\n \n         for (target in targets) {\n             val hasNameFamilyConflict =\n@@ -95,15 +94,15 @@ constructor() {\n                     isSequentialCarryoverWindow\n             if (!isEligibleTarget) continue\n \n-            immediateMatchForTarget(input, target)?.let { return it }\n-            val weightedMatch = weightedMatchForTarget(input, target)\n-            if (weightedMatch != null && weightedMatch.evidence.confidence > highestScore) {\n-                highestScore = weightedMatch.evidence.confidence\n-                bestMatch = weightedMatch\n+            val match = immediateMatchForTarget(input, target) ?: weightedMatchForTarget(input, target)\n+            if (match != null) {\n+                // An equally plausible second target makes destructive identity carryover unsafe.\n+                if (uniqueMatch != null) return null\n+                uniqueMatch = match\n             }\n         }\n \n-        return bestMatch\n+        return uniqueMatch\n     }\n \n     /**\n@@ -117,6 +116,7 @@ constructor() {\n         targets: Collection<TrackedTarget>,\n     ): IdentityCandidateMatch? {\n         val input = buildMatchInput(data, deviceName, advertisingInterval)\n+        var uniqueCandidate: IdentityCandidateMatch? = null\n         for (target in targets) {\n             val timeSinceLastSeen = input.data.timestamp - target.lastSeenAt\n             val isWithinCandidateWindow =\n@@ -126,17 +126,22 @@ constructor() {\n                 AppleIdentityConflictGuard.hasNameFamilyConflict(input.deviceName, target.lastDeviceName)\n             val hasFindHubWidthConflict =\n                 hasFindHubIdentityWidthConflict(input.rawData, target.lastPayload)\n-            if (isWithinCandidateWindow && !hasNameFamilyConflict && !hasFindHubWidthConflict) {\n-                val evidence = longGapSameNameEvidence(input, target)\n-                if (evidence != null) {\n-                    return IdentityCandidateMatch(\n+            val evidence =\n+                if (isWithinCandidateWindow && !hasNameFamilyConflict && !hasFindHubWidthConflict) {\n+                    longGapSameNameEvidence(input, target)\n+                } else {\n+                    null\n+                }\n+            if (evidence != null) {\n+                if (uniqueCandidate != null) return null\n+                uniqueCandidate =\n+                    IdentityCandidateMatch(\n                         candidateFingerprint = target.primaryMac,\n                         evidence = evidence,\n                     )\n-                }\n             }\n         }\n-        return null\n+        return uniqueCandidate\n     }\n \n     private fun buildMatchInput(\ndiff --git a/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt b/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\nindex 0762bc4..de1d20b 100644\n--- a/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n+++ b/core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n@@ -96,6 +96,56 @@ class AddressCarryoverTrackerTest {\n         )\n     }\n \n+    @Test\n+    fun `two plausible targets cannot absorb a third rotating address`() {\n+        val now = System.currentTimeMillis()\n+        val uuids = listOf(\"0000fe2c-0000-1000-8000-00805f9b34fb\")\n+        val first =\n+            createScanData(\"39:11:11:11:11:11\", \"JBL Tune 520BT-LE\", null, null)\n+                .copy(timestamp = now, serviceUuids = uuids)\n+        val second =\n+            createScanData(\"39:22:22:22:22:22\", \"JBL Tune 520BT-LE\", null, null)\n+                .copy(timestamp = now + 500L, serviceUuids = uuids)\n+        val third =\n+            createScanData(\"39:33:33:33:33:33\", \"JBL Tune 520BT-LE\", null, null)\n+                .copy(timestamp = now + 3_000L, serviceUuids = uuids)\n+\n+        val firstResult = tracker.processScan(first, first.name)\n+        val secondResult = tracker.processScan(second, second.name)\n+        val thirdResult = tracker.processScan(third, third.name)\n+\n+        assertTrue(firstResult.isNewTarget)\n+        assertTrue(secondResult.isNewTarget)\n+        assertTrue(thirdResult.isNewTarget)\n+        assertFalse(thirdResult.isCarryover)\n+        assertNull(thirdResult.correlatedMac)\n+        assertNotEquals(firstResult.targetId, thirdResult.targetId)\n+        assertNotEquals(secondResult.targetId, thirdResult.targetId)\n+    }\n+\n+    @Test\n+    fun `long gap with two corroborated targets is not an arbitrary identity candidate`() {\n+        val now = System.currentTimeMillis()\n+        val uuids = listOf(\"0000fe2c-0000-1000-8000-00805f9b34fb\")\n+        val first =\n+            createScanData(\"49:11:11:11:11:11\", \"JBL Tune 520BT-LE\", null, null)\n+                .copy(timestamp = now, serviceUuids = uuids)\n+        val second =\n+            createScanData(\"49:22:22:22:22:22\", \"JBL Tune 520BT-LE\", null, null)\n+                .copy(timestamp = now + 500L, serviceUuids = uuids)\n+        val third =\n+            createScanData(\"49:33:33:33:33:33\", \"JBL Tune 520BT-LE\", null, null)\n+                .copy(timestamp = now + 108_000L, serviceUuids = uuids)\n+\n+        tracker.processScan(first, first.name)\n+        tracker.processScan(second, second.name)\n+        val result = tracker.processScan(third, third.name)\n+\n+        assertTrue(result.isNewTarget)\n+        assertFalse(result.isCarryover)\n+        assertNull(result.identityCandidate)\n+    }\n+\n     @Test\n     fun `same corroborated device seen under two addresses concurrently stays separate`() {\n         val now = System.currentTimeMillis()\n"
+  },
+  "git_status": {
+    "elapsed_seconds": 0.071,
+    "exit_code": 0,
+    "output": " M core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt\n M core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n"
+  },
+  "id": "20261014-blueeye-identity-ambiguous-carryover-r3",
+  "idle_timeout": 300,
+  "memory_limit_mb": 3072,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.471,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2
+    },
+    {
+      "elapsed_seconds": 147.429,
+      "outcome": "passed",
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2
+    }
+  ],
+  "started_at": "2026-10-14T18:12:29.934319+00:00",
+  "status": "done",
+  "task_digest": "1cabe838ad67a15abace55166e456d66476bc1c348738dc0a22059ce7f4aaf94",
+  "task_timeout": 1800,
+  "verification": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 4226,
+      "command": "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :core:data:detekt :core:data:ktlintTestSourceSetCheck :core:data:testDebugUnitTest --tests io.blueeye.core.data.tracker.AddressCarryoverTrackerTest --tests io.blueeye.core.data.tracker.AppleShadowCarryoverGuardTest --no-daemon --console=plain --max-workers=2",
+      "current_rss_mb": 20.98,
+      "elapsed_seconds": 147.429,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \nReusing configuration cache.\n> Task :core:data:loadKtlintReporters UP-TO-DATE\n> Task :core:data:runKtlintCheckOverTestSourceSet NO-SOURCE\n> Task :core:data:ktlintTestSourceSetCheck SKIPPED\n> Task :core:domain:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:domain:compileKotlin UP-TO-DATE\n> Task :core:domain:compileJava NO-SOURCE\n> Task :core:domain:processResources NO-SOURCE\n> Task :core:domain:classes UP-TO-DATE\n> Task :core:domain:jar UP-TO-DATE\n> Task :core:data:preBuild UP-TO-DATE\n> Task :core:data:preDebugBuild UP-TO-DATE\n> Task :core:data:checkKotlinGradlePluginConfigurationErrors\n> Task :core:data:generateDebugResValues UP-TO-DATE\n> Task :core:data:generateDebugResources UP-TO-DATE\n> Task :core:data:packageDebugResources UP-TO-DATE\n> Task :core:data:parseDebugLocalResources UP-TO-DATE\n> Task :core:data:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:preBuild UP-TO-DATE\n> Task :core:decoders:preDebugBuild UP-TO-DATE\n> Task :core:decoders:generateDebugResValues UP-TO-DATE\n> Task :core:decoders:generateDebugResources UP-TO-DATE\n> Task :core:decoders:packageDebugResources UP-TO-DATE\n> Task :core:decoders:parseDebugLocalResources UP-TO-DATE\n> Task :core:decoders:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:checkKotlinGradlePluginConfigurationErrors\n> Task :core:decoders:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :core:decoders:kaptDebugKotlin UP-TO-DATE\n> Task :core:decoders:compileDebugKotlin UP-TO-DATE\n> Task :core:decoders:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:transformDebugClassesWithAsm UP-TO-DATE\n> Task :core:decoders:bundleLibCompileToJarDebug UP-TO-DATE\n> Task :core:data:detekt\n> Task :core:data:kaptGenerateStubsDebugKotlin\n\n> Task :core:data:detekt\n\n\n285 kotlin files were analyzed.\n\n> Task :core:data:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:data:preDebugUnitTestBuild UP-TO-DATE\n> Task :core:data:generateDebugUnitTestStubRFile UP-TO-DATE\n> Task :core:data:javaPreCompileDebugUnitTest UP-TO-DATE\n> Task :core:decoders:processDebugJavaRes UP-TO-DATE\n> Task :core:data:kaptDebugKotlin UP-TO-DATE\n> Task :core:data:compileDebugKotlin\n> Task :core:data:compileDebugJavaWithJavac\n> Task :core:data:processDebugJavaRes UP-TO-DATE\n> Task :core:data:transformDebugClassesWithAsm\n> Task :core:data:bundleLibRuntimeToJarDebug\n> Task :core:data:bundleLibCompileToJarDebug\n> Task :core:data:kaptGenerateStubsDebugUnitTestKotlin\n\n> Task :core:data:kaptDebugUnitTestKotlin\nwarning: The following options were not recognized by any processor: '[dagger.fastInit, dagger.hilt.android.internal.disableAndroidSuperclassValidation, dagger.hilt.android.internal.projectType, dagger.hilt.internal.useAggregatingRootProcessor, kapt.kotlin.generated]'\n\n> Task :core:data:compileDebugUnitTestKotlin\nw: file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/test/kotlin/io/blueeye/core/data/verify/CorrelationAnalysisTest.kt:115:9 Parameter 'strategy' is never used\nw: file:///Users/michal/agent-workspace/repos/tracker/work/core/data/src/test/kotlin/io/blueeye/core/data/verify/CorrelationAnalysisTest.kt:117:9 Parameter 'payloadHash' is never used\n\n> Task :core:data:compileDebugUnitTestJavaWithJavac UP-TO-DATE\n> Task :core:data:hiltAggregateDepsDebugUnitTest UP-TO-DATE\n> Task :core:data:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :core:data:processDebugUnitTestJavaRes UP-TO-DATE\n> Task :core:data:transformDebugUnitTestClassesWithAsm\n> Task :core:data:testDebugUnitTest\n\nBUILD SUCCESSFUL in 2m 25s\n48 actionable tasks: 16 executed, 32 up-to-date\nConfiguration cache entry reused.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 129.94,
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "work_branch": "main",
+  "workspace_checkpoint": {
+    "base_head": "07f65d7e623c5e7740a742665a294fb8f5ac9a8b",
+    "created_at": "2026-10-14T18:15:01.375038+00:00",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/20261014-blueeye-identity-ambiguous-carryover-r3/1792001701255986000-task-exit",
+    "reason": "task-exit",
+    "status": " M core/data/src/main/java/io/blueeye/core/data/tracker/strategy/DeviceCorrelationStrategy.kt\n M core/data/src/test/kotlin/io/blueeye/core/data/tracker/AddressCarryoverTrackerTest.kt\n",
+    "task_id": "20261014-blueeye-identity-ambiguous-carryover-r3",
+    "total_bytes": 6410,
+    "tracked_patch": "tracked.patch",
+    "tracked_patch_bytes": 6410,
+    "untracked_bytes": 0,
+    "untracked_files": [],
+    "untracked_root": "untracked",
+    "version": 2,
+    "work_branch": "agent-work"
+  }
+}

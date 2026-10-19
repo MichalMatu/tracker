@@ -1,0 +1,119 @@
+{
+  "allow_write": true,
+  "attempt_id": "65d4afbc990e6c07070bf4c1",
+  "command_timeout": 900,
+  "commands": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 0,
+      "command": "set -eu\ntest \"$(git rev-parse HEAD)\" = 0033f6413c6ec0a014265320ab75d959c720171a\ngit diff --check",
+      "elapsed_seconds": 0.428,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": null,
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "daemon_version": "4.20.6",
+  "edits": {
+    "writes": [
+      {
+        "bytes": 3436,
+        "path": "core/data/src/main/java/io/blueeye/core/connectivity/client/BleOperationManager.kt"
+      },
+      {
+        "bytes": 11803,
+        "path": "core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt"
+      },
+      {
+        "bytes": 2362,
+        "path": "core/data/src/test/kotlin/io/blueeye/core/connectivity/client/BleOperationManagerTest.kt"
+      }
+    ]
+  },
+  "finished_at": "2026-10-14T16:12:13.459414+00:00",
+  "git_diff": {
+    "elapsed_seconds": 0.017,
+    "exit_code": 0,
+    "output": "diff --git a/core/data/src/main/java/io/blueeye/core/connectivity/client/BleOperationManager.kt b/core/data/src/main/java/io/blueeye/core/connectivity/client/BleOperationManager.kt\nindex 9677be8..4b9b039 100644\n--- a/core/data/src/main/java/io/blueeye/core/connectivity/client/BleOperationManager.kt\n+++ b/core/data/src/main/java/io/blueeye/core/connectivity/client/BleOperationManager.kt\n@@ -53,22 +53,25 @@ constructor(private val bleGattClient: BleGattClient) {\n         characteristic: BluetoothGattCharacteristic,\n         value: ByteArray,\n         status: Int,\n-    ) {\n+    ): Boolean {\n         // A late callback for the previous characteristic must not finish a new read.\n         val request =\n             synchronized(stateLock) {\n                 pendingRead?.takeIf { it.characteristic === characteristic }?.also {\n                     pendingRead = null\n                 }\n-            } ?: return\n-\n-        if (!request.continuation.isActive) return\n-        if (status == android.bluetooth.BluetoothGatt.GATT_SUCCESS) {\n-            request.continuation.resume(value)\n+            }\n+        return if (request == null || !request.continuation.isActive) {\n+            false\n         } else {\n-            request.continuation.resumeWithException(\n-                IllegalStateException(\"GATT Read failed with status $status\"),\n-            )\n+            if (status == android.bluetooth.BluetoothGatt.GATT_SUCCESS) {\n+                request.continuation.resume(value)\n+            } else {\n+                request.continuation.resumeWithException(\n+                    IllegalStateException(\"GATT Read failed with status $status\"),\n+                )\n+            }\n+            true\n         }\n     }\n \ndiff --git a/core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt b/core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt\nindex 939bc96..43b3496 100644\n--- a/core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt\n+++ b/core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt\n@@ -119,7 +119,14 @@ constructor(\n             is BleGattEvent.CharacteristicRead -> {\n                 // Przekazujemy wynik do OperationManager (żeby odblokował coroutine czekającą na\n                 // wynik)\n-                bleOperationManager.onReadResult(event.characteristic, event.value, event.status)\n+                val accepted = bleOperationManager.onReadResult(\n+                    event.characteristic,\n+                    event.value,\n+                    event.status,\n+                )\n+\n+                // Ignore unsolicited/late callbacks from a previous session entirely.\n+                if (!accepted) return\n \n                 // Oraz aktualizujemy UI\n                 if (event.status == android.bluetooth.BluetoothGatt.GATT_SUCCESS) {\ndiff --git a/core/data/src/test/kotlin/io/blueeye/core/connectivity/client/BleOperationManagerTest.kt b/core/data/src/test/kotlin/io/blueeye/core/connectivity/client/BleOperationManagerTest.kt\nindex d34047b..e284eb4 100644\n--- a/core/data/src/test/kotlin/io/blueeye/core/connectivity/client/BleOperationManagerTest.kt\n+++ b/core/data/src/test/kotlin/io/blueeye/core/connectivity/client/BleOperationManagerTest.kt\n@@ -24,10 +24,10 @@ class BleOperationManagerTest {\n         val pending = async(start = CoroutineStart.UNDISPATCHED) {\n             manager.read(expectedCharacteristic)\n         }\n-        manager.onReadResult(oldCharacteristic, byteArrayOf(9), 0)\n+        assertFalse(manager.onReadResult(oldCharacteristic, byteArrayOf(9), 0))\n         assertFalse(pending.isCompleted)\n \n-        manager.onReadResult(expectedCharacteristic, byteArrayOf(7), 0)\n+        assertTrue(manager.onReadResult(expectedCharacteristic, byteArrayOf(7), 0))\n         assertArrayEquals(byteArrayOf(7), pending.await())\n     }\n \n@@ -48,9 +48,10 @@ class BleOperationManagerTest {\n         val second = async(start = CoroutineStart.UNDISPATCHED) {\n             manager.read(secondCharacteristic)\n         }\n-        manager.onReadResult(firstCharacteristic, byteArrayOf(9), 0)\n+        assertFalse(manager.onReadResult(firstCharacteristic, byteArrayOf(9), 0))\n         assertFalse(second.isCompleted)\n-        manager.onReadResult(secondCharacteristic, byteArrayOf(4), 0)\n+        assertTrue(manager.onReadResult(secondCharacteristic, byteArrayOf(4), 0))\n         assertArrayEquals(byteArrayOf(4), second.await())\n+        assertFalse(manager.onReadResult(secondCharacteristic, byteArrayOf(4), 0))\n     }\n }\n"
+  },
+  "git_status": {
+    "elapsed_seconds": 0.093,
+    "exit_code": 0,
+    "output": " M core/data/src/main/java/io/blueeye/core/connectivity/client/BleOperationManager.kt\n M core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt\n M core/data/src/test/kotlin/io/blueeye/core/connectivity/client/BleOperationManagerTest.kt\n"
+  },
+  "id": "20261014-blueeye-gatt-stale-read-persistence-r2",
+  "idle_timeout": 300,
+  "memory_limit_mb": 3072,
+  "mode": "commands",
+  "stages": [
+    {
+      "elapsed_seconds": 0.428,
+      "outcome": "passed",
+      "stage_index": 1,
+      "stage_name": "command-1",
+      "stage_phase": "commands",
+      "stage_total": 2
+    },
+    {
+      "elapsed_seconds": 28.81,
+      "outcome": "passed",
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2
+    }
+  ],
+  "started_at": "2026-10-14T16:11:42.596015+00:00",
+  "status": "done",
+  "task_digest": "77031e3d5d2330a2c618a3a190a33f5eb4dd759d5a891874d5b6a88ff485bd2f",
+  "task_timeout": 1800,
+  "verification": [
+    {
+      "background_process_leak": false,
+      "captured_output_chars": 4057,
+      "command": "set -eu\nexport JAVA_HOME=\"$(/usr/libexec/java_home -v 21)\"\n./gradlew :core:data:detekt :core:data:testDebugUnitTest --tests io.blueeye.core.connectivity.client.BleOperationManagerTest --no-daemon --console=plain --max-workers=2",
+      "current_rss_mb": 37.97,
+      "elapsed_seconds": 28.81,
+      "exit_code": 0,
+      "idle_timed_out": false,
+      "memory_limit_mb": 3072,
+      "memory_limited": false,
+      "output": "To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.\nDaemon will be stopped at the end of the build \nReusing configuration cache.\n> Task :core:domain:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:checkKotlinGradlePluginConfigurationErrors\n> Task :core:model:compileKotlin UP-TO-DATE\n> Task :core:model:compileJava NO-SOURCE\n> Task :core:model:processResources NO-SOURCE\n> Task :core:model:classes UP-TO-DATE\n> Task :core:model:jar UP-TO-DATE\n> Task :core:domain:compileKotlin UP-TO-DATE\n> Task :core:domain:compileJava NO-SOURCE\n> Task :core:domain:processResources NO-SOURCE\n> Task :core:domain:classes UP-TO-DATE\n> Task :core:domain:jar UP-TO-DATE\n> Task :core:data:preBuild UP-TO-DATE\n> Task :core:data:preDebugBuild UP-TO-DATE\n> Task :core:data:checkKotlinGradlePluginConfigurationErrors\n> Task :core:data:generateDebugResValues UP-TO-DATE\n> Task :core:data:generateDebugResources UP-TO-DATE\n> Task :core:data:packageDebugResources UP-TO-DATE\n> Task :core:data:parseDebugLocalResources UP-TO-DATE\n> Task :core:data:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:preBuild UP-TO-DATE\n> Task :core:decoders:preDebugBuild UP-TO-DATE\n> Task :core:decoders:generateDebugResValues UP-TO-DATE\n> Task :core:decoders:generateDebugResources UP-TO-DATE\n> Task :core:decoders:packageDebugResources UP-TO-DATE\n> Task :core:decoders:parseDebugLocalResources UP-TO-DATE\n> Task :core:decoders:generateDebugRFile UP-TO-DATE\n> Task :core:decoders:checkKotlinGradlePluginConfigurationErrors\n> Task :core:decoders:kaptGenerateStubsDebugKotlin UP-TO-DATE\n> Task :core:decoders:kaptDebugKotlin UP-TO-DATE\n> Task :core:decoders:compileDebugKotlin UP-TO-DATE\n> Task :core:decoders:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:compileDebugJavaWithJavac UP-TO-DATE\n> Task :core:decoders:transformDebugClassesWithAsm UP-TO-DATE\n> Task :core:decoders:bundleLibCompileToJarDebug UP-TO-DATE\n\n> Task :core:data:detekt\n\n\n283 kotlin files were analyzed.\n\n> Task :core:data:javaPreCompileDebug UP-TO-DATE\n> Task :core:decoders:bundleLibRuntimeToJarDebug UP-TO-DATE\n> Task :core:data:preDebugUnitTestBuild UP-TO-DATE\n> Task :core:data:generateDebugUnitTestStubRFile UP-TO-DATE\n> Task :core:data:javaPreCompileDebugUnitTest UP-TO-DATE\n> Task :core:decoders:processDebugJavaRes UP-TO-DATE\n> Task :core:data:kaptGenerateStubsDebugKotlin\n\n> Task :core:data:kaptDebugKotlin\nwarning: The following options were not recognized by any processor: '[dagger.hilt.android.internal.disableAndroidSuperclassValidation, dagger.hilt.android.internal.projectType, dagger.hilt.internal.useAggregatingRootProcessor, kapt.kotlin.generated]'\n\n> Task :core:data:compileDebugKotlin\n\n> Task :core:data:compileDebugJavaWithJavac\nNote: /Users/michal/agent-workspace/repos/tracker/work/core/data/build/generated/source/kapt/debug/io/blueeye/core/connectivity/manager/AutoActiveProbeCoordinator_Factory.java uses or overrides a deprecated API.\nNote: Recompile with -Xlint:deprecation for details.\n\n> Task :core:data:processDebugJavaRes UP-TO-DATE\n> Task :core:data:transformDebugClassesWithAsm\n> Task :core:data:bundleLibRuntimeToJarDebug\n> Task :core:data:bundleLibCompileToJarDebug\n> Task :core:data:kaptGenerateStubsDebugUnitTestKotlin\n> Task :core:data:kaptDebugUnitTestKotlin\n> Task :core:data:compileDebugUnitTestKotlin\n> Task :core:data:compileDebugUnitTestJavaWithJavac UP-TO-DATE\n> Task :core:data:hiltAggregateDepsDebugUnitTest UP-TO-DATE\n> Task :core:data:hiltJavaCompileDebugUnitTest NO-SOURCE\n> Task :core:data:processDebugUnitTestJavaRes UP-TO-DATE\n> Task :core:data:transformDebugUnitTestClassesWithAsm\n> Task :core:data:testDebugUnitTest\n[Incubating] Problems report is available at: file:///Users/michal/agent-workspace/repos/tracker/work/build/reports/problems/problems-report.html\n\nBUILD SUCCESSFUL in 27s\n47 actionable tasks: 17 executed, 30 up-to-date\nConfiguration cache entry reused.\n",
+      "output_policy": "stream",
+      "output_truncated": false,
+      "peak_rss_mb": 110.94,
+      "stage_index": 2,
+      "stage_name": "verification-1",
+      "stage_phase": "verification",
+      "stage_total": 2,
+      "timed_out": false
+    }
+  ],
+  "work_branch": "main",
+  "workspace_checkpoint": {
+    "base_head": "0033f6413c6ec0a014265320ab75d959c720171a",
+    "created_at": "2026-10-14T16:12:13.845732+00:00",
+    "path": "/Users/michal/agent-workspace/repos/tracker/checkpoints/20261014-blueeye-gatt-stale-read-persistence-r2/1791994333696398000-task-exit",
+    "reason": "task-exit",
+    "status": " M core/data/src/main/java/io/blueeye/core/connectivity/client/BleOperationManager.kt\n M core/data/src/main/java/io/blueeye/core/connectivity/manager/BleConnectionManager.kt\n M core/data/src/test/kotlin/io/blueeye/core/connectivity/client/BleOperationManagerTest.kt\n",
+    "task_id": "20261014-blueeye-gatt-stale-read-persistence-r2",
+    "total_bytes": 4785,
+    "tracked_patch": "tracked.patch",
+    "tracked_patch_bytes": 4785,
+    "untracked_bytes": 0,
+    "untracked_files": [],
+    "untracked_root": "untracked",
+    "version": 2,
+    "work_branch": "agent-work"
+  }
+}

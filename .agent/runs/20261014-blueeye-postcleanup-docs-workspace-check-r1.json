@@ -1,0 +1,13 @@
+{
+  "event": "task_finished",
+  "task_id": "20261014-blueeye-postcleanup-docs-workspace-check-r1",
+  "task_digest": "844b9a7bf06fbacbcc646ce94cba6fc2fe9e90490f08c651403cbaccdab99207",
+  "status": "done",
+  "failure_reason": null,
+  "finished_at": "2026-10-14T19:10:43.966094+00:00",
+  "attempt_id": "35f60a420ee5eccfa56de460",
+  "daemon_version": "4.20.6",
+  "daemon_pid": 44925,
+  "updated_at": "2026-10-14T19:10:44.411561+00:00",
+  "pid": 44925
+}
