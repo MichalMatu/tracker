@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -65,7 +66,7 @@ jobs:
           name: tracker-debug-${{ github.sha }}
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 1
 
       - name: Upload exact source snapshot
         if: always()
@@ -74,4 +75,4 @@ jobs:
           name: tracker-source-${{ github.sha }}
           path: tracker-source-${{ github.sha }}.tar.gz
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 1
